@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CheckInsModule } from './check-ins/check-ins.module';
 import { ClassSessionsModule } from './class-sessions/class-sessions.module';
 import { ClassTypesModule } from './class-types/class-types.module';
 import { LeadsModule } from './leads/leads.module';
@@ -26,6 +27,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     ClassTypesModule,
     ClassSessionsModule,
     ReservationsModule,
+    CheckInsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
