@@ -257,6 +257,32 @@ Reglas:
 - Cambia el lead a `CONVERTED`.
 - Mueve el lead a la etapa `CONVERTED`.
 
+### POST `/leads/:id/revert-conversion`
+
+Revierte una conversion hecha por error.
+
+Requiere JWT.
+
+Reglas:
+
+- El lead debe pertenecer al tenant.
+- El lead debe estar convertido o tener un socio vinculado.
+- Cancela y desvincula el socio generado desde el lead.
+- Cambia el lead de nuevo a `OPEN`.
+- Mueve el lead a una etapa comercial abierta.
+
+### DELETE `/leads/:id`
+
+Elimina un lead del tenant.
+
+Requiere JWT.
+
+Reglas:
+
+- El lead debe pertenecer al tenant.
+- Si el lead tiene un socio vinculado, primero debe revertirse la conversion.
+- Elimina tareas, alertas y comunicaciones asociadas al lead.
+
 ## 9. Members
 
 ### GET `/members`

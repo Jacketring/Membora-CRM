@@ -210,3 +210,28 @@ export async function apiPatch<T>(path: string, body: unknown) {
 
   return (await response.json()) as T;
 }
+
+export async function apiDelete<T>(path: string) {
+  const token = getStoredToken();
+
+  if (!token) {
+    throw new Error('SesiÃ³n no iniciada');
+  }
+
+  const response = await fetch(`${API_URL}${path}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error ${response.status}`);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return (await response.json()) as T;
+}

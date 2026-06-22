@@ -119,17 +119,21 @@ export function LeadsTable({
   leads,
   onConvert,
   onCreateTask,
+  onDelete,
   onMarkLost,
   onMove,
   onOpen,
+  onRevertConversion,
   stages,
 }: {
   leads: Lead[];
   onConvert: (lead: Lead) => void;
   onCreateTask: (lead: Lead) => void;
+  onDelete: (lead: Lead) => void;
   onMarkLost: (lead: Lead) => void;
   onMove: (lead: Lead, stageId: string) => void;
   onOpen: (lead: Lead) => void;
+  onRevertConversion: (lead: Lead) => void;
   stages: PipelineStage[];
 }) {
   return (
@@ -166,9 +170,11 @@ export function LeadsTable({
                   lead={lead}
                   onConvert={() => onConvert(lead)}
                   onCreateTask={() => onCreateTask(lead)}
+                  onDelete={() => onDelete(lead)}
                   onMarkLost={() => onMarkLost(lead)}
                   onMove={(stageId) => onMove(lead, stageId)}
                   onOpen={() => onOpen(lead)}
+                  onRevertConversion={() => onRevertConversion(lead)}
                   stages={stages}
                 />
               ))
@@ -190,17 +196,21 @@ function LeadTableRow({
   lead,
   onConvert,
   onCreateTask,
+  onDelete,
   onMarkLost,
   onMove,
   onOpen,
+  onRevertConversion,
   stages,
 }: {
   lead: Lead;
   onConvert: () => void;
   onCreateTask: () => void;
+  onDelete: () => void;
   onMarkLost: () => void;
   onMove: (stageId: string) => void;
   onOpen: () => void;
+  onRevertConversion: () => void;
   stages: PipelineStage[];
 }) {
   return (
@@ -246,8 +256,10 @@ function LeadTableRow({
           lead={lead}
           onConvert={onConvert}
           onCreateTask={onCreateTask}
+          onDelete={onDelete}
           onMarkLost={onMarkLost}
           onOpen={onOpen}
+          onRevertConversion={onRevertConversion}
         />
       </td>
     </tr>
@@ -258,14 +270,18 @@ function LeadActionsMenu({
   lead,
   onConvert,
   onCreateTask,
+  onDelete,
   onMarkLost,
   onOpen,
+  onRevertConversion,
 }: {
   lead: Lead;
   onConvert: () => void;
   onCreateTask: () => void;
+  onDelete: () => void;
   onMarkLost: () => void;
   onOpen: () => void;
+  onRevertConversion: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -298,11 +314,19 @@ function LeadActionsMenu({
               Convertir a socio
             </button>
           ) : null}
-          {lead.status !== 'LOST' ? (
+          {lead.status === 'CONVERTED' ? (
+            <button onClick={() => run(onRevertConversion)} type="button">
+              Revertir conversión
+            </button>
+          ) : null}
+          {lead.status === 'OPEN' ? (
             <button className="danger-action" onClick={() => run(onMarkLost)} type="button">
               Marcar como perdido
             </button>
           ) : null}
+          <button className="danger-action" onClick={() => run(onDelete)} type="button">
+            Eliminar lead
+          </button>
         </div>
       ) : null}
     </div>
@@ -314,16 +338,20 @@ export function LeadDetailDrawer({
   onClose,
   onConvert,
   onCreateTask,
+  onDelete,
   onMarkLost,
   onMove,
+  onRevertConversion,
   stages,
 }: {
   lead: Lead | null;
   onClose: () => void;
   onConvert: (lead: Lead) => void;
   onCreateTask: (lead: Lead) => void;
+  onDelete: (lead: Lead) => void;
   onMarkLost: (lead: Lead) => void;
   onMove: (lead: Lead, stageId: string) => void;
+  onRevertConversion: (lead: Lead) => void;
   stages: PipelineStage[];
 }) {
   if (!lead) return null;
@@ -413,11 +441,19 @@ export function LeadDetailDrawer({
               Convertir a socio
             </button>
           ) : null}
-          {lead.status !== 'LOST' ? (
+          {lead.status === 'CONVERTED' ? (
+            <button className="drawer-actions__primary" onClick={() => onRevertConversion(lead)} type="button">
+              Revertir conversión
+            </button>
+          ) : null}
+          {lead.status === 'OPEN' ? (
             <button className="drawer-actions__danger" onClick={() => onMarkLost(lead)} type="button">
               Marcar perdido
             </button>
           ) : null}
+          <button className="drawer-actions__danger" onClick={() => onDelete(lead)} type="button">
+            Eliminar lead
+          </button>
         </footer>
       </aside>
     </div>

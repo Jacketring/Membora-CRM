@@ -202,6 +202,104 @@ export class LeadsService {
     });
   }
 
+  async revertConversion(user: AuthUser, id: string) {
+    const tenantId = this.requireTenant(user);
+    const lead = await this.prisma.lead.findFirst({
+      where: { id, tenantId },
+      include: { members: true },
+    });
+
+    if (!lead) {
+      throw new NotFoundException('Lead not found');
+    }
+
+    if (lead.status !== LeadStatus.CONVERTED && lead.members.length === 0) {
+      throw new BadRequestException('Lead is not converted');
+    }
+
+    const targetStage = (await this.prisma.pipelineStage.findFirst({
+      where: {
+        tenantId,
+        key: 'CONTACTED',
+      },
+      select: { id: true },
+    })) ?? await this.prisma.pipelineStage.findFirst({
+      where: {
+        tenantId,
+        isFinal: false,
+      },
+      orderBy: { order: 'asc' },
+      select: { id: true },
+    });
+
+    if (!targetStage) {
+      throw new BadRequestException('Open pipeline stage not found');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.member.updateMany({
+        where: {
+          tenantId,
+          leadId: lead.id,
+        },
+        data: {
+          leadId: null,
+          status: MemberStatus.CANCELLED,
+          cancelledAt: new Date(),
+        },
+      });
+
+      return tx.lead.update({
+        where: { id: lead.id },
+        data: {
+          status: LeadStatus.OPEN,
+          pipelineStageId: targetStage.id,
+          lostReason: null,
+        },
+        include: {
+          pipelineStage: true,
+          assignedUser: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+    });
+  }
+
+  async remove(user: AuthUser, id: string) {
+    const tenantId = this.requireTenant(user);
+    const lead = await this.prisma.lead.findFirst({
+      where: { id, tenantId },
+      include: { members: true },
+    });
+
+    if (!lead) {
+      throw new NotFoundException('Lead not found');
+    }
+
+    if (lead.members.length > 0) {
+      throw new BadRequestException('Revert the conversion before deleting this lead');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.riskAlert.deleteMany({
+        where: {
+          tenantId,
+          OR: [{ leadId: id }, { task: { leadId: id } }],
+        },
+      }),
+      this.prisma.communicationLog.deleteMany({ where: { tenantId, leadId: id } }),
+      this.prisma.task.deleteMany({ where: { tenantId, leadId: id } }),
+      this.prisma.lead.delete({ where: { id } }),
+    ]);
+
+    return { deleted: true };
+  }
+
   private requireTenant(user: AuthUser): string {
     if (!user.tenantId || user.role === RoleKey.SUPERADMIN) {
       throw new ForbiddenException('A tenant user is required');

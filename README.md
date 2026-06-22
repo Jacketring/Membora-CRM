@@ -309,6 +309,8 @@ Rutas principales:
 - `POST /api/leads`
 - `PATCH /api/leads/:id`
 - `POST /api/leads/:id/convert`
+- `POST /api/leads/:id/revert-conversion`
+- `DELETE /api/leads/:id`
 - `GET /api/members`
 - `GET /api/membership-plans`
 - `GET /api/subscriptions`

@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   apiGet,
+  apiDelete,
   apiPatch,
   apiPost,
   clearSession,
@@ -148,6 +149,40 @@ export default function LeadsPage() {
       await loadData();
     } catch {
       setError('No se pudo convertir el lead. Puede que ya esté convertido.');
+    }
+  }
+
+  async function revertConversion(lead: Lead) {
+    setError('');
+
+    try {
+      const updatedLead = await apiPost<Lead>(`/leads/${lead.id}/revert-conversion`);
+      setLeads((current) => current.map((item) => (item.id === lead.id ? updatedLead : item)));
+      setSelectedLead((current) => (current?.id === lead.id ? updatedLead : current));
+      setError('Conversión revertida correctamente.');
+    } catch {
+      setError('No se pudo revertir la conversión.');
+    }
+  }
+
+  async function deleteLead(lead: Lead) {
+    const confirmed = window.confirm(
+      `¿Eliminar el lead de ${lead.firstName} ${lead.lastName ?? ''}? Esta acción no se puede deshacer.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setError('');
+
+    try {
+      await apiDelete<{ deleted: boolean }>(`/leads/${lead.id}`);
+      setLeads((current) => current.filter((item) => item.id !== lead.id));
+      setSelectedLead((current) => (current?.id === lead.id ? null : current));
+      setError('Lead eliminado correctamente.');
+    } catch {
+      setError('No se pudo eliminar el lead. Si está convertido, revierte la conversión primero.');
     }
   }
 
@@ -291,9 +326,11 @@ export default function LeadsPage() {
               leads={filteredLeads}
               onConvert={convertLead}
               onCreateTask={createFollowUpTask}
+              onDelete={deleteLead}
               onMarkLost={markLost}
               onMove={moveLead}
               onOpen={setSelectedLead}
+              onRevertConversion={revertConversion}
               stages={stages}
             />
           )}
@@ -315,8 +352,10 @@ export default function LeadsPage() {
         onClose={() => setSelectedLead(null)}
         onConvert={convertLead}
         onCreateTask={createFollowUpTask}
+        onDelete={deleteLead}
         onMarkLost={markLost}
         onMove={moveLead}
+        onRevertConversion={revertConversion}
         stages={stages}
       />
     </main>

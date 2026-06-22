@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthUser } from '../auth/auth-user';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -38,5 +38,15 @@ export class LeadsController {
   @Post(':id/convert')
   convertToMember(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.leadsService.convertToMember(user, id);
+  }
+
+  @Post(':id/revert-conversion')
+  revertConversion(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.leadsService.revertConversion(user, id);
+  }
+
+  @Delete(':id')
+  remove(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.leadsService.remove(user, id);
   }
 }
