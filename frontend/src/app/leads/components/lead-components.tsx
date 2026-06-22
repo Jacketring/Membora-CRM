@@ -3,13 +3,10 @@
 import {
   ArrowRight,
   CalendarClock,
-  CheckCircle2,
-  CircleDot,
-  Mail,
-  Phone,
   Plus,
   Search,
-  UserRound,
+  MoreHorizontal,
+  CircleDot,
   X,
 } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
@@ -118,118 +115,197 @@ export function LeadFilters({
   );
 }
 
-export function LeadKanban({
+export function LeadsTable({
   leads,
   onConvert,
-  onFollowUp,
+  onCreateTask,
+  onMarkLost,
+  onMove,
   onOpen,
   stages,
 }: {
   leads: Lead[];
   onConvert: (lead: Lead) => void;
-  onFollowUp: (lead: Lead) => void;
+  onCreateTask: (lead: Lead) => void;
+  onMarkLost: (lead: Lead) => void;
+  onMove: (lead: Lead, stageId: string) => void;
   onOpen: (lead: Lead) => void;
   stages: PipelineStage[];
 }) {
   return (
-    <section className="lead-kanban" aria-label="Pipeline de leads">
-      {stages.map((stage) => {
-        const stageLeads = leads.filter((lead) => lead.pipelineStageId === stage.id);
+    <section className="leads-table-card">
+      <header>
+        <div>
+          <h3>Listado de leads</h3>
+          <span>{leads.length} resultados</span>
+        </div>
+      </header>
 
-        return (
-          <article className="lead-stage" key={stage.id}>
-            <header>
-              <div>
-                <h3>{stage.name}</h3>
-                <span>{stageLeads.length} leads</span>
-              </div>
-              <StageDot stageKey={stage.key} />
-            </header>
-
-            <div className="lead-stage-list">
-              {stageLeads.length ? (
-                stageLeads.map((lead) => (
-                  <LeadCard
-                    key={lead.id}
-                    lead={lead}
-                    onConvert={() => onConvert(lead)}
-                    onFollowUp={() => onFollowUp(lead)}
-                    onOpen={() => onOpen(lead)}
-                  />
-                ))
-              ) : (
-                <p className="lead-stage-empty">Sin leads en esta etapa.</p>
-              )}
-            </div>
-          </article>
-        );
-      })}
+      <div className="leads-table-wrap">
+        <table className="leads-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Origen</th>
+              <th>Interés</th>
+              <th>Etapa</th>
+              <th>Estado</th>
+              <th>Próxima acción</th>
+              <th>Último contacto</th>
+              <th>Fecha de creación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leads.length ? (
+              leads.map((lead) => (
+                <LeadTableRow
+                  key={lead.id}
+                  lead={lead}
+                  onConvert={() => onConvert(lead)}
+                  onCreateTask={() => onCreateTask(lead)}
+                  onMarkLost={() => onMarkLost(lead)}
+                  onMove={(stageId) => onMove(lead, stageId)}
+                  onOpen={() => onOpen(lead)}
+                  stages={stages}
+                />
+              ))
+            ) : (
+              <tr>
+                <td className="leads-empty-cell" colSpan={11}>
+                  No hay leads que coincidan con los filtros actuales.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
 
-function LeadCard({
+function LeadTableRow({
   lead,
   onConvert,
-  onFollowUp,
+  onCreateTask,
+  onMarkLost,
+  onMove,
   onOpen,
+  stages,
 }: {
   lead: Lead;
   onConvert: () => void;
-  onFollowUp: () => void;
+  onCreateTask: () => void;
+  onMarkLost: () => void;
+  onMove: (stageId: string) => void;
   onOpen: () => void;
+  stages: PipelineStage[];
 }) {
   return (
-    <article className="lead-card-v2" onClick={onOpen}>
-      <header>
-        <div>
-          <strong>
-            {lead.firstName} {lead.lastName ?? ''}
-          </strong>
-          <span>{lead.pipelineStage.name}</span>
-        </div>
-        <StatusBadge status={lead.status} />
-      </header>
-
-      <div className="lead-card-contact">
-        {lead.phone ? (
-          <span>
-            <Phone size={14} />
-            {lead.phone}
-          </span>
-        ) : (
-          <span>
-            <Mail size={14} />
-            {lead.email ?? 'Sin contacto'}
-          </span>
-        )}
-      </div>
-
-      <p>{lead.interest ?? 'Interés pendiente de completar'}</p>
-
-      <div className="lead-card-meta">
+    <tr className="lead-data-row">
+      <td data-label="Nombre">
+        <button className="lead-name-button" onClick={onOpen} type="button">
+          {lead.firstName} {lead.lastName ?? ''}
+        </button>
+      </td>
+      <td data-label="Teléfono">{lead.phone ?? 'Sin teléfono'}</td>
+      <td data-label="Email">{lead.email ?? 'Sin email'}</td>
+      <td data-label="Origen">
         <SourceBadge source={lead.source} />
+      </td>
+      <td data-label="Interés">{lead.interest ?? 'Sin interés indicado'}</td>
+      <td data-label="Etapa">
+        <select
+          aria-label="Cambiar etapa"
+          className="stage-select stage-select--table"
+          onChange={(event) => onMove(event.target.value)}
+          value={lead.pipelineStageId}
+        >
+          {stages.map((stage) => (
+            <option key={stage.id} value={stage.id}>
+              {stage.name}
+            </option>
+          ))}
+        </select>
+      </td>
+      <td data-label="Estado">
+        <StatusBadge status={lead.status} />
+      </td>
+      <td data-label="Próxima acción">
         <span className={lead.nextActionAt ? 'next-action' : 'next-action next-action--warning'}>
           <CalendarClock size={14} />
           {nextActionLabel(lead)}
         </span>
-      </div>
+      </td>
+      <td data-label="Último contacto">{formatDate(lead.updatedAt)}</td>
+      <td data-label="Fecha de creación">{formatDate(lead.createdAt)}</td>
+      <td data-label="Acciones">
+        <LeadActionsMenu
+          lead={lead}
+          onConvert={onConvert}
+          onCreateTask={onCreateTask}
+          onMarkLost={onMarkLost}
+          onOpen={onOpen}
+        />
+      </td>
+    </tr>
+  );
+}
 
-      <div className="lead-card-actions" onClick={(event) => event.stopPropagation()}>
-        {lead.status === 'OPEN' ? (
-          <>
-            <button onClick={onFollowUp} type="button">
-              Seguimiento
+function LeadActionsMenu({
+  lead,
+  onConvert,
+  onCreateTask,
+  onMarkLost,
+  onOpen,
+}: {
+  lead: Lead;
+  onConvert: () => void;
+  onCreateTask: () => void;
+  onMarkLost: () => void;
+  onOpen: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  function run(action: () => void) {
+    setOpen(false);
+    action();
+  }
+
+  return (
+    <div className="lead-actions-menu">
+      <button aria-label="Abrir acciones" onClick={() => setOpen((current) => !current)} type="button">
+        <MoreHorizontal size={18} />
+      </button>
+      {open ? (
+        <div className="lead-actions-popover">
+          <button onClick={() => run(onOpen)} type="button">
+            Ver detalle
+          </button>
+          <button onClick={() => run(onOpen)} type="button">
+            Editar
+          </button>
+          <button onClick={() => run(onOpen)} type="button">
+            Cambiar etapa
+          </button>
+          <button onClick={() => run(onCreateTask)} type="button">
+            Crear tarea
+          </button>
+          {lead.status === 'OPEN' ? (
+            <button onClick={() => run(onConvert)} type="button">
+              Convertir a socio
             </button>
-            <button className="lead-card-actions__primary" onClick={onConvert} type="button">
-              Convertir
+          ) : null}
+          {lead.status !== 'LOST' ? (
+            <button className="danger-action" onClick={() => run(onMarkLost)} type="button">
+              Marcar como perdido
             </button>
-          </>
-        ) : (
-          <span>Lead {lead.status === 'CONVERTED' ? 'convertido' : 'perdido'}</span>
-        )}
-      </div>
-    </article>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -499,10 +575,6 @@ export function StatusBadge({ status }: { status: string }) {
 
 export function SourceBadge({ source }: { source: string }) {
   return <span className="source-badge">{translateSource(source)}</span>;
-}
-
-function StageDot({ stageKey }: { stageKey: string }) {
-  return <span className={`stage-dot stage-dot--${stageKey.toLowerCase()}`} />;
 }
 
 function nextActionLabel(lead: Lead) {

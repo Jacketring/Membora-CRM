@@ -932,130 +932,78 @@ button {
   padding: 11px 12px;
 }
 
-.lead-kanban {
-  align-items: stretch;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(7, minmax(260px, 1fr));
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.lead-stage {
-  background: #f3f6fd;
-  border: 1px solid #e1e7f3;
+.leads-table-card {
+  background: var(--surface);
+  border: 1px solid #edf0f7;
   border-radius: 16px;
-  min-height: 560px;
-  padding: 14px;
+  box-shadow: var(--shadow);
+  overflow: visible;
 }
 
-.lead-stage > header {
+.leads-table-card > header {
   align-items: center;
+  border-bottom: 1px solid #edf0f7;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 14px;
+  padding: 20px 22px;
 }
 
-.lead-stage h3 {
-  font-size: 15px;
+.leads-table-card h3 {
+  font-size: 20px;
   margin: 0 0 4px;
 }
 
-.lead-stage header span {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.stage-dot {
-  border-radius: 999px;
-  display: block;
-  height: 12px;
-  width: 12px;
-}
-
-.stage-dot--new_lead,
-.stage-dot--contacted {
-  background: var(--primary);
-}
-
-.stage-dot--trial_scheduled,
-.stage-dot--trial_completed,
-.stage-dot--offer_sent {
-  background: var(--warning);
-}
-
-.stage-dot--converted {
-  background: var(--secondary);
-}
-
-.stage-dot--lost {
-  background: var(--danger);
-}
-
-.lead-stage-list {
-  display: grid;
-  gap: 12px;
-}
-
-.lead-stage-empty {
+.leads-table-card header span {
   color: var(--muted);
   font-size: 14px;
-  margin: 12px 0;
 }
 
-.lead-card-v2 {
-  background: var(--surface);
-  border: 1px solid #e8ecf5;
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  cursor: pointer;
+.leads-table-wrap {
+  max-height: 620px;
+  overflow: auto;
+}
+
+.leads-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1320px;
+  width: 100%;
+}
+
+.leads-table th {
+  background: #f8faff;
+  border-bottom: 1px solid #edf0f7;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 12px 14px;
+  position: sticky;
+  text-align: left;
+  text-transform: uppercase;
+  top: 0;
+  z-index: 1;
+}
+
+.leads-table td {
+  border-bottom: 1px solid #edf0f7;
+  color: #30384c;
+  font-size: 14px;
   padding: 14px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  vertical-align: middle;
 }
 
-.lead-card-v2:hover {
-  border-color: #b7c8ed;
-  transform: translateY(-1px);
+.lead-data-row:hover td {
+  background: #fbfdff;
 }
 
-.lead-card-v2 header {
-  align-items: flex-start;
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.lead-card-v2 strong,
-.lead-card-v2 small,
-.lead-card-v2 span {
-  display: block;
-}
-
-.lead-card-v2 header span {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 3px;
-}
-
-.lead-card-contact span {
-  align-items: center;
-  color: var(--muted);
-  display: flex;
-  font-size: 13px;
-  gap: 7px;
-}
-
-.lead-card-v2 p {
+.lead-name-button {
+  background: transparent;
+  border: 0;
   color: var(--text);
-  font-size: 14px;
-  line-height: 1.45;
-  margin: 12px 0;
-}
-
-.lead-card-meta {
-  display: grid;
-  gap: 8px;
+  font-weight: 800;
+  padding: 0;
+  text-align: left;
 }
 
 .source-badge {
@@ -1067,6 +1015,10 @@ button {
   font-weight: 800;
   justify-self: start;
   padding: 6px 9px;
+}
+
+.stage-select--table {
+  min-width: 160px;
 }
 
 .next-action {
@@ -1082,26 +1034,59 @@ button {
   font-weight: 800;
 }
 
-.lead-card-actions {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: 1fr 1fr;
-  margin-top: 14px;
+.lead-actions-menu {
+  position: relative;
 }
 
-.lead-card-actions button {
+.lead-actions-menu > button {
+  align-items: center;
   background: var(--surface-soft);
   border: 0;
   border-radius: 10px;
   color: var(--text);
-  font-size: 13px;
-  font-weight: 800;
-  padding: 10px;
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  width: 38px;
 }
 
-.lead-card-actions .lead-card-actions__primary {
-  background: #dcfce7;
-  color: #047857;
+.lead-actions-popover {
+  background: var(--surface);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 14px 40px rgba(2, 8, 23, 0.16);
+  display: grid;
+  gap: 4px;
+  min-width: 190px;
+  padding: 8px;
+  position: absolute;
+  right: 0;
+  top: 42px;
+  z-index: 20;
+}
+
+.lead-actions-popover button {
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.lead-actions-popover button:hover {
+  background: var(--surface-soft);
+}
+
+.lead-actions-popover .danger-action {
+  color: var(--danger);
+}
+
+.leads-empty-cell {
+  color: var(--muted) !important;
+  padding: 28px !important;
+  text-align: center;
 }
 
 .drawer-backdrop {
@@ -1373,10 +1358,6 @@ button {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .lead-kanban {
-    grid-template-columns: repeat(7, minmax(250px, 1fr));
-  }
-
   .pipeline-board {
     grid-template-columns: repeat(7, minmax(220px, 1fr));
   }
@@ -1412,21 +1393,52 @@ button {
   .form-grid,
   .lead-summary-strip,
   .lead-metrics,
-  .lead-filter-group,
-  .lead-kanban {
-    grid-template-columns: 1fr;
-  }
-
-  .lead-stage {
-    min-height: auto;
-  }
-
-  .lead-card-actions {
+  .lead-filter-group {
     grid-template-columns: 1fr;
   }
 
   .lead-drawer {
     max-width: none;
+  }
+
+  .leads-table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .leads-table,
+  .leads-table thead,
+  .leads-table tbody,
+  .leads-table tr,
+  .leads-table th,
+  .leads-table td {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .leads-table thead {
+    display: none;
+  }
+
+  .leads-table tr {
+    border-bottom: 1px solid #edf0f7;
+    padding: 14px;
+  }
+
+  .leads-table td {
+    border-bottom: 0;
+    padding: 6px 0;
+  }
+
+  .leads-table td::before {
+    color: var(--muted);
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 3px;
+    text-transform: uppercase;
   }
 
   .user-chip div {

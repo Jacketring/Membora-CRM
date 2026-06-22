@@ -30,8 +30,8 @@ import {
   LeadDetailDrawer,
   LeadFilters,
   LeadFiltersState,
-  LeadKanban,
   LeadMetrics,
+  LeadsTable,
 } from './components/lead-components';
 
 const initialFilters: LeadFiltersState = {
@@ -285,12 +285,14 @@ export default function LeadsPage() {
           />
 
           {loading ? (
-            <div className="loading-card">Cargando pipeline comercial...</div>
+            <div className="loading-card">Cargando tabla de leads...</div>
           ) : (
-            <LeadKanban
+            <LeadsTable
               leads={filteredLeads}
               onConvert={convertLead}
-              onFollowUp={createFollowUpTask}
+              onCreateTask={createFollowUpTask}
+              onMarkLost={markLost}
+              onMove={moveLead}
               onOpen={setSelectedLead}
               stages={stages}
             />
