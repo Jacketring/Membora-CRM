@@ -353,7 +353,7 @@ model Payment {
   amount         Decimal       @db.Decimal(10, 2)
   currency       String        @default("EUR")
   paymentMethod  PaymentMethod @default(OTHER) @map("payment_method")
-  status         TaskStatus    @default(PENDING)
+  status         PaymentStatus @default(PENDING)
   paidAt         DateTime?     @map("paid_at")
   dueDate        DateTime?     @map("due_date")
   notes          String?
@@ -473,7 +473,7 @@ model Task {
   title          String
   description    String?
   type           TaskType      @default(OTHER)
-  status         PaymentStatus @default(PENDING)
+  status         TaskStatus    @default(PENDING)
   dueAt          DateTime?     @map("due_at")
   completedAt    DateTime?     @map("completed_at")
   createdAt      DateTime      @default(now()) @map("created_at")
