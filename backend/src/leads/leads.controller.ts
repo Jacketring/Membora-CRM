@@ -34,4 +34,9 @@ export class LeadsController {
   ) {
     return this.leadsService.update(user, id, dto);
   }
+
+  @Post(':id/convert')
+  convertToMember(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.leadsService.convertToMember(user, id);
+  }
 }

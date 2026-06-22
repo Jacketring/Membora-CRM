@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { LeadSource, LeadStatus, RoleKey } from '@prisma/client';
+import { LeadSource, LeadStatus, MemberStatus, RoleKey } from '@prisma/client';
 import { AuthUser } from '../auth/auth-user';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
@@ -145,6 +145,60 @@ export class LeadsService {
           },
         },
       },
+    });
+  }
+
+  async convertToMember(user: AuthUser, id: string) {
+    const tenantId = this.requireTenant(user);
+    const lead = await this.prisma.lead.findFirst({
+      where: { id, tenantId },
+      include: { members: true },
+    });
+
+    if (!lead) {
+      throw new NotFoundException('Lead not found');
+    }
+
+    if (lead.status === LeadStatus.CONVERTED || lead.members.length > 0) {
+      throw new BadRequestException('Lead already converted');
+    }
+
+    const convertedStage = await this.prisma.pipelineStage.findFirst({
+      where: {
+        tenantId,
+        key: 'CONVERTED',
+      },
+      select: { id: true },
+    });
+
+    if (!convertedStage) {
+      throw new BadRequestException('Converted pipeline stage not found');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const member = await tx.member.create({
+        data: {
+          tenantId,
+          leadId: lead.id,
+          firstName: lead.firstName,
+          lastName: lead.lastName,
+          email: lead.email,
+          phone: lead.phone,
+          status: MemberStatus.ACTIVE,
+          joinedAt: new Date(),
+          notes: `Converted from lead ${lead.id}`,
+        },
+      });
+
+      await tx.lead.update({
+        where: { id: lead.id },
+        data: {
+          status: LeadStatus.CONVERTED,
+          pipelineStageId: convertedStage.id,
+        },
+      });
+
+      return member;
     });
   }
 
