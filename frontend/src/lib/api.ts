@@ -59,6 +59,49 @@ export interface DashboardSummary {
   }>;
 }
 
+export interface PipelineStage {
+  id: string;
+  name: string;
+  key: string;
+  order: number;
+  isFinal: boolean;
+}
+
+export interface Lead {
+  id: string;
+  tenantId: string;
+  pipelineStageId: string;
+  assignedUserId: string | null;
+  firstName: string;
+  lastName: string | null;
+  email: string | null;
+  phone: string | null;
+  source: string;
+  interest: string | null;
+  status: 'OPEN' | 'CONVERTED' | 'LOST';
+  lostReason: string | null;
+  nextActionAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  pipelineStage: PipelineStage;
+  assignedUser: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
+export interface CreateLeadPayload {
+  pipelineStageId: string;
+  firstName: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  source?: string;
+  interest?: string;
+  nextActionAt?: string;
+}
+
 export function getStoredToken() {
   if (typeof window === 'undefined') {
     return null;
@@ -113,6 +156,52 @@ export async function apiGet<T>(path: string) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error ${response.status}`);
+  }
+
+  return (await response.json()) as T;
+}
+
+export async function apiPost<T>(path: string, body?: unknown) {
+  const token = getStoredToken();
+
+  if (!token) {
+    throw new Error('Sesión no iniciada');
+  }
+
+  const response = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error ${response.status}`);
+  }
+
+  return (await response.json()) as T;
+}
+
+export async function apiPatch<T>(path: string, body: unknown) {
+  const token = getStoredToken();
+
+  if (!token) {
+    throw new Error('Sesión no iniciada');
+  }
+
+  const response = await fetch(`${API_URL}${path}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {

@@ -12,6 +12,7 @@ import {
   Users,
   WalletCards,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -64,14 +65,14 @@ export default function DashboardPage() {
         </div>
 
         <nav className="sidebar-nav" aria-label="Navegación principal">
-          <a className="active" href="/dashboard">
+          <Link className="active" href="/dashboard">
             <LayoutDashboard size={20} />
             Panel
-          </a>
-          <a href="#">
+          </Link>
+          <Link href="/leads">
             <Search size={20} />
             Leads
-          </a>
+          </Link>
           <a href="#">
             <Users size={20} />
             Socios
@@ -122,9 +123,9 @@ export default function DashboardPage() {
               <h2>Panel de control</h2>
               <p>Resumen operativo de NexoFit Studio.</p>
             </div>
-            <button className="primary-action primary-action--compact" type="button">
+            <Link className="primary-action primary-action--compact" href="/leads">
               Nuevo lead
-            </button>
+            </Link>
           </div>
 
           {error ? <div className="notice notice-error">{error}</div> : null}
