@@ -1,13 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
-const crypto = require('node:crypto');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
 const DEMO_PASSWORD = 'MemboraDemo2026!';
-const demoPasswordHash = `sha256:${crypto
-  .createHash('sha256')
-  .update(DEMO_PASSWORD)
-  .digest('hex')}`;
+const demoPasswordHash = bcrypt.hashSync(DEMO_PASSWORD, 10);
 
 const addDays = (date, days) => {
   const copy = new Date(date);
