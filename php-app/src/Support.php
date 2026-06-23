@@ -47,49 +47,49 @@ function format_date(?string $value): string
 function country_dial_codes(): array
 {
     return [
-        'Espana' => '+34',
-        'Portugal' => '+351',
-        'Francia' => '+33',
-        'Italia' => '+39',
-        'Alemania' => '+49',
-        'Reino Unido' => '+44',
-        'Irlanda' => '+353',
-        'Paises Bajos' => '+31',
-        'Belgica' => '+32',
-        'Suiza' => '+41',
-        'Austria' => '+43',
-        'Dinamarca' => '+45',
-        'Suecia' => '+46',
-        'Noruega' => '+47',
-        'Finlandia' => '+358',
-        'Polonia' => '+48',
-        'Rumania' => '+40',
-        'Marruecos' => '+212',
-        'Estados Unidos' => '+1',
-        'Canada' => '+1',
-        'Mexico' => '+52',
-        'Argentina' => '+54',
-        'Chile' => '+56',
-        'Colombia' => '+57',
-        'Peru' => '+51',
-        'Ecuador' => '+593',
-        'Venezuela' => '+58',
-        'Uruguay' => '+598',
-        'Paraguay' => '+595',
-        'Brasil' => '+55',
-        'China' => '+86',
-        'Japon' => '+81',
-        'Corea del Sur' => '+82',
-        'India' => '+91',
-        'Australia' => '+61',
+        ['country' => 'Espana', 'flag' => '🇪🇸', 'code' => '+34'],
+        ['country' => 'Portugal', 'flag' => '🇵🇹', 'code' => '+351'],
+        ['country' => 'Francia', 'flag' => '🇫🇷', 'code' => '+33'],
+        ['country' => 'Italia', 'flag' => '🇮🇹', 'code' => '+39'],
+        ['country' => 'Alemania', 'flag' => '🇩🇪', 'code' => '+49'],
+        ['country' => 'Reino Unido', 'flag' => '🇬🇧', 'code' => '+44'],
+        ['country' => 'Irlanda', 'flag' => '🇮🇪', 'code' => '+353'],
+        ['country' => 'Paises Bajos', 'flag' => '🇳🇱', 'code' => '+31'],
+        ['country' => 'Belgica', 'flag' => '🇧🇪', 'code' => '+32'],
+        ['country' => 'Suiza', 'flag' => '🇨🇭', 'code' => '+41'],
+        ['country' => 'Austria', 'flag' => '🇦🇹', 'code' => '+43'],
+        ['country' => 'Dinamarca', 'flag' => '🇩🇰', 'code' => '+45'],
+        ['country' => 'Suecia', 'flag' => '🇸🇪', 'code' => '+46'],
+        ['country' => 'Noruega', 'flag' => '🇳🇴', 'code' => '+47'],
+        ['country' => 'Finlandia', 'flag' => '🇫🇮', 'code' => '+358'],
+        ['country' => 'Polonia', 'flag' => '🇵🇱', 'code' => '+48'],
+        ['country' => 'Rumania', 'flag' => '🇷🇴', 'code' => '+40'],
+        ['country' => 'Marruecos', 'flag' => '🇲🇦', 'code' => '+212'],
+        ['country' => 'Estados Unidos', 'flag' => '🇺🇸', 'code' => '+1'],
+        ['country' => 'Canada', 'flag' => '🇨🇦', 'code' => '+1'],
+        ['country' => 'Mexico', 'flag' => '🇲🇽', 'code' => '+52'],
+        ['country' => 'Argentina', 'flag' => '🇦🇷', 'code' => '+54'],
+        ['country' => 'Chile', 'flag' => '🇨🇱', 'code' => '+56'],
+        ['country' => 'Colombia', 'flag' => '🇨🇴', 'code' => '+57'],
+        ['country' => 'Peru', 'flag' => '🇵🇪', 'code' => '+51'],
+        ['country' => 'Ecuador', 'flag' => '🇪🇨', 'code' => '+593'],
+        ['country' => 'Venezuela', 'flag' => '🇻🇪', 'code' => '+58'],
+        ['country' => 'Uruguay', 'flag' => '🇺🇾', 'code' => '+598'],
+        ['country' => 'Paraguay', 'flag' => '🇵🇾', 'code' => '+595'],
+        ['country' => 'Brasil', 'flag' => '🇧🇷', 'code' => '+55'],
+        ['country' => 'China', 'flag' => '🇨🇳', 'code' => '+86'],
+        ['country' => 'Japon', 'flag' => '🇯🇵', 'code' => '+81'],
+        ['country' => 'Corea del Sur', 'flag' => '🇰🇷', 'code' => '+82'],
+        ['country' => 'India', 'flag' => '🇮🇳', 'code' => '+91'],
+        ['country' => 'Australia', 'flag' => '🇦🇺', 'code' => '+61'],
     ];
 }
 
 function country_dial_options(): array
 {
     $options = [];
-    foreach (country_dial_codes() as $country => $code) {
-        $options[] = $country . ' ' . $code;
+    foreach (country_dial_codes() as $entry) {
+        $options[] = $entry['flag'] . ' ' . $entry['code'] . ' ' . $entry['country'];
     }
 
     return $options;
@@ -99,15 +99,16 @@ function phone_country_value(?string $phone): string
 {
     $phone = trim((string) $phone);
     if ($phone === '') {
-        return 'Espana +34';
+        return '🇪🇸 +34 Espana';
     }
 
     $codes = country_dial_codes();
-    uasort($codes, fn (string $a, string $b): int => strlen($b) <=> strlen($a));
+    usort($codes, fn (array $a, array $b): int => strlen($b['code']) <=> strlen($a['code']));
 
-    foreach ($codes as $country => $code) {
+    foreach ($codes as $entry) {
+        $code = $entry['code'];
         if (str_starts_with($phone, $code)) {
-            return $country . ' ' . $code;
+            return $entry['flag'] . ' ' . $code . ' ' . $entry['country'];
         }
     }
 
@@ -115,7 +116,7 @@ function phone_country_value(?string $phone): string
         return $matches[1];
     }
 
-    return 'Espana +34';
+    return '🇪🇸 +34 Espana';
 }
 
 function phone_local_value(?string $phone): string

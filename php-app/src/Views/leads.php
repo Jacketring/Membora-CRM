@@ -6,12 +6,6 @@
   <button class="primary-action primary-action--compact" data-open-modal="lead-modal" type="button">Nuevo lead</button>
 </div>
 
-<datalist id="country-dial-codes">
-  <?php foreach (country_dial_options() as $option): ?>
-    <option value="<?= e($option) ?>"></option>
-  <?php endforeach; ?>
-</datalist>
-
 <section class="lead-metrics">
   <article class="lead-metric lead-metric--blue">
     <span>Abiertos</span>
@@ -175,7 +169,11 @@
         <label class="field">
           <span>Telefono</span>
           <div class="phone-combo">
-            <input class="phone-country-input" name="phone_country" list="country-dial-codes" value="<?= e(phone_country_value($lead['phone'])) ?>" placeholder="Pais o prefijo">
+            <select class="phone-country-input" name="phone_country" aria-label="Prefijo de pais">
+              <?php foreach (country_dial_options() as $option): ?>
+                <option value="<?= e($option) ?>" <?= phone_country_value($lead['phone']) === $option ? 'selected' : '' ?>><?= e($option) ?></option>
+              <?php endforeach; ?>
+            </select>
             <input class="phone-number-input" name="phone_number" value="<?= e(phone_local_value($lead['phone'])) ?>" inputmode="tel" placeholder="Numero">
           </div>
         </label>
@@ -274,7 +272,11 @@
       <label class="field">
         <span>Telefono</span>
         <div class="phone-combo">
-          <input class="phone-country-input" name="phone_country" list="country-dial-codes" value="Espana +34" placeholder="Pais o prefijo">
+          <select class="phone-country-input" name="phone_country" aria-label="Prefijo de pais">
+            <?php foreach (country_dial_options() as $option): ?>
+              <option value="<?= e($option) ?>" <?= $option === '🇪🇸 +34 Espana' ? 'selected' : '' ?>><?= e($option) ?></option>
+            <?php endforeach; ?>
+          </select>
           <input class="phone-number-input" name="phone_number" inputmode="tel" placeholder="Numero">
         </div>
       </label>
