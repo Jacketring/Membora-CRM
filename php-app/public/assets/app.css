@@ -525,6 +525,14 @@ a { color: inherit; text-decoration: none; }
   border-color: #b9c9e8;
   color: var(--primary);
 }
+.icon-action.success-action {
+  color: var(--secondary);
+}
+.icon-action.success-action:hover {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: var(--secondary);
+}
 .icon-action.danger-action:hover {
   background: #fff1f1;
   border-color: #fecaca;

@@ -23,6 +23,7 @@ final class Actions
             'mark_lead_lost' => self::markLeadLost(),
             'delete_lead' => self::deleteLead(),
             'create_task' => self::createTask(),
+            'update_task' => self::updateTask(),
             'update_task_status' => self::updateTaskStatus(),
             'delete_task' => self::deleteTask(),
             default => null,
@@ -324,10 +325,7 @@ final class Actions
 
         TaskRepository::ensureMemberLinksTable();
         $tenantId = Auth::tenantId();
-        $memberIds = array_values(array_filter(array_map(
-            static fn ($value): string => trim((string) $value),
-            is_array($_POST['member_ids'] ?? null) ? $_POST['member_ids'] : []
-        )));
+        $memberIds = self::taskMemberIdsFromPost();
         $taskId = cuid();
         $pdo = Database::connection();
 
@@ -348,21 +346,7 @@ final class Actions
                 'due_at' => post_value('due_at') ?: null,
             ]);
 
-            if ($memberIds) {
-                $link = $pdo->prepare(
-                    'INSERT IGNORE INTO task_members (id, tenant_id, task_id, member_id, created_at)
-                     VALUES (:id, :tenant_id, :task_id, :member_id, NOW())'
-                );
-
-                foreach ($memberIds as $memberId) {
-                    $link->execute([
-                        'id' => cuid(),
-                        'tenant_id' => $tenantId,
-                        'task_id' => $taskId,
-                        'member_id' => $memberId,
-                    ]);
-                }
-            }
+            self::syncTaskMembers($pdo, $tenantId, $taskId, $memberIds);
 
             $pdo->commit();
         } catch (Throwable $exception) {
@@ -375,6 +359,70 @@ final class Actions
         }
 
         flash('Tarea creada correctamente.');
+        redirect('tasks');
+    }
+
+    private static function updateTask(): never
+    {
+        $title = post_value('title', '');
+        if ($title === '') {
+            flash('Indica un titulo para la tarea.', 'error');
+            redirect('tasks');
+        }
+
+        TaskRepository::ensureMemberLinksTable();
+        $tenantId = Auth::tenantId();
+        $taskId = post_value('id');
+        $memberIds = self::taskMemberIdsFromPost();
+        $status = post_value('status', 'PENDING');
+        $allowedStatuses = ['PENDING', 'COMPLETED', 'CANCELLED'];
+        if (!in_array($status, $allowedStatuses, true)) {
+            $status = 'PENDING';
+        }
+
+        $pdo = Database::connection();
+        $pdo->beginTransaction();
+
+        try {
+            $stmt = $pdo->prepare(
+                'UPDATE tasks
+                 SET assigned_user_id = :assigned_user_id,
+                     member_id = :member_id,
+                     title = :title,
+                     description = :description,
+                     type = :type,
+                     status = :status,
+                     due_at = :due_at,
+                     completed_at = IF(:status_done = "COMPLETED", COALESCE(completed_at, NOW()), IF(:status_pending = "PENDING", NULL, completed_at)),
+                     updated_at = NOW()
+                 WHERE id = :id AND tenant_id = :tenant_id'
+            );
+            $stmt->execute([
+                'assigned_user_id' => post_value('assigned_user_id') ?: null,
+                'member_id' => $memberIds[0] ?? null,
+                'title' => $title,
+                'description' => post_value('description') ?: null,
+                'type' => post_value('type', 'OTHER'),
+                'status' => $status,
+                'status_done' => $status,
+                'status_pending' => $status,
+                'due_at' => post_value('due_at') ?: null,
+                'id' => $taskId,
+                'tenant_id' => $tenantId,
+            ]);
+
+            self::syncTaskMembers($pdo, $tenantId, (string) $taskId, $memberIds);
+            $pdo->commit();
+        } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            flash('No se pudo actualizar la tarea.', 'error');
+            redirect('tasks');
+        }
+
+        flash('Tarea actualizada correctamente.');
         redirect('tasks');
     }
 
@@ -407,5 +455,37 @@ final class Actions
         $stmt = $pdo->prepare('DELETE FROM tasks WHERE id = :id AND tenant_id = :tenant_id');
         $stmt->execute(['id' => $taskId, 'tenant_id' => $tenantId]);
         redirect('tasks');
+    }
+
+    private static function taskMemberIdsFromPost(): array
+    {
+        return array_values(array_unique(array_filter(array_map(
+            static fn ($value): string => trim((string) $value),
+            is_array($_POST['member_ids'] ?? null) ? $_POST['member_ids'] : []
+        ))));
+    }
+
+    private static function syncTaskMembers(PDO $pdo, string $tenantId, string $taskId, array $memberIds): void
+    {
+        $delete = $pdo->prepare('DELETE FROM task_members WHERE task_id = :task_id AND tenant_id = :tenant_id');
+        $delete->execute(['task_id' => $taskId, 'tenant_id' => $tenantId]);
+
+        if (!$memberIds) {
+            return;
+        }
+
+        $insert = $pdo->prepare(
+            'INSERT IGNORE INTO task_members (id, tenant_id, task_id, member_id, created_at)
+             VALUES (:id, :tenant_id, :task_id, :member_id, NOW())'
+        );
+
+        foreach ($memberIds as $memberId) {
+            $insert->execute([
+                'id' => cuid(),
+                'tenant_id' => $tenantId,
+                'task_id' => $taskId,
+                'member_id' => $memberId,
+            ]);
+        }
     }
 }

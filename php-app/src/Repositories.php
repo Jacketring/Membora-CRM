@@ -318,7 +318,13 @@ final class TaskRepository
                            INNER JOIN members linked_members ON linked_members.id = task_members.member_id
                            WHERE task_members.task_id = tasks.id
                            AND task_members.tenant_id = tasks.tenant_id
-                       ) AS linked_member_names
+                       ) AS linked_member_names,
+                       (
+                           SELECT GROUP_CONCAT(task_members.member_id SEPARATOR "||")
+                           FROM task_members
+                           WHERE task_members.task_id = tasks.id
+                           AND task_members.tenant_id = tasks.tenant_id
+                       ) AS linked_member_ids
                 FROM tasks
                 LEFT JOIN users ON users.id = tasks.assigned_user_id
                 LEFT JOIN leads ON leads.id = tasks.lead_id

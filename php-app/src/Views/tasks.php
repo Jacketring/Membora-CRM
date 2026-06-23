@@ -99,11 +99,15 @@
             $leadName = trim(($task['lead_first_name'] ?? '') . ' ' . ($task['lead_last_name'] ?? ''));
             $memberName = trim(($task['member_first_name'] ?? '') . ' ' . ($task['member_last_name'] ?? ''));
             $linkedMembers = array_values(array_filter(array_map('trim', explode('||', (string) ($task['linked_member_names'] ?? '')))));
+            $linkedMemberIds = array_values(array_filter(array_map('trim', explode('||', (string) ($task['linked_member_ids'] ?? '')))));
             if (!$linkedMembers && $memberName !== '') {
                 $linkedMembers = [$memberName];
+                if (!empty($task['member_id'])) {
+                    $linkedMemberIds = [$task['member_id']];
+                }
             }
           ?>
-          <tr class="lead-data-row">
+          <tr class="lead-data-row clickable-row" data-open-modal="task-detail-<?= e($task['id']) ?>" tabindex="0" role="button" aria-label="Editar tarea <?= e($task['title']) ?>">
             <td>
               <strong><?= e($task['title']) ?></strong>
               <small class="task-description"><?= e($task['description'] ?: 'Sin descripcion') ?></small>
@@ -142,23 +146,32 @@
             <td><?= e(format_date($task['created_at'])) ?></td>
             <td>
               <div class="row-actions">
+                <button class="icon-action" data-open-modal="task-detail-<?= e($task['id']) ?>" type="button" title="Editar tarea" aria-label="Editar tarea">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-2v-1.95l7.25-7.25 1.95 1.95L7.95 18H6Zm10.6-8.65L14.65 7.4 16 6.05 17.95 8l-1.35 1.35Z"/></svg>
+                </button>
                 <?php if ($task['status'] !== 'COMPLETED'): ?>
                   <form method="post">
                     <input type="hidden" name="id" value="<?= e($task['id']) ?>">
                     <input type="hidden" name="status" value="COMPLETED">
-                    <button name="action" value="update_task_status">Completar</button>
+                    <button class="icon-action success-action" name="action" value="update_task_status" title="Marcar completada" aria-label="Marcar completada">
+                      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.2 16.6 4.9 12.3l-1.4 1.4 5.7 5.7L21 7.6l-1.4-1.4L9.2 16.6Z"/></svg>
+                    </button>
                   </form>
                 <?php endif; ?>
                 <?php if ($task['status'] !== 'PENDING'): ?>
                   <form method="post">
                     <input type="hidden" name="id" value="<?= e($task['id']) ?>">
                     <input type="hidden" name="status" value="PENDING">
-                    <button name="action" value="update_task_status">Reabrir</button>
+                    <button class="icon-action" name="action" value="update_task_status" title="Reabrir tarea" aria-label="Reabrir tarea">
+                      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5V2L7 7l5 5V9a5 5 0 1 1-4.58 7H5.26A7 7 0 1 0 12 5Z"/></svg>
+                    </button>
                   </form>
                 <?php endif; ?>
                 <form method="post" onsubmit="return confirm('Eliminar esta tarea?')">
                   <input type="hidden" name="id" value="<?= e($task['id']) ?>">
-                  <button class="danger-action" name="action" value="delete_task">Eliminar</button>
+                  <button class="icon-action danger-action" name="action" value="delete_task" title="Eliminar tarea" aria-label="Eliminar tarea">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 21a2 2 0 0 1-2-2V8h14v11a2 2 0 0 1-2 2H7ZM9 6V4h6v2h5v2H4V6h5Zm0 5v7h2v-7H9Zm4 0v7h2v-7h-2Z"/></svg>
+                  </button>
                 </form>
               </div>
             </td>
@@ -174,6 +187,88 @@
     </table>
   </div>
 </section>
+
+<?php foreach ($tasks as $task): ?>
+  <?php
+    $selectedMemberIds = array_values(array_filter(array_map('trim', explode('||', (string) ($task['linked_member_ids'] ?? '')))));
+    if (!$selectedMemberIds && !empty($task['member_id'])) {
+        $selectedMemberIds = [$task['member_id']];
+    }
+  ?>
+  <dialog id="task-detail-<?= e($task['id']) ?>" class="modal-card lead-detail-modal">
+    <form method="post">
+      <input type="hidden" name="action" value="update_task">
+      <input type="hidden" name="id" value="<?= e($task['id']) ?>">
+      <header>
+        <div>
+          <h2><?= e($task['title']) ?></h2>
+          <p><?= e(task_type_label($task['type'])) ?> &middot; <?= e(status_label($task['status'])) ?></p>
+        </div>
+        <button data-close-modal type="button">Cerrar</button>
+      </header>
+
+      <div class="form-grid">
+        <label class="field field--wide">
+          <span>Titulo</span>
+          <input name="title" required value="<?= e($task['title']) ?>">
+        </label>
+        <label class="field">
+          <span>Tipo</span>
+          <select name="type">
+            <?php foreach (['SALES', 'RETENTION', 'PAYMENT', 'OPERATIONAL', 'OTHER'] as $type): ?>
+              <option value="<?= e($type) ?>" <?= $task['type'] === $type ? 'selected' : '' ?>><?= e(task_type_label($type)) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
+        <label class="field">
+          <span>Estado</span>
+          <select name="status">
+            <?php foreach (['PENDING', 'COMPLETED', 'CANCELLED'] as $status): ?>
+              <option value="<?= e($status) ?>" <?= $task['status'] === $status ? 'selected' : '' ?>><?= e(status_label($status)) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
+        <label class="field">
+          <span>Vencimiento</span>
+          <input name="due_at" type="datetime-local" value="<?= $task['due_at'] ? e(date('Y-m-d\TH:i', strtotime($task['due_at']))) : '' ?>">
+        </label>
+        <label class="field">
+          <span>Responsable</span>
+          <select name="assigned_user_id">
+            <option value="">Sin responsable</option>
+            <?php foreach ($staff as $staffUser): ?>
+              <option value="<?= e($staffUser['id']) ?>" <?= $task['assigned_user_id'] === $staffUser['id'] ? 'selected' : '' ?>><?= e($staffUser['name']) ?> - <?= e($staffUser['role_key']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
+        <div class="field field--wide">
+          <span>Socios vinculados</span>
+          <div class="member-picker">
+            <?php foreach ($members as $member): ?>
+              <?php $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')); ?>
+              <label>
+                <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>" <?= in_array($member['id'], $selectedMemberIds, true) ? 'checked' : '' ?>>
+                <span>
+                  <strong><?= e($memberName) ?></strong>
+                  <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
+                </span>
+              </label>
+            <?php endforeach; ?>
+            <?php if (!$members): ?>
+              <p>No hay socios disponibles para vincular.</p>
+            <?php endif; ?>
+          </div>
+        </div>
+        <label class="field field--wide">
+          <span>Descripcion</span>
+          <input name="description" value="<?= e($task['description']) ?>" placeholder="Notas internas de la tarea">
+        </label>
+      </div>
+
+      <button class="primary-action" type="submit">Guardar cambios</button>
+    </form>
+  </dialog>
+<?php endforeach; ?>
 
 <dialog id="task-modal" class="modal-card">
   <form method="post" data-prevent-double-submit>
