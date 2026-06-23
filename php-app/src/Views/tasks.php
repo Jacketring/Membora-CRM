@@ -244,20 +244,27 @@
         </label>
         <div class="field field--wide">
           <span>Socios vinculados</span>
-          <div class="member-picker">
-            <?php foreach ($members as $member): ?>
-              <?php $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')); ?>
-              <label>
-                <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>" <?= in_array($member['id'], $selectedMemberIds, true) ? 'checked' : '' ?>>
-                <span>
-                  <strong><?= e($memberName) ?></strong>
-                  <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
-                </span>
-              </label>
-            <?php endforeach; ?>
-            <?php if (!$members): ?>
-              <p>No hay socios disponibles para vincular.</p>
-            <?php endif; ?>
+          <div class="member-picker-shell" data-member-picker>
+            <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o telefono" data-member-search>
+            <div class="member-picker">
+              <?php foreach ($members as $member): ?>
+                <?php
+                  $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
+                  $searchText = strtolower($memberName . ' ' . ($member['email'] ?? '') . ' ' . ($member['phone'] ?? ''));
+                ?>
+                <label data-member-option data-search="<?= e($searchText) ?>">
+                  <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>" <?= in_array($member['id'], $selectedMemberIds, true) ? 'checked' : '' ?>>
+                  <span>
+                    <strong><?= e($memberName) ?></strong>
+                    <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
+                  </span>
+                </label>
+              <?php endforeach; ?>
+              <?php if (!$members): ?>
+                <p>No hay socios disponibles para vincular.</p>
+              <?php endif; ?>
+              <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la busqueda.</p>
+            </div>
           </div>
         </div>
         <label class="field field--wide">
@@ -309,20 +316,27 @@
       </label>
       <div class="field field--wide">
         <span>Socios vinculados</span>
-        <div class="member-picker">
-          <?php foreach ($members as $member): ?>
-            <?php $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')); ?>
-            <label>
-              <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>">
-              <span>
-                <strong><?= e($memberName) ?></strong>
-                <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
-              </span>
-            </label>
-          <?php endforeach; ?>
-          <?php if (!$members): ?>
-            <p>No hay socios disponibles para vincular.</p>
-          <?php endif; ?>
+        <div class="member-picker-shell" data-member-picker>
+          <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o telefono" data-member-search>
+          <div class="member-picker">
+            <?php foreach ($members as $member): ?>
+              <?php
+                $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
+                $searchText = strtolower($memberName . ' ' . ($member['email'] ?? '') . ' ' . ($member['phone'] ?? ''));
+              ?>
+              <label data-member-option data-search="<?= e($searchText) ?>">
+                <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>">
+                <span>
+                  <strong><?= e($memberName) ?></strong>
+                  <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
+                </span>
+              </label>
+            <?php endforeach; ?>
+            <?php if (!$members): ?>
+              <p>No hay socios disponibles para vincular.</p>
+            <?php endif; ?>
+            <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la busqueda.</p>
+          </div>
         </div>
       </div>
       <label class="field field--wide">

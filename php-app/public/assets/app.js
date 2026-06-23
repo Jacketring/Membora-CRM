@@ -105,6 +105,31 @@ document.querySelectorAll('[data-prevent-double-submit]').forEach((form) => {
   });
 });
 
+document.querySelectorAll('[data-member-picker]').forEach((picker) => {
+  const search = picker.querySelector('[data-member-search]');
+  const options = picker.querySelectorAll('[data-member-option]');
+  const empty = picker.querySelector('[data-member-empty]');
+
+  if (!search) {
+    return;
+  }
+
+  search.addEventListener('input', () => {
+    const term = search.value.trim().toLowerCase();
+    let visibleCount = 0;
+
+    options.forEach((option) => {
+      const matches = term === '' || option.dataset.search.includes(term);
+      option.hidden = !matches;
+      if (matches) visibleCount += 1;
+    });
+
+    if (empty) {
+      empty.hidden = visibleCount !== 0;
+    }
+  });
+});
+
 const confirmDialog = document.getElementById('confirm-dialog');
 let pendingConfirmForm = null;
 

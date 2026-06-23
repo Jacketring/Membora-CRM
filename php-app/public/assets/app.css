@@ -589,15 +589,31 @@ a { color: inherit; text-decoration: none; }
   font-weight: 750;
   padding: 7px 9px;
 }
-.member-picker {
+.member-picker-shell {
   background: #f8faff;
   border: 1px solid #dbe3f1;
   border-radius: 12px;
+  padding: 10px;
+}
+.field .member-picker-search {
+  background: #fff;
+  border-color: #dbe3f1;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+}
+.member-picker {
   display: grid;
   gap: 8px;
   max-height: 230px;
   overflow: auto;
-  padding: 10px;
+}
+.member-picker-empty {
+  background: #fff;
+  border: 1px dashed #dbe3f1;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
 }
 .member-picker label {
   align-items: center;
