@@ -95,14 +95,35 @@ export default function TasksPage() {
     setLoading(true);
 
     try {
-      const [loadedTasks, loadedMembers, loadedStaffUsers] = await Promise.all([
+      const [loadedTasks, loadedMembers] = await Promise.all([
         apiGet<Task[]>('/tasks'),
         apiGet<Member[]>('/members'),
-        apiGet<StaffUser[]>('/users'),
       ]);
       setTasks(loadedTasks);
       setMembers(loadedMembers);
-      setStaffUsers(loadedStaffUsers);
+
+      try {
+        const loadedStaffUsers = await apiGet<StaffUser[]>('/users');
+        setStaffUsers(loadedStaffUsers);
+      } catch {
+        const currentUser = getStoredUser();
+        setStaffUsers(
+          currentUser
+            ? [
+                {
+                  id: currentUser.id,
+                  name: currentUser.name,
+                  email: currentUser.email,
+                  status: 'ACTIVE',
+                  role: {
+                    key: currentUser.role,
+                    name: translateStaffRole(currentUser.role),
+                  },
+                },
+              ]
+            : [],
+        );
+      }
     } catch {
       showError('No se pudieron cargar las tareas.');
     } finally {
