@@ -47,59 +47,54 @@ function format_date(?string $value): string
 function country_dial_codes(): array
 {
     return [
-        ['country' => 'Espana', 'flag' => '🇪🇸', 'code' => '+34'],
-        ['country' => 'Portugal', 'flag' => '🇵🇹', 'code' => '+351'],
-        ['country' => 'Francia', 'flag' => '🇫🇷', 'code' => '+33'],
-        ['country' => 'Italia', 'flag' => '🇮🇹', 'code' => '+39'],
-        ['country' => 'Alemania', 'flag' => '🇩🇪', 'code' => '+49'],
-        ['country' => 'Reino Unido', 'flag' => '🇬🇧', 'code' => '+44'],
-        ['country' => 'Irlanda', 'flag' => '🇮🇪', 'code' => '+353'],
-        ['country' => 'Paises Bajos', 'flag' => '🇳🇱', 'code' => '+31'],
-        ['country' => 'Belgica', 'flag' => '🇧🇪', 'code' => '+32'],
-        ['country' => 'Suiza', 'flag' => '🇨🇭', 'code' => '+41'],
-        ['country' => 'Austria', 'flag' => '🇦🇹', 'code' => '+43'],
-        ['country' => 'Dinamarca', 'flag' => '🇩🇰', 'code' => '+45'],
-        ['country' => 'Suecia', 'flag' => '🇸🇪', 'code' => '+46'],
-        ['country' => 'Noruega', 'flag' => '🇳🇴', 'code' => '+47'],
-        ['country' => 'Finlandia', 'flag' => '🇫🇮', 'code' => '+358'],
-        ['country' => 'Polonia', 'flag' => '🇵🇱', 'code' => '+48'],
-        ['country' => 'Rumania', 'flag' => '🇷🇴', 'code' => '+40'],
-        ['country' => 'Marruecos', 'flag' => '🇲🇦', 'code' => '+212'],
-        ['country' => 'Estados Unidos', 'flag' => '🇺🇸', 'code' => '+1'],
-        ['country' => 'Canada', 'flag' => '🇨🇦', 'code' => '+1'],
-        ['country' => 'Mexico', 'flag' => '🇲🇽', 'code' => '+52'],
-        ['country' => 'Argentina', 'flag' => '🇦🇷', 'code' => '+54'],
-        ['country' => 'Chile', 'flag' => '🇨🇱', 'code' => '+56'],
-        ['country' => 'Colombia', 'flag' => '🇨🇴', 'code' => '+57'],
-        ['country' => 'Peru', 'flag' => '🇵🇪', 'code' => '+51'],
-        ['country' => 'Ecuador', 'flag' => '🇪🇨', 'code' => '+593'],
-        ['country' => 'Venezuela', 'flag' => '🇻🇪', 'code' => '+58'],
-        ['country' => 'Uruguay', 'flag' => '🇺🇾', 'code' => '+598'],
-        ['country' => 'Paraguay', 'flag' => '🇵🇾', 'code' => '+595'],
-        ['country' => 'Brasil', 'flag' => '🇧🇷', 'code' => '+55'],
-        ['country' => 'China', 'flag' => '🇨🇳', 'code' => '+86'],
-        ['country' => 'Japon', 'flag' => '🇯🇵', 'code' => '+81'],
-        ['country' => 'Corea del Sur', 'flag' => '🇰🇷', 'code' => '+82'],
-        ['country' => 'India', 'flag' => '🇮🇳', 'code' => '+91'],
-        ['country' => 'Australia', 'flag' => '🇦🇺', 'code' => '+61'],
+        ['country' => 'Espana', 'iso' => 'es', 'code' => '+34'],
+        ['country' => 'Portugal', 'iso' => 'pt', 'code' => '+351'],
+        ['country' => 'Francia', 'iso' => 'fr', 'code' => '+33'],
+        ['country' => 'Italia', 'iso' => 'it', 'code' => '+39'],
+        ['country' => 'Alemania', 'iso' => 'de', 'code' => '+49'],
+        ['country' => 'Reino Unido', 'iso' => 'gb', 'code' => '+44'],
+        ['country' => 'Irlanda', 'iso' => 'ie', 'code' => '+353'],
+        ['country' => 'Paises Bajos', 'iso' => 'nl', 'code' => '+31'],
+        ['country' => 'Belgica', 'iso' => 'be', 'code' => '+32'],
+        ['country' => 'Suiza', 'iso' => 'ch', 'code' => '+41'],
+        ['country' => 'Austria', 'iso' => 'at', 'code' => '+43'],
+        ['country' => 'Dinamarca', 'iso' => 'dk', 'code' => '+45'],
+        ['country' => 'Suecia', 'iso' => 'se', 'code' => '+46'],
+        ['country' => 'Noruega', 'iso' => 'no', 'code' => '+47'],
+        ['country' => 'Finlandia', 'iso' => 'fi', 'code' => '+358'],
+        ['country' => 'Polonia', 'iso' => 'pl', 'code' => '+48'],
+        ['country' => 'Rumania', 'iso' => 'ro', 'code' => '+40'],
+        ['country' => 'Marruecos', 'iso' => 'ma', 'code' => '+212'],
+        ['country' => 'Estados Unidos', 'iso' => 'us', 'code' => '+1'],
+        ['country' => 'Canada', 'iso' => 'ca', 'code' => '+1'],
+        ['country' => 'Mexico', 'iso' => 'mx', 'code' => '+52'],
+        ['country' => 'Argentina', 'iso' => 'ar', 'code' => '+54'],
+        ['country' => 'Chile', 'iso' => 'cl', 'code' => '+56'],
+        ['country' => 'Colombia', 'iso' => 'co', 'code' => '+57'],
+        ['country' => 'Peru', 'iso' => 'pe', 'code' => '+51'],
+        ['country' => 'Ecuador', 'iso' => 'ec', 'code' => '+593'],
+        ['country' => 'Venezuela', 'iso' => 've', 'code' => '+58'],
+        ['country' => 'Uruguay', 'iso' => 'uy', 'code' => '+598'],
+        ['country' => 'Paraguay', 'iso' => 'py', 'code' => '+595'],
+        ['country' => 'Brasil', 'iso' => 'br', 'code' => '+55'],
+        ['country' => 'China', 'iso' => 'cn', 'code' => '+86'],
+        ['country' => 'Japon', 'iso' => 'jp', 'code' => '+81'],
+        ['country' => 'Corea del Sur', 'iso' => 'kr', 'code' => '+82'],
+        ['country' => 'India', 'iso' => 'in', 'code' => '+91'],
+        ['country' => 'Australia', 'iso' => 'au', 'code' => '+61'],
     ];
 }
 
 function country_dial_options(): array
 {
-    $options = [];
-    foreach (country_dial_codes() as $entry) {
-        $options[] = $entry['flag'] . ' ' . $entry['code'];
-    }
-
-    return $options;
+    return country_dial_codes();
 }
 
 function phone_country_value(?string $phone): string
 {
     $phone = trim((string) $phone);
     if ($phone === '') {
-        return '🇪🇸 +34';
+        return '+34';
     }
 
     $codes = country_dial_codes();
@@ -108,7 +103,7 @@ function phone_country_value(?string $phone): string
     foreach ($codes as $entry) {
         $code = $entry['code'];
         if (str_starts_with($phone, $code)) {
-            return $entry['flag'] . ' ' . $code;
+            return $code;
         }
     }
 
@@ -116,7 +111,20 @@ function phone_country_value(?string $phone): string
         return $matches[1];
     }
 
-    return '🇪🇸 +34';
+    return '+34';
+}
+
+function phone_country_entry(?string $phone): array
+{
+    $code = phone_country_value($phone);
+
+    foreach (country_dial_codes() as $entry) {
+        if ($entry['code'] === $code) {
+            return $entry;
+        }
+    }
+
+    return country_dial_codes()[0];
 }
 
 function phone_local_value(?string $phone): string

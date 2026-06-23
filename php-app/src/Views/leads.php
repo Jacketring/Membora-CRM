@@ -166,14 +166,29 @@
           <span>Apellidos</span>
           <input name="last_name" value="<?= e($lead['last_name']) ?>">
         </label>
+        <?php $phoneCountry = phone_country_entry($lead['phone']); ?>
         <label class="field">
           <span>Telefono</span>
           <div class="phone-combo">
-            <select class="phone-country-input" name="phone_country" aria-label="Prefijo de pais">
-              <?php foreach (country_dial_options() as $option): ?>
-                <option value="<?= e($option) ?>" <?= phone_country_value($lead['phone']) === $option ? 'selected' : '' ?>><?= e($option) ?></option>
-              <?php endforeach; ?>
-            </select>
+            <div class="phone-prefix-picker" data-phone-picker>
+              <input type="hidden" name="phone_country" value="<?= e($phoneCountry['code']) ?>" data-phone-country-value>
+              <button class="phone-prefix-trigger" type="button" data-phone-country-trigger aria-label="Seleccionar prefijo">
+                <img src="https://flagcdn.com/w40/<?= e($phoneCountry['iso']) ?>.png" alt="" data-phone-country-flag>
+                <span data-phone-country-code><?= e($phoneCountry['code']) ?></span>
+              </button>
+              <div class="phone-prefix-menu" data-phone-country-menu hidden>
+                <input class="phone-prefix-search" type="search" placeholder="Buscar pais" data-phone-country-search>
+                <div class="phone-prefix-options">
+                  <?php foreach (country_dial_options() as $option): ?>
+                    <button type="button" data-phone-country-option data-code="<?= e($option['code']) ?>" data-iso="<?= e($option['iso']) ?>" data-search="<?= e(strtolower($option['country'] . ' ' . $option['code'] . ' ' . $option['iso'])) ?>">
+                      <img src="https://flagcdn.com/w40/<?= e($option['iso']) ?>.png" alt="">
+                      <span><?= e($option['code']) ?></span>
+                      <small><?= e($option['country']) ?></small>
+                    </button>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+            </div>
             <input class="phone-number-input" name="phone_number" value="<?= e(phone_local_value($lead['phone'])) ?>" inputmode="tel" placeholder="Numero">
           </div>
         </label>
@@ -269,14 +284,29 @@
         <span>Apellidos</span>
         <input name="last_name">
       </label>
+      <?php $defaultPhoneCountry = phone_country_entry(null); ?>
       <label class="field">
         <span>Telefono</span>
         <div class="phone-combo">
-          <select class="phone-country-input" name="phone_country" aria-label="Prefijo de pais">
-            <?php foreach (country_dial_options() as $option): ?>
-              <option value="<?= e($option) ?>" <?= $option === '🇪🇸 +34' ? 'selected' : '' ?>><?= e($option) ?></option>
-            <?php endforeach; ?>
-          </select>
+          <div class="phone-prefix-picker" data-phone-picker>
+            <input type="hidden" name="phone_country" value="<?= e($defaultPhoneCountry['code']) ?>" data-phone-country-value>
+            <button class="phone-prefix-trigger" type="button" data-phone-country-trigger aria-label="Seleccionar prefijo">
+              <img src="https://flagcdn.com/w40/<?= e($defaultPhoneCountry['iso']) ?>.png" alt="" data-phone-country-flag>
+              <span data-phone-country-code><?= e($defaultPhoneCountry['code']) ?></span>
+            </button>
+            <div class="phone-prefix-menu" data-phone-country-menu hidden>
+              <input class="phone-prefix-search" type="search" placeholder="Buscar pais" data-phone-country-search>
+              <div class="phone-prefix-options">
+                <?php foreach (country_dial_options() as $option): ?>
+                  <button type="button" data-phone-country-option data-code="<?= e($option['code']) ?>" data-iso="<?= e($option['iso']) ?>" data-search="<?= e(strtolower($option['country'] . ' ' . $option['code'] . ' ' . $option['iso'])) ?>">
+                    <img src="https://flagcdn.com/w40/<?= e($option['iso']) ?>.png" alt="">
+                    <span><?= e($option['code']) ?></span>
+                    <small><?= e($option['country']) ?></small>
+                  </button>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
           <input class="phone-number-input" name="phone_number" inputmode="tel" placeholder="Numero">
         </div>
       </label>
