@@ -811,12 +811,12 @@ a.global-search-result:hover {
 }
 .task-toolbar {
   align-items: stretch;
-  grid-template-columns: minmax(280px, 1fr) auto;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr) auto;
 }
 .task-toolbar .lead-filter-group {
   display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  grid-template-columns: repeat(5, minmax(142px, 1fr));
+  min-width: 0;
   width: 100%;
 }
 .task-toolbar .filter-control.custom-select--filter,
@@ -826,6 +826,15 @@ a.global-search-result:hover {
 }
 .task-toolbar .primary-action {
   min-height: 54px;
+}
+@media (max-width: 1280px) {
+  .task-toolbar {
+    grid-template-columns: minmax(260px, 360px) auto;
+  }
+  .task-toolbar .lead-filter-group {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
 }
 .lead-filter-group {
   align-items: center;
