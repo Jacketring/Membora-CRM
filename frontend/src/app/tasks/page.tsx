@@ -97,12 +97,15 @@ export default function TasksPage() {
     setLoading(true);
 
     try {
-      const [loadedTasks, loadedMembers] = await Promise.all([
-        apiGet<Task[]>('/tasks'),
-        apiGet<Member[]>('/members'),
-      ]);
+      const loadedTasks = await apiGet<Task[]>('/tasks');
       setTasks(loadedTasks);
-      setMembers(loadedMembers);
+
+      try {
+        const loadedMembers = await apiGet<Member[]>('/members');
+        setMembers(loadedMembers);
+      } catch {
+        setMembers([]);
+      }
 
       try {
         const loadedStaffUsers = await apiGet<StaffUser[]>('/users');
