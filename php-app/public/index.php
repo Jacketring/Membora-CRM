@@ -55,12 +55,25 @@ switch ($route) {
         $filters = [
             'q' => trim((string) ($_GET['q'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
+            'type' => trim((string) ($_GET['type'] ?? '')),
+            'assigned_user_id' => trim((string) ($_GET['assigned_user_id'] ?? '')),
+            'date_from' => trim((string) ($_GET['date_from'] ?? '')),
+            'date_to' => trim((string) ($_GET['date_to'] ?? '')),
         ];
         render_layout('Tareas', 'tasks', [
             'filters' => $filters,
             'staff' => StaffRepository::all($tenantId),
+            'members' => MemberRepository::all($tenantId),
             'metrics' => TaskRepository::metrics($tenantId),
-            'tasks' => TaskRepository::all($tenantId, $filters['q'], $filters['status']),
+            'tasks' => TaskRepository::all(
+                $tenantId,
+                $filters['q'],
+                $filters['status'],
+                $filters['type'],
+                $filters['assigned_user_id'],
+                $filters['date_from'],
+                $filters['date_to']
+            ),
         ]);
         break;
 

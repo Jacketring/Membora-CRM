@@ -317,19 +317,45 @@ final class Actions
             redirect('tasks');
         }
 
+        TaskRepository::ensureMemberLinksTable();
+        $tenantId = Auth::tenantId();
+        $memberIds = array_values(array_filter(array_map(
+            static fn ($value): string => trim((string) $value),
+            is_array($_POST['member_ids'] ?? null) ? $_POST['member_ids'] : []
+        )));
+        $taskId = cuid();
+
         $stmt = Database::connection()->prepare(
-            'INSERT INTO tasks (id, tenant_id, assigned_user_id, title, description, type, status, due_at, created_at, updated_at)
-             VALUES (:id, :tenant_id, :assigned_user_id, :title, :description, :type, "PENDING", :due_at, NOW(), NOW())'
+            'INSERT INTO tasks (id, tenant_id, assigned_user_id, member_id, title, description, type, status, due_at, created_at, updated_at)
+             VALUES (:id, :tenant_id, :assigned_user_id, :member_id, :title, :description, :type, "PENDING", :due_at, NOW(), NOW())'
         );
         $stmt->execute([
-            'id' => cuid(),
-            'tenant_id' => Auth::tenantId(),
+            'id' => $taskId,
+            'tenant_id' => $tenantId,
             'assigned_user_id' => post_value('assigned_user_id') ?: null,
+            'member_id' => $memberIds[0] ?? null,
             'title' => $title,
             'description' => post_value('description') ?: null,
             'type' => post_value('type', 'OTHER'),
             'due_at' => post_value('due_at') ?: null,
         ]);
+
+        if ($memberIds) {
+            $link = Database::connection()->prepare(
+                'INSERT IGNORE INTO task_members (id, tenant_id, task_id, member_id, created_at)
+                 VALUES (:id, :tenant_id, :task_id, :member_id, NOW())'
+            );
+
+            foreach ($memberIds as $memberId) {
+                $link->execute([
+                    'id' => cuid(),
+                    'tenant_id' => $tenantId,
+                    'task_id' => $taskId,
+                    'member_id' => $memberId,
+                ]);
+            }
+        }
+
         flash('Tarea creada correctamente.');
         redirect('tasks');
     }
@@ -355,6 +381,9 @@ final class Actions
         $pdo = Database::connection();
         $taskId = post_value('id');
         $tenantId = Auth::tenantId();
+        TaskRepository::ensureMemberLinksTable();
+        $deleteLinks = $pdo->prepare('DELETE FROM task_members WHERE task_id = :id AND tenant_id = :tenant_id');
+        $deleteLinks->execute(['id' => $taskId, 'tenant_id' => $tenantId]);
         $alerts = $pdo->prepare('DELETE FROM risk_alerts WHERE task_id = :id AND tenant_id = :tenant_id');
         $alerts->execute(['id' => $taskId, 'tenant_id' => $tenantId]);
         $stmt = $pdo->prepare('DELETE FROM tasks WHERE id = :id AND tenant_id = :tenant_id');
