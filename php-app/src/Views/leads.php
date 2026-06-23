@@ -25,7 +25,7 @@
   </article>
 </section>
 
-<form class="lead-toolbar" method="get" aria-label="Filtros de leads" data-auto-filter-form>
+<form class="lead-toolbar" method="get" aria-label="Filtros de leads" data-auto-filter-form data-live-search-form data-live-search-target="leads-table">
   <input type="hidden" name="route" value="leads">
   <label class="lead-search">
     <span>Buscar</span>
@@ -94,12 +94,12 @@
   <header>
     <div>
       <h3>Listado de leads</h3>
-      <span><?= count($leads) ?> resultados</span>
+      <span data-live-search-count><?= count($leads) ?> resultados</span>
     </div>
   </header>
 
   <div class="leads-table-wrap">
-    <table class="leads-table">
+    <table class="leads-table" id="leads-table">
       <caption class="sr-only">Listado de leads con contacto, etapa, estado, responsable, fecha de creacion y acciones disponibles</caption>
       <thead>
         <tr>
@@ -117,7 +117,7 @@
       </thead>
       <tbody>
         <?php foreach ($leads as $lead): ?>
-          <tr class="lead-data-row clickable-row" data-open-modal="lead-detail-<?= e($lead['id']) ?>">
+          <tr class="lead-data-row clickable-row" data-open-modal="lead-detail-<?= e($lead['id']) ?>" data-live-search-row>
             <td>
               <strong><?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?></strong>
             </td>
@@ -162,8 +162,12 @@
         <?php endforeach; ?>
 
         <?php if (!$leads): ?>
-          <tr>
+          <tr data-live-search-empty>
             <td class="leads-empty-cell" colspan="10">No hay leads que coincidan con los filtros actuales.</td>
+          </tr>
+        <?php else: ?>
+          <tr data-live-search-empty hidden>
+            <td class="leads-empty-cell" colspan="10">No hay leads que coincidan con la busqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>

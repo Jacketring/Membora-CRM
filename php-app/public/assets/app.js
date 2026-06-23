@@ -240,6 +240,10 @@ document.addEventListener('keydown', (event) => {
 
 document.querySelectorAll('[data-auto-filter-form]').forEach((form) => {
   form.querySelectorAll('[data-auto-filter-input]').forEach((input) => {
+    if (input.name === 'q') {
+      return;
+    }
+
     input.addEventListener('input', () => {
       submitAutoFilterForm(form, input.type === 'date' ? 0 : 420);
     });
@@ -248,6 +252,51 @@ document.querySelectorAll('[data-auto-filter-form]').forEach((form) => {
       submitAutoFilterForm(form, 0);
     });
   });
+});
+
+function normalizeSearchText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+document.querySelectorAll('[data-live-search-form]').forEach((form) => {
+  const input = form.querySelector('input[name="q"]');
+  const tableId = form.dataset.liveSearchTarget;
+  const table = tableId ? document.getElementById(tableId) : null;
+  const counter = document.querySelector('[data-live-search-count]');
+
+  if (!input || !table) {
+    return;
+  }
+
+  const rows = Array.from(table.querySelectorAll('[data-live-search-row]'));
+  const emptyRow = table.querySelector('[data-live-search-empty]');
+
+  function applyLiveSearch() {
+    const term = normalizeSearchText(input.value.trim());
+    let visibleCount = 0;
+
+    rows.forEach((row) => {
+      const matches = term === '' || normalizeSearchText(row.textContent).includes(term);
+      row.hidden = !matches;
+      if (matches) {
+        visibleCount += 1;
+      }
+    });
+
+    if (emptyRow) {
+      emptyRow.hidden = visibleCount !== 0;
+    }
+
+    if (counter) {
+      counter.textContent = `${visibleCount} ${visibleCount === 1 ? 'resultado' : 'resultados'}`;
+    }
+  }
+
+  input.addEventListener('input', applyLiveSearch);
+  applyLiveSearch();
 });
 
 document.querySelectorAll('[data-prevent-double-submit]').forEach((form) => {

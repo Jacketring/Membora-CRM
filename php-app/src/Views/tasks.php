@@ -42,7 +42,7 @@ $taskStatusOptions = [
 ];
 ?>
 
-<form class="lead-toolbar task-toolbar" method="get" data-auto-filter-form>
+<form class="lead-toolbar task-toolbar" method="get" data-auto-filter-form data-live-search-form data-live-search-target="tasks-table">
   <input type="hidden" name="route" value="tasks">
   <div class="lead-search">
     <span>Buscar</span>
@@ -117,12 +117,12 @@ $taskStatusOptions = [
   <header>
     <div>
       <h3>Listado de tareas</h3>
-      <span><?= count($tasks) ?> resultados</span>
+      <span data-live-search-count><?= count($tasks) ?> resultados</span>
     </div>
   </header>
 
   <div class="leads-table-wrap">
-    <table class="leads-table tasks-table">
+    <table class="leads-table tasks-table" id="tasks-table">
       <thead>
         <tr>
           <th>Tarea</th>
@@ -149,7 +149,7 @@ $taskStatusOptions = [
                 }
             }
           ?>
-          <tr class="lead-data-row clickable-row" data-open-modal="task-detail-<?= e($task['id']) ?>" tabindex="0" role="button" aria-label="Editar tarea <?= e($task['title']) ?>">
+          <tr class="lead-data-row clickable-row" data-open-modal="task-detail-<?= e($task['id']) ?>" tabindex="0" role="button" aria-label="Editar tarea <?= e($task['title']) ?>" data-live-search-row>
             <td>
               <strong><?= e($task['title']) ?></strong>
               <small class="task-description"><?= e($task['description'] ?: 'Sin descripcion') ?></small>
@@ -222,8 +222,12 @@ $taskStatusOptions = [
         <?php endforeach; ?>
 
         <?php if (!$tasks): ?>
-          <tr>
+          <tr data-live-search-empty>
             <td class="leads-empty-cell" colspan="8">No hay tareas que coincidan con los filtros actuales.</td>
+          </tr>
+        <?php else: ?>
+          <tr data-live-search-empty hidden>
+            <td class="leads-empty-cell" colspan="8">No hay tareas que coincidan con la busqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
