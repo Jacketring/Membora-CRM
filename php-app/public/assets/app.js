@@ -7,6 +7,27 @@ function openModalById(id) {
   if (modal) modal.showModal();
 }
 
+function clearModalUrlParam(modal) {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('modal') !== modal.id) {
+    return;
+  }
+
+  params.delete('modal');
+  const nextQuery = params.toString();
+  const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, '', nextUrl);
+}
+
+const modalToOpen = new URLSearchParams(window.location.search).get('modal');
+if (modalToOpen) {
+  openModalById(modalToOpen);
+}
+
+document.querySelectorAll('dialog').forEach((modal) => {
+  modal.addEventListener('close', () => clearModalUrlParam(modal));
+});
+
 document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
   trigger.addEventListener('click', (event) => {
     if (trigger.classList.contains('clickable-row') && shouldIgnoreModalOpen(event)) {

@@ -150,10 +150,11 @@ final class Actions
 
     private static function addLeadNote(): never
     {
+        $leadId = post_value('id');
         $note = post_value('note', '');
         if ($note === '') {
             flash('La nota no puede estar vacia.', 'error');
-            redirect('leads');
+            self::redirectLeadModal($leadId);
         }
 
         LeadRepository::ensureNotesTable();
@@ -164,21 +165,22 @@ final class Actions
         $stmt->execute([
             'id' => cuid(),
             'tenant_id' => Auth::tenantId(),
-            'lead_id' => post_value('id'),
+            'lead_id' => $leadId,
             'user_id' => Auth::user()['id'] ?? null,
             'note' => $note,
         ]);
 
         flash('Nota anadida correctamente.');
-        redirect('leads');
+        self::redirectLeadModal($leadId);
     }
 
     private static function updateLeadNote(): never
     {
+        $leadId = post_value('id');
         $note = post_value('note', '');
         if ($note === '') {
             flash('La nota no puede quedar vacia.', 'error');
-            redirect('leads');
+            self::redirectLeadModal($leadId);
         }
 
         LeadRepository::ensureNotesTable();
@@ -194,11 +196,12 @@ final class Actions
         ]);
 
         flash('Nota actualizada correctamente.');
-        redirect('leads');
+        self::redirectLeadModal($leadId);
     }
 
     private static function deleteLeadNote(): never
     {
+        $leadId = post_value('id');
         LeadRepository::ensureNotesTable();
         $stmt = Database::connection()->prepare(
             'DELETE FROM lead_notes WHERE id = :id AND tenant_id = :tenant_id'
@@ -209,7 +212,17 @@ final class Actions
         ]);
 
         flash('Nota eliminada correctamente.');
-        redirect('leads');
+        self::redirectLeadModal($leadId);
+    }
+
+    private static function redirectLeadModal(?string $leadId): never
+    {
+        if (!$leadId) {
+            redirect('leads');
+        }
+
+        header('Location: index.php?route=leads&modal=' . urlencode('lead-detail-' . $leadId));
+        exit;
     }
 
     private static function convertLead(): never
