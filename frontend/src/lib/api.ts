@@ -135,17 +135,6 @@ export interface Task {
     email: string | null;
     status: string;
   } | null;
-  taskMembers: Array<{
-    id: string;
-    member: {
-      id: string;
-      firstName: string;
-      lastName: string | null;
-      email: string | null;
-      phone: string | null;
-      status: string;
-    };
-  }>;
 }
 
 export interface Member {
@@ -183,7 +172,6 @@ export interface CreateTaskPayload {
   dueAt?: string | null;
   leadId?: string | null;
   memberId?: string | null;
-  memberIds?: string[];
   assignedUserId?: string | null;
 }
 

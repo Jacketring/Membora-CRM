@@ -28,7 +28,6 @@ import {
   AuthUser,
   getStoredToken,
   getStoredUser,
-  Member,
   StaffUser,
   Task,
 } from '@/lib/api';
@@ -65,7 +64,6 @@ export default function TasksPage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [members, setMembers] = useState<Member[]>([]);
   const [staffUsers, setStaffUsers] = useState<StaffUser[]>([]);
   const [filters, setFilters] = useState<TaskFiltersState>(initialFilters);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -99,13 +97,6 @@ export default function TasksPage() {
     try {
       const loadedTasks = await apiGet<Task[]>('/tasks');
       setTasks(loadedTasks);
-
-      try {
-        const loadedMembers = await apiGet<Member[]>('/members');
-        setMembers(loadedMembers);
-      } catch {
-        setMembers([]);
-      }
 
       try {
         const loadedStaffUsers = await apiGet<StaffUser[]>('/users');
@@ -186,15 +177,12 @@ export default function TasksPage() {
   );
   const selectedTasksCount = selectedTaskIds.length;
 
-  async function createTask(payload: CreateTaskPayload, memberIds: string[]) {
+  async function createTask(payload: CreateTaskPayload) {
     setSaving(true);
     setMessage('');
 
     try {
-      await apiPost<Task>('/tasks', {
-        ...payload,
-        memberIds,
-      });
+      await apiPost<Task>('/tasks', payload);
 
       setShowCreateModal(false);
       await loadTasks();
@@ -437,7 +425,6 @@ export default function TasksPage() {
 
       {showCreateModal ? (
         <CreateTaskModal
-          members={members}
           onClose={() => setShowCreateModal(false)}
           onSubmit={createTask}
           saving={saving}
@@ -824,54 +811,33 @@ function PaginationControls({
 }
 
 function TaskLinkedMembers({ task }: { task: Task }) {
-  const [open, setOpen] = useState(false);
-  const linkedMembers = getTaskMembers(task);
-
-  if (linkedMembers.length === 0) {
-    if (task.lead) {
-      return (
-        <span>
-          {task.lead.firstName} {task.lead.lastName ?? ''}
-        </span>
-      );
-    }
-
-    return <span>Sin vincular</span>;
+  if (task.lead) {
+    return (
+      <span>
+        {task.lead.firstName} {task.lead.lastName ?? ''}
+      </span>
+    );
   }
 
-  if (linkedMembers.length === 1) {
-    return <span>{getTaskMemberName(linkedMembers[0])}</span>;
+  if (task.member) {
+    return (
+      <span>
+        {task.member.firstName} {task.member.lastName ?? ''}
+      </span>
+    );
   }
 
-  return (
-    <div className="linked-members-menu">
-      <button onClick={() => setOpen((current) => !current)} type="button">
-        {linkedMembers.length} socios vinculados
-      </button>
-      {open ? (
-        <div className="linked-members-popover">
-          {linkedMembers.map((member) => (
-            <div key={member.id}>
-              <strong>{getTaskMemberName(member)}</strong>
-              <small>{member.email ?? member.phone ?? 'Sin contacto'}</small>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
+  return <span>Sin vincular</span>;
 }
 
 function CreateTaskModal({
-  members,
   onClose,
   onSubmit,
   saving,
   staffUsers,
 }: {
-  members: Member[];
   onClose: () => void;
-  onSubmit: (payload: CreateTaskPayload, memberIds: string[]) => void;
+  onSubmit: (payload: CreateTaskPayload) => void;
   saving: boolean;
   staffUsers: StaffUser[];
 }) {
@@ -886,33 +852,13 @@ function CreateTaskModal({
     dueAt: '',
     assignedUserId: defaultAssignedUserId,
   });
-  const [memberQuery, setMemberQuery] = useState('');
-  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [validation, setValidation] = useState('');
-
-  const filteredMembers = useMemo(() => {
-    const term = memberQuery.trim().toLowerCase();
-    const selectedIds = new Set(selectedMembers.map((member) => member.id));
-
-    if (!term) {
-      return [];
-    }
-
-    return members
-      .filter((member) => !selectedIds.has(member.id))
-      .filter((member) =>
-        [member.firstName, member.lastName, member.email, member.phone]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(term)),
-      )
-      .slice(0, 8);
-  }, [memberQuery, members, selectedMembers]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!form.title.trim()) {
-      setValidation('El título es obligatorio.');
+      setValidation('El titulo es obligatorio.');
       return;
     }
 
@@ -922,16 +868,7 @@ function CreateTaskModal({
       title: form.title.trim(),
       description: form.description?.trim() || undefined,
       dueAt: form.dueAt ? new Date(form.dueAt).toISOString() : null,
-    }, selectedMembers.map((member) => member.id));
-  }
-
-  function selectMember(member: Member) {
-    setSelectedMembers((current) => [...current, member]);
-    setMemberQuery('');
-  }
-
-  function removeMember(memberId: string) {
-    setSelectedMembers((current) => current.filter((member) => member.id !== memberId));
+    });
   }
 
   return (
@@ -940,7 +877,7 @@ function CreateTaskModal({
         <header>
           <div>
             <h2>Nueva tarea</h2>
-            <p>Registra una acción de seguimiento o gestión interna.</p>
+            <p>Registra una accion de seguimiento o gestion interna.</p>
           </div>
           <button onClick={onClose} type="button">
             Cerrar
@@ -951,7 +888,7 @@ function CreateTaskModal({
 
         <div className="form-grid">
           <label className="field field--wide">
-            <span>Título</span>
+            <span>Titulo</span>
             <input
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
               required
@@ -999,52 +936,13 @@ function CreateTaskModal({
             </select>
           </label>
           <label className="field field--wide">
-            <span>Descripción</span>
+            <span>Descripcion</span>
             <input
               onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
               placeholder="Ej. Llamar para confirmar prueba, revisar pago pendiente..."
               value={form.description ?? ''}
             />
           </label>
-          <div className="field field--wide member-picker">
-            <span>Socios vinculados</span>
-            <div className="member-picker__search">
-              <Search size={18} />
-              <input
-                onChange={(event) => setMemberQuery(event.target.value)}
-                placeholder="Escribe el nombre, email o teléfono de un socio"
-                value={memberQuery}
-              />
-            </div>
-            {selectedMembers.length ? (
-              <div className="member-picker__selected">
-                {selectedMembers.map((member) => (
-                  <button key={member.id} onClick={() => removeMember(member.id)} type="button">
-                    {getMemberName(member)}
-                    <X size={14} />
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <small className="member-picker__hint">
-                Si seleccionas varios socios, quedarán vinculados dentro de la misma tarea.
-              </small>
-            )}
-            {memberQuery ? (
-              <div className="member-picker__results">
-                {filteredMembers.length ? (
-                  filteredMembers.map((member) => (
-                    <button key={member.id} onClick={() => selectMember(member)} type="button">
-                      <strong>{getMemberName(member)}</strong>
-                      <small>{member.email ?? member.phone ?? translateMemberStatus(member.status)}</small>
-                    </button>
-                  ))
-                ) : (
-                  <p>No hay socios que coincidan.</p>
-                )}
-              </div>
-            ) : null}
-          </div>
         </div>
 
         <button className="primary-action" disabled={saving} type="submit">
@@ -1054,7 +952,6 @@ function CreateTaskModal({
     </div>
   );
 }
-
 function TaskDetailDrawer({
   onCancel,
   onClose,
@@ -1159,12 +1056,6 @@ function translateTaskType(type: Task['type']) {
 }
 
 function getRelatedName(task: Task) {
-  const linkedMembers = getTaskMembers(task);
-
-  if (linkedMembers.length) {
-    return linkedMembers.map(getTaskMemberName).join(', ');
-  }
-
   if (task.lead) {
     return `${task.lead.firstName} ${task.lead.lastName ?? ''}`.trim();
   }
@@ -1174,37 +1065,6 @@ function getRelatedName(task: Task) {
   }
 
   return 'Sin vincular';
-}
-
-function getTaskMembers(task: Task) {
-  if (task.taskMembers?.length) {
-    return task.taskMembers.map((item) => item.member);
-  }
-
-  return task.member ? [{ ...task.member, phone: null }] : [];
-}
-
-function getTaskMemberName(member: {
-  firstName: string;
-  lastName: string | null;
-}) {
-  return `${member.firstName} ${member.lastName ?? ''}`.trim();
-}
-
-function getMemberName(member: Member) {
-  return `${member.firstName} ${member.lastName ?? ''}`.trim();
-}
-
-function translateMemberStatus(status: Member['status']) {
-  const labels: Record<Member['status'], string> = {
-    ACTIVE: 'Activo',
-    INACTIVE: 'Inactivo',
-    AT_RISK: 'En riesgo',
-    CANCELLED: 'Cancelado',
-    PAYMENT_PENDING: 'Pago pendiente',
-  };
-
-  return labels[status];
 }
 
 function translateStaffRole(role: string) {

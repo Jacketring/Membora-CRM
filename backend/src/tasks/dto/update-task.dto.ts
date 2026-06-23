@@ -4,7 +4,6 @@ export interface UpdateTaskDto {
   assignedUserId?: string | null;
   leadId?: string | null;
   memberId?: string | null;
-  memberIds?: string[];
   title?: string;
   description?: string | null;
   type?: TaskType;
