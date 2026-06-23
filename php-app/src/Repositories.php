@@ -8,8 +8,14 @@ final class DashboardRepository
 
         return [
             'activeMembers' => self::count($pdo, 'members', 'status = "ACTIVE"', $tenantId),
+            'totalMembers' => self::count($pdo, 'members', '1 = 1', $tenantId),
             'openLeads' => self::count($pdo, 'leads', 'status = "OPEN"', $tenantId),
+            'convertedLeads' => self::count($pdo, 'leads', 'status = "CONVERTED"', $tenantId),
+            'lostLeads' => self::count($pdo, 'leads', 'status = "LOST"', $tenantId),
+            'totalLeads' => self::count($pdo, 'leads', '1 = 1', $tenantId),
             'pendingTasks' => self::count($pdo, 'tasks', 'status = "PENDING"', $tenantId),
+            'completedTasks' => self::count($pdo, 'tasks', 'status = "COMPLETED"', $tenantId),
+            'todayTasks' => self::count($pdo, 'tasks', 'DATE(due_at) = CURDATE()', $tenantId),
             'overdueTasks' => self::count($pdo, 'tasks', 'status = "PENDING" AND due_at < NOW()', $tenantId),
             'openAlerts' => self::count($pdo, 'risk_alerts', 'status = "OPEN"', $tenantId),
             'pendingPayments' => self::count($pdo, 'payments', 'status IN ("PENDING", "OVERDUE")', $tenantId),
