@@ -420,6 +420,50 @@ a { color: inherit; text-decoration: none; }
   border-radius: 12px;
   padding: 12px 14px;
 }
+.note-item {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.note-edit-form { display: grid; gap: 8px; margin: 0; }
+.note-edit-form textarea {
+  background: #fff;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--text);
+  min-height: 78px;
+  outline: 0;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+}
+.note-edit-form textarea:focus {
+  border-color: #9bb7ec;
+  box-shadow: 0 0 0 3px rgba(7, 84, 214, 0.09);
+}
+.note-meta-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+.note-save-button {
+  background: #eef4ff;
+  border: 1px solid #dbe3f1;
+  border-radius: 8px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 7px 10px;
+}
+.note-save-button:hover {
+  background: var(--primary);
+  color: #fff;
+}
+.note-delete-form {
+  align-self: start;
+  margin: 0;
+}
 .notes-list p { margin: 0 0 8px; }
 .notes-list span, .empty-note { color: var(--muted); font-size: 13px; }
 

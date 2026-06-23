@@ -216,9 +216,23 @@
 
       <div class="notes-list">
         <?php foreach ($notes as $note): ?>
-          <article>
-            <p><?= nl2br(e($note['note'])) ?></p>
-            <span><?= e($note['user_name'] ?: 'Usuario') ?> &middot; <?= e(format_date($note['created_at'])) ?></span>
+          <article class="note-item">
+            <form method="post" class="note-edit-form">
+              <input type="hidden" name="action" value="update_lead_note">
+              <input type="hidden" name="note_id" value="<?= e($note['id']) ?>">
+              <textarea name="note" rows="3" required><?= e($note['note']) ?></textarea>
+              <div class="note-meta-row">
+                <span><?= e($note['user_name'] ?: 'Usuario') ?> &middot; <?= e(format_date($note['created_at'])) ?></span>
+                <button class="note-save-button" type="submit">Guardar</button>
+              </div>
+            </form>
+            <form method="post" class="note-delete-form" onsubmit="return confirm('Eliminar esta nota?')">
+              <input type="hidden" name="action" value="delete_lead_note">
+              <input type="hidden" name="note_id" value="<?= e($note['id']) ?>">
+              <button class="icon-action danger-action" type="submit" title="Eliminar nota" aria-label="Eliminar nota">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 21a2 2 0 0 1-2-2V8h14v11a2 2 0 0 1-2 2H7ZM9 6V4h6v2h5v2H4V6h5Zm0 5v7h2v-7H9Zm4 0v7h2v-7h-2Z"/></svg>
+              </button>
+            </form>
           </article>
         <?php endforeach; ?>
         <?php if (!$notes): ?>

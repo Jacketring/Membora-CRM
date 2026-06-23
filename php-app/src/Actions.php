@@ -16,6 +16,8 @@ final class Actions
             'create_lead' => self::createLead(),
             'update_lead' => self::updateLead(),
             'add_lead_note' => self::addLeadNote(),
+            'update_lead_note' => self::updateLeadNote(),
+            'delete_lead_note' => self::deleteLeadNote(),
             'update_lead_stage' => self::updateLeadStage(),
             'convert_lead' => self::convertLead(),
             'mark_lead_lost' => self::markLeadLost(),
@@ -151,6 +153,45 @@ final class Actions
         ]);
 
         flash('Nota anadida correctamente.');
+        redirect('leads');
+    }
+
+    private static function updateLeadNote(): never
+    {
+        $note = post_value('note', '');
+        if ($note === '') {
+            flash('La nota no puede quedar vacia.', 'error');
+            redirect('leads');
+        }
+
+        LeadRepository::ensureNotesTable();
+        $stmt = Database::connection()->prepare(
+            'UPDATE lead_notes
+             SET note = :note
+             WHERE id = :id AND tenant_id = :tenant_id'
+        );
+        $stmt->execute([
+            'note' => $note,
+            'id' => post_value('note_id'),
+            'tenant_id' => Auth::tenantId(),
+        ]);
+
+        flash('Nota actualizada correctamente.');
+        redirect('leads');
+    }
+
+    private static function deleteLeadNote(): never
+    {
+        LeadRepository::ensureNotesTable();
+        $stmt = Database::connection()->prepare(
+            'DELETE FROM lead_notes WHERE id = :id AND tenant_id = :tenant_id'
+        );
+        $stmt->execute([
+            'id' => post_value('note_id'),
+            'tenant_id' => Auth::tenantId(),
+        ]);
+
+        flash('Nota eliminada correctamente.');
         redirect('leads');
     }
 
