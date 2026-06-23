@@ -42,7 +42,7 @@ $taskStatusOptions = [
 ];
 ?>
 
-<form class="lead-toolbar" method="get">
+<form class="lead-toolbar task-toolbar" method="get">
   <input type="hidden" name="route" value="tasks">
   <div class="lead-search">
     <span>Buscar</span>

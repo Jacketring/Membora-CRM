@@ -801,6 +801,32 @@ a.global-search-result:hover {
   margin-bottom: 18px;
   padding: 14px;
 }
+.lead-search {
+  min-width: 0;
+  width: 100%;
+}
+.lead-search input {
+  min-width: 0;
+  width: 100%;
+}
+.task-toolbar {
+  align-items: stretch;
+  grid-template-columns: minmax(280px, 1fr) auto;
+}
+.task-toolbar .lead-filter-group {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  width: 100%;
+}
+.task-toolbar .filter-control.custom-select--filter,
+.task-toolbar .filter-control--date {
+  min-width: 0;
+  width: 100%;
+}
+.task-toolbar .primary-action {
+  min-height: 54px;
+}
 .lead-filter-group {
   align-items: center;
   display: flex;
