@@ -382,6 +382,66 @@ final class TaskRepository
 
 final class GlobalSearchRepository
 {
+    public static function autocomplete(string $tenantId, string $query): array
+    {
+        $results = self::search($tenantId, $query);
+        $items = [];
+
+        foreach ($results['leads'] as $lead) {
+            $name = trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''));
+            $items[] = [
+                'type' => 'Lead',
+                'kind' => 'lead',
+                'title' => $name,
+                'description' => $lead['email'] ?: ($lead['phone'] ?: ($lead['interest'] ?: status_label($lead['status']))),
+                'href' => 'index.php?route=leads&q=' . urlencode($query),
+            ];
+        }
+
+        foreach ($results['tasks'] as $task) {
+            $items[] = [
+                'type' => 'Tarea',
+                'kind' => 'task',
+                'title' => $task['title'],
+                'description' => format_date($task['due_at']) . ' - ' . ($task['assigned_name'] ?: 'Sin responsable'),
+                'href' => 'index.php?route=tasks&q=' . urlencode($query),
+            ];
+        }
+
+        foreach ($results['members'] as $member) {
+            $name = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
+            $items[] = [
+                'type' => 'Socio',
+                'kind' => 'member',
+                'title' => $name,
+                'description' => $member['email'] ?: ($member['phone'] ?: status_label($member['status'])),
+                'href' => '',
+            ];
+        }
+
+        foreach ($results['memberships'] as $plan) {
+            $items[] = [
+                'type' => 'Membresia',
+                'kind' => 'membership',
+                'title' => $plan['name'],
+                'description' => $plan['description'] ?: 'Plan de membresia',
+                'href' => '',
+            ];
+        }
+
+        foreach ($results['classes'] as $class) {
+            $items[] = [
+                'type' => 'Clase',
+                'kind' => 'class',
+                'title' => $class['name'],
+                'description' => $class['description'] ?: 'Tipo de clase',
+                'href' => '',
+            ];
+        }
+
+        return array_slice($items, 0, 10);
+    }
+
     public static function search(string $tenantId, string $query): array
     {
         $query = trim($query);

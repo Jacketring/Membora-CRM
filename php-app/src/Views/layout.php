@@ -35,11 +35,11 @@
 
     <section class="workspace">
       <header class="topbar">
-        <form class="search-box global-search-box" method="get" action="index.php">
-          <input type="hidden" name="route" value="search">
+        <form class="search-box global-search-box" method="get" action="index.php" data-global-search-form>
           <span>Buscar</span>
-          <input name="q" value="<?= e(($_GET['route'] ?? '') === 'search' && is_string($_GET['q'] ?? null) ? $_GET['q'] : '') ?>" placeholder="Buscar tareas, socios, leads, clases o membresias...">
-          <button type="submit" aria-label="Buscar">Buscar</button>
+          <input name="q" value="" placeholder="Buscar tareas, socios, leads, clases o membresias..." autocomplete="off" data-global-search-input>
+          <button class="global-search-submit" type="submit" aria-label="Buscar">Buscar</button>
+          <div class="global-search-dropdown" data-global-search-results hidden></div>
         </form>
         <div class="user-chip">
           <span><?= e(substr($user['name'], 0, 1)) ?></span>

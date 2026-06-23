@@ -19,6 +19,16 @@ if ($route === 'login') {
 Auth::requireUser();
 $tenantId = Auth::tenantId();
 
+if ($route === 'global-search') {
+    $query = trim((string) ($_GET['q'] ?? ''));
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'query' => $query,
+        'items' => GlobalSearchRepository::autocomplete($tenantId, $query),
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 switch ($route) {
     case 'dashboard':
         render_layout('Panel', 'dashboard', [
@@ -74,14 +84,6 @@ switch ($route) {
                 $filters['date_from'],
                 $filters['date_to']
             ),
-        ]);
-        break;
-
-    case 'search':
-        $query = trim((string) ($_GET['q'] ?? ''));
-        render_layout('Busqueda global', 'global-search', [
-            'query' => $query,
-            'results' => GlobalSearchRepository::search($tenantId, $query),
         ]);
         break;
 

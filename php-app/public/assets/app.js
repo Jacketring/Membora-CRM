@@ -130,6 +130,131 @@ document.querySelectorAll('[data-member-picker]').forEach((picker) => {
   });
 });
 
+document.querySelectorAll('[data-global-search-form]').forEach((form) => {
+  const input = form.querySelector('[data-global-search-input]');
+  const results = form.querySelector('[data-global-search-results]');
+  let searchTimer = null;
+  let activeController = null;
+
+  if (!input || !results) {
+    return;
+  }
+
+  function clearResults() {
+    results.hidden = true;
+    results.innerHTML = '';
+  }
+
+  function resultIcon(kind) {
+    const icon = document.createElement('span');
+    icon.className = `result-icon result-icon--${kind}`;
+    icon.textContent = kind.slice(0, 1).toUpperCase();
+    return icon;
+  }
+
+  function renderResults(items, term) {
+    results.innerHTML = '';
+
+    const heading = document.createElement('div');
+    heading.className = 'global-search-dropdown-heading';
+    heading.textContent = `Resultados para "${term}"`;
+    results.appendChild(heading);
+
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'global-search-empty';
+      empty.textContent = 'No hay resultados con esa busqueda.';
+      results.appendChild(empty);
+      results.hidden = false;
+      return;
+    }
+
+    items.forEach((item) => {
+      const row = document.createElement(item.href ? 'a' : 'div');
+      row.className = 'global-search-result';
+      if (item.href) {
+        row.href = item.href;
+      } else {
+        row.setAttribute('aria-disabled', 'true');
+      }
+
+      const body = document.createElement('div');
+      const title = document.createElement('strong');
+      const detail = document.createElement('small');
+      const type = document.createElement('em');
+
+      title.textContent = item.title;
+      detail.textContent = item.description || item.type;
+      type.textContent = item.type;
+
+      body.appendChild(title);
+      body.appendChild(detail);
+      row.appendChild(resultIcon(item.kind || 'default'));
+      row.appendChild(body);
+      row.appendChild(type);
+      results.appendChild(row);
+    });
+
+    results.hidden = false;
+  }
+
+  input.addEventListener('input', () => {
+    const term = input.value.trim();
+    window.clearTimeout(searchTimer);
+
+    if (activeController) {
+      activeController.abort();
+    }
+
+    if (term.length < 2) {
+      clearResults();
+      return;
+    }
+
+    searchTimer = window.setTimeout(async () => {
+      activeController = new AbortController();
+      try {
+        const response = await fetch(`index.php?route=global-search&q=${encodeURIComponent(term)}`, {
+          headers: { Accept: 'application/json' },
+          signal: activeController.signal,
+        });
+        if (!response.ok) {
+          clearResults();
+          return;
+        }
+
+        const payload = await response.json();
+        renderResults(payload.items || [], term);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          clearResults();
+        }
+      }
+    }, 180);
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      clearResults();
+      input.blur();
+    }
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const firstLink = results.querySelector('a.global-search-result');
+    if (firstLink) {
+      window.location.href = firstLink.href;
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!form.contains(event.target)) {
+      clearResults();
+    }
+  });
+});
+
 const confirmDialog = document.getElementById('confirm-dialog');
 let pendingConfirmForm = null;
 
