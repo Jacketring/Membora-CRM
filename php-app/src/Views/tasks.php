@@ -176,8 +176,9 @@
 </section>
 
 <dialog id="task-modal" class="modal-card">
-  <form method="post">
+  <form method="post" data-prevent-double-submit>
     <input type="hidden" name="action" value="create_task">
+    <input type="hidden" name="form_token" value="<?= e(form_token('create_task')) ?>">
     <header>
       <h2>Nueva tarea</h2>
       <button data-close-modal type="button">Cerrar</button>

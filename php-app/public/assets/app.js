@@ -93,3 +93,14 @@ document.addEventListener('click', (event) => {
     closePhonePickers(null);
   }
 });
+
+document.querySelectorAll('[data-prevent-double-submit]').forEach((form) => {
+  form.addEventListener('submit', () => {
+    const submitter = form.querySelector('button[type="submit"], button:not([type])');
+    if (submitter) {
+      submitter.disabled = true;
+      submitter.dataset.originalText = submitter.textContent;
+      submitter.textContent = 'Guardando...';
+    }
+  });
+});

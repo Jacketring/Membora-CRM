@@ -29,6 +29,22 @@ function flash(?string $message = null, string $type = 'success'): ?array
     return $flash;
 }
 
+function form_token(string $key): string
+{
+    $token = bin2hex(random_bytes(16));
+    $_SESSION['form_tokens'][$key] = $token;
+
+    return $token;
+}
+
+function consume_form_token(string $key, ?string $token): bool
+{
+    $storedToken = $_SESSION['form_tokens'][$key] ?? null;
+    unset($_SESSION['form_tokens'][$key]);
+
+    return is_string($storedToken) && is_string($token) && hash_equals($storedToken, $token);
+}
+
 function cuid(): string
 {
     return 'php_' . bin2hex(random_bytes(12));
