@@ -28,6 +28,7 @@ import {
   getStoredToken,
   getStoredUser,
   Member,
+  StaffUser,
   Task,
 } from '@/lib/api';
 
@@ -64,6 +65,7 @@ export default function TasksPage() {
   const user = useMemo(() => getStoredUser(), []);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [staffUsers, setStaffUsers] = useState<StaffUser[]>([]);
   const [filters, setFilters] = useState<TaskFiltersState>(initialFilters);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -93,12 +95,14 @@ export default function TasksPage() {
     setLoading(true);
 
     try {
-      const [loadedTasks, loadedMembers] = await Promise.all([
+      const [loadedTasks, loadedMembers, loadedStaffUsers] = await Promise.all([
         apiGet<Task[]>('/tasks'),
         apiGet<Member[]>('/members'),
+        apiGet<StaffUser[]>('/users'),
       ]);
       setTasks(loadedTasks);
       setMembers(loadedMembers);
+      setStaffUsers(loadedStaffUsers);
     } catch {
       showError('No se pudieron cargar las tareas.');
     } finally {
@@ -411,6 +415,7 @@ export default function TasksPage() {
           onClose={() => setShowCreateModal(false)}
           onSubmit={createTask}
           saving={saving}
+          staffUsers={staffUsers}
         />
       ) : null}
 
@@ -797,6 +802,14 @@ function TaskLinkedMembers({ task }: { task: Task }) {
   const linkedMembers = getTaskMembers(task);
 
   if (linkedMembers.length === 0) {
+    if (task.lead) {
+      return (
+        <span>
+          {task.lead.firstName} {task.lead.lastName ?? ''}
+        </span>
+      );
+    }
+
     return <span>Sin vincular</span>;
   }
 
@@ -828,18 +841,24 @@ function CreateTaskModal({
   onClose,
   onSubmit,
   saving,
+  staffUsers,
 }: {
   members: Member[];
   onClose: () => void;
   onSubmit: (payload: CreateTaskPayload, memberIds: string[]) => void;
   saving: boolean;
+  staffUsers: StaffUser[];
 }) {
+  const storedUser = useMemo(() => getStoredUser(), []);
+  const defaultAssignedUserId =
+    staffUsers.find((staffUser) => staffUser.id === storedUser?.id)?.id ?? staffUsers[0]?.id ?? null;
   const [form, setForm] = useState<CreateTaskPayload>({
     title: '',
     description: '',
     type: 'SALES',
     status: 'PENDING',
     dueAt: '',
+    assignedUserId: defaultAssignedUserId,
   });
   const [memberQuery, setMemberQuery] = useState('');
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
@@ -933,6 +952,25 @@ function CreateTaskModal({
               type="datetime-local"
               value={form.dueAt ?? ''}
             />
+          </label>
+          <label className="field field--wide">
+            <span>Responsable</span>
+            <select
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  assignedUserId: event.target.value || null,
+                }))
+              }
+              value={form.assignedUserId ?? ''}
+            >
+              <option value="">Sin responsable</option>
+              {staffUsers.map((staffUser) => (
+                <option key={staffUser.id} value={staffUser.id}>
+                  {staffUser.name} - {translateStaffRole(staffUser.role.key)}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="field field--wide">
             <span>Descripción</span>
@@ -1141,6 +1179,17 @@ function translateMemberStatus(status: Member['status']) {
   };
 
   return labels[status];
+}
+
+function translateStaffRole(role: string) {
+  const labels: Record<string, string> = {
+    GYM_ADMIN: 'Administrador',
+    SALES_RECEPTION: 'Recepción / comercial',
+    TRAINER: 'Entrenador',
+    SUPERADMIN: 'Superadmin',
+  };
+
+  return labels[role] ?? role;
 }
 
 function isOverdue(task: Task) {

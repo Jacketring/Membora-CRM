@@ -164,6 +164,17 @@ export interface Member {
   updatedAt: string;
 }
 
+export interface StaffUser {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  role: {
+    key: string;
+    name: string;
+  };
+}
+
 export interface CreateTaskPayload {
   title: string;
   description?: string | null;

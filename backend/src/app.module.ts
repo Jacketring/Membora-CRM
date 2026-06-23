@@ -16,6 +16,7 @@ import { ReservationsModule } from './reservations/reservations.module';
 import { RiskAlertsModule } from './risk-alerts/risk-alerts.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { TasksModule } from './tasks/tasks.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TasksModule } from './tasks/tasks.module';
     ClassSessionsModule,
     ReservationsModule,
     CheckInsModule,
+    UsersModule,
     TasksModule,
     RiskAlertsModule,
     DashboardModule,

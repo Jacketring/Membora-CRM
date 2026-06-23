@@ -531,6 +531,20 @@ Reglas:
 
 ## 17. Tasks
 
+### GET `/users`
+
+Lista usuarios activos del tenant para asignar responsables a tareas, leads u operaciones internas.
+
+Requiere JWT.
+
+Devuelve:
+
+- id
+- nombre
+- email
+- estado
+- rol
+
 ### GET `/tasks`
 
 Lista tareas del tenant.

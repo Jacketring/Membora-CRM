@@ -226,6 +226,7 @@ export default function LeadsPage() {
 
     try {
       await apiPost('/tasks', {
+        assignedUserId: user?.id ?? null,
         leadId: lead.id,
         title: `Seguimiento a ${lead.firstName} ${lead.lastName ?? ''}`.trim(),
         description: 'Contactar para continuar el proceso comercial.',

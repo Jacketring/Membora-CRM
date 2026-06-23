@@ -313,6 +313,7 @@ Rutas principales:
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `GET /api/dashboard`
+- `GET /api/users`
 - `GET /api/pipeline-stages`
 - `GET /api/leads`
 - `POST /api/leads`
