@@ -838,10 +838,44 @@ a.global-search-result:hover {
   padding: 12px 12px 12px 8px;
 }
 .filter-control--select { min-width: 190px; }
-.filter-control--date { min-width: 156px; }
+.filter-control--date { min-width: 174px; }
 .filter-control:focus-within {
   border-color: #9bb7ec;
   box-shadow: 0 0 0 3px rgba(7, 84, 214, 0.09);
+}
+.date-filter-control {
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 1fr;
+  min-height: 54px;
+  overflow: visible;
+  padding: 8px 12px;
+}
+.date-filter-control span {
+  line-height: 1;
+  padding: 0;
+}
+.date-filter-control input {
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 850;
+  height: auto;
+  min-height: 22px;
+  padding: 0 26px 0 0;
+  position: relative;
+}
+.date-filter-control input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.72;
+}
+.date-filter-control input::-webkit-datetime-edit {
+  color: var(--text);
+}
+.date-filter-control input:invalid::-webkit-datetime-edit,
+.date-filter-control input:placeholder-shown {
+  color: var(--muted);
 }
 .filter-control.custom-select--filter {
   display: block;

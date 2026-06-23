@@ -78,11 +78,11 @@
         <?php endforeach; ?>
       </div>
     </div>
-    <label class="filter-control filter-control--date">
+    <label class="filter-control filter-control--date date-filter-control">
       <span>Desde</span>
       <input name="date_from" type="date" value="<?= e($filters['date_from']) ?>" aria-label="Fecha desde">
     </label>
-    <label class="filter-control filter-control--date">
+    <label class="filter-control filter-control--date date-filter-control">
       <span>Hasta</span>
       <input name="date_to" type="date" value="<?= e($filters['date_to']) ?>" aria-label="Fecha hasta">
     </label>
