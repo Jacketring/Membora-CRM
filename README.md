@@ -45,6 +45,15 @@ lead -> prueba -> alta -> socio -> membresía -> reserva -> check-in -> pago -> 
 
 ## 3. Stack tecnológico
 
+### Nueva app PHP en migración
+
+- PHP 8.2 o superior.
+- MariaDB existente.
+- PDO.
+- HTML, CSS y JavaScript navegador.
+- Sin Node.js en producción.
+- Carpeta pública prevista: `php-app/public`.
+
 ### Frontend previsto
 
 - React.
@@ -229,7 +238,43 @@ http://localhost:3001/api
 
 ## 8. Despliegue actual
 
-El backend está desplegado en Plesk bajo el subdominio:
+### Despliegue nuevo previsto en PHP
+
+Objetivo de migración:
+
+```text
+app.crm.josehurtado.dev
+```
+
+Configuración Plesk prevista:
+
+- Tipo de hosting: PHP.
+- Raíz del documento: `php-app/public`.
+- Base de datos: MariaDB existente.
+- Configuración sensible en `php-app/.env`.
+- Sin `npm install`.
+- Sin `npm run build`.
+- Sin aplicación Node.js para el frontend.
+
+Variables mínimas para `php-app/.env`:
+
+```env
+DATABASE_URL="mysql://usuario:password@localhost:3306/membora_crm"
+APP_NAME="Membora CRM"
+APP_ENV="production"
+```
+
+La app PHP inicial incluye:
+
+- Login.
+- Panel.
+- Leads.
+- Tareas.
+- Diseño base heredado del frontend actual.
+
+### Despliegue Node anterior
+
+El backend Node está desplegado en Plesk bajo el subdominio:
 
 ```text
 crm.josehurtado.dev
