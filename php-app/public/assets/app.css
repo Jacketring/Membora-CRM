@@ -421,25 +421,31 @@ a { color: inherit; text-decoration: none; }
   padding: 12px 14px;
 }
 .note-item {
+  align-items: stretch;
+  background: #fbfdff !important;
   display: grid;
-  gap: 10px;
-  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
 }
 .note-edit-form { display: grid; gap: 8px; margin: 0; }
 .note-edit-form textarea {
-  background: #fff;
-  border: 1px solid transparent;
-  border-radius: 10px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #e1e8f5;
+  border-radius: 0;
   color: var(--text);
-  min-height: 78px;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 70px;
   outline: 0;
-  padding: 10px 12px;
+  padding: 4px 42px 10px 0;
   resize: vertical;
   width: 100%;
 }
 .note-edit-form textarea:focus {
-  border-color: #9bb7ec;
-  box-shadow: 0 0 0 3px rgba(7, 84, 214, 0.09);
+  border-bottom-color: #9bb7ec;
+  box-shadow: none;
 }
 .note-meta-row {
   align-items: center;
@@ -448,21 +454,46 @@ a { color: inherit; text-decoration: none; }
   justify-content: space-between;
 }
 .note-save-button {
-  background: #eef4ff;
-  border: 1px solid #dbe3f1;
-  border-radius: 8px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
   color: var(--primary);
+  display: inline-flex;
   font-size: 12px;
+  gap: 5px;
   font-weight: 900;
-  padding: 7px 10px;
+  padding: 6px 8px;
 }
 .note-save-button:hover {
-  background: var(--primary);
-  color: #fff;
+  background: #eef4ff;
+}
+.note-save-button svg,
+.note-delete-button svg {
+  fill: currentColor;
+  height: 15px;
+  width: 15px;
 }
 .note-delete-form {
-  align-self: start;
+  position: absolute;
+  right: 10px;
+  top: 10px;
   margin: 0;
+}
+.note-delete-button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #b91c1c;
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  padding: 0;
+  width: 30px;
+}
+.note-delete-button:hover {
+  background: #fee2e2;
 }
 .notes-list p { margin: 0 0 8px; }
 .notes-list span, .empty-note { color: var(--muted); font-size: 13px; }
