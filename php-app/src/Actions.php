@@ -279,6 +279,7 @@ final class Actions
         $leadId = post_value('id');
         $tenantId = Auth::tenantId();
 
+        LeadRepository::ensureNotesTable();
         $pdo->beginTransaction();
         try {
             $deleteAlerts = $pdo->prepare('DELETE FROM risk_alerts WHERE lead_id = :id AND tenant_id = :tenant_id');
@@ -287,7 +288,6 @@ final class Actions
             $deleteTasks = $pdo->prepare('DELETE FROM tasks WHERE lead_id = :id AND tenant_id = :tenant_id');
             $deleteTasks->execute(['id' => $leadId, 'tenant_id' => $tenantId]);
 
-            LeadRepository::ensureNotesTable();
             $deleteNotes = $pdo->prepare('DELETE FROM lead_notes WHERE lead_id = :id AND tenant_id = :tenant_id');
             $deleteNotes->execute(['id' => $leadId, 'tenant_id' => $tenantId]);
 
@@ -298,7 +298,9 @@ final class Actions
             $stmt->execute(['id' => $leadId, 'tenant_id' => $tenantId]);
             $pdo->commit();
         } catch (Throwable $exception) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             flash('No se pudo eliminar el lead porque tiene datos relacionados.', 'error');
             redirect('leads');
         }
