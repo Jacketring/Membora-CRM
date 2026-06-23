@@ -90,7 +90,7 @@
       </thead>
       <tbody>
         <?php foreach ($leads as $lead): ?>
-          <tr class="lead-data-row">
+          <tr class="lead-data-row clickable-row" data-open-modal="lead-detail-<?= e($lead['id']) ?>" tabindex="0" role="button" aria-label="Editar lead <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">
             <td>
               <strong><?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?></strong>
             </td>
