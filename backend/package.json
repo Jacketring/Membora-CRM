@@ -4,6 +4,7 @@
   "private": true,
   "description": "Backend API for Membora CRM.",
   "scripts": {
+    "prebuild": "npm run prisma:generate",
     "build": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
