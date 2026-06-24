@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Membora CRM">
+  <rect width="64" height="64" rx="16" fill="#0754d6"/>
+  <path d="M16 44V20h7l9 14 9-14h7v24h-7V31.8l-7 10.7h-4L23 31.8V44h-7Z" fill="#fff"/>
+  <g fill="none" stroke="#dbeafe" stroke-width="4" stroke-linecap="round">
+    <path d="M13 15v8"/>
+    <path d="M19 18h26"/>
+    <path d="M51 15v8"/>
+  </g>
+  <g fill="#dbeafe">
+    <rect x="8" y="14" width="5" height="10" rx="2"/>
+    <rect x="51" y="14" width="5" height="10" rx="2"/>
+  </g>
+</svg>

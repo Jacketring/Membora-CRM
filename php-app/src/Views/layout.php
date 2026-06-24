@@ -9,7 +9,9 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0754d6">
   <title><?= e($title) ?> - Membora CRM</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/app.css?v=<?= e($cssVersion) ?>">
 </head>
 <body>
