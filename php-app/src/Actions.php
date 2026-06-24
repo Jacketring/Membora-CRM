@@ -704,15 +704,13 @@ final class Actions
         ClassRepository::ensureTables();
         $tenantId = Auth::tenantId();
         $classTypeId = post_value('class_type_id', '');
-        $startsAt = self::classStartsAtFromPost();
+        [$startsAt, $endsAt] = self::classDateTimesFromPost();
 
-        if ($classTypeId === '' || !$startsAt) {
-            flash('Indica clase, fecha y hora.', 'error');
+        if ($classTypeId === '' || !$startsAt || !$endsAt) {
+            flash('Indica clase, fecha, hora de inicio y hora de finalizacion.', 'error');
             redirect('classes');
         }
 
-        $duration = self::classDurationMinutes($tenantId, $classTypeId);
-        $endsAt = (new DateTimeImmutable($startsAt))->modify('+' . $duration . ' minutes')->format('Y-m-d H:i:s');
         $stmt = Database::connection()->prepare(
             'INSERT INTO class_sessions (id, tenant_id, class_type_id, instructor_user_id, starts_at, ends_at, capacity, status, created_at, updated_at)
              VALUES (:id, :tenant_id, :class_type_id, :instructor_user_id, :starts_at, :ends_at, :capacity, "SCHEDULED", NOW(), NOW())'
@@ -736,15 +734,13 @@ final class Actions
         ClassRepository::ensureTables();
         $tenantId = Auth::tenantId();
         $classTypeId = post_value('class_type_id', '');
-        $startsAt = self::classStartsAtFromPost();
+        [$startsAt, $endsAt] = self::classDateTimesFromPost();
 
-        if ($classTypeId === '' || !$startsAt) {
-            flash('Indica clase, fecha y hora.', 'error');
+        if ($classTypeId === '' || !$startsAt || !$endsAt) {
+            flash('Indica clase, fecha, hora de inicio y hora de finalizacion.', 'error');
             redirect('classes');
         }
 
-        $duration = self::classDurationMinutes($tenantId, $classTypeId);
-        $endsAt = (new DateTimeImmutable($startsAt))->modify('+' . $duration . ' minutes')->format('Y-m-d H:i:s');
         $status = in_array(post_value('status'), ['SCHEDULED', 'CANCELLED', 'COMPLETED'], true) ? post_value('status') : 'SCHEDULED';
         $stmt = Database::connection()->prepare(
             'UPDATE class_sessions
@@ -782,23 +778,25 @@ final class Actions
         redirect('classes');
     }
 
-    private static function classStartsAtFromPost(): ?string
+    private static function classDateTimesFromPost(): array
     {
         $date = post_value('class_date', '');
-        $time = post_value('class_time', '');
+        $startTime = post_value('class_start_time', '');
+        $endTime = post_value('class_end_time', '');
 
-        if ($date === '' || $time === '') {
-            return null;
+        if ($date === '' || $startTime === '' || $endTime === '') {
+            return [null, null];
         }
 
-        return $date . ' ' . $time . ':00';
-    }
+        $startsAt = $date . ' ' . $startTime . ':00';
+        $endsAt = $date . ' ' . $endTime . ':00';
 
-    private static function classDurationMinutes(string $tenantId, string $classTypeId): int
-    {
-        $stmt = Database::connection()->prepare('SELECT duration_minutes FROM class_types WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
-        $stmt->execute(['id' => $classTypeId, 'tenant_id' => $tenantId]);
-        return max(15, (int) ($stmt->fetchColumn() ?: 60));
+        if (strtotime($endsAt) <= strtotime($startsAt)) {
+            flash('La hora de finalizacion debe ser posterior a la hora de inicio.', 'error');
+            redirect('classes');
+        }
+
+        return [$startsAt, $endsAt];
     }
 
     private static function createTask(): never

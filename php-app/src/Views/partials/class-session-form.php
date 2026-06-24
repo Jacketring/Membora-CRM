@@ -17,7 +17,8 @@ foreach ($staff as $staffMember) {
 }
 $sessionStatus = $editingSession['status'] ?? 'SCHEDULED';
 $sessionDate = !empty($editingSession['starts_at']) ? date('Y-m-d', strtotime($editingSession['starts_at'])) : date('Y-m-d');
-$sessionTime = !empty($editingSession['starts_at']) ? date('H:i', strtotime($editingSession['starts_at'])) : date('H:00', strtotime('+1 hour'));
+$sessionStartTime = !empty($editingSession['starts_at']) ? date('H:i', strtotime($editingSession['starts_at'])) : date('H:00', strtotime('+1 hour'));
+$sessionEndTime = !empty($editingSession['ends_at']) ? date('H:i', strtotime($editingSession['ends_at'])) : date('H:00', strtotime('+2 hours'));
 $sessionCapacity = $editingSession['capacity'] ?? ($activeClassTypes[0]['capacity'] ?? 12);
 ?>
 
@@ -60,8 +61,12 @@ $sessionCapacity = $editingSession['capacity'] ?? ($activeClassTypes[0]['capacit
     <input name="class_date" type="date" required value="<?= e($sessionDate) ?>">
   </label>
   <label class="field">
-    <span>Hora</span>
-    <input name="class_time" type="time" required value="<?= e($sessionTime) ?>">
+    <span>Hora inicio</span>
+    <input name="class_start_time" type="time" required value="<?= e($sessionStartTime) ?>">
+  </label>
+  <label class="field">
+    <span>Hora finalizacion</span>
+    <input name="class_end_time" type="time" required value="<?= e($sessionEndTime) ?>">
   </label>
   <label class="field">
     <span>Aforo</span>

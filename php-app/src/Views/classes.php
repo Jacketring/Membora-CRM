@@ -151,7 +151,7 @@ foreach ($classTypes as $type) {
       <header>
         <div>
           <h2 id="class-title-<?= e($session['id']) ?>"><?= e($session['class_name']) ?></h2>
-          <p><?= e(format_date_short($session['starts_at'])) ?> · <?= e(format_time($session['starts_at'])) ?></p>
+          <p><?= e(format_date_short($session['starts_at'])) ?> · <?= e(format_time($session['starts_at'])) ?> - <?= e(format_time($session['ends_at'])) ?></p>
         </div>
         <button data-close-modal type="button">Cerrar</button>
       </header>
