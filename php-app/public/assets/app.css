@@ -498,7 +498,8 @@ a.global-search-result:hover {
   z-index: 40;
 }
 .user-menu-dropdown[hidden] { display: none; }
-.user-menu-dropdown button {
+.user-menu-dropdown button,
+.user-menu-dropdown a {
   background: transparent;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -510,7 +511,9 @@ a.global-search-result:hover {
   width: 100%;
 }
 .user-menu-dropdown button:hover,
-.user-menu-dropdown button:focus-visible {
+.user-menu-dropdown button:focus-visible,
+.user-menu-dropdown a:hover,
+.user-menu-dropdown a:focus-visible {
   background: var(--surface-soft);
   border-color: var(--outline);
 }
@@ -1479,6 +1482,34 @@ a.global-search-result:hover {
   margin-bottom: 18px;
   padding: 4px;
 }
+.settings-page-tabs {
+  background: var(--surface);
+  border: 1px solid #edf0f7;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 8px;
+}
+.settings-page-tabs a {
+  border-radius: 10px;
+  color: var(--muted);
+  font-weight: 900;
+  padding: 10px 14px;
+}
+.settings-page-tabs a.active,
+.settings-page-tabs a:hover {
+  background: var(--surface-soft);
+  color: var(--primary);
+}
+.settings-page-card {
+  background: var(--surface);
+  border: 1px solid #edf0f7;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
 .settings-tabs button {
   background: transparent;
   border: 0;
@@ -1955,6 +1986,8 @@ body[data-theme="dark"] .lead-search,
 body[data-theme="dark"] .panel-card,
 body[data-theme="dark"] .leads-table-card,
 body[data-theme="dark"] .lead-toolbar,
+body[data-theme="dark"] .settings-page-tabs,
+body[data-theme="dark"] .settings-page-card,
 body[data-theme="dark"] .lead-metric,
 body[data-theme="dark"] .dashboard-metric,
 body[data-theme="dark"] .dashboard-card,

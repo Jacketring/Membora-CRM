@@ -101,6 +101,18 @@ switch ($route) {
         ]);
         break;
 
+    case 'profile':
+        render_layout('Mi perfil', 'profile', []);
+        break;
+
+    case 'settings':
+        render_layout('Configuracion', 'settings', []);
+        break;
+
+    case 'company-settings':
+        render_layout('Empresa', 'company-settings', []);
+        break;
+
     case 'members':
         $filters = [
             'q' => trim((string) ($_GET['q'] ?? '')),
