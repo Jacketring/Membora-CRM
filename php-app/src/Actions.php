@@ -28,6 +28,10 @@ final class Actions
             'create_membership_plan' => self::createMembershipPlan(),
             'update_membership_plan' => self::updateMembershipPlan(),
             'delete_membership_plan' => self::deleteMembershipPlan(),
+            'create_class_type' => self::createClassType(),
+            'create_class_session' => self::createClassSession(),
+            'update_class_session' => self::updateClassSession(),
+            'delete_class_session' => self::deleteClassSession(),
             'create_task' => self::createTask(),
             'update_task' => self::updateTask(),
             'update_task_status' => self::updateTaskStatus(),
@@ -666,6 +670,135 @@ final class Actions
     {
         $price = str_replace(',', '.', post_value('price', '0') ?? '0');
         return number_format(max(0, (float) $price), 2, '.', '');
+    }
+
+    private static function createClassType(): never
+    {
+        ClassRepository::ensureTables();
+        $name = post_value('name', '');
+
+        if ($name === '') {
+            flash('Indica el nombre de la clase.', 'error');
+            redirect('classes');
+        }
+
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO class_types (id, tenant_id, name, description, capacity, duration_minutes, status, created_at, updated_at)
+             VALUES (:id, :tenant_id, :name, :description, :capacity, :duration_minutes, "ACTIVE", NOW(), NOW())'
+        );
+        $stmt->execute([
+            'id' => cuid(),
+            'tenant_id' => Auth::tenantId(),
+            'name' => $name,
+            'description' => post_value('description') ?: null,
+            'capacity' => max(1, (int) post_value('capacity', '12')),
+            'duration_minutes' => max(15, (int) post_value('duration_minutes', '60')),
+        ]);
+
+        flash('Tipo de clase creado correctamente.');
+        redirect('classes');
+    }
+
+    private static function createClassSession(): never
+    {
+        ClassRepository::ensureTables();
+        $tenantId = Auth::tenantId();
+        $classTypeId = post_value('class_type_id', '');
+        $startsAt = self::classStartsAtFromPost();
+
+        if ($classTypeId === '' || !$startsAt) {
+            flash('Indica clase, fecha y hora.', 'error');
+            redirect('classes');
+        }
+
+        $duration = self::classDurationMinutes($tenantId, $classTypeId);
+        $endsAt = (new DateTimeImmutable($startsAt))->modify('+' . $duration . ' minutes')->format('Y-m-d H:i:s');
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO class_sessions (id, tenant_id, class_type_id, instructor_user_id, starts_at, ends_at, capacity, status, created_at, updated_at)
+             VALUES (:id, :tenant_id, :class_type_id, :instructor_user_id, :starts_at, :ends_at, :capacity, "SCHEDULED", NOW(), NOW())'
+        );
+        $stmt->execute([
+            'id' => cuid(),
+            'tenant_id' => $tenantId,
+            'class_type_id' => $classTypeId,
+            'instructor_user_id' => post_value('instructor_user_id') ?: null,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'capacity' => max(1, (int) post_value('capacity', '12')),
+        ]);
+
+        flash('Clase programada correctamente.');
+        redirect('classes');
+    }
+
+    private static function updateClassSession(): never
+    {
+        ClassRepository::ensureTables();
+        $tenantId = Auth::tenantId();
+        $classTypeId = post_value('class_type_id', '');
+        $startsAt = self::classStartsAtFromPost();
+
+        if ($classTypeId === '' || !$startsAt) {
+            flash('Indica clase, fecha y hora.', 'error');
+            redirect('classes');
+        }
+
+        $duration = self::classDurationMinutes($tenantId, $classTypeId);
+        $endsAt = (new DateTimeImmutable($startsAt))->modify('+' . $duration . ' minutes')->format('Y-m-d H:i:s');
+        $status = in_array(post_value('status'), ['SCHEDULED', 'CANCELLED', 'COMPLETED'], true) ? post_value('status') : 'SCHEDULED';
+        $stmt = Database::connection()->prepare(
+            'UPDATE class_sessions
+             SET class_type_id = :class_type_id,
+                 instructor_user_id = :instructor_user_id,
+                 starts_at = :starts_at,
+                 ends_at = :ends_at,
+                 capacity = :capacity,
+                 status = :status,
+                 updated_at = NOW()
+             WHERE id = :id AND tenant_id = :tenant_id'
+        );
+        $stmt->execute([
+            'class_type_id' => $classTypeId,
+            'instructor_user_id' => post_value('instructor_user_id') ?: null,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'capacity' => max(1, (int) post_value('capacity', '12')),
+            'status' => $status,
+            'id' => post_value('id'),
+            'tenant_id' => $tenantId,
+        ]);
+
+        flash('Clase actualizada correctamente.');
+        redirect('classes');
+    }
+
+    private static function deleteClassSession(): never
+    {
+        ClassRepository::ensureTables();
+        $stmt = Database::connection()->prepare('DELETE FROM class_sessions WHERE id = :id AND tenant_id = :tenant_id');
+        $stmt->execute(['id' => post_value('id'), 'tenant_id' => Auth::tenantId()]);
+
+        flash('Clase eliminada correctamente.');
+        redirect('classes');
+    }
+
+    private static function classStartsAtFromPost(): ?string
+    {
+        $date = post_value('class_date', '');
+        $time = post_value('class_time', '');
+
+        if ($date === '' || $time === '') {
+            return null;
+        }
+
+        return $date . ' ' . $time . ':00';
+    }
+
+    private static function classDurationMinutes(string $tenantId, string $classTypeId): int
+    {
+        $stmt = Database::connection()->prepare('SELECT duration_minutes FROM class_types WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
+        $stmt->execute(['id' => $classTypeId, 'tenant_id' => $tenantId]);
+        return max(15, (int) ($stmt->fetchColumn() ?: 60));
     }
 
     private static function createTask(): never

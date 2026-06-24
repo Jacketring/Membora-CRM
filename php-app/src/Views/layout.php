@@ -29,7 +29,7 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
         <a class="<?= $route === 'leads' ? 'active' : '' ?>" href="index.php?route=leads">Leads</a>
         <a class="<?= $route === 'members' ? 'active' : '' ?>" href="index.php?route=members">Socios</a>
         <a class="<?= $route === 'memberships' ? 'active' : '' ?>" href="index.php?route=memberships">Membresias</a>
-        <a href="#">Clases</a>
+        <a class="<?= $route === 'classes' ? 'active' : '' ?>" href="index.php?route=classes">Clases</a>
         <a class="<?= $route === 'tasks' ? 'active' : '' ?>" href="index.php?route=tasks">Tareas</a>
       </nav>
 

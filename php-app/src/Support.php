@@ -220,11 +220,22 @@ function status_label(?string $status): string
         'PENDING' => 'Pendiente',
         'COMPLETED' => 'Completada',
         'CANCELLED' => 'Cancelada',
+        'SCHEDULED' => 'Programada',
         'ACTIVE' => 'Activo',
         'INACTIVE' => 'Inactivo',
         'PAYMENT_PENDING' => 'Activo',
         'AT_RISK' => 'Activo',
     ]);
+}
+
+function format_time(?string $value): string
+{
+    if (!$value) {
+        return '--:--';
+    }
+
+    $timestamp = strtotime($value);
+    return $timestamp ? date('H:i', $timestamp) : '--:--';
 }
 
 function stage_color_class(?string $value): string
@@ -309,4 +320,25 @@ function membership_end_date(?string $startDate, ?string $period): string
         'YEARLY' => $date->modify('+1 year')->format('Y-m-d'),
         default => $date->modify('+1 month')->format('Y-m-d'),
     };
+}
+
+function month_title(string $month): string
+{
+    $date = DateTimeImmutable::createFromFormat('Y-m-d', $month . '-01') ?: new DateTimeImmutable('first day of this month');
+    $months = [
+        1 => 'enero',
+        2 => 'febrero',
+        3 => 'marzo',
+        4 => 'abril',
+        5 => 'mayo',
+        6 => 'junio',
+        7 => 'julio',
+        8 => 'agosto',
+        9 => 'septiembre',
+        10 => 'octubre',
+        11 => 'noviembre',
+        12 => 'diciembre',
+    ];
+
+    return ucfirst($months[(int) $date->format('n')] ?? '') . ' ' . $date->format('Y');
 }
