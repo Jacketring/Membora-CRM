@@ -1,3 +1,44 @@
+const crmSettingsKey = 'membora-crm-settings';
+const defaultCrmSettings = {
+  theme: 'system',
+  accent: '#0754d6',
+  compact: false,
+};
+
+function readCrmSettings() {
+  try {
+    return { ...defaultCrmSettings, ...JSON.parse(localStorage.getItem(crmSettingsKey) || '{}') };
+  } catch {
+    return { ...defaultCrmSettings };
+  }
+}
+
+function darkenHexColor(hex, amount = 34) {
+  const clean = String(hex || defaultCrmSettings.accent).replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(clean)) {
+    return '#003ea8';
+  }
+
+  const value = Number.parseInt(clean, 16);
+  const r = Math.max(0, (value >> 16) - amount);
+  const g = Math.max(0, ((value >> 8) & 255) - amount);
+  const b = Math.max(0, (value & 255) - amount);
+  return `#${[r, g, b].map((part) => part.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function applyCrmSettings(settings = readCrmSettings()) {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = settings.theme === 'system' ? (prefersDark ? 'dark' : 'light') : settings.theme;
+
+  document.body.dataset.theme = theme;
+  document.body.dataset.density = settings.compact ? 'compact' : 'comfortable';
+  document.documentElement.style.setProperty('--primary', settings.accent || defaultCrmSettings.accent);
+  document.documentElement.style.setProperty('--primary-dark', darkenHexColor(settings.accent));
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', settings.accent || defaultCrmSettings.accent);
+}
+
+applyCrmSettings();
+
 function shouldIgnoreModalOpen(event) {
   return Boolean(event.target.closest('button, a, input, select, textarea, form, label'));
 }
@@ -74,6 +115,7 @@ document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
       if (currentModal && currentModal !== modal && currentModal.open) {
         currentModal.close();
       }
+      closeUserMenus(null);
       openModalById(trigger.dataset.openModal);
     }
   });
@@ -97,6 +139,57 @@ document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
       openModalById(trigger.dataset.openModal);
     }
   });
+});
+
+function closeUserMenus(exceptMenu) {
+  document.querySelectorAll('[data-user-menu]').forEach((menu) => {
+    if (menu === exceptMenu) {
+      return;
+    }
+
+    const dropdown = menu.querySelector('[data-user-menu-dropdown]');
+    const trigger = menu.querySelector('[data-user-menu-trigger]');
+    if (dropdown) dropdown.hidden = true;
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  });
+}
+
+document.querySelectorAll('[data-user-menu]').forEach((menu) => {
+  const trigger = menu.querySelector('[data-user-menu-trigger]');
+  const dropdown = menu.querySelector('[data-user-menu-dropdown]');
+
+  if (!trigger || !dropdown) {
+    return;
+  }
+
+  trigger.addEventListener('click', () => {
+    const nextHiddenState = !dropdown.hidden;
+    closeUserMenus(menu);
+    dropdown.hidden = nextHiddenState;
+    trigger.setAttribute('aria-expanded', String(!dropdown.hidden));
+  });
+
+  trigger.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeUserMenus(menu);
+      dropdown.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      dropdown.querySelector('button')?.focus();
+    }
+  });
+});
+
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('[data-user-menu]')) {
+    closeUserMenus(null);
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeUserMenus(null);
+  }
 });
 
 document.querySelectorAll('[data-class-create-date]').forEach((trigger) => {
@@ -445,6 +538,59 @@ document.querySelectorAll('[data-member-picker]').forEach((picker) => {
     if (empty) {
       empty.hidden = visibleCount !== 0;
     }
+  });
+});
+
+document.querySelectorAll('[data-crm-settings-form]').forEach((form) => {
+  const themeInputs = form.querySelectorAll('[data-setting-theme]');
+  const accentInput = form.querySelector('[data-setting-accent]');
+  const compactInput = form.querySelector('[data-setting-compact]');
+  const resetButton = form.querySelector('[data-settings-reset]');
+
+  function syncSettingsForm(settings = readCrmSettings()) {
+    themeInputs.forEach((input) => {
+      input.checked = input.value === settings.theme;
+    });
+    if (accentInput) {
+      accentInput.value = settings.accent || defaultCrmSettings.accent;
+    }
+    if (compactInput) {
+      compactInput.checked = Boolean(settings.compact);
+    }
+  }
+
+  function settingsFromForm() {
+    const selectedTheme = Array.from(themeInputs).find((input) => input.checked)?.value || defaultCrmSettings.theme;
+    return {
+      theme: selectedTheme,
+      accent: accentInput?.value || defaultCrmSettings.accent,
+      compact: Boolean(compactInput?.checked),
+    };
+  }
+
+  syncSettingsForm();
+
+  [...themeInputs, accentInput, compactInput].filter(Boolean).forEach((input) => {
+    input.addEventListener('input', () => {
+      applyCrmSettings(settingsFromForm());
+    });
+    input.addEventListener('change', () => {
+      applyCrmSettings(settingsFromForm());
+    });
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const nextSettings = settingsFromForm();
+    localStorage.setItem(crmSettingsKey, JSON.stringify(nextSettings));
+    applyCrmSettings(nextSettings);
+    form.closest('dialog')?.close();
+  });
+
+  resetButton?.addEventListener('click', () => {
+    localStorage.removeItem(crmSettingsKey);
+    syncSettingsForm(defaultCrmSettings);
+    applyCrmSettings(defaultCrmSettings);
   });
 });
 

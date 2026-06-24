@@ -13,6 +13,7 @@ final class Actions
         match ($action) {
             'login' => self::login(),
             'logout' => self::logout(),
+            'update_profile' => self::updateProfile(),
             'create_user' => self::createUser(),
             'update_user' => self::updateUser(),
             'create_lead' => self::createLead(),
@@ -64,6 +65,64 @@ final class Actions
     {
         Auth::logout();
         redirect('login');
+    }
+
+    private static function updateProfile(): never
+    {
+        $tenantId = Auth::tenantId();
+        $user = Auth::requireUser();
+        $userId = $user['id'];
+        $name = post_value('name', '');
+        $email = strtolower(post_value('email', ''));
+        $password = post_value('password', '');
+
+        if ($name === '' || $email === '') {
+            flash('Indica nombre y email para actualizar tu perfil.', 'error');
+            redirect($_GET['return'] ?? 'dashboard');
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            flash('El email del perfil no es valido.', 'error');
+            redirect($_GET['return'] ?? 'dashboard');
+        }
+
+        if ($password !== '' && strlen($password) < 8) {
+            flash('La nueva contrasena debe tener al menos 8 caracteres.', 'error');
+            redirect($_GET['return'] ?? 'dashboard');
+        }
+
+        if (UserRepository::emailExists($tenantId, $email, $userId)) {
+            flash('Ya existe otro usuario con ese email.', 'error');
+            redirect($_GET['return'] ?? 'dashboard');
+        }
+
+        $params = [
+            'name' => $name,
+            'email' => $email,
+            'id' => $userId,
+            'tenant_id' => $tenantId,
+        ];
+        $passwordSql = '';
+
+        if ($password !== '') {
+            $passwordSql = ', password_hash = :password_hash';
+            $params['password_hash'] = password_hash($password, PASSWORD_BCRYPT);
+        }
+
+        $stmt = Database::connection()->prepare(
+            'UPDATE users
+             SET name = :name,
+                 email = :email' . $passwordSql . ',
+                 updated_at = NOW()
+             WHERE id = :id AND tenant_id = :tenant_id'
+        );
+        $stmt->execute($params);
+
+        $_SESSION['user']['name'] = $name;
+        $_SESSION['user']['email'] = $email;
+
+        flash('Perfil actualizado correctamente.');
+        redirect($_GET['return'] ?? 'dashboard');
     }
 
     private static function createUser(): never
