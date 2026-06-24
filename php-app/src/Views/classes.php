@@ -229,11 +229,16 @@ foreach ($classTypes as $type) {
     <?php for ($day = 1; $day <= (int) $calendar['days_in_month']; $day++): ?>
       <?php $dateKey = $calendar['month'] . '-' . str_pad((string) $day, 2, '0', STR_PAD_LEFT); ?>
       <?php $daySessions = $calendar['sessions_by_day'][$dateKey] ?? []; ?>
-      <div class="calendar-day <?= $dateKey === date('Y-m-d') ? 'calendar-day--today' : '' ?>" role="cell">
-        <strong><?= $day ?></strong>
+      <div class="calendar-day <?= $dateKey === date('Y-m-d') ? 'calendar-day--today' : '' ?>" role="cell" tabindex="0" data-class-create-date="<?= e($dateKey) ?>" aria-label="Crear clase el <?= e(format_date_short($dateKey)) ?>">
+        <div class="calendar-day-head">
+          <strong><?= $day ?></strong>
+          <button class="calendar-add-button" type="button" data-class-create-date="<?= e($dateKey) ?>" aria-label="Anadir clase el <?= e(format_date_short($dateKey)) ?>">+</button>
+        </div>
         <div class="calendar-events">
           <?php foreach ($daySessions as $daySession): ?>
-            <span><?= e(format_time($daySession['starts_at'])) ?> <?= e($daySession['class_name']) ?></span>
+            <button class="calendar-event" type="button" data-open-modal="class-detail-<?= e($daySession['id']) ?>" aria-label="Editar <?= e($daySession['class_name']) ?> del <?= e(format_date_short($daySession['starts_at'])) ?>">
+              <?= e(format_time($daySession['starts_at'])) ?> <?= e($daySession['class_name']) ?>
+            </button>
           <?php endforeach; ?>
         </div>
       </div>

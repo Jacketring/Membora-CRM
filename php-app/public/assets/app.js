@@ -52,6 +52,10 @@ document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
     const modal = document.getElementById(trigger.dataset.openModal);
     if (modal) {
       lastModalTrigger = trigger;
+      const currentModal = trigger.closest('dialog');
+      if (currentModal && currentModal !== modal && currentModal.open) {
+        currentModal.close();
+      }
       openModalById(trigger.dataset.openModal);
     }
   });
@@ -64,8 +68,45 @@ document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       lastModalTrigger = trigger;
+      const currentModal = trigger.closest('dialog');
+      const targetModal = document.getElementById(trigger.dataset.openModal);
+      if (currentModal && targetModal && currentModal !== targetModal && currentModal.open) {
+        currentModal.close();
+      }
       openModalById(trigger.dataset.openModal);
     }
+  });
+});
+
+document.querySelectorAll('[data-class-create-date]').forEach((trigger) => {
+  trigger.addEventListener('click', (event) => {
+    if (event.target.closest('[data-open-modal], .calendar-event')) {
+      return;
+    }
+
+    const modal = document.getElementById('class-session-modal');
+    const dateInput = modal?.querySelector('input[name="class_date"]');
+    if (!modal || !dateInput) {
+      return;
+    }
+
+    event.stopPropagation();
+    dateInput.value = trigger.dataset.classCreateDate || dateInput.value;
+    lastModalTrigger = trigger;
+    const currentModal = trigger.closest('dialog');
+    if (currentModal && currentModal.open) {
+      currentModal.close();
+    }
+    openModalById('class-session-modal');
+  });
+
+  trigger.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    event.preventDefault();
+    trigger.click();
   });
 });
 

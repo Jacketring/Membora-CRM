@@ -33,7 +33,7 @@ $sessionCapacity = $editingSession['capacity'] ?? ($activeClassTypes[0]['capacit
       <div class="custom-select-menu" data-custom-select-menu hidden>
         <?php foreach ($activeClassTypes as $type): ?>
           <button class="custom-select-option <?= $sessionTypeId === $type['id'] ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($type['id']) ?>">
-            <?= e($type['name']) ?> · <?= (int) $type['duration_minutes'] ?> min
+            <?= e($type['name']) ?> - <?= (int) $type['duration_minutes'] ?> min
           </button>
         <?php endforeach; ?>
       </div>
