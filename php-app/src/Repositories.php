@@ -7,7 +7,7 @@ final class DashboardRepository
         $pdo = Database::connection();
 
         return [
-            'activeMembers' => self::count($pdo, 'members', 'status = "ACTIVE"', $tenantId),
+            'activeMembers' => self::count($pdo, 'members', 'status <> "INACTIVE"', $tenantId),
             'totalMembers' => self::count($pdo, 'members', '1 = 1', $tenantId),
             'openLeads' => self::count($pdo, 'leads', 'status = "OPEN"', $tenantId),
             'convertedLeads' => self::count($pdo, 'leads', 'status = "CONVERTED"', $tenantId),
@@ -149,9 +149,10 @@ final class MemberRepository
             $params['query'] = '%' . $query . '%';
         }
 
-        if ($status !== '') {
-            $where[] = 'status = :status';
-            $params['status'] = $status;
+        if ($status === 'ACTIVE') {
+            $where[] = 'status <> "INACTIVE"';
+        } elseif ($status === 'INACTIVE') {
+            $where[] = 'status = "INACTIVE"';
         }
 
         if ($dateFrom !== '') {
@@ -165,7 +166,9 @@ final class MemberRepository
         }
 
         $stmt = Database::connection()->prepare(
-            'SELECT id, first_name, last_name, email, phone, status, photo_path, joined_at, created_at, updated_at
+            'SELECT id, first_name, last_name, email, phone,
+                    CASE WHEN status = "INACTIVE" THEN "INACTIVE" ELSE "ACTIVE" END AS status,
+                    photo_path, joined_at, created_at, updated_at
              FROM members
              WHERE ' . implode(' AND ', $where) . '
              ORDER BY joined_at DESC, created_at DESC
@@ -182,7 +185,7 @@ final class MemberRepository
         $pdo = Database::connection();
 
         return [
-            'active' => self::count($pdo, $tenantId, 'status = "ACTIVE"'),
+            'active' => self::count($pdo, $tenantId, 'status <> "INACTIVE"'),
             'inactive' => self::count($pdo, $tenantId, 'status = "INACTIVE"'),
             'new_month' => self::count($pdo, $tenantId, 'joined_at >= DATE_FORMAT(CURDATE(), "%Y-%m-01")'),
             'total' => self::count($pdo, $tenantId, '1 = 1'),

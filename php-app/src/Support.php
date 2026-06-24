@@ -207,6 +207,8 @@ function status_label(?string $status): string
         'CANCELLED' => 'Cancelada',
         'ACTIVE' => 'Activo',
         'INACTIVE' => 'Inactivo',
+        'PAYMENT_PENDING' => 'Activo',
+        'AT_RISK' => 'Activo',
     ]);
 }
 
