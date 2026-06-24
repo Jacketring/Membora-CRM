@@ -708,7 +708,7 @@ final class Actions
 
         if ($classTypeId === '' || !$startsAt || !$endsAt) {
             flash('Indica clase, fecha, hora de inicio y hora de finalizacion.', 'error');
-            redirect('classes');
+            self::redirectAfterClassAction();
         }
 
         $stmt = Database::connection()->prepare(
@@ -726,7 +726,7 @@ final class Actions
         ]);
 
         flash('Clase programada correctamente.');
-        redirect('classes');
+        self::redirectAfterClassAction();
     }
 
     private static function updateClassSession(): never
@@ -738,7 +738,7 @@ final class Actions
 
         if ($classTypeId === '' || !$startsAt || !$endsAt) {
             flash('Indica clase, fecha, hora de inicio y hora de finalizacion.', 'error');
-            redirect('classes');
+            self::redirectAfterClassAction();
         }
 
         $status = in_array(post_value('status'), ['SCHEDULED', 'CANCELLED', 'COMPLETED'], true) ? post_value('status') : 'SCHEDULED';
@@ -765,7 +765,7 @@ final class Actions
         ]);
 
         flash('Clase actualizada correctamente.');
-        redirect('classes');
+        self::redirectAfterClassAction();
     }
 
     private static function deleteClassSession(): never
@@ -775,7 +775,7 @@ final class Actions
         $stmt->execute(['id' => post_value('id'), 'tenant_id' => Auth::tenantId()]);
 
         flash('Clase eliminada correctamente.');
-        redirect('classes');
+        self::redirectAfterClassAction();
     }
 
     private static function classDateTimesFromPost(): array
@@ -793,10 +793,27 @@ final class Actions
 
         if (strtotime($endsAt) <= strtotime($startsAt)) {
             flash('La hora de finalizacion debe ser posterior a la hora de inicio.', 'error');
-            redirect('classes');
+            self::redirectAfterClassAction();
         }
 
         return [$startsAt, $endsAt];
+    }
+
+    private static function redirectAfterClassAction(): never
+    {
+        if (post_value('return_to_calendar') === '1') {
+            $month = post_value('calendar_month', date('Y-m')) ?: date('Y-m');
+            if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+                $month = date('Y-m');
+            }
+
+            $dateFrom = $month . '-01';
+            $dateTo = date('Y-m-t', strtotime($dateFrom));
+            header('Location: index.php?route=classes&month=' . urlencode($month) . '&date_from=' . urlencode($dateFrom) . '&date_to=' . urlencode($dateTo) . '&modal=classes-calendar-modal');
+            exit;
+        }
+
+        redirect('classes');
     }
 
     private static function createTask(): never

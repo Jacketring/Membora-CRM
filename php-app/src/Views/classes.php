@@ -148,6 +148,8 @@ foreach ($classTypes as $type) {
     <form method="post">
       <input type="hidden" name="action" value="update_class_session">
       <input type="hidden" name="id" value="<?= e($session['id']) ?>">
+      <input type="hidden" name="return_to_calendar" value="0" data-class-return-to-calendar>
+      <input type="hidden" name="calendar_month" value="<?= e($filters['month']) ?>" data-class-calendar-month>
       <header>
         <div>
           <h2 id="class-title-<?= e($session['id']) ?>"><?= e($session['class_name']) ?></h2>
@@ -164,6 +166,8 @@ foreach ($classTypes as $type) {
 <dialog id="class-session-modal" class="modal-card" aria-labelledby="class-session-modal-title">
   <form method="post">
     <input type="hidden" name="action" value="create_class_session">
+    <input type="hidden" name="return_to_calendar" value="0" data-class-return-to-calendar>
+    <input type="hidden" name="calendar_month" value="<?= e($filters['month']) ?>" data-class-calendar-month>
     <header>
       <h2 id="class-session-modal-title">Nueva clase programada</h2>
       <button data-close-modal type="button">Cerrar</button>
@@ -236,9 +240,20 @@ foreach ($classTypes as $type) {
         </div>
         <div class="calendar-events">
           <?php foreach ($daySessions as $daySession): ?>
-            <button class="calendar-event" type="button" data-open-modal="class-detail-<?= e($daySession['id']) ?>" aria-label="Editar <?= e($daySession['class_name']) ?> del <?= e(format_date_short($daySession['starts_at'])) ?>">
-              <?= e(format_time($daySession['starts_at'])) ?> <?= e($daySession['class_name']) ?>
-            </button>
+            <div class="calendar-event-row">
+              <button class="calendar-event" type="button" data-open-modal="class-detail-<?= e($daySession['id']) ?>" data-class-calendar-trigger data-class-date="<?= e($dateKey) ?>" aria-label="Editar <?= e($daySession['class_name']) ?> del <?= e(format_date_short($daySession['starts_at'])) ?>">
+                <?= e(format_time($daySession['starts_at'])) ?> <?= e($daySession['class_name']) ?>
+              </button>
+              <form method="post" data-confirm-message="Eliminar esta clase programada?">
+                <input type="hidden" name="action" value="delete_class_session">
+                <input type="hidden" name="id" value="<?= e($daySession['id']) ?>">
+                <input type="hidden" name="return_to_calendar" value="1">
+                <input type="hidden" name="calendar_month" value="<?= e($calendar['month']) ?>">
+                <button class="calendar-delete-button" type="submit" aria-label="Eliminar <?= e($daySession['class_name']) ?>">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 21a2 2 0 0 1-2-2V8h14v11a2 2 0 0 1-2 2H7ZM9 6V4h6v2h5v2H4V6h5Zm0 5v7h2v-7H9Zm4 0v7h2v-7h-2Z"/></svg>
+                </button>
+              </form>
+            </div>
           <?php endforeach; ?>
         </div>
       </div>

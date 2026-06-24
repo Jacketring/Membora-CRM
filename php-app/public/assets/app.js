@@ -17,6 +17,21 @@ function openModalById(id) {
   }
 }
 
+function markClassCalendarReturn(modal, dateValue) {
+  if (!modal) {
+    return;
+  }
+
+  const returnInput = modal.querySelector('[data-class-return-to-calendar]');
+  const monthInput = modal.querySelector('[data-class-calendar-month]');
+  if (returnInput) {
+    returnInput.value = '1';
+  }
+  if (monthInput && dateValue) {
+    monthInput.value = String(dateValue).slice(0, 7);
+  }
+}
+
 function clearModalUrlParam(modal) {
   const params = new URLSearchParams(window.location.search);
   if (params.get('modal') !== modal.id) {
@@ -52,6 +67,9 @@ document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
     const modal = document.getElementById(trigger.dataset.openModal);
     if (modal) {
       lastModalTrigger = trigger;
+      if (trigger.dataset.classCalendarTrigger !== undefined) {
+        markClassCalendarReturn(modal, trigger.dataset.classDate);
+      }
       const currentModal = trigger.closest('dialog');
       if (currentModal && currentModal !== modal && currentModal.open) {
         currentModal.close();
@@ -70,6 +88,9 @@ document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
       lastModalTrigger = trigger;
       const currentModal = trigger.closest('dialog');
       const targetModal = document.getElementById(trigger.dataset.openModal);
+      if (targetModal && trigger.dataset.classCalendarTrigger !== undefined) {
+        markClassCalendarReturn(targetModal, trigger.dataset.classDate);
+      }
       if (currentModal && targetModal && currentModal !== targetModal && currentModal.open) {
         currentModal.close();
       }
@@ -92,6 +113,7 @@ document.querySelectorAll('[data-class-create-date]').forEach((trigger) => {
 
     event.stopPropagation();
     dateInput.value = trigger.dataset.classCreateDate || dateInput.value;
+    markClassCalendarReturn(modal, trigger.dataset.classCreateDate);
     lastModalTrigger = trigger;
     const currentModal = trigger.closest('dialog');
     if (currentModal && currentModal.open) {

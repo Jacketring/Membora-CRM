@@ -1625,6 +1625,12 @@ a.global-search-result:hover {
   display: grid;
   gap: 5px;
 }
+.calendar-event-row {
+  align-items: stretch;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: minmax(0, 1fr) 28px;
+}
 .calendar-event {
   background: #eaf1ff;
   border: 0;
@@ -1638,6 +1644,30 @@ a.global-search-result:hover {
 }
 .calendar-event:hover {
   background: #dbeafe;
+}
+.calendar-event-row form {
+  margin: 0;
+}
+.calendar-delete-button {
+  align-items: center;
+  background: #fff1f1;
+  border: 0;
+  border-radius: 8px;
+  color: var(--danger);
+  display: inline-flex;
+  height: 100%;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0;
+  width: 28px;
+}
+.calendar-delete-button:hover {
+  background: #fee2e2;
+}
+.calendar-delete-button svg {
+  fill: currentColor;
+  height: 15px;
+  width: 15px;
 }
 
 .member-identity {
