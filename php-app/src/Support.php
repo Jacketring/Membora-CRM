@@ -230,12 +230,16 @@ function status_label(?string $status): string
 
 function role_label(?string $role): string
 {
-    return enum_label((string) $role, [
+    $key = strtoupper(trim((string) $role));
+
+    return enum_label($key, [
         'SUPER_ADMIN' => 'Superadmin',
+        'SUPERADMIN' => 'Superadmin',
         'GYM_ADMIN' => 'Administrador',
         'ADMIN' => 'Administrador',
         'RECEPTION' => 'Recepcion',
         'SALES' => 'Comercial',
+        'SALES_RECEPTION' => 'Recepcion / Comercial',
         'TRAINER' => 'Entrenador',
         'STAFF' => 'Equipo',
     ]);

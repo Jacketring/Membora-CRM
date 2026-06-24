@@ -97,12 +97,14 @@ final class UserRepository
              FROM roles
              ORDER BY CASE `key`
                 WHEN "SUPER_ADMIN" THEN 1
+                WHEN "SUPERADMIN" THEN 1
                 WHEN "GYM_ADMIN" THEN 2
                 WHEN "ADMIN" THEN 3
-                WHEN "RECEPTION" THEN 4
-                WHEN "SALES" THEN 5
-                WHEN "TRAINER" THEN 6
-                WHEN "STAFF" THEN 7
+                WHEN "SALES_RECEPTION" THEN 4
+                WHEN "RECEPTION" THEN 5
+                WHEN "SALES" THEN 6
+                WHEN "TRAINER" THEN 7
+                WHEN "STAFF" THEN 8
                 ELSE 99
              END, `key` ASC'
         );

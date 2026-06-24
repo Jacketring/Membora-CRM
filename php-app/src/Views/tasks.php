@@ -301,7 +301,7 @@ $taskStatusOptions = [
             <div class="custom-select-menu" data-custom-select-menu hidden>
             <button class="custom-select-option <?= empty($task['assigned_user_id']) ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="">Sin responsable</button>
             <?php foreach ($staff as $staffUser): ?>
-              <button class="custom-select-option <?= $task['assigned_user_id'] === $staffUser['id'] ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($staffUser['id']) ?>"><?= e($staffUser['name']) ?> - <?= e($staffUser['role_key']) ?></button>
+              <button class="custom-select-option <?= $task['assigned_user_id'] === $staffUser['id'] ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($staffUser['id']) ?>"><?= e($staffUser['name']) ?> - <?= e(role_label($staffUser['role_key'])) ?></button>
             <?php endforeach; ?>
             </div>
           </div>
@@ -383,7 +383,7 @@ $taskStatusOptions = [
           <div class="custom-select-menu" data-custom-select-menu hidden>
           <button class="custom-select-option selected" type="button" data-custom-select-option data-value="">Sin responsable</button>
           <?php foreach ($staff as $staffUser): ?>
-            <button class="custom-select-option" type="button" data-custom-select-option data-value="<?= e($staffUser['id']) ?>"><?= e($staffUser['name']) ?> - <?= e($staffUser['role_key']) ?></button>
+            <button class="custom-select-option" type="button" data-custom-select-option data-value="<?= e($staffUser['id']) ?>"><?= e($staffUser['name']) ?> - <?= e(role_label($staffUser['role_key'])) ?></button>
           <?php endforeach; ?>
           </div>
         </div>
