@@ -174,6 +174,23 @@ function phone_from_post(): ?string
     return trim($prefix . ' ' . trim($cleanNumber));
 }
 
+function initials(?string $firstName, ?string $lastName = null): string
+{
+    $first = trim((string) $firstName);
+    $last = trim((string) $lastName);
+    $letters = '';
+
+    if ($first !== '') {
+        $letters .= substr($first, 0, 1);
+    }
+
+    if ($last !== '') {
+        $letters .= substr($last, 0, 1);
+    }
+
+    return strtoupper($letters !== '' ? $letters : 'S');
+}
+
 function enum_label(string $value, array $labels): string
 {
     return $labels[$value] ?? $value;

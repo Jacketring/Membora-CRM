@@ -1499,6 +1499,75 @@ a.global-search-result:hover {
 .notes-list p { margin: 0 0 8px; }
 .notes-list span, .empty-note { color: var(--muted); font-size: 13px; }
 
+.member-identity {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 180px;
+}
+.member-avatar {
+  background: #eaf1ff;
+  border: 1px solid #dbe6f7;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  height: 42px;
+  object-fit: cover;
+  width: 42px;
+}
+.member-avatar--initials {
+  align-items: center;
+  color: var(--primary);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  justify-content: center;
+}
+.member-avatar--large {
+  height: 64px;
+  width: 64px;
+}
+.member-modal-heading {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+.member-photo-field input[type="file"] {
+  background: #f8faff;
+  border: 1px dashed #b9c9e8;
+  border-radius: 10px;
+  color: var(--text);
+  padding: 12px;
+}
+.member-photo-field input[type="file"]::file-selector-button {
+  background: #eef4ff;
+  border: 0;
+  border-radius: 8px;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 900;
+  margin-right: 12px;
+  padding: 9px 12px;
+}
+.member-photo-field small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.checkbox-field {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-top: -4px;
+}
+.checkbox-field input {
+  accent-color: var(--primary);
+  height: 16px;
+  width: 16px;
+}
+.checkbox-field span {
+  color: var(--text);
+  font-weight: 800;
+}
+
 @media (max-width: 900px) {
   .app-shell { display: block; }
   .sidebar { min-height: auto; position: static; width: 100%; }

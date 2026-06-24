@@ -92,7 +92,16 @@ $memberStatusOptions = [
         <?php foreach ($members as $member): ?>
           <?php $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')); ?>
           <tr class="lead-data-row clickable-row" data-open-modal="member-detail-<?= e($member['id']) ?>" data-live-search-row>
-            <td><strong><?= e($memberName) ?></strong></td>
+            <td>
+              <div class="member-identity">
+                <?php if (!empty($member['photo_path'])): ?>
+                  <img class="member-avatar" src="<?= e($member['photo_path']) ?>" alt="Foto de <?= e($memberName) ?>">
+                <?php else: ?>
+                  <span class="member-avatar member-avatar--initials" aria-hidden="true"><?= e(initials($member['first_name'], $member['last_name'])) ?></span>
+                <?php endif; ?>
+                <strong><?= e($memberName) ?></strong>
+              </div>
+            </td>
             <td><?= e($member['phone'] ?: 'Sin telefono') ?></td>
             <td><?= e($member['email'] ?: 'Sin email') ?></td>
             <td>
@@ -137,13 +146,22 @@ $memberStatusOptions = [
   <?php $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')); ?>
   <?php $phoneCountry = phone_country_entry($member['phone']); ?>
   <dialog id="member-detail-<?= e($member['id']) ?>" class="modal-card lead-detail-modal" aria-labelledby="member-detail-title-<?= e($member['id']) ?>">
-    <form method="post" aria-label="Editar datos del socio <?= e($memberName) ?>">
+    <form method="post" enctype="multipart/form-data" aria-label="Editar datos del socio <?= e($memberName) ?>">
       <input type="hidden" name="action" value="update_member">
       <input type="hidden" name="id" value="<?= e($member['id']) ?>">
       <header>
         <div>
-          <h2 id="member-detail-title-<?= e($member['id']) ?>"><?= e($memberName) ?></h2>
-          <p><?= e($member['phone'] ?: 'Sin telefono') ?> &middot; <?= e($member['email'] ?: 'Sin email') ?></p>
+          <div class="member-modal-heading">
+            <?php if (!empty($member['photo_path'])): ?>
+              <img class="member-avatar member-avatar--large" src="<?= e($member['photo_path']) ?>" alt="Foto de <?= e($memberName) ?>">
+            <?php else: ?>
+              <span class="member-avatar member-avatar--large member-avatar--initials" aria-hidden="true"><?= e(initials($member['first_name'], $member['last_name'])) ?></span>
+            <?php endif; ?>
+            <div>
+              <h2 id="member-detail-title-<?= e($member['id']) ?>"><?= e($memberName) ?></h2>
+              <p><?= e($member['phone'] ?: 'Sin telefono') ?> &middot; <?= e($member['email'] ?: 'Sin email') ?></p>
+            </div>
+          </div>
         </div>
         <button data-close-modal type="button" aria-label="Cerrar detalles de <?= e($memberName) ?>">Cerrar</button>
       </header>
@@ -204,6 +222,17 @@ $memberStatusOptions = [
           <span>Fecha de alta</span>
           <input name="joined_at" type="date" value="<?= $member['joined_at'] ? e(date('Y-m-d', strtotime($member['joined_at']))) : '' ?>">
         </label>
+        <label class="field field--wide member-photo-field">
+          <span>Foto del socio</span>
+          <input name="photo" type="file" accept="image/jpeg,image/png,image/webp">
+          <small>JPG, PNG o WEBP. Maximo 2 MB.</small>
+        </label>
+        <?php if (!empty($member['photo_path'])): ?>
+          <label class="checkbox-field field--wide">
+            <input name="remove_photo" type="checkbox" value="1">
+            <span>Quitar foto actual</span>
+          </label>
+        <?php endif; ?>
       </div>
 
       <button class="primary-action" type="submit">Guardar cambios</button>
@@ -213,7 +242,7 @@ $memberStatusOptions = [
 
 <?php $defaultPhoneCountry = phone_country_entry(null); ?>
 <dialog id="member-modal" class="modal-card" aria-labelledby="member-modal-title">
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="action" value="create_member">
     <header>
       <h2 id="member-modal-title">Nuevo socio</h2>
@@ -273,6 +302,11 @@ $memberStatusOptions = [
       <label class="field">
         <span>Fecha de alta</span>
         <input name="joined_at" type="date" value="<?= e(date('Y-m-d')) ?>">
+      </label>
+      <label class="field field--wide member-photo-field">
+        <span>Foto del socio</span>
+        <input name="photo" type="file" accept="image/jpeg,image/png,image/webp">
+        <small>JPG, PNG o WEBP. Maximo 2 MB.</small>
       </label>
     </div>
     <button class="primary-action" type="submit">Crear socio</button>

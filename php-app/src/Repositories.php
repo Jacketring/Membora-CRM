@@ -139,6 +139,8 @@ final class MemberRepository
         int $limit = 200
     ): array
     {
+        self::ensurePhotoColumn();
+
         $params = ['tenant_id' => $tenantId];
         $where = ['tenant_id = :tenant_id'];
 
@@ -163,7 +165,7 @@ final class MemberRepository
         }
 
         $stmt = Database::connection()->prepare(
-            'SELECT id, first_name, last_name, email, phone, status, joined_at, created_at, updated_at
+            'SELECT id, first_name, last_name, email, phone, status, photo_path, joined_at, created_at, updated_at
              FROM members
              WHERE ' . implode(' AND ', $where) . '
              ORDER BY joined_at DESC, created_at DESC
@@ -175,6 +177,8 @@ final class MemberRepository
 
     public static function metrics(string $tenantId): array
     {
+        self::ensurePhotoColumn();
+
         $pdo = Database::connection();
 
         return [
@@ -190,6 +194,20 @@ final class MemberRepository
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM members WHERE tenant_id = :tenant_id AND {$where}");
         $stmt->execute(['tenant_id' => $tenantId]);
         return (int) $stmt->fetchColumn();
+    }
+
+    public static function ensurePhotoColumn(): void
+    {
+        try {
+            $stmt = Database::connection()->query('SHOW COLUMNS FROM members LIKE "photo_path"');
+            if ($stmt && $stmt->fetchColumn()) {
+                return;
+            }
+
+            Database::connection()->exec('ALTER TABLE members ADD COLUMN photo_path VARCHAR(255) NULL AFTER phone');
+        } catch (Throwable) {
+            // The app still works without photos if the DB user cannot alter the table.
+        }
     }
 }
 

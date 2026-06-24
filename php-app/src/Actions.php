@@ -328,6 +328,8 @@ final class Actions
 
     private static function createMember(): never
     {
+        MemberRepository::ensurePhotoColumn();
+
         $firstName = post_value('first_name', '');
         if ($firstName === '') {
             flash('Indica al menos el nombre del socio.', 'error');
@@ -339,9 +341,11 @@ final class Actions
             $status = 'ACTIVE';
         }
 
+        $photoPath = self::uploadedMemberPhotoPath();
+
         $stmt = Database::connection()->prepare(
-            'INSERT INTO members (id, tenant_id, lead_id, first_name, last_name, email, phone, status, joined_at, created_at, updated_at)
-             VALUES (:id, :tenant_id, NULL, :first_name, :last_name, :email, :phone, :status, :joined_at, NOW(), NOW())'
+            'INSERT INTO members (id, tenant_id, lead_id, first_name, last_name, email, phone, photo_path, status, joined_at, created_at, updated_at)
+             VALUES (:id, :tenant_id, NULL, :first_name, :last_name, :email, :phone, :photo_path, :status, :joined_at, NOW(), NOW())'
         );
         $stmt->execute([
             'id' => cuid(),
@@ -350,6 +354,7 @@ final class Actions
             'last_name' => post_value('last_name') ?: null,
             'email' => post_value('email') ?: null,
             'phone' => phone_from_post(),
+            'photo_path' => $photoPath,
             'status' => $status,
             'joined_at' => post_value('joined_at') ?: date('Y-m-d'),
         ]);
@@ -360,6 +365,8 @@ final class Actions
 
     private static function updateMember(): never
     {
+        MemberRepository::ensurePhotoColumn();
+
         $firstName = post_value('first_name', '');
         if ($firstName === '') {
             flash('Indica al menos el nombre del socio.', 'error');
@@ -371,12 +378,26 @@ final class Actions
             $status = 'ACTIVE';
         }
 
+        $tenantId = Auth::tenantId();
+        $memberId = post_value('id');
+        $currentStmt = Database::connection()->prepare('SELECT photo_path FROM members WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
+        $currentStmt->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
+        $currentPhoto = (string) (($currentStmt->fetch()['photo_path'] ?? '') ?: '');
+        $uploadedPhoto = self::uploadedMemberPhotoPath();
+        $removePhoto = post_value('remove_photo') === '1';
+        $photoPath = $uploadedPhoto ?: ($removePhoto ? null : ($currentPhoto ?: null));
+
+        if (($uploadedPhoto || $removePhoto) && $currentPhoto !== '') {
+            self::deleteLocalUpload($currentPhoto);
+        }
+
         $stmt = Database::connection()->prepare(
             'UPDATE members
              SET first_name = :first_name,
                  last_name = :last_name,
                  email = :email,
                  phone = :phone,
+                 photo_path = :photo_path,
                  status = :status,
                  joined_at = :joined_at,
                  updated_at = NOW()
@@ -387,10 +408,11 @@ final class Actions
             'last_name' => post_value('last_name') ?: null,
             'email' => post_value('email') ?: null,
             'phone' => phone_from_post(),
+            'photo_path' => $photoPath,
             'status' => $status,
             'joined_at' => post_value('joined_at') ?: null,
-            'id' => post_value('id'),
-            'tenant_id' => Auth::tenantId(),
+            'id' => $memberId,
+            'tenant_id' => $tenantId,
         ]);
 
         flash('Socio actualizado correctamente.');
@@ -403,13 +425,15 @@ final class Actions
         $memberId = post_value('id');
         $tenantId = Auth::tenantId();
 
+        MemberRepository::ensurePhotoColumn();
         TaskRepository::ensureMemberLinksTable();
         $pdo->beginTransaction();
         try {
-            $memberStmt = $pdo->prepare('SELECT lead_id FROM members WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
+            $memberStmt = $pdo->prepare('SELECT lead_id, photo_path FROM members WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
             $memberStmt->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
             $member = $memberStmt->fetch();
             $leadId = $member['lead_id'] ?? null;
+            $photoPath = (string) (($member['photo_path'] ?? '') ?: '');
 
             $deleteLinks = $pdo->prepare('DELETE FROM task_members WHERE member_id = :id AND tenant_id = :tenant_id');
             $deleteLinks->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
@@ -437,6 +461,10 @@ final class Actions
             }
 
             $pdo->commit();
+
+            if ($photoPath !== '') {
+                self::deleteLocalUpload($photoPath);
+            }
         } catch (Throwable) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
@@ -448,6 +476,69 @@ final class Actions
 
         flash('Socio eliminado correctamente. Si venia de un lead, se ha reactivado en Leads.');
         redirect('members');
+    }
+
+    private static function uploadedMemberPhotoPath(): ?string
+    {
+        $file = $_FILES['photo'] ?? null;
+        if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+
+        if ((int) $file['error'] !== UPLOAD_ERR_OK) {
+            flash('No se pudo subir la foto del socio.', 'error');
+            redirect('members');
+        }
+
+        if ((int) ($file['size'] ?? 0) > 2 * 1024 * 1024) {
+            flash('La foto no puede superar 2 MB.', 'error');
+            redirect('members');
+        }
+
+        $tmpPath = (string) ($file['tmp_name'] ?? '');
+        $imageInfo = @getimagesize($tmpPath);
+        $allowedMimeTypes = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        ];
+        $mimeType = is_array($imageInfo) ? (string) ($imageInfo['mime'] ?? '') : '';
+        if (!isset($allowedMimeTypes[$mimeType])) {
+            flash('La foto debe ser JPG, PNG o WEBP.', 'error');
+            redirect('members');
+        }
+
+        $uploadDir = self::memberUploadDirectory();
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+            flash('No se pudo preparar la carpeta de fotos.', 'error');
+            redirect('members');
+        }
+
+        $filename = cuid() . '.' . $allowedMimeTypes[$mimeType];
+        $target = $uploadDir . DIRECTORY_SEPARATOR . $filename;
+        if (!move_uploaded_file($tmpPath, $target)) {
+            flash('No se pudo guardar la foto del socio.', 'error');
+            redirect('members');
+        }
+
+        return 'uploads/members/' . $filename;
+    }
+
+    private static function memberUploadDirectory(): string
+    {
+        return dirname(__DIR__) . '/public/uploads/members';
+    }
+
+    private static function deleteLocalUpload(string $path): void
+    {
+        if (!str_starts_with($path, 'uploads/members/')) {
+            return;
+        }
+
+        $fullPath = dirname(__DIR__) . '/public/' . $path;
+        if (is_file($fullPath)) {
+            @unlink($fullPath);
+        }
     }
 
     private static function createTask(): never
