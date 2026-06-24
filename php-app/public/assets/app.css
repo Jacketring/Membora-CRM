@@ -2001,6 +2001,14 @@ body[data-theme="dark"] .notice {
 body[data-theme="dark"] .topbar {
   background: rgba(15, 28, 46, 0.92);
 }
+body[data-theme="dark"] .brand-lockup--sidebar h1,
+body[data-theme="dark"] .sidebar-nav a,
+body[data-theme="dark"] .logout-button {
+  color: #e8eef8;
+}
+body[data-theme="dark"] .brand-lockup--sidebar p {
+  color: #c8d6e8;
+}
 body[data-theme="dark"] .sidebar-nav a:hover,
 body[data-theme="dark"] .sidebar-nav a.active,
 body[data-theme="dark"] .global-search-dropdown,
@@ -2012,6 +2020,13 @@ body[data-theme="dark"] .task-health-list span,
 body[data-theme="dark"] .risk-list div {
   background: var(--surface-soft);
   border-color: var(--outline);
+}
+body[data-theme="dark"] .sidebar-nav a.active,
+body[data-theme="dark"] .sidebar-nav a:hover {
+  color: #fff;
+}
+body[data-theme="dark"] .logout-button:hover {
+  color: #fff;
 }
 body[data-theme="dark"] .leads-table th {
   background: var(--surface-soft);
