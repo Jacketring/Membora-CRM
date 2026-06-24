@@ -22,6 +22,9 @@ final class Actions
             'convert_lead' => self::convertLead(),
             'mark_lead_lost' => self::markLeadLost(),
             'delete_lead' => self::deleteLead(),
+            'create_member' => self::createMember(),
+            'update_member' => self::updateMember(),
+            'delete_member' => self::deleteMember(),
             'create_task' => self::createTask(),
             'update_task' => self::updateTask(),
             'update_task_status' => self::updateTaskStatus(),
@@ -321,6 +324,108 @@ final class Actions
 
         flash('Lead eliminado.');
         redirect('leads');
+    }
+
+    private static function createMember(): never
+    {
+        $firstName = post_value('first_name', '');
+        if ($firstName === '') {
+            flash('Indica al menos el nombre del socio.', 'error');
+            redirect('members');
+        }
+
+        $status = post_value('status', 'ACTIVE');
+        if (!in_array($status, ['ACTIVE', 'INACTIVE'], true)) {
+            $status = 'ACTIVE';
+        }
+
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO members (id, tenant_id, lead_id, first_name, last_name, email, phone, status, joined_at, created_at, updated_at)
+             VALUES (:id, :tenant_id, NULL, :first_name, :last_name, :email, :phone, :status, :joined_at, NOW(), NOW())'
+        );
+        $stmt->execute([
+            'id' => cuid(),
+            'tenant_id' => Auth::tenantId(),
+            'first_name' => $firstName,
+            'last_name' => post_value('last_name') ?: null,
+            'email' => post_value('email') ?: null,
+            'phone' => phone_from_post(),
+            'status' => $status,
+            'joined_at' => post_value('joined_at') ?: date('Y-m-d'),
+        ]);
+
+        flash('Socio creado correctamente.');
+        redirect('members');
+    }
+
+    private static function updateMember(): never
+    {
+        $firstName = post_value('first_name', '');
+        if ($firstName === '') {
+            flash('Indica al menos el nombre del socio.', 'error');
+            redirect('members');
+        }
+
+        $status = post_value('status', 'ACTIVE');
+        if (!in_array($status, ['ACTIVE', 'INACTIVE'], true)) {
+            $status = 'ACTIVE';
+        }
+
+        $stmt = Database::connection()->prepare(
+            'UPDATE members
+             SET first_name = :first_name,
+                 last_name = :last_name,
+                 email = :email,
+                 phone = :phone,
+                 status = :status,
+                 joined_at = :joined_at,
+                 updated_at = NOW()
+             WHERE id = :id AND tenant_id = :tenant_id'
+        );
+        $stmt->execute([
+            'first_name' => $firstName,
+            'last_name' => post_value('last_name') ?: null,
+            'email' => post_value('email') ?: null,
+            'phone' => phone_from_post(),
+            'status' => $status,
+            'joined_at' => post_value('joined_at') ?: null,
+            'id' => post_value('id'),
+            'tenant_id' => Auth::tenantId(),
+        ]);
+
+        flash('Socio actualizado correctamente.');
+        redirect('members');
+    }
+
+    private static function deleteMember(): never
+    {
+        $pdo = Database::connection();
+        $memberId = post_value('id');
+        $tenantId = Auth::tenantId();
+
+        TaskRepository::ensureMemberLinksTable();
+        $pdo->beginTransaction();
+        try {
+            $deleteLinks = $pdo->prepare('DELETE FROM task_members WHERE member_id = :id AND tenant_id = :tenant_id');
+            $deleteLinks->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
+
+            $unlinkTasks = $pdo->prepare('UPDATE tasks SET member_id = NULL, updated_at = NOW() WHERE member_id = :id AND tenant_id = :tenant_id');
+            $unlinkTasks->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
+
+            $deleteMember = $pdo->prepare('DELETE FROM members WHERE id = :id AND tenant_id = :tenant_id');
+            $deleteMember->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
+            $pdo->commit();
+        } catch (Throwable) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            flash('No se pudo eliminar el socio porque tiene datos relacionados.', 'error');
+            redirect('members');
+        }
+
+        flash('Socio eliminado correctamente.');
+        redirect('members');
     }
 
     private static function createTask(): never

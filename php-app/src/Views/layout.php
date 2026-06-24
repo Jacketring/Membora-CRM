@@ -27,7 +27,7 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
       <nav class="sidebar-nav">
         <a class="<?= $route === 'dashboard' ? 'active' : '' ?>" href="index.php?route=dashboard">Panel</a>
         <a class="<?= $route === 'leads' ? 'active' : '' ?>" href="index.php?route=leads">Leads</a>
-        <a href="#">Socios</a>
+        <a class="<?= $route === 'members' ? 'active' : '' ?>" href="index.php?route=members">Socios</a>
         <a href="#">Membresias</a>
         <a href="#">Clases</a>
         <a class="<?= $route === 'tasks' ? 'active' : '' ?>" href="index.php?route=tasks">Tareas</a>

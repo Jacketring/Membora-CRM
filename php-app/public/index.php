@@ -87,6 +87,27 @@ switch ($route) {
         ]);
         break;
 
+    case 'members':
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+            'date_from' => trim((string) ($_GET['date_from'] ?? '')),
+            'date_to' => trim((string) ($_GET['date_to'] ?? '')),
+        ];
+        $members = MemberRepository::all(
+            $tenantId,
+            $filters['q'],
+            $filters['status'],
+            $filters['date_from'],
+            $filters['date_to']
+        );
+        render_layout('Socios', 'members', [
+            'filters' => $filters,
+            'metrics' => MemberRepository::metrics($tenantId),
+            'members' => $members,
+        ]);
+        break;
+
     default:
         redirect('dashboard');
 }

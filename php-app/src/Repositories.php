@@ -117,16 +117,66 @@ final class PipelineRepository
 
 final class MemberRepository
 {
-    public static function all(string $tenantId): array
+    public static function all(
+        string $tenantId,
+        string $query = '',
+        string $status = '',
+        string $dateFrom = '',
+        string $dateTo = '',
+        int $limit = 200
+    ): array
     {
+        $params = ['tenant_id' => $tenantId];
+        $where = ['tenant_id = :tenant_id'];
+
+        if ($query !== '') {
+            $where[] = '(first_name LIKE :query OR last_name LIKE :query OR email LIKE :query OR phone LIKE :query)';
+            $params['query'] = '%' . $query . '%';
+        }
+
+        if ($status !== '') {
+            $where[] = 'status = :status';
+            $params['status'] = $status;
+        }
+
+        if ($dateFrom !== '') {
+            $where[] = 'DATE(joined_at) >= :date_from';
+            $params['date_from'] = $dateFrom;
+        }
+
+        if ($dateTo !== '') {
+            $where[] = 'DATE(joined_at) <= :date_to';
+            $params['date_to'] = $dateTo;
+        }
+
         $stmt = Database::connection()->prepare(
-            'SELECT id, first_name, last_name, email, phone, status
+            'SELECT id, first_name, last_name, email, phone, status, joined_at, created_at, updated_at
              FROM members
-             WHERE tenant_id = :tenant_id
-             ORDER BY first_name ASC, last_name ASC'
+             WHERE ' . implode(' AND ', $where) . '
+             ORDER BY joined_at DESC, created_at DESC
+             LIMIT ' . max(1, min($limit, 300))
         );
-        $stmt->execute(['tenant_id' => $tenantId]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    public static function metrics(string $tenantId): array
+    {
+        $pdo = Database::connection();
+
+        return [
+            'active' => self::count($pdo, $tenantId, 'status = "ACTIVE"'),
+            'inactive' => self::count($pdo, $tenantId, 'status = "INACTIVE"'),
+            'new_month' => self::count($pdo, $tenantId, 'joined_at >= DATE_FORMAT(CURDATE(), "%Y-%m-01")'),
+            'total' => self::count($pdo, $tenantId, '1 = 1'),
+        ];
+    }
+
+    private static function count(PDO $pdo, string $tenantId, string $where): int
+    {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM members WHERE tenant_id = :tenant_id AND {$where}");
+        $stmt->execute(['tenant_id' => $tenantId]);
+        return (int) $stmt->fetchColumn();
     }
 }
 
@@ -415,7 +465,7 @@ final class GlobalSearchRepository
                 'kind' => 'member',
                 'title' => $name,
                 'description' => $member['email'] ?: ($member['phone'] ?: status_label($member['status'])),
-                'href' => '',
+                'href' => 'index.php?route=members&q=' . urlencode($query),
             ];
         }
 
