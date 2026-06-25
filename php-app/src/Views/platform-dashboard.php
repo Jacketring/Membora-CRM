@@ -116,9 +116,22 @@ $planOptions = ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', '
             <td><?= e(format_date_short($empresa['next_payment_at'])) ?></td>
             <td><?= e($empresa['notes'] ? substr($empresa['notes'], 0, 60) . (strlen($empresa['notes']) > 60 ? '...' : '') : 'Sin notas') ?></td>
             <td>
-              <button class="icon-action" type="button" data-open-modal="empresa-edit-<?= e($empresa['id']) ?>" aria-label="Editar <?= e($empresa['name']) ?>">
-                <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
-              </button>
+              <div class="platform-row-actions">
+                <?php if ($empresa['tenant_id']): ?>
+                  <form method="post">
+                    <input type="hidden" name="action" value="enter_empresa_crm">
+                    <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">
+                    <button class="support-enter-action" type="submit" aria-label="Entrar al CRM de <?= e($empresa['name']) ?>">
+                      <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg>
+                      <span>Entrar</span>
+                    </button>
+                  </form>
+                <?php endif; ?>
+                <button class="support-edit-action" type="button" data-open-modal="empresa-edit-<?= e($empresa['id']) ?>" aria-label="Editar <?= e($empresa['name']) ?>">
+                  <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
+                  <span>Editar</span>
+                </button>
+              </div>
             </td>
           </tr>
         <?php endforeach; ?>

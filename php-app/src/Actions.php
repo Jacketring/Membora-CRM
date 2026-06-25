@@ -16,6 +16,8 @@ final class Actions
             'update_profile' => self::updateProfile(),
             'create_empresa' => self::createEmpresa(),
             'update_empresa' => self::updateEmpresa(),
+            'enter_empresa_crm' => self::enterEmpresaCrm(),
+            'exit_empresa_crm' => self::exitEmpresaCrm(),
             'create_user' => self::createUser(),
             'update_user' => self::updateUser(),
             'create_lead' => self::createLead(),
@@ -165,6 +167,26 @@ final class Actions
 
         EmpresaRepository::update($id, $_POST);
         flash('Empresa actualizada correctamente.');
+        redirect('platform-dashboard');
+    }
+
+    private static function enterEmpresaCrm(): never
+    {
+        self::requirePlatformAdmin();
+        $empresa = EmpresaRepository::find(post_value('id', ''));
+        if (!$empresa) {
+            flash('No se encontro la empresa.', 'error');
+            redirect('platform-dashboard');
+        }
+
+        Auth::enterTenantContext($empresa);
+        flash('Estas viendo el CRM de ' . $empresa['name'] . '.');
+        redirect('dashboard');
+    }
+
+    private static function exitEmpresaCrm(): never
+    {
+        Auth::exitTenantContext();
         redirect('platform-dashboard');
     }
 

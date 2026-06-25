@@ -57,14 +57,14 @@ final class Auth
 
         $isPlatformAdmin = in_array(strtoupper((string) $user['role_key']), ['SUPER_ADMIN', 'SUPERADMIN'], true);
 
-        if (!$user['tenant_id'] && !$isPlatformAdmin) {
+        if ($isPlatformAdmin) {
+            $user['tenant_name'] = 'Membora CRM';
+            $user['tenant_primary_color'] = '#0754d6';
+        } elseif (!$user['tenant_id']) {
             $tenant = self::fallbackTenant();
             $user['tenant_id'] = $tenant['id'] ?? null;
             $user['tenant_name'] = $tenant['name'] ?? 'Membora CRM';
             $user['tenant_primary_color'] = $tenant['primary_color'] ?? '#0754d6';
-        } elseif (!$user['tenant_id'] && $isPlatformAdmin) {
-            $user['tenant_name'] = 'Membora CRM';
-            $user['tenant_primary_color'] = '#0754d6';
         }
 
         $_SESSION['user'] = [
@@ -86,7 +86,43 @@ final class Auth
 
     public static function logout(): void
     {
-        unset($_SESSION['user']);
+        unset($_SESSION['user'], $_SESSION['platform_admin_user']);
+    }
+
+    public static function enterTenantContext(array $empresa): void
+    {
+        if (empty($empresa['tenant_id'])) {
+            flash('Esta empresa no tiene un CRM conectado todavia.', 'error');
+            redirect('platform-dashboard');
+        }
+
+        if (!isset($_SESSION['platform_admin_user'])) {
+            $_SESSION['platform_admin_user'] = self::requireUser();
+        }
+
+        TenantRepository::ensureSettingsColumns();
+        $stmt = Database::connection()->prepare('SELECT id, name, primary_color FROM tenants WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $empresa['tenant_id']]);
+        $tenant = $stmt->fetch();
+
+        if (!$tenant) {
+            flash('No se encontro el CRM conectado a esta empresa.', 'error');
+            redirect('platform-dashboard');
+        }
+
+        $_SESSION['user']['tenant_id'] = $tenant['id'];
+        $_SESSION['user']['tenant_name'] = $tenant['name'];
+        $_SESSION['user']['tenant_primary_color'] = $tenant['primary_color'] ?? '#0754d6';
+        $_SESSION['user']['tenant_context'] = true;
+        $_SESSION['user']['support_company_name'] = $empresa['name'];
+    }
+
+    public static function exitTenantContext(): void
+    {
+        if (isset($_SESSION['platform_admin_user'])) {
+            $_SESSION['user'] = $_SESSION['platform_admin_user'];
+            unset($_SESSION['platform_admin_user']);
+        }
     }
 
     private static function fallbackTenantId(): ?string

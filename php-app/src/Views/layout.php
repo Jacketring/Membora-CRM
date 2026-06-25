@@ -99,6 +99,18 @@ $isPlatformAdmin = is_platform_admin($user);
         <?php if ($flash): ?>
           <div class="notice <?= $flash['type'] === 'error' ? 'notice-error' : 'notice-success' ?>" role="<?= $flash['type'] === 'error' ? 'alert' : 'status' ?>"><?= e($flash['message']) ?></div>
         <?php endif; ?>
+        <?php if (is_platform_support_context()): ?>
+          <div class="support-context-banner" role="status">
+            <div>
+              <strong>Modo soporte</strong>
+              <span>Estas viendo el CRM de <?= e($user['support_company_name'] ?? $user['tenant_name']) ?>.</span>
+            </div>
+            <form method="post">
+              <input type="hidden" name="action" value="exit_empresa_crm">
+              <button class="secondary-action" type="submit">Volver a Admin CRM</button>
+            </form>
+          </div>
+        <?php endif; ?>
         <?php require __DIR__ . '/' . $contentView . '.php'; ?>
       </div>
     </section>

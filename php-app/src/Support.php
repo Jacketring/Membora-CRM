@@ -253,8 +253,18 @@ function role_label(?string $role): string
 
 function is_platform_admin(?array $user = null): bool
 {
-    $role = strtoupper((string) (($user ?? Auth::user())['role'] ?? ''));
+    $user = $user ?? Auth::user();
+    if (($user['tenant_context'] ?? false) === true) {
+        return false;
+    }
+
+    $role = strtoupper((string) ($user['role'] ?? ''));
     return in_array($role, ['SUPER_ADMIN', 'SUPERADMIN'], true);
+}
+
+function is_platform_support_context(): bool
+{
+    return (Auth::user()['tenant_context'] ?? false) === true && isset($_SESSION['platform_admin_user']);
 }
 
 function empresa_status_label(?string $status): string

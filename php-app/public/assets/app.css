@@ -1312,6 +1312,77 @@ a.global-search-result:hover {
 .platform-table {
   min-width: 1180px;
 }
+.platform-row-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+.platform-row-actions form {
+  margin: 0;
+}
+.support-enter-action,
+.support-edit-action {
+  align-items: center;
+  border-radius: 10px;
+  display: inline-flex;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 11px;
+  white-space: nowrap;
+}
+.support-enter-action {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: #fff;
+  font-weight: 900;
+}
+.support-enter-action:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+.support-edit-action {
+  background: var(--surface-soft);
+  border: 1px solid var(--outline);
+  color: var(--text);
+  font-weight: 850;
+}
+.support-edit-action:hover {
+  border-color: #9bb7ec;
+  color: var(--primary);
+}
+.support-enter-action svg,
+.support-edit-action svg {
+  fill: currentColor;
+  height: 16px;
+  width: 16px;
+}
+.support-context-banner {
+  align-items: center;
+  background: #eef4ff;
+  border: 1px solid #cfe0ff;
+  border-radius: 14px;
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+}
+.support-context-banner div {
+  display: grid;
+  gap: 3px;
+}
+.support-context-banner strong {
+  color: var(--primary);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.support-context-banner span {
+  color: var(--muted);
+  font-weight: 700;
+}
+.support-context-banner form {
+  margin: 0;
+}
 .empresa-modal {
   max-width: 780px;
   width: min(780px, calc(100vw - 32px));
@@ -2131,6 +2202,21 @@ body[data-theme="dark"] .empresa-modal {
 }
 body[data-theme="dark"] .empresa-modal::backdrop {
   background: rgba(3, 8, 18, 0.72);
+}
+body[data-theme="dark"] .support-edit-action {
+  background: var(--surface-soft);
+  border-color: var(--outline);
+  color: var(--text);
+}
+body[data-theme="dark"] .support-context-banner {
+  background: rgba(7, 84, 214, 0.16);
+  border-color: rgba(125, 168, 255, 0.32);
+}
+body[data-theme="dark"] .support-context-banner strong {
+  color: #9ec2ff;
+}
+body[data-theme="dark"] .support-context-banner span {
+  color: #d4e0f0;
 }
 body[data-theme="dark"] .status-badge--active,
 body[data-theme="dark"] .status-badge--paid {

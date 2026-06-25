@@ -308,6 +308,16 @@ final class EmpresaRepository
         return $stmt->fetchAll();
     }
 
+    public static function find(string $id): ?array
+    {
+        self::ensureTables();
+        $stmt = Database::connection()->prepare('SELECT * FROM empresas WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+        $empresa = $stmt->fetch();
+
+        return $empresa ?: null;
+    }
+
     public static function create(array $data): void
     {
         self::ensureTables();
