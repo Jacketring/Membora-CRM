@@ -1292,6 +1292,71 @@ a.global-search-result:hover {
   border-color: #fecaca;
   color: var(--danger);
 }
+.platform-heading {
+  align-items: center;
+  gap: 18px;
+}
+.platform-toolbar {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(260px, 1fr) 180px 180px auto;
+}
+.platform-toolbar .field {
+  margin: 0;
+}
+.platform-toolbar .field input,
+.platform-toolbar .field select {
+  min-height: 46px;
+}
+.platform-table {
+  min-width: 1180px;
+}
+.empresa-modal {
+  max-width: 780px;
+  width: min(780px, calc(100vw - 32px));
+}
+.empresa-modal header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--outline);
+  margin: -6px 0 20px;
+  padding-bottom: 16px;
+}
+.empresa-modal header h2 {
+  font-size: 24px;
+}
+.empresa-modal header p {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.modal-close-action {
+  white-space: nowrap;
+}
+.empresa-form {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.empresa-form .field {
+  margin: 0;
+}
+.empresa-form .field input,
+.empresa-form .field select,
+.empresa-form .field textarea {
+  min-height: 44px;
+}
+.empresa-form .form-full {
+  grid-column: 1 / -1;
+}
+.empresa-form .form-actions {
+  align-items: center;
+  border-top: 1px solid var(--outline);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+  padding-top: 16px;
+}
 .row-actions .danger-action, .danger-action { color: var(--danger); }
 .leads-empty-cell { color: var(--muted) !important; padding: 28px !important; text-align: center; }
 .task-description { color: var(--muted); display: block; margin-top: 4px; }
@@ -2047,6 +2112,7 @@ body[data-theme="dark"] .dashboard-card-header p {
   color: var(--muted);
 }
 body[data-theme="dark"] .field input,
+body[data-theme="dark"] .field select,
 body[data-theme="dark"] .field textarea,
 body[data-theme="dark"] .custom-select-trigger,
 body[data-theme="dark"] .date-filter-control,
@@ -2055,6 +2121,35 @@ body[data-theme="dark"] .phone-prefix-trigger {
   background: var(--surface-soft);
   border-color: var(--outline);
   color: var(--text);
+}
+body[data-theme="dark"] .field input::placeholder,
+body[data-theme="dark"] .field textarea::placeholder {
+  color: #7f8da0;
+}
+body[data-theme="dark"] .empresa-modal {
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.44);
+}
+body[data-theme="dark"] .empresa-modal::backdrop {
+  background: rgba(3, 8, 18, 0.72);
+}
+body[data-theme="dark"] .status-badge--active,
+body[data-theme="dark"] .status-badge--paid {
+  background: rgba(16, 185, 129, 0.18);
+  color: #7dd3ac;
+}
+body[data-theme="dark"] .status-badge--trial {
+  background: rgba(14, 165, 233, 0.18);
+  color: #7dd3fc;
+}
+body[data-theme="dark"] .status-badge--pending {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+}
+body[data-theme="dark"] .status-badge--suspended,
+body[data-theme="dark"] .status-badge--overdue,
+body[data-theme="dark"] .status-badge--cancelled {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
 }
 body[data-density="compact"] .content { padding: 28px 34px; }
 body[data-density="compact"] .lead-metric,

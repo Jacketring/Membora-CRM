@@ -19,7 +19,7 @@ $paymentOptions = [
 $planOptions = ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', 'ENTERPRISE' => 'Enterprise'];
 ?>
 
-<div class="page-heading leads-heading">
+<div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Administracion Membora CRM</h2>
     <p>Control de empresas cliente, estado del CRM, pagos y facturacion mensual.</p>
@@ -52,11 +52,11 @@ $planOptions = ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', '
 
 <form class="lead-toolbar platform-toolbar" method="get" action="index.php" data-auto-filter-form>
   <input type="hidden" name="route" value="platform-dashboard">
-  <label class="filter-search platform-search">
+  <label class="field platform-search">
     <span>Buscar</span>
     <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, plan o notas" data-auto-submit-input>
   </label>
-  <label class="filter-field">
+  <label class="field platform-filter-field">
     <span>Estado CRM</span>
     <select name="status" data-auto-submit-input>
       <?php foreach ($statusOptions as $value => $label): ?>
@@ -64,7 +64,7 @@ $planOptions = ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', '
       <?php endforeach; ?>
     </select>
   </label>
-  <label class="filter-field">
+  <label class="field platform-filter-field">
     <span>Pago</span>
     <select name="payment_status" data-auto-submit-input>
       <?php foreach ($paymentOptions as $value => $label): ?>
@@ -130,25 +130,25 @@ $planOptions = ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', '
   </div>
 </section>
 
-<dialog class="modal-card" id="empresa-create-modal">
+<dialog class="modal-card empresa-modal" id="empresa-create-modal">
   <header>
     <div>
       <h2>Nueva empresa</h2>
       <p>Alta manual de cliente CRM para seguimiento comercial y pagos.</p>
     </div>
-    <button type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
+    <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
   </header>
   <?php require __DIR__ . '/partials/empresa-form.php'; ?>
 </dialog>
 
 <?php foreach ($empresas as $empresa): ?>
-  <dialog class="modal-card" id="empresa-edit-<?= e($empresa['id']) ?>">
+  <dialog class="modal-card empresa-modal" id="empresa-edit-<?= e($empresa['id']) ?>">
     <header>
       <div>
         <h2><?= e($empresa['name']) ?></h2>
         <p>Gestiona plan, estado y pagos de esta empresa cliente.</p>
       </div>
-      <button type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
+      <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
     </header>
     <?php require __DIR__ . '/partials/empresa-form.php'; ?>
   </dialog>
