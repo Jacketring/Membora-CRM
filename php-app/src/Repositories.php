@@ -196,6 +196,134 @@ final class TenantRepository
     }
 }
 
+final class PlatformClientRepository
+{
+    public static function ensureTable(): void
+    {
+        Database::connection()->exec(
+            'CREATE TABLE IF NOT EXISTS platform_clients (
+                id VARCHAR(191) NOT NULL PRIMARY KEY,
+                company_name VARCHAR(191) NOT NULL,
+                contact_name VARCHAR(191) NULL,
+                email VARCHAR(191) NULL,
+                phone VARCHAR(64) NULL,
+                status VARCHAR(32) NOT NULL DEFAULT "LEAD",
+                notes TEXT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX platform_clients_status_idx (status),
+                INDEX platform_clients_email_idx (email)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+        );
+    }
+
+    public static function metrics(): array
+    {
+        self::ensureTable();
+        $pdo = Database::connection();
+
+        return [
+            'lead' => self::count($pdo, 'status = "LEAD"'),
+            'qualified' => self::count($pdo, 'status = "QUALIFIED"'),
+            'customer' => self::count($pdo, 'status = "CUSTOMER"'),
+            'lost' => self::count($pdo, 'status = "LOST"'),
+        ];
+    }
+
+    public static function all(string $query = '', string $status = ''): array
+    {
+        self::ensureTable();
+        $params = [];
+        $where = ['1 = 1'];
+
+        if ($query !== '') {
+            $where[] = '(company_name LIKE :query OR contact_name LIKE :query OR email LIKE :query OR phone LIKE :query OR notes LIKE :query)';
+            $params['query'] = '%' . $query . '%';
+        }
+
+        if ($status !== '') {
+            $where[] = 'status = :status';
+            $params['status'] = $status;
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT *
+             FROM platform_clients
+             WHERE ' . implode(' AND ', $where) . '
+             ORDER BY FIELD(status, "QUALIFIED", "LEAD", "CUSTOMER", "LOST"), updated_at DESC, company_name ASC'
+        );
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    public static function find(string $id): ?array
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare('SELECT * FROM platform_clients WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $id]);
+        $client = $stmt->fetch();
+
+        return $client ?: null;
+    }
+
+    public static function create(array $data): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO platform_clients (id, company_name, contact_name, email, phone, status, notes, created_at, updated_at)
+             VALUES (:id, :company_name, :contact_name, :email, :phone, :status, :notes, NOW(), NOW())'
+        );
+        $stmt->execute(self::clientParams($data) + ['id' => cuid()]);
+    }
+
+    public static function update(string $id, array $data): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'UPDATE platform_clients
+             SET company_name = :company_name,
+                 contact_name = :contact_name,
+                 email = :email,
+                 phone = :phone,
+                 status = :status,
+                 notes = :notes,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+        $stmt->execute(self::clientParams($data) + ['id' => $id]);
+    }
+
+    public static function markCustomer(string $id): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'UPDATE platform_clients SET status = "CUSTOMER", updated_at = NOW() WHERE id = :id'
+        );
+        $stmt->execute(['id' => $id]);
+    }
+
+    private static function clientParams(array $data): array
+    {
+        $status = in_array($data['status'] ?? '', ['LEAD', 'QUALIFIED', 'CUSTOMER', 'LOST'], true) ? $data['status'] : 'LEAD';
+
+        return [
+            'company_name' => trim((string) ($data['company_name'] ?? '')),
+            'contact_name' => trim((string) ($data['contact_name'] ?? '')) ?: null,
+            'email' => strtolower(trim((string) ($data['email'] ?? ''))) ?: null,
+            'phone' => phone_from_post() ?: (trim((string) ($data['phone'] ?? '')) ?: null),
+            'status' => $status,
+            'notes' => trim((string) ($data['notes'] ?? '')) ?: null,
+        ];
+    }
+
+    private static function count(PDO $pdo, string $where): int
+    {
+        $stmt = $pdo->query("SELECT COUNT(*) FROM platform_clients WHERE {$where}");
+        return (int) $stmt->fetchColumn();
+    }
+}
+
 final class EmpresaRepository
 {
     public const PLATFORM_ADMIN_EMAIL = 'admin@membora.crm';
@@ -208,6 +336,7 @@ final class EmpresaRepository
             'CREATE TABLE IF NOT EXISTS empresas (
                 id VARCHAR(191) NOT NULL PRIMARY KEY,
                 tenant_id VARCHAR(191) NULL,
+                client_id VARCHAR(191) NULL,
                 name VARCHAR(191) NOT NULL,
                 contact_email VARCHAR(191) NULL,
                 plan VARCHAR(64) NOT NULL DEFAULT "BASIC",
@@ -224,6 +353,7 @@ final class EmpresaRepository
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
         );
 
+        self::ensureColumn('empresas', 'client_id', 'ALTER TABLE empresas ADD COLUMN client_id VARCHAR(191) NULL AFTER tenant_id');
         self::syncFromTenants();
     }
 
@@ -321,11 +451,32 @@ final class EmpresaRepository
     public static function create(array $data): void
     {
         self::ensureTables();
+        PlatformClientRepository::ensureTable();
+        $params = self::empresaParams($data);
+        $client = null;
+
+        if ($params['client_id']) {
+            $client = PlatformClientRepository::find($params['client_id']);
+            if ($client) {
+                $params['name'] = $params['name'] ?: $client['company_name'];
+                $params['contact_email'] = $params['contact_email'] ?: $client['email'];
+            }
+        }
+
+        $tenantId = null;
+        if (($data['create_tenant'] ?? '') === '1' || trim((string) ($data['admin_email'] ?? '')) !== '') {
+            $tenantId = self::createTenantAndAdmin($params['name'], $data, $client);
+        }
+
         $stmt = Database::connection()->prepare(
-            'INSERT INTO empresas (id, tenant_id, name, contact_email, plan, status, payment_status, monthly_price, next_payment_at, notes, created_at, updated_at)
-             VALUES (:id, NULL, :name, :contact_email, :plan, :status, :payment_status, :monthly_price, :next_payment_at, :notes, NOW(), NOW())'
+            'INSERT INTO empresas (id, tenant_id, client_id, name, contact_email, plan, status, payment_status, monthly_price, next_payment_at, notes, created_at, updated_at)
+             VALUES (:id, :tenant_id, :client_id, :name, :contact_email, :plan, :status, :payment_status, :monthly_price, :next_payment_at, :notes, NOW(), NOW())'
         );
-        $stmt->execute(self::empresaParams($data) + ['id' => cuid()]);
+        $stmt->execute($params + ['id' => cuid(), 'tenant_id' => $tenantId]);
+
+        if ($client) {
+            PlatformClientRepository::markCustomer($client['id']);
+        }
     }
 
     public static function update(string $id, array $data): void
@@ -335,6 +486,7 @@ final class EmpresaRepository
             'UPDATE empresas
              SET name = :name,
                  contact_email = :contact_email,
+                 client_id = :client_id,
                  plan = :plan,
                  status = :status,
                  payment_status = :payment_status,
@@ -412,6 +564,7 @@ final class EmpresaRepository
         return [
             'name' => trim((string) ($data['name'] ?? '')),
             'contact_email' => trim((string) ($data['contact_email'] ?? '')) ?: null,
+            'client_id' => trim((string) ($data['client_id'] ?? '')) ?: null,
             'plan' => strtoupper(trim((string) ($data['plan'] ?? 'BASIC'))) ?: 'BASIC',
             'status' => $status,
             'payment_status' => $paymentStatus,
@@ -425,6 +578,180 @@ final class EmpresaRepository
     {
         $stmt = Database::connection()->query('SHOW COLUMNS FROM ' . $table);
         return array_map(static fn (array $column): string => $column['Field'], $stmt->fetchAll());
+    }
+
+    private static function ensureColumn(string $table, string $column, string $sql): void
+    {
+        $stmt = Database::connection()->query('SHOW COLUMNS FROM ' . $table . ' LIKE "' . $column . '"');
+        if (!$stmt->fetch()) {
+            Database::connection()->exec($sql);
+        }
+    }
+
+    private static function createTenantAndAdmin(string $companyName, array $data, ?array $client = null): string
+    {
+        $companyName = trim($companyName);
+        if ($companyName === '') {
+            throw new RuntimeException('Indica el nombre de la empresa.');
+        }
+
+        $adminEmail = strtolower(trim((string) ($data['admin_email'] ?? '')));
+        $adminName = trim((string) ($data['admin_name'] ?? '')) ?: ($client['contact_name'] ?? 'Administrador');
+        $adminPassword = trim((string) ($data['admin_password'] ?? '')) ?: 'MemboraDemo2026!';
+        if ($adminEmail === '' && $client) {
+            $adminEmail = strtolower((string) $client['email']);
+        }
+
+        if ($adminEmail === '' || !filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new RuntimeException('Indica un email valido para el administrador de la empresa.');
+        }
+
+        if (strlen($adminPassword) < 8) {
+            throw new RuntimeException('La contrasena del administrador debe tener al menos 8 caracteres.');
+        }
+
+        $pdo = Database::connection();
+        $exists = $pdo->prepare('SELECT COUNT(*) FROM users WHERE email = :email');
+        $exists->execute(['email' => $adminEmail]);
+        if ((int) $exists->fetchColumn() > 0) {
+            throw new RuntimeException('Ya existe un usuario con ese email. Usa otro email para el administrador.');
+        }
+
+        $tenantId = cuid();
+        $tenantColumns = self::tableColumns('tenants');
+        $tenantValues = [
+            'id' => $tenantId,
+            'name' => $companyName,
+            'slug' => self::uniqueTenantSlug($companyName),
+            'primary_color' => '#0754d6',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        $insertTenantColumns = array_values(array_intersect(array_keys($tenantValues), $tenantColumns));
+        $tenantPlaceholders = array_map(static fn (string $column): string => ':' . $column, $insertTenantColumns);
+        $tenantParams = array_intersect_key($tenantValues, array_flip($insertTenantColumns));
+        $tenantInsert = $pdo->prepare(
+            'INSERT INTO tenants (' . implode(', ', $insertTenantColumns) . ')
+             VALUES (' . implode(', ', $tenantPlaceholders) . ')'
+        );
+        $tenantInsert->execute($tenantParams);
+
+        $roleId = self::ensureGymAdminRole();
+        $userColumns = self::tableColumns('users');
+        $userValues = [
+            'id' => cuid(),
+            'tenant_id' => $tenantId,
+            'role_id' => $roleId,
+            'name' => $adminName,
+            'email' => $adminEmail,
+            'password_hash' => password_hash($adminPassword, PASSWORD_BCRYPT),
+            'status' => 'ACTIVE',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        $insertUserColumns = array_values(array_intersect(array_keys($userValues), $userColumns));
+        $userPlaceholders = array_map(static fn (string $column): string => ':' . $column, $insertUserColumns);
+        $userParams = array_intersect_key($userValues, array_flip($insertUserColumns));
+        $userInsert = $pdo->prepare(
+            'INSERT INTO users (' . implode(', ', $insertUserColumns) . ')
+             VALUES (' . implode(', ', $userPlaceholders) . ')'
+        );
+        $userInsert->execute($userParams);
+
+        self::seedTenantPipeline($tenantId);
+
+        return $tenantId;
+    }
+
+    private static function ensureGymAdminRole(): string
+    {
+        $pdo = Database::connection();
+        $stmt = $pdo->query('SELECT id FROM roles WHERE `key` IN ("GYM_ADMIN", "ADMIN") ORDER BY `key` = "GYM_ADMIN" DESC LIMIT 1');
+        $roleId = $stmt->fetchColumn();
+        if ($roleId) {
+            return (string) $roleId;
+        }
+
+        $roleId = cuid();
+        $columns = self::tableColumns('roles');
+        $values = [
+            'id' => $roleId,
+            'key' => 'GYM_ADMIN',
+            'name' => 'Administrador',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        $insertColumns = array_values(array_intersect(array_keys($values), $columns));
+        $placeholders = array_map(static fn (string $column): string => ':' . $column, $insertColumns);
+        $params = array_intersect_key($values, array_flip($insertColumns));
+        $insert = $pdo->prepare(
+            'INSERT INTO roles (' . implode(', ', array_map(static fn (string $column): string => $column === 'key' ? '`key`' : $column, $insertColumns)) . ')
+             VALUES (' . implode(', ', $placeholders) . ')'
+        );
+        $insert->execute($params);
+
+        return $roleId;
+    }
+
+    private static function seedTenantPipeline(string $tenantId): void
+    {
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM pipeline_stages WHERE tenant_id = :tenant_id');
+        $stmt->execute(['tenant_id' => $tenantId]);
+        if ((int) $stmt->fetchColumn() > 0) {
+            return;
+        }
+
+        $insert = $pdo->prepare(
+            'INSERT INTO pipeline_stages (id, tenant_id, `key`, name, `order`, created_at, updated_at)
+             VALUES (:id, :tenant_id, :key, :name, :order, NOW(), NOW())'
+        );
+
+        foreach ([
+            ['NEW', 'Nuevo lead'],
+            ['CONTACTED', 'Contactado'],
+            ['TRIAL_SCHEDULED', 'Visita o prueba agendada'],
+            ['PROPOSAL', 'Alta propuesta'],
+            ['CONVERTED', 'Convertido a socio'],
+            ['LOST', 'Perdido'],
+        ] as $index => $stage) {
+            $insert->execute([
+                'id' => cuid(),
+                'tenant_id' => $tenantId,
+                'key' => $stage[0],
+                'name' => $stage[1],
+                'order' => $index + 1,
+            ]);
+        }
+    }
+
+    private static function tenantSlug(string $name): string
+    {
+        $slug = strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $name) ?? 'empresa'));
+        return trim($slug, '-') ?: 'empresa';
+    }
+
+    private static function uniqueTenantSlug(string $name): string
+    {
+        $columns = self::tableColumns('tenants');
+        $base = self::tenantSlug($name);
+        if (!in_array('slug', $columns, true)) {
+            return $base;
+        }
+
+        $pdo = Database::connection();
+        $slug = $base;
+        $suffix = 2;
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM tenants WHERE slug = :slug');
+        while (true) {
+            $stmt->execute(['slug' => $slug]);
+            if ((int) $stmt->fetchColumn() === 0) {
+                return $slug;
+            }
+
+            $slug = $base . '-' . $suffix;
+            $suffix++;
+        }
     }
 
     private static function usersTenantAllowsNull(): bool

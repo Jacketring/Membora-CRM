@@ -287,6 +287,16 @@ function empresa_payment_status_label(?string $status): string
     ]);
 }
 
+function platform_client_status_label(?string $status): string
+{
+    return enum_label((string) $status, [
+        'LEAD' => 'Lead',
+        'QUALIFIED' => 'Cualificado',
+        'CUSTOMER' => 'Cliente',
+        'LOST' => 'Perdido',
+    ]);
+}
+
 function platform_payment_status_label(?string $status): string
 {
     return enum_label((string) $status, [

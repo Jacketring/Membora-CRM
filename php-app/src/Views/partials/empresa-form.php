@@ -1,9 +1,11 @@
 <?php
 $isEditingEmpresa = isset($empresa) && is_array($empresa);
+$selectedClient = $selectedClient ?? null;
 $empresaValues = $isEditingEmpresa ? $empresa : [
     'id' => '',
-    'name' => '',
-    'contact_email' => '',
+    'client_id' => $selectedClient['id'] ?? '',
+    'name' => $selectedClient['company_name'] ?? '',
+    'contact_email' => $selectedClient['email'] ?? '',
     'plan' => 'BASIC',
     'status' => 'TRIAL',
     'payment_status' => 'TRIAL',
@@ -17,6 +19,20 @@ $empresaValues = $isEditingEmpresa ? $empresa : [
   <input type="hidden" name="action" value="<?= $isEditingEmpresa ? 'update_empresa' : 'create_empresa' ?>">
   <?php if ($isEditingEmpresa): ?>
     <input type="hidden" name="id" value="<?= e($empresaValues['id']) ?>">
+  <?php endif; ?>
+
+  <?php if (!empty($clients)): ?>
+    <label class="field form-full">
+      <span>Cliente origen</span>
+      <select name="client_id">
+        <option value="">Sin cliente vinculado</option>
+        <?php foreach ($clients as $clientOption): ?>
+          <option value="<?= e($clientOption['id']) ?>" <?= ($empresaValues['client_id'] ?? '') === $clientOption['id'] ? 'selected' : '' ?>>
+            <?= e($clientOption['company_name']) ?><?= $clientOption['email'] ? ' - ' . e($clientOption['email']) : '' ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </label>
   <?php endif; ?>
 
   <label class="field">
@@ -63,6 +79,29 @@ $empresaValues = $isEditingEmpresa ? $empresa : [
     <span>Notas internas</span>
     <textarea name="notes" rows="4" placeholder="Contrato, incidencias de pago, contacto decisor..."><?= e($empresaValues['notes']) ?></textarea>
   </label>
+
+  <?php if (!$isEditingEmpresa): ?>
+    <div class="form-full platform-form-divider">
+      <strong>Acceso al CRM de la empresa</strong>
+      <span>Marca esta opcion para crear el tenant y el usuario administrador de este gimnasio.</span>
+    </div>
+    <label class="settings-check form-full">
+      <input name="create_tenant" type="checkbox" value="1" checked>
+      <span>Crear CRM y usuario administrador para esta empresa</span>
+    </label>
+    <label class="field">
+      <span>Nombre administrador</span>
+      <input name="admin_name" value="<?= e($selectedClient['contact_name'] ?? 'Administrador') ?>" placeholder="Laura Martin">
+    </label>
+    <label class="field">
+      <span>Email administrador</span>
+      <input name="admin_email" type="email" value="<?= e($selectedClient['email'] ?? '') ?>" placeholder="admin@empresa.com">
+    </label>
+    <label class="field">
+      <span>Contrasena inicial</span>
+      <input name="admin_password" type="text" value="MemboraDemo2026!" placeholder="Minimo 8 caracteres">
+    </label>
+  <?php endif; ?>
 
   <div class="form-actions form-full">
     <button class="secondary-action" type="button" data-close-modal>Cancelar</button>

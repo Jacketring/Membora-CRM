@@ -14,6 +14,8 @@ final class Actions
             'login' => self::login(),
             'logout' => self::logout(),
             'update_profile' => self::updateProfile(),
+            'create_platform_client' => self::createPlatformClient(),
+            'update_platform_client' => self::updatePlatformClient(),
             'create_empresa' => self::createEmpresa(),
             'update_empresa' => self::updateEmpresa(),
             'create_platform_payment' => self::createPlatformPayment(),
@@ -154,7 +156,13 @@ final class Actions
             redirect('platform-companies');
         }
 
-        EmpresaRepository::create($_POST);
+        try {
+            EmpresaRepository::create($_POST);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo crear la empresa.', 'error');
+            redirect('platform-companies');
+        }
+
         flash('Empresa creada correctamente.');
         redirect('platform-companies');
     }
@@ -172,6 +180,35 @@ final class Actions
         EmpresaRepository::update($id, $_POST);
         flash('Empresa actualizada correctamente.');
         redirect('platform-companies');
+    }
+
+    private static function createPlatformClient(): never
+    {
+        self::requirePlatformAdmin();
+
+        if (post_value('company_name', '') === '') {
+            flash('Indica el nombre de la empresa cliente.', 'error');
+            redirect('platform-clients');
+        }
+
+        PlatformClientRepository::create($_POST);
+        flash('Cliente creado correctamente.');
+        redirect('platform-clients');
+    }
+
+    private static function updatePlatformClient(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '' || post_value('company_name', '') === '') {
+            flash('Indica el cliente que quieres actualizar.', 'error');
+            redirect('platform-clients');
+        }
+
+        PlatformClientRepository::update($id, $_POST);
+        flash('Cliente actualizado correctamente.');
+        redirect('platform-clients');
     }
 
     private static function createPlatformPayment(): never

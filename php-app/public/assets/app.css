@@ -1174,9 +1174,9 @@ a.global-search-result:hover {
   font-weight: 900;
   padding: 6px 9px;
 }
-.status-badge--converted, .status-badge--completed, .status-badge--active { background: #dcfce7; color: #047857; }
+.status-badge--converted, .status-badge--completed, .status-badge--active, .status-badge--customer, .status-badge--qualified { background: #dcfce7; color: #047857; }
 .status-badge--lost, .status-badge--cancelled, .status-badge--inactive, .status-badge--archived { background: #fee2e2; color: var(--danger); }
-.status-badge--pending, .status-badge--open, .status-badge--scheduled { background: #eef4ff; color: var(--primary); }
+.status-badge--pending, .status-badge--open, .status-badge--scheduled, .status-badge--lead { background: #eef4ff; color: var(--primary); }
 .status-badge--trial { background: #e0f2fe; color: #0369a1; }
 .status-badge--suspended, .status-badge--overdue { background: #fee2e2; color: var(--danger); }
 .status-badge--paid { background: #dcfce7; color: #047857; }
@@ -1601,6 +1601,23 @@ a.global-search-result:hover {
 }
 .empresa-form .field {
   margin: 0;
+}
+.platform-form-divider {
+  background: var(--surface-soft);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  display: grid;
+  gap: 4px;
+  padding: 13px 14px;
+}
+.platform-form-divider strong {
+  color: var(--text);
+  font-size: 14px;
+}
+.platform-form-divider span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
 }
 .platform-plan-cards {
   display: grid;
@@ -2496,7 +2513,9 @@ body[data-theme="dark"] .platform-plan-list i {
   background: linear-gradient(90deg, var(--primary) var(--plan-width), rgba(255, 255, 255, 0.08) var(--plan-width));
 }
 body[data-theme="dark"] .status-badge--active,
-body[data-theme="dark"] .status-badge--paid {
+body[data-theme="dark"] .status-badge--paid,
+body[data-theme="dark"] .status-badge--customer,
+body[data-theme="dark"] .status-badge--qualified {
   background: rgba(16, 185, 129, 0.18);
   color: #7dd3ac;
 }
@@ -2504,7 +2523,8 @@ body[data-theme="dark"] .status-badge--trial {
   background: rgba(14, 165, 233, 0.18);
   color: #7dd3fc;
 }
-body[data-theme="dark"] .status-badge--pending {
+body[data-theme="dark"] .status-badge--pending,
+body[data-theme="dark"] .status-badge--lead {
   background: rgba(245, 158, 11, 0.18);
   color: #fbbf24;
 }

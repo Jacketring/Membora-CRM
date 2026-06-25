@@ -1,6 +1,6 @@
 # Modelo de datos inicial - Membora CRM
 
-> Nota de estado actual: este documento describe el modelo inicial planteado para el MVP. La version PHP actual reutiliza MariaDB y crea algunas tablas auxiliares de forma incremental, como `empresas`, `empresa_payments`, `saas_plans`, `lead_notes`, `task_members`, `membership_plans`, `subscriptions`, `class_types` y `class_sessions`. El estado actualizado esta resumido en `docs/07-estado-actual-php.md`.
+> Nota de estado actual: este documento describe el modelo inicial planteado para el MVP. La version PHP actual reutiliza MariaDB y crea algunas tablas auxiliares de forma incremental, como `platform_clients`, `empresas`, `empresa_payments`, `saas_plans`, `lead_notes`, `task_members`, `membership_plans`, `subscriptions`, `class_types` y `class_sessions`. El estado actualizado esta resumido en `docs/07-estado-actual-php.md`.
 
 ## 1. Introducción
 

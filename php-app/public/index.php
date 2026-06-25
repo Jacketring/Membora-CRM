@@ -22,6 +22,15 @@ if ($route === 'global-search') {
     $query = trim((string) ($_GET['q'] ?? ''));
     $items = [];
     if (is_platform_admin($currentUser)) {
+        foreach (array_slice(PlatformClientRepository::all($query), 0, 8) as $client) {
+            $items[] = [
+                'type' => 'Cliente',
+                'kind' => 'client',
+                'title' => $client['company_name'],
+                'description' => platform_client_status_label($client['status']) . ' - ' . ($client['email'] ?: 'Sin email'),
+                'href' => 'index.php?route=platform-clients&q=' . urlencode($query),
+            ];
+        }
         foreach (array_slice(EmpresaRepository::all($query), 0, 10) as $empresa) {
             $items[] = [
                 'type' => 'Empresa',
@@ -84,6 +93,22 @@ switch ($route) {
         ]);
         break;
 
+    case 'platform-clients':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+        ];
+        render_layout('Clientes CRM', 'platform-clients', [
+            'filters' => $filters,
+            'metrics' => PlatformClientRepository::metrics(),
+            'clients' => PlatformClientRepository::all($filters['q'], $filters['status']),
+        ]);
+        break;
+
     case 'platform-companies':
         if (!is_platform_admin($currentUser)) {
             redirect('dashboard');
@@ -94,10 +119,13 @@ switch ($route) {
             'status' => trim((string) ($_GET['status'] ?? '')),
             'payment_status' => trim((string) ($_GET['payment_status'] ?? '')),
         ];
+        $selectedClientId = trim((string) ($_GET['client_id'] ?? ''));
         render_layout('Empresas', 'platform-companies', [
             'filters' => $filters,
             'metrics' => EmpresaRepository::metrics(),
             'planOptions' => PlatformPlanRepository::options(),
+            'clients' => PlatformClientRepository::all(),
+            'selectedClient' => $selectedClientId !== '' ? PlatformClientRepository::find($selectedClientId) : null,
             'allEmpresas' => EmpresaRepository::all(),
             'empresas' => EmpresaRepository::all($filters['q'], $filters['status'], $filters['payment_status']),
         ]);
