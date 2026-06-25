@@ -28,7 +28,25 @@ if ($route === 'global-search') {
                 'kind' => 'empresa',
                 'title' => $empresa['name'],
                 'description' => empresa_status_label($empresa['status']) . ' - ' . empresa_payment_status_label($empresa['payment_status']),
-                'href' => 'index.php?route=platform-dashboard&q=' . urlencode($query),
+                'href' => 'index.php?route=platform-companies&q=' . urlencode($query),
+            ];
+        }
+        foreach (array_slice(PlatformPaymentRepository::all($query), 0, 5) as $payment) {
+            $items[] = [
+                'type' => 'Pago',
+                'kind' => 'payment',
+                'title' => $payment['concept'],
+                'description' => $payment['empresa_name'] . ' - ' . platform_payment_status_label($payment['status']),
+                'href' => 'index.php?route=platform-payments&q=' . urlencode($query),
+            ];
+        }
+        foreach (array_slice(PlatformPlanRepository::all($query), 0, 5) as $plan) {
+            $items[] = [
+                'type' => 'Plan',
+                'kind' => 'plan',
+                'title' => $plan['name'],
+                'description' => money_amount($plan['monthly_price']) . ' / mes',
+                'href' => 'index.php?route=platform-plans&q=' . urlencode($query),
             ];
         }
     } else {
@@ -49,16 +67,72 @@ switch ($route) {
             redirect('dashboard');
         }
 
+        $allEmpresas = EmpresaRepository::all();
+        $filters = [
+            'q' => '',
+            'status' => '',
+            'payment_status' => '',
+        ];
+        render_layout('Admin CRM', 'platform-dashboard', [
+            'filters' => $filters,
+            'metrics' => EmpresaRepository::metrics(),
+            'paymentMetrics' => PlatformPaymentRepository::metrics(),
+            'planMetrics' => PlatformPlanRepository::metrics(),
+            'allEmpresas' => $allEmpresas,
+            'empresas' => array_slice($allEmpresas, 0, 6),
+            'payments' => array_slice(PlatformPaymentRepository::all(), 0, 6),
+        ]);
+        break;
+
+    case 'platform-companies':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
         $filters = [
             'q' => trim((string) ($_GET['q'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
             'payment_status' => trim((string) ($_GET['payment_status'] ?? '')),
         ];
-        render_layout('Admin CRM', 'platform-dashboard', [
+        render_layout('Empresas', 'platform-companies', [
             'filters' => $filters,
             'metrics' => EmpresaRepository::metrics(),
+            'planOptions' => PlatformPlanRepository::options(),
             'allEmpresas' => EmpresaRepository::all(),
             'empresas' => EmpresaRepository::all($filters['q'], $filters['status'], $filters['payment_status']),
+        ]);
+        break;
+
+    case 'platform-payments':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+        ];
+        render_layout('Pagos CRM', 'platform-payments', [
+            'filters' => $filters,
+            'metrics' => PlatformPaymentRepository::metrics(),
+            'empresas' => EmpresaRepository::all(),
+            'payments' => PlatformPaymentRepository::all($filters['q'], $filters['status']),
+        ]);
+        break;
+
+    case 'platform-plans':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+        ];
+        render_layout('Planes CRM', 'platform-plans', [
+            'filters' => $filters,
+            'metrics' => PlatformPlanRepository::metrics(),
+            'plans' => PlatformPlanRepository::all($filters['q'], $filters['status']),
         ]);
         break;
 

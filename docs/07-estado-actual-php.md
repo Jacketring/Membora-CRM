@@ -98,13 +98,18 @@ No se usa Node.js en produccion.
 
 ### Administracion SaaS de Membora CRM
 
-- Panel `Admin CRM`.
+- Panel `Admin CRM` separado en resumen, empresas, pagos y planes.
+- Resumen ejecutivo con MRR, ARR, ARPA, pagos pendientes, cobrado en el mes y prioridades.
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente.
 - Estado del CRM: activo, prueba, suspendido o cancelado.
 - Estado de pago: al dia, pendiente, vencido o prueba.
 - Precio mensual y proximo pago.
 - MRR estimado.
+- Tabla `empresa_payments` para cobros SaaS por empresa.
+- Registro y edicion de pagos con concepto, importe, vencimiento, fecha de pago, estado y notas.
+- Tabla `saas_plans` para catalogo comercial.
+- Gestion de planes con precio mensual, setup, limites de usuarios/socios, estado y prestaciones.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 
@@ -114,7 +119,7 @@ No se usa Node.js en produccion.
 - Reservas de clase.
 - Check-ins.
 - Alertas de riesgo.
-- Mejoras avanzadas de facturacion SaaS.
+- Integraciones avanzadas de facturacion SaaS.
 - Auditoria de acciones.
 - Permisos finos por rol.
 
@@ -153,6 +158,8 @@ Password: MemboraAdmin2026!
 La aplicacion PHP puede crear de forma incremental:
 
 - `empresas`.
+- `empresa_payments`.
+- `saas_plans`.
 - `lead_notes`.
 - `task_members`.
 - `membership_plans`.

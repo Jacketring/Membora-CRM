@@ -32,7 +32,10 @@ $isPlatformAdmin = is_platform_admin($user);
       <?php $route = $_GET['route'] ?? 'dashboard'; ?>
       <nav class="sidebar-nav">
         <?php if ($isPlatformAdmin): ?>
-          <a class="<?= $route === 'platform-dashboard' ? 'active' : '' ?>" href="index.php?route=platform-dashboard">Admin CRM</a>
+          <a class="<?= $route === 'platform-dashboard' ? 'active' : '' ?>" href="index.php?route=platform-dashboard">Resumen</a>
+          <a class="<?= $route === 'platform-companies' ? 'active' : '' ?>" href="index.php?route=platform-companies">Empresas</a>
+          <a class="<?= $route === 'platform-payments' ? 'active' : '' ?>" href="index.php?route=platform-payments">Pagos</a>
+          <a class="<?= $route === 'platform-plans' ? 'active' : '' ?>" href="index.php?route=platform-plans">Planes</a>
         <?php else: ?>
           <a class="<?= $route === 'dashboard' ? 'active' : '' ?>" href="index.php?route=dashboard">Panel</a>
           <a class="<?= $route === 'leads' ? 'active' : '' ?>" href="index.php?route=leads">Leads</a>

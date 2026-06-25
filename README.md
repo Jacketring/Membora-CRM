@@ -24,7 +24,7 @@ Pantallas disponibles:
 - Usuarios internos del gimnasio.
 - Perfil de usuario.
 - Configuracion visual personal.
-- Panel de administracion de Membora CRM para empresas cliente.
+- Panel de administracion de Membora CRM separado en resumen, empresas, pagos y planes.
 
 Pendiente o futuro:
 
@@ -32,7 +32,8 @@ Pendiente o futuro:
 - Reservas.
 - Check-ins.
 - Alertas de riesgo.
-- Mejoras comerciales del panel SaaS.
+- Auditoria de acciones.
+- Integraciones futuras de facturacion externa.
 
 Repositorio:
 
@@ -63,7 +64,7 @@ La aplicacion PHP usa una estructura monolitica sencilla:
 - `public/assets/app.css`: estilos de la interfaz.
 - `public/assets/app.js`: interacciones de modales, buscadores y controles.
 
-La base de datos mantiene separacion por `tenant_id` para datos de gimnasios. La administracion SaaS usa la tabla `empresas` para controlar clientes del CRM, estado, plan, pagos y acceso de soporte.
+La base de datos mantiene separacion por `tenant_id` para datos de gimnasios. La administracion SaaS usa `empresas`, `empresa_payments` y `saas_plans` para controlar clientes del CRM, planes comerciales, pagos, facturacion mensual y acceso de soporte.
 
 ## Estructura
 
@@ -192,12 +193,15 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 ### Administracion Membora CRM
 
 - Panel `Admin CRM`.
+- Resumen SaaS con MRR, ARR, ARPA, riesgo, cobros y prioridades.
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente.
 - Estado del CRM: activo, prueba, suspendido o cancelado.
 - Estado de pago: al dia, pendiente, vencido o prueba.
 - Precio mensual y proximo pago.
 - MRR estimado.
+- Seccion `Pagos` para registrar cobros SaaS, vencimientos, pagados, pendientes y cancelados.
+- Seccion `Planes` para definir catalogo comercial, precio mensual, setup, limites y prestaciones.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 

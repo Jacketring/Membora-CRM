@@ -452,6 +452,296 @@ final class EmpresaRepository
     }
 }
 
+final class PlatformPaymentRepository
+{
+    public static function ensureTable(): void
+    {
+        Database::connection()->exec(
+            'CREATE TABLE IF NOT EXISTS empresa_payments (
+                id VARCHAR(191) NOT NULL PRIMARY KEY,
+                empresa_id VARCHAR(191) NOT NULL,
+                concept VARCHAR(191) NOT NULL,
+                amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+                status VARCHAR(32) NOT NULL DEFAULT "PENDING",
+                due_at DATE NULL,
+                paid_at DATE NULL,
+                notes TEXT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX empresa_payments_empresa_idx (empresa_id),
+                INDEX empresa_payments_status_idx (status),
+                INDEX empresa_payments_due_idx (due_at)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+        );
+    }
+
+    public static function metrics(): array
+    {
+        self::ensureTable();
+        $pdo = Database::connection();
+
+        $paidMonth = $pdo->query(
+            'SELECT COALESCE(SUM(amount), 0)
+             FROM empresa_payments
+             WHERE status = "PAID"
+             AND paid_at >= DATE_FORMAT(CURDATE(), "%Y-%m-01")'
+        )->fetchColumn();
+
+        $pending = $pdo->query(
+            'SELECT COALESCE(SUM(amount), 0)
+             FROM empresa_payments
+             WHERE status IN ("PENDING", "OVERDUE")'
+        )->fetchColumn();
+
+        $overdue = $pdo->query(
+            'SELECT COUNT(*)
+             FROM empresa_payments
+             WHERE status = "OVERDUE"
+             OR (status = "PENDING" AND due_at IS NOT NULL AND due_at < CURDATE())'
+        )->fetchColumn();
+
+        $dueWeek = $pdo->query(
+            'SELECT COUNT(*)
+             FROM empresa_payments
+             WHERE status = "PENDING"
+             AND due_at BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)'
+        )->fetchColumn();
+
+        return [
+            'paid_month' => (float) $paidMonth,
+            'pending_amount' => (float) $pending,
+            'overdue' => (int) $overdue,
+            'due_week' => (int) $dueWeek,
+        ];
+    }
+
+    public static function all(string $query = '', string $status = ''): array
+    {
+        self::ensureTable();
+        EmpresaRepository::ensureTables();
+
+        $params = [];
+        $where = ['1 = 1'];
+        if ($query !== '') {
+            $where[] = '(p.concept LIKE :query OR p.notes LIKE :query OR e.name LIKE :query OR e.contact_email LIKE :query)';
+            $params['query'] = '%' . $query . '%';
+        }
+
+        if ($status !== '') {
+            $where[] = 'p.status = :status';
+            $params['status'] = $status;
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT p.*, e.name AS empresa_name, e.contact_email
+             FROM empresa_payments p
+             INNER JOIN empresas e ON e.id = p.empresa_id
+             WHERE ' . implode(' AND ', $where) . '
+             ORDER BY p.due_at IS NULL, p.due_at ASC, p.created_at DESC'
+        );
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    public static function create(array $data): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO empresa_payments (id, empresa_id, concept, amount, status, due_at, paid_at, notes, created_at, updated_at)
+             VALUES (:id, :empresa_id, :concept, :amount, :status, :due_at, :paid_at, :notes, NOW(), NOW())'
+        );
+        $stmt->execute(self::paymentParams($data) + ['id' => cuid()]);
+    }
+
+    public static function update(string $id, array $data): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'UPDATE empresa_payments
+             SET empresa_id = :empresa_id,
+                 concept = :concept,
+                 amount = :amount,
+                 status = :status,
+                 due_at = :due_at,
+                 paid_at = :paid_at,
+                 notes = :notes,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+        $stmt->execute(self::paymentParams($data) + ['id' => $id]);
+    }
+
+    private static function paymentParams(array $data): array
+    {
+        $amount = str_replace(',', '.', (string) ($data['amount'] ?? '0'));
+        $status = in_array($data['status'] ?? '', ['PAID', 'PENDING', 'OVERDUE', 'CANCELLED'], true) ? $data['status'] : 'PENDING';
+
+        return [
+            'empresa_id' => trim((string) ($data['empresa_id'] ?? '')),
+            'concept' => trim((string) ($data['concept'] ?? '')),
+            'amount' => number_format(max(0, (float) $amount), 2, '.', ''),
+            'status' => $status,
+            'due_at' => trim((string) ($data['due_at'] ?? '')) ?: null,
+            'paid_at' => trim((string) ($data['paid_at'] ?? '')) ?: null,
+            'notes' => trim((string) ($data['notes'] ?? '')) ?: null,
+        ];
+    }
+}
+
+final class PlatformPlanRepository
+{
+    public static function ensureTable(): void
+    {
+        Database::connection()->exec(
+            'CREATE TABLE IF NOT EXISTS saas_plans (
+                id VARCHAR(191) NOT NULL PRIMARY KEY,
+                code VARCHAR(64) NOT NULL UNIQUE,
+                name VARCHAR(191) NOT NULL,
+                monthly_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+                setup_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+                max_users INT NULL,
+                max_members INT NULL,
+                status VARCHAR(32) NOT NULL DEFAULT "ACTIVE",
+                features TEXT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX saas_plans_status_idx (status)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+        );
+
+        self::seedDefaults();
+    }
+
+    public static function metrics(): array
+    {
+        self::ensureTable();
+        $pdo = Database::connection();
+
+        return [
+            'active' => (int) $pdo->query('SELECT COUNT(*) FROM saas_plans WHERE status = "ACTIVE"')->fetchColumn(),
+            'average_price' => (float) $pdo->query('SELECT COALESCE(AVG(monthly_price), 0) FROM saas_plans WHERE status = "ACTIVE"')->fetchColumn(),
+            'enterprise' => (int) $pdo->query('SELECT COUNT(*) FROM saas_plans WHERE code = "ENTERPRISE" AND status = "ACTIVE"')->fetchColumn(),
+        ];
+    }
+
+    public static function all(string $query = '', string $status = ''): array
+    {
+        self::ensureTable();
+        $params = [];
+        $where = ['1 = 1'];
+
+        if ($query !== '') {
+            $where[] = '(name LIKE :query OR code LIKE :query OR features LIKE :query)';
+            $params['query'] = '%' . $query . '%';
+        }
+
+        if ($status !== '') {
+            $where[] = 'status = :status';
+            $params['status'] = $status;
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT *
+             FROM saas_plans
+             WHERE ' . implode(' AND ', $where) . '
+             ORDER BY monthly_price ASC, name ASC'
+        );
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    public static function options(): array
+    {
+        $options = [];
+        foreach (self::all('', 'ACTIVE') as $plan) {
+            $options[$plan['code']] = $plan['name'];
+        }
+
+        return $options ?: ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', 'ENTERPRISE' => 'Enterprise'];
+    }
+
+    public static function create(array $data): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO saas_plans (id, code, name, monthly_price, setup_price, max_users, max_members, status, features, created_at, updated_at)
+             VALUES (:id, :code, :name, :monthly_price, :setup_price, :max_users, :max_members, :status, :features, NOW(), NOW())'
+        );
+        $stmt->execute(self::planParams($data) + ['id' => cuid()]);
+    }
+
+    public static function update(string $id, array $data): void
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'UPDATE saas_plans
+             SET code = :code,
+                 name = :name,
+                 monthly_price = :monthly_price,
+                 setup_price = :setup_price,
+                 max_users = :max_users,
+                 max_members = :max_members,
+                 status = :status,
+                 features = :features,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+        $stmt->execute(self::planParams($data) + ['id' => $id]);
+    }
+
+    private static function seedDefaults(): void
+    {
+        $pdo = Database::connection();
+        $count = (int) $pdo->query('SELECT COUNT(*) FROM saas_plans')->fetchColumn();
+        if ($count > 0) {
+            return;
+        }
+
+        $insert = $pdo->prepare(
+            'INSERT INTO saas_plans (id, code, name, monthly_price, setup_price, max_users, max_members, status, features, created_at, updated_at)
+             VALUES (:id, :code, :name, :monthly_price, :setup_price, :max_users, :max_members, "ACTIVE", :features, NOW(), NOW())'
+        );
+
+        foreach ([
+            ['BASIC', 'Basico', '49.00', '0.00', 3, 300, 'Leads, socios, tareas y membresias base.'],
+            ['PRO', 'Pro', '89.00', '99.00', 8, 1000, 'Calendario de clases, usuarios y soporte prioritario.'],
+            ['BUSINESS', 'Business', '149.00', '199.00', 20, 3000, 'Multi-equipo, reporting avanzado y soporte preferente.'],
+            ['ENTERPRISE', 'Enterprise', '299.00', '499.00', null, null, 'Condiciones personalizadas para cadenas o franquicias.'],
+        ] as $plan) {
+            $insert->execute([
+                'id' => cuid(),
+                'code' => $plan[0],
+                'name' => $plan[1],
+                'monthly_price' => $plan[2],
+                'setup_price' => $plan[3],
+                'max_users' => $plan[4],
+                'max_members' => $plan[5],
+                'features' => $plan[6],
+            ]);
+        }
+    }
+
+    private static function planParams(array $data): array
+    {
+        $monthlyPrice = str_replace(',', '.', (string) ($data['monthly_price'] ?? '0'));
+        $setupPrice = str_replace(',', '.', (string) ($data['setup_price'] ?? '0'));
+        $status = in_array($data['status'] ?? '', ['ACTIVE', 'INACTIVE', 'ARCHIVED'], true) ? $data['status'] : 'ACTIVE';
+
+        return [
+            'code' => strtoupper(preg_replace('/[^A-Z0-9_]/', '', trim((string) ($data['code'] ?? '')))) ?: 'CUSTOM',
+            'name' => trim((string) ($data['name'] ?? '')),
+            'monthly_price' => number_format(max(0, (float) $monthlyPrice), 2, '.', ''),
+            'setup_price' => number_format(max(0, (float) $setupPrice), 2, '.', ''),
+            'max_users' => trim((string) ($data['max_users'] ?? '')) !== '' ? max(0, (int) $data['max_users']) : null,
+            'max_members' => trim((string) ($data['max_members'] ?? '')) !== '' ? max(0, (int) $data['max_members']) : null,
+            'status' => $status,
+            'features' => trim((string) ($data['features'] ?? '')) ?: null,
+        ];
+    }
+}
+
 final class PipelineRepository
 {
     public static function all(string $tenantId): array

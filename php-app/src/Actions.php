@@ -16,6 +16,10 @@ final class Actions
             'update_profile' => self::updateProfile(),
             'create_empresa' => self::createEmpresa(),
             'update_empresa' => self::updateEmpresa(),
+            'create_platform_payment' => self::createPlatformPayment(),
+            'update_platform_payment' => self::updatePlatformPayment(),
+            'create_platform_plan' => self::createPlatformPlan(),
+            'update_platform_plan' => self::updatePlatformPlan(),
             'enter_empresa_crm' => self::enterEmpresaCrm(),
             'exit_empresa_crm' => self::exitEmpresaCrm(),
             'create_user' => self::createUser(),
@@ -147,12 +151,12 @@ final class Actions
 
         if (post_value('name', '') === '') {
             flash('Indica el nombre de la empresa.', 'error');
-            redirect('platform-dashboard');
+            redirect('platform-companies');
         }
 
         EmpresaRepository::create($_POST);
         flash('Empresa creada correctamente.');
-        redirect('platform-dashboard');
+        redirect('platform-companies');
     }
 
     private static function updateEmpresa(): never
@@ -162,12 +166,70 @@ final class Actions
 
         if ($id === '' || post_value('name', '') === '') {
             flash('Indica la empresa que quieres actualizar.', 'error');
-            redirect('platform-dashboard');
+            redirect('platform-companies');
         }
 
         EmpresaRepository::update($id, $_POST);
         flash('Empresa actualizada correctamente.');
-        redirect('platform-dashboard');
+        redirect('platform-companies');
+    }
+
+    private static function createPlatformPayment(): never
+    {
+        self::requirePlatformAdmin();
+
+        if (post_value('empresa_id', '') === '' || post_value('concept', '') === '') {
+            flash('Indica empresa y concepto del pago.', 'error');
+            redirect('platform-payments');
+        }
+
+        PlatformPaymentRepository::create($_POST);
+        flash('Pago registrado correctamente.');
+        redirect('platform-payments');
+    }
+
+    private static function updatePlatformPayment(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '' || post_value('empresa_id', '') === '' || post_value('concept', '') === '') {
+            flash('Indica el pago que quieres actualizar.', 'error');
+            redirect('platform-payments');
+        }
+
+        PlatformPaymentRepository::update($id, $_POST);
+        flash('Pago actualizado correctamente.');
+        redirect('platform-payments');
+    }
+
+    private static function createPlatformPlan(): never
+    {
+        self::requirePlatformAdmin();
+
+        if (post_value('name', '') === '' || post_value('code', '') === '') {
+            flash('Indica nombre y codigo del plan.', 'error');
+            redirect('platform-plans');
+        }
+
+        PlatformPlanRepository::create($_POST);
+        flash('Plan creado correctamente.');
+        redirect('platform-plans');
+    }
+
+    private static function updatePlatformPlan(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '' || post_value('name', '') === '' || post_value('code', '') === '') {
+            flash('Indica el plan que quieres actualizar.', 'error');
+            redirect('platform-plans');
+        }
+
+        PlatformPlanRepository::update($id, $_POST);
+        flash('Plan actualizado correctamente.');
+        redirect('platform-plans');
     }
 
     private static function enterEmpresaCrm(): never

@@ -287,6 +287,25 @@ function empresa_payment_status_label(?string $status): string
     ]);
 }
 
+function platform_payment_status_label(?string $status): string
+{
+    return enum_label((string) $status, [
+        'PAID' => 'Pagado',
+        'PENDING' => 'Pendiente',
+        'OVERDUE' => 'Vencido',
+        'CANCELLED' => 'Cancelado',
+    ]);
+}
+
+function platform_plan_status_label(?string $status): string
+{
+    return enum_label((string) $status, [
+        'ACTIVE' => 'Activo',
+        'INACTIVE' => 'Inactivo',
+        'ARCHIVED' => 'Archivado',
+    ]);
+}
+
 function format_time(?string $value): string
 {
     if (!$value) {

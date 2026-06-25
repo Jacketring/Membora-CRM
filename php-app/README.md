@@ -59,11 +59,11 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Usuarios internos.
 - Perfil.
 - Configuracion visual.
-- Panel de administracion SaaS `Admin CRM`.
+- Panel de administracion SaaS con resumen, empresas, pagos y planes.
 
 ## Administracion SaaS
 
-La app crea y usa la tabla `empresas` para controlar clientes del CRM:
+La app crea y usa tablas de administracion SaaS para controlar clientes, cobros y catalogo comercial:
 
 - Empresa cliente.
 - Plan.
@@ -73,6 +73,8 @@ La app crea y usa la tabla `empresas` para controlar clientes del CRM:
 - Proximo pago.
 - Notas internas.
 - Acceso de soporte al CRM de la empresa si tiene `tenant_id`.
+- Pagos SaaS por empresa: concepto, importe, vencimiento, fecha de pago y estado.
+- Planes SaaS: codigo, precio mensual, coste de alta, limites y prestaciones.
 
 Usuario de administracion de plataforma:
 
@@ -86,6 +88,8 @@ Password: MemboraAdmin2026!
 La aplicacion crea algunas tablas o columnas auxiliares si no existen, por ejemplo:
 
 - `empresas`.
+- `empresa_payments`.
+- `saas_plans`.
 - `lead_notes`.
 - `task_members`.
 - `membership_plans`.

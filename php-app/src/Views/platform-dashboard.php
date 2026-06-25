@@ -17,7 +17,10 @@ $paymentOptions = [
     'OVERDUE' => 'Vencido',
     'TRIAL' => 'Prueba',
 ];
-$planOptions = ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', 'ENTERPRISE' => 'Enterprise'];
+$planOptions = PlatformPlanRepository::options();
+$payments = $payments ?? [];
+$paymentMetrics = $paymentMetrics ?? ['paid_month' => 0, 'pending_amount' => 0, 'overdue' => 0, 'due_week' => 0];
+$planMetrics = $planMetrics ?? ['active' => 0, 'average_price' => 0, 'enterprise' => 0];
 $today = new DateTimeImmutable('today');
 $nextWeek = $today->modify('+7 days');
 $activeCustomers = array_values(array_filter($allEmpresas, static fn (array $empresa): bool => in_array($empresa['status'], ['ACTIVE', 'TRIAL'], true)));
@@ -52,9 +55,12 @@ $arpa = count($activeCustomers) > 0 ? (float) $metrics['mrr'] / count($activeCus
 <div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Administracion Membora CRM</h2>
-    <p>Control de empresas cliente, estado del CRM, pagos y facturacion mensual.</p>
+    <p>Resumen ejecutivo de empresas cliente, cobros, planes y soporte.</p>
   </div>
-  <button class="primary-action" type="button" data-open-modal="empresa-create-modal">Nueva empresa</button>
+  <div class="platform-heading-actions">
+    <a class="secondary-action" href="index.php?route=platform-payments">Ver pagos</a>
+    <a class="primary-action" href="index.php?route=platform-companies">Gestionar empresas</a>
+  </div>
 </div>
 
 <section class="dashboard-metrics">
@@ -70,14 +76,32 @@ $arpa = count($activeCustomers) > 0 ? (float) $metrics['mrr'] / count($activeCus
   </article>
   <article class="dashboard-metric dashboard-metric--orange">
     <span>Pagos pendientes</span>
-    <strong><?= (int) $metrics['payments_pending'] ?></strong>
-    <small>Pendientes o vencidos</small>
+    <strong><?= e(money_amount($paymentMetrics['pending_amount'])) ?></strong>
+    <small><?= (int) $paymentMetrics['overdue'] ?> vencidos</small>
   </article>
   <article class="dashboard-metric dashboard-metric--danger">
     <span>MRR estimado</span>
     <strong><?= e(money_amount($metrics['mrr'])) ?></strong>
     <small>Ingresos recurrentes mensuales</small>
   </article>
+</section>
+
+<section class="platform-module-grid" aria-label="Secciones de administracion">
+  <a class="platform-module-card" href="index.php?route=platform-companies">
+    <span>Empresas</span>
+    <strong>Clientes CRM</strong>
+    <small>Alta, estado, soporte y acceso al CRM de cada empresa.</small>
+  </a>
+  <a class="platform-module-card" href="index.php?route=platform-payments">
+    <span>Pagos</span>
+    <strong>Facturacion SaaS</strong>
+    <small>Control de cobros, vencidos, pagados y proximos pagos.</small>
+  </a>
+  <a class="platform-module-card" href="index.php?route=platform-plans">
+    <span>Planes</span>
+    <strong>Packaging</strong>
+    <small>Precios, limites, configuracion comercial y planes activos.</small>
+  </a>
 </section>
 
 <section class="platform-ops-grid" aria-label="Resumen operativo de administracion">
@@ -97,9 +121,9 @@ $arpa = count($activeCustomers) > 0 ? (float) $metrics['mrr'] / count($activeCus
     <small>Suspendidas o canceladas</small>
   </article>
   <article class="platform-insight-card platform-insight-card--warning">
-    <span>Importe vencido</span>
-    <strong><?= e(money_amount($overdueAmount)) ?></strong>
-    <small>MRR actualmente en riesgo</small>
+    <span>Cobrado este mes</span>
+    <strong><?= e(money_amount($paymentMetrics['paid_month'])) ?></strong>
+    <small><?= (int) $paymentMetrics['due_week'] ?> cobros próximos</small>
   </article>
 </section>
 
@@ -173,119 +197,49 @@ $arpa = count($activeCustomers) > 0 ? (float) $metrics['mrr'] / count($activeCus
   </article>
 </section>
 
-<form class="lead-toolbar platform-toolbar" method="get" action="index.php" data-auto-filter-form>
-  <input type="hidden" name="route" value="platform-dashboard">
-  <label class="field platform-search">
-    <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, plan o notas" data-auto-submit-input>
-  </label>
-  <label class="field platform-filter-field">
-    <span>Estado CRM</span>
-    <select name="status" data-auto-submit-input>
-      <?php foreach ($statusOptions as $value => $label): ?>
-        <option value="<?= e($value) ?>" <?= $filters['status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </label>
-  <label class="field platform-filter-field">
-    <span>Pago</span>
-    <select name="payment_status" data-auto-submit-input>
-      <?php foreach ($paymentOptions as $value => $label): ?>
-        <option value="<?= e($value) ?>" <?= $filters['payment_status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </label>
-  <button class="primary-action" type="submit">Filtrar</button>
-</form>
-
-<section class="leads-table-card">
-  <header>
-    <div>
-      <h3>Empresas cliente</h3>
-      <span><?= count($empresas) ?> resultados</span>
-    </div>
-  </header>
-  <div class="leads-table-wrap">
-    <table class="leads-table platform-table">
-      <thead>
-        <tr>
-          <th>Empresa</th>
-          <th>Contacto</th>
-          <th>Plan</th>
-          <th>Estado CRM</th>
-          <th>Pago</th>
-          <th>Precio mensual</th>
-          <th>Proximo pago</th>
-          <th>Notas</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($empresas as $empresa): ?>
-          <?php
-            $statusClass = strtolower((string) $empresa['status']);
-            $paymentClass = strtolower((string) $empresa['payment_status']);
-          ?>
-          <tr class="lead-data-row clickable-row" data-open-modal="empresa-edit-<?= e($empresa['id']) ?>">
-            <td>
-              <strong><?= e($empresa['name']) ?></strong>
-              <span class="table-subtext"><?= $empresa['tenant_id'] ? 'Tenant conectado' : 'Alta manual' ?></span>
-            </td>
-            <td><?= e($empresa['contact_email'] ?: 'Sin contacto') ?></td>
-            <td><span class="source-badge"><?= e($planOptions[$empresa['plan']] ?? $empresa['plan']) ?></span></td>
-            <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(empresa_status_label($empresa['status'])) ?></span></td>
-            <td><span class="status-badge status-badge--<?= e($paymentClass) ?>"><?= e(empresa_payment_status_label($empresa['payment_status'])) ?></span></td>
-            <td><?= e(money_amount($empresa['monthly_price'])) ?></td>
-            <td><?= e(format_date_short($empresa['next_payment_at'])) ?></td>
-            <td><?= e($empresa['notes'] ? substr($empresa['notes'], 0, 60) . (strlen($empresa['notes']) > 60 ? '...' : '') : 'Sin notas') ?></td>
-            <td>
-              <div class="platform-row-actions">
-                <?php if ($empresa['tenant_id']): ?>
-                  <form method="post">
-                    <input type="hidden" name="action" value="enter_empresa_crm">
-                    <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">
-                    <button class="support-enter-action" type="submit" aria-label="Entrar al CRM de <?= e($empresa['name']) ?>">
-                      <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg>
-                      <span>Entrar</span>
-                    </button>
-                  </form>
-                <?php endif; ?>
-                <button class="support-edit-action" type="button" data-open-modal="empresa-edit-<?= e($empresa['id']) ?>" aria-label="Editar <?= e($empresa['name']) ?>">
-                  <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
-                  <span>Editar</span>
-                </button>
-              </div>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-        <?php if (!$empresas): ?>
-          <tr><td colspan="9" class="empty-state">No hay empresas que coincidan con los filtros actuales.</td></tr>
-        <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<dialog class="modal-card empresa-modal" id="empresa-create-modal">
-  <header>
-    <div>
-      <h2>Nueva empresa</h2>
-      <p>Alta manual de cliente CRM para seguimiento comercial y pagos.</p>
-    </div>
-    <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
-  </header>
-  <?php require __DIR__ . '/partials/empresa-form.php'; ?>
-</dialog>
-
-<?php foreach ($empresas as $empresa): ?>
-  <dialog class="modal-card empresa-modal" id="empresa-edit-<?= e($empresa['id']) ?>">
+<section class="platform-dashboard-grid">
+  <article class="leads-table-card">
     <header>
       <div>
-        <h2><?= e($empresa['name']) ?></h2>
-        <p>Gestiona plan, estado y pagos de esta empresa cliente.</p>
+        <h3>Ultimas empresas</h3>
+        <span><?= count($empresas) ?> visibles</span>
       </div>
-      <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
+      <a class="secondary-action" href="index.php?route=platform-companies">Abrir empresas</a>
     </header>
-    <?php require __DIR__ . '/partials/empresa-form.php'; ?>
-  </dialog>
-<?php endforeach; ?>
+    <div class="platform-list">
+      <?php foreach ($empresas as $empresa): ?>
+        <a class="platform-list-item platform-list-link" href="index.php?route=platform-companies&q=<?= urlencode($empresa['name']) ?>">
+          <div>
+            <strong><?= e($empresa['name']) ?></strong>
+            <small><?= e(empresa_status_label($empresa['status'])) ?> · <?= e($planOptions[$empresa['plan']] ?? $empresa['plan']) ?></small>
+          </div>
+          <b><?= e(money_amount($empresa['monthly_price'])) ?></b>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </article>
+
+  <article class="leads-table-card">
+    <header>
+      <div>
+        <h3>Cobros recientes</h3>
+        <span><?= count($payments) ?> visibles</span>
+      </div>
+      <a class="secondary-action" href="index.php?route=platform-payments">Abrir pagos</a>
+    </header>
+    <div class="platform-list">
+      <?php foreach ($payments as $payment): ?>
+        <a class="platform-list-item platform-list-link" href="index.php?route=platform-payments&q=<?= urlencode($payment['concept']) ?>">
+          <div>
+            <strong><?= e($payment['concept']) ?></strong>
+            <small><?= e($payment['empresa_name']) ?> · <?= e(platform_payment_status_label($payment['status'])) ?></small>
+          </div>
+          <b><?= e(money_amount($payment['amount'])) ?></b>
+        </a>
+      <?php endforeach; ?>
+      <?php if (!$payments): ?>
+        <p class="platform-empty">Todavia no hay pagos registrados.</p>
+      <?php endif; ?>
+    </div>
+  </article>
+</section>

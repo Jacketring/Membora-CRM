@@ -1175,7 +1175,7 @@ a.global-search-result:hover {
   padding: 6px 9px;
 }
 .status-badge--converted, .status-badge--completed, .status-badge--active { background: #dcfce7; color: #047857; }
-.status-badge--lost, .status-badge--cancelled, .status-badge--inactive { background: #fee2e2; color: var(--danger); }
+.status-badge--lost, .status-badge--cancelled, .status-badge--inactive, .status-badge--archived { background: #fee2e2; color: var(--danger); }
 .status-badge--pending, .status-badge--open, .status-badge--scheduled { background: #eef4ff; color: var(--primary); }
 .status-badge--trial { background: #e0f2fe; color: #0369a1; }
 .status-badge--suspended, .status-badge--overdue { background: #fee2e2; color: var(--danger); }
@@ -1296,11 +1296,21 @@ a.global-search-result:hover {
   align-items: center;
   gap: 18px;
 }
+.platform-heading-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
 .platform-toolbar {
   align-items: end;
   display: grid;
   gap: 12px;
   grid-template-columns: minmax(260px, 1fr) 180px 180px auto;
+}
+.platform-toolbar--payments {
+  grid-template-columns: minmax(280px, 1fr) 220px auto;
 }
 .platform-toolbar .field {
   margin: 0;
@@ -1317,6 +1327,44 @@ a.global-search-result:hover {
   gap: 14px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 18px;
+}
+.platform-module-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+.platform-module-card {
+  background: linear-gradient(135deg, var(--surface), #f7faff);
+  border: 1px solid #dbe7ff;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  color: var(--text);
+  display: grid;
+  gap: 8px;
+  min-height: 128px;
+  padding: 18px;
+  text-decoration: none;
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.platform-module-card:hover {
+  border-color: #9bb7ec;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, .1);
+  transform: translateY(-2px);
+}
+.platform-module-card span {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+.platform-module-card strong {
+  font-size: 20px;
+}
+.platform-module-card small {
+  color: var(--muted);
+  font-weight: 750;
+  line-height: 1.45;
 }
 .platform-insight-card {
   background: var(--surface);
@@ -1354,6 +1402,11 @@ a.global-search-result:hover {
   gap: 18px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 18px;
+}
+.platform-dashboard-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .platform-panel {
   background: var(--surface);
@@ -1400,6 +1453,15 @@ a.global-search-result:hover {
   gap: 12px;
   justify-content: space-between;
   padding: 11px 12px;
+}
+.platform-list-link {
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color .16s ease, transform .16s ease;
+}
+.platform-list-link:hover {
+  border-color: #9bb7ec;
+  transform: translateY(-1px);
 }
 .platform-list-item strong,
 .platform-list-item small {
@@ -1539,6 +1601,71 @@ a.global-search-result:hover {
 }
 .empresa-form .field {
   margin: 0;
+}
+.platform-plan-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.platform-plan-card {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+.platform-plan-card header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+.platform-plan-card header span:first-child {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .04em;
+}
+.platform-plan-card h3 {
+  font-size: 20px;
+  margin: 4px 0 0;
+}
+.platform-plan-card > strong {
+  color: var(--text);
+  font-size: 28px;
+}
+.platform-plan-card > strong small {
+  color: var(--muted);
+  font-size: 13px;
+  margin-left: 4px;
+}
+.platform-plan-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.platform-plan-card dl div {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.platform-plan-card dt,
+.platform-plan-card dd,
+.platform-plan-card p {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+  margin: 0;
+}
+.platform-plan-card dd {
+  color: var(--text);
+  font-weight: 900;
+}
+.platform-plan-card p {
+  line-height: 1.45;
+  min-height: 56px;
 }
 .empresa-form .field input,
 .empresa-form .field select,
@@ -2261,6 +2388,8 @@ body[data-theme="dark"] .dashboard-metric,
 body[data-theme="dark"] .dashboard-card,
 body[data-theme="dark"] .platform-insight-card,
 body[data-theme="dark"] .platform-panel,
+body[data-theme="dark"] .platform-module-card,
+body[data-theme="dark"] .platform-plan-card,
 body[data-theme="dark"] .activity-item,
 body[data-theme="dark"] .modal-card,
 body[data-theme="dark"] .confirm-dialog,
@@ -2297,6 +2426,15 @@ body[data-theme="dark"] .sidebar-nav a:hover {
 }
 body[data-theme="dark"] .logout-button:hover {
   color: #fff;
+}
+body[data-theme="dark"] .platform-module-card {
+  background: linear-gradient(135deg, var(--surface), var(--surface-soft));
+}
+body[data-theme="dark"] .platform-module-card,
+body[data-theme="dark"] .platform-list-link,
+body[data-theme="dark"] .platform-plan-card dd,
+body[data-theme="dark"] .platform-plan-card > strong {
+  color: var(--text);
 }
 body[data-theme="dark"] .leads-table th {
   background: var(--surface-soft);
@@ -2387,7 +2525,7 @@ body[data-density="compact"] .leads-table td { padding: 10px 12px; }
   .sidebar { min-height: auto; position: static; width: 100%; }
   .workspace { margin-left: 0; width: 100%; }
   .content { padding: 24px; }
-  .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid { grid-template-columns: 1fr; }
+  .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid, .platform-module-grid, .platform-dashboard-grid, .platform-plan-cards { grid-template-columns: 1fr; }
   .dashboard-hero { align-items: flex-start; flex-direction: column; gap: 18px; }
   .dashboard-hero-actions { flex-wrap: wrap; }
   .funnel-row { grid-template-columns: 1fr; }
