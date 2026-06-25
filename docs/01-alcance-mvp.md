@@ -1,5 +1,7 @@
 # Alcance del MVP - Membora CRM
 
+> Nota de estado actual: el proyecto ha evolucionado a una aplicacion PHP monolitica desplegable en Plesk. El alcance funcional sigue siendo el mismo como referencia academica, pero el estado real implementado se documenta en `docs/07-estado-actual-php.md`.
+
 ## 1. Nombre del proyecto
 
 **Membora CRM**

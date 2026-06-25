@@ -1,27 +1,43 @@
 # Membora CRM
 
-**Membora CRM** es una plataforma web SaaS responsive para gimnasios, centros fitness y estudios deportivos pequenos o medianos. Es una aplicacion de gestion para propietarios, recepcion, comerciales y entrenadores.
+**Membora CRM** es una plataforma web SaaS responsive para gimnasios, centros fitness y estudios deportivos pequenos o medianos. Es una aplicacion de gestion para propietarios, recepcion, comerciales, entrenadores y administradores de la plataforma.
 
 El proyecto se ha migrado a una app PHP monolitica para simplificar el despliegue en Plesk y evitar procesos Node.js en produccion.
 
 ## Estado actual
 
 ```text
-Aplicacion PHP en migracion funcional.
-Pantallas disponibles: login, panel, leads y tareas.
-Pendiente: socios, membresias, pagos, clases, reservas, check-ins y alertas.
+Aplicacion PHP funcional en migracion avanzada.
+Despliegue previsto/actual: https://app.crm.josehurtado.dev
+Produccion sin Node.js, sin npm install y sin npm run build.
 ```
+
+Pantallas disponibles:
+
+- Login.
+- Panel de control del gimnasio.
+- Leads con filtros, conversion a socio, notas y acciones.
+- Socios con foto, edicion y eliminacion controlada.
+- Membresias con planes, precios, duracion y caducidad automatica.
+- Clases con listado y calendario mensual.
+- Tareas con filtros, responsables y varios socios vinculados.
+- Usuarios internos del gimnasio.
+- Perfil de usuario.
+- Configuracion visual personal.
+- Panel de administracion de Membora CRM para empresas cliente.
+
+Pendiente o futuro:
+
+- Pagos completos.
+- Reservas.
+- Check-ins.
+- Alertas de riesgo.
+- Mejoras comerciales del panel SaaS.
 
 Repositorio:
 
 ```text
 https://github.com/Jacketring/Membora-CRM.git
-```
-
-Subdominio previsto:
-
-```text
-https://app.crm.josehurtado.dev
 ```
 
 ## Stack
@@ -30,9 +46,24 @@ https://app.crm.josehurtado.dev
 - MariaDB.
 - PDO.
 - HTML, CSS y JavaScript de navegador.
+- Apache/Plesk con document root en `php-app/public`.
 - Sin Node.js en produccion.
 - Sin `npm install`.
 - Sin `npm run build`.
+
+## Arquitectura actual
+
+La aplicacion PHP usa una estructura monolitica sencilla:
+
+- `public/index.php`: entrada unica, routing basico y carga de vistas.
+- `src/Actions.php`: acciones POST de formularios.
+- `src/Auth.php`: login, sesion y contexto de soporte.
+- `src/Repositories.php`: consultas y creacion automatica de tablas auxiliares.
+- `src/Views/`: pantallas HTML/PHP.
+- `public/assets/app.css`: estilos de la interfaz.
+- `public/assets/app.js`: interacciones de modales, buscadores y controles.
+
+La base de datos mantiene separacion por `tenant_id` para datos de gimnasios. La administracion SaaS usa la tabla `empresas` para controlar clientes del CRM, estado, plan, pagos y acceso de soporte.
 
 ## Estructura
 
@@ -42,6 +73,7 @@ membora-crm/
 |   |-- config/
 |   |-- public/
 |   |   |-- assets/
+|   |   |-- uploads/
 |   |   |-- .htaccess
 |   |   |-- index.php
 |   |-- src/
@@ -105,40 +137,80 @@ Si Plesk ha clonado el repositorio dentro de otra carpeta, la ruta debe acabar i
 6. Crear `php-app/.env` con los datos reales de MariaDB.
 7. Abrir el subdominio.
 
-## Credenciales demo
+No hay que ejecutar comandos Node, compilar frontend ni reiniciar una app Node.
+
+## Credenciales de prueba
+
+Administrador de gimnasio:
 
 ```text
-Administrador
 Email: admin@nexofit.demo
-Password: MemboraDemo2026!
-
-Recepcion / Comercial
-Email: recepcion@nexofit.demo
-Password: MemboraDemo2026!
-
-Entrenador
-Email: entrenador@nexofit.demo
-Password: MemboraDemo2026!
-
-Superadmin
-Email: superadmin@membora.demo
 Password: MemboraDemo2026!
 ```
 
+Recepcion / comercial:
+
+```text
+Email: recepcion@nexofit.demo
+Password: MemboraDemo2026!
+```
+
+Entrenador:
+
+```text
+Email: entrenador@nexofit.demo
+Password: MemboraDemo2026!
+```
+
+Administrador de la plataforma Membora:
+
+```text
+Email: admin@membora.crm
+Password: MemboraAdmin2026!
+```
+
+Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
+
 ## Funcionalidades actuales
 
-- Login con usuarios existentes.
-- Panel de control.
-- Listado y creacion de leads.
-- Cambio de etapa comercial.
+### Gimnasio
+
+- Login y cierre de sesion.
+- Dashboard con KPIs principales.
+- Buscador global superior.
+- Gestion de leads.
+- Pipeline comercial.
 - Conversion de lead a socio.
-- Marcado de lead como perdido.
-- Eliminacion de leads.
-- Listado y creacion de tareas.
-- Asignacion de responsable interno.
-- Cambio de estado de tareas.
-- Eliminacion de tareas.
+- Notas en leads.
+- Gestion de socios con foto.
+- Membresias y suscripciones.
+- Clases y calendario mensual.
+- Tareas con varios socios vinculados.
+- Usuarios internos y roles.
+- Perfil, imagen de usuario y configuracion visual.
+
+### Administracion Membora CRM
+
+- Panel `Admin CRM`.
+- Tabla `empresas`.
+- Alta y edicion de empresas cliente.
+- Estado del CRM: activo, prueba, suspendido o cancelado.
+- Estado de pago: al dia, pendiente, vencido o prueba.
+- Precio mensual y proximo pago.
+- MRR estimado.
+- Acceso de soporte al CRM de una empresa conectada.
+- Banner de modo soporte y retorno al panel de administracion.
+
+## Documentacion
+
+- `docs/00-checklist-entrega-tfm.md`: checklist de entrega academica.
+- `docs/01-alcance-mvp.md`: alcance funcional.
+- `docs/02-requisitos.md`: requisitos.
+- `docs/03-historias-usuario.md`: historias de usuario.
+- `docs/04-modelo-datos.md`: modelo de datos.
+- `docs/05-pruebas.md`: plan de pruebas.
+- `docs/07-estado-actual-php.md`: estado actual de la version PHP.
 
 ## Notas
 
-La aplicacion PHP reutiliza la base de datos MariaDB ya existente. No es necesario compilar assets ni reiniciar una aplicacion Node.js.
+La aplicacion PHP reutiliza la base de datos MariaDB existente y crea algunas tablas/columnas auxiliares si faltan. La version Node anterior ya no es necesaria para produccion.

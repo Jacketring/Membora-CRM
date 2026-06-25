@@ -8,10 +8,13 @@ Aplicacion PHP monolitica para ejecutar Membora CRM en un unico subdominio, sin 
 - Extension PDO MySQL activada.
 - MariaDB/MySQL existente.
 - Apache con `mod_rewrite` activado.
+- Document root apuntando a `php-app/public`.
 
 ## Configuracion
 
-Crear `php-app/.env` a partir de `.env.example`:
+Crear `php-app/.env` a partir de `.env.example`.
+
+Configuracion recomendada:
 
 ```env
 APP_NAME="Membora CRM"
@@ -23,9 +26,15 @@ DB_USERNAME="usuario"
 DB_PASSWORD="password"
 ```
 
+Tambien se admite:
+
+```env
+DATABASE_URL="mysql://usuario:password@localhost:3306/membora_crm"
+```
+
 ## Despliegue en Plesk
 
-1. Subir el repositorio desde GitHub.
+1. Subir o actualizar el repositorio desde GitHub.
 2. Configurar el subdominio para que el document root apunte a:
 
 ```text
@@ -40,9 +49,49 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 
 ## Pantallas incluidas
 
-- Login con usuarios existentes.
-- Panel de control.
+- Login.
+- Dashboard del gimnasio.
 - Leads.
+- Socios.
+- Membresias.
+- Clases y calendario.
 - Tareas.
+- Usuarios internos.
+- Perfil.
+- Configuracion visual.
+- Panel de administracion SaaS `Admin CRM`.
 
-La aplicacion reutiliza la base de datos actual. El backend y frontend Node antiguos siguen en el repositorio durante la migracion y se eliminaran cuando la version PHP quede validada.
+## Administracion SaaS
+
+La app crea y usa la tabla `empresas` para controlar clientes del CRM:
+
+- Empresa cliente.
+- Plan.
+- Estado del CRM.
+- Estado de pago.
+- Precio mensual.
+- Proximo pago.
+- Notas internas.
+- Acceso de soporte al CRM de la empresa si tiene `tenant_id`.
+
+Usuario de administracion de plataforma:
+
+```text
+Email: admin@membora.crm
+Password: MemboraAdmin2026!
+```
+
+## Automatismos de base de datos
+
+La aplicacion crea algunas tablas o columnas auxiliares si no existen, por ejemplo:
+
+- `empresas`.
+- `lead_notes`.
+- `task_members`.
+- `membership_plans`.
+- `subscriptions`.
+- `class_types`.
+- `class_sessions`.
+- columnas de imagen para usuarios/socios.
+
+Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones Node.
