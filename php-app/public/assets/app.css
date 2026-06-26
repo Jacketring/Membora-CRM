@@ -749,13 +749,13 @@ a.global-search-result:hover {
 }
 .funnel-stack {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 .funnel-row {
   align-items: center;
   display: grid;
-  gap: 14px;
-  grid-template-columns: 150px minmax(0, 1fr) 48px;
+  gap: 18px;
+  grid-template-columns: 130px minmax(180px, 1fr) 52px;
 }
 .funnel-row strong,
 .funnel-row span {
@@ -768,13 +768,16 @@ a.global-search-result:hover {
 }
 .funnel-row b {
   color: var(--text);
+  font-size: 14px;
+  font-weight: 950;
   text-align: right;
 }
 .progress-track {
   background: #edf3ff;
   border-radius: 999px;
-  height: 12px;
+  height: 10px;
   overflow: hidden;
+  width: 100%;
 }
 .progress-track span {
   background: var(--primary);
@@ -2544,6 +2547,9 @@ body[data-theme="dark"] .platform-list-item {
 body[data-theme="dark"] .platform-plan-list i {
   background: linear-gradient(90deg, var(--primary) var(--plan-width), rgba(255, 255, 255, 0.08) var(--plan-width));
 }
+body[data-theme="dark"] .progress-track {
+  background: rgba(226, 235, 248, 0.92);
+}
 body[data-theme="dark"] .status-badge--active,
 body[data-theme="dark"] .status-badge--paid,
 body[data-theme="dark"] .status-badge--customer,
@@ -2580,8 +2586,14 @@ body[data-density="compact"] .leads-table td { padding: 10px 12px; }
   .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid, .platform-module-grid, .platform-dashboard-grid, .platform-plan-cards { grid-template-columns: 1fr; }
   .dashboard-hero { align-items: flex-start; flex-direction: column; gap: 18px; }
   .dashboard-hero-actions { flex-wrap: wrap; }
-  .funnel-row { grid-template-columns: 1fr; }
-  .funnel-row b { text-align: left; }
+  .funnel-row {
+    gap: 8px 12px;
+    grid-template-columns: 1fr 52px;
+  }
+  .funnel-row > div:first-child {
+    grid-column: 1 / -1;
+  }
+  .funnel-row b { text-align: right; }
   .task-health { grid-template-columns: 1fr; }
   .activity-item--task { grid-template-columns: 40px minmax(0, 1fr); }
   .activity-item--task em { justify-self: flex-start; }
