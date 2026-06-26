@@ -11,6 +11,18 @@ function redirect(string $route): never
     exit;
 }
 
+function app_base_url(): string
+{
+    $configured = getenv('APP_URL');
+    if ($configured) {
+        return rtrim($configured, '/');
+    }
+
+    $host = $_SERVER['HTTP_HOST'] ?? 'app.crm.josehurtado.dev';
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    return ($https ? 'https://' : 'http://') . $host;
+}
+
 function post_value(string $key, ?string $default = null): ?string
 {
     $value = $_POST[$key] ?? $default;
@@ -369,6 +381,9 @@ function source_label(?string $source): string
         'PHONE' => 'Telefono',
         'SOCIAL_MEDIA' => 'Redes',
         'REFERRAL' => 'Recomendacion',
+        'WEB' => 'Web',
+        'LANDING' => 'Landing',
+        'FORMULARIO_WEB' => 'Formulario web',
         'OTHER' => 'Otro',
     ]);
 }

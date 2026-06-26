@@ -754,6 +754,40 @@ document.querySelectorAll('[data-global-search-form]').forEach((form) => {
   });
 });
 
+document.querySelectorAll('[data-copy-target]').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const source = document.querySelector(`[data-copy-source="${button.dataset.copyTarget}"]`);
+    const text = source?.value ?? source?.textContent ?? '';
+    if (!text.trim()) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalText = button.textContent;
+      button.textContent = 'Copiado';
+      window.setTimeout(() => {
+        button.textContent = originalText;
+      }, 1400);
+    } catch {
+      if (source instanceof HTMLInputElement || source instanceof HTMLTextAreaElement) {
+        source.select();
+        document.execCommand('copy');
+      } else {
+        const fallback = document.createElement('textarea');
+        fallback.value = text;
+        fallback.setAttribute('readonly', '');
+        fallback.style.position = 'fixed';
+        fallback.style.opacity = '0';
+        document.body.appendChild(fallback);
+        fallback.select();
+        document.execCommand('copy');
+        fallback.remove();
+      }
+    }
+  });
+});
+
 const confirmDialog = document.getElementById('confirm-dialog');
 let pendingConfirmForm = null;
 

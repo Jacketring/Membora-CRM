@@ -19,6 +19,7 @@ Configuracion recomendada:
 ```env
 APP_NAME="Membora CRM"
 APP_ENV="production"
+APP_URL="https://app.crm.josehurtado.dev"
 DB_HOST="localhost"
 DB_PORT="3306"
 DB_DATABASE="membora_crm"
@@ -52,6 +53,7 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Login.
 - Dashboard del gimnasio.
 - Leads.
+- Captacion Web para recibir leads externos por webhook.
 - Socios.
 - Membresias.
 - Clases y calendario.
@@ -94,6 +96,8 @@ La aplicacion crea algunas tablas o columnas auxiliares si no existen, por ejemp
 - `empresa_payments`.
 - `saas_plans`.
 - `lead_notes`.
+- `webhook_settings`.
+- `webhook_logs`.
 - `task_members`.
 - `membership_plans`.
 - `subscriptions`.
@@ -102,3 +106,17 @@ La aplicacion crea algunas tablas o columnas auxiliares si no existen, por ejemp
 - columnas de imagen para usuarios/socios.
 
 Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones Node.
+
+## Captacion Web
+
+Cada gimnasio dispone de una seccion `Captacion Web` con:
+
+- URL publica del webhook: `/webhook/lead`.
+- Token secreto por tenant.
+- Regeneracion de token.
+- Ejemplo HTML y JavaScript copiables.
+- Formulario interno de prueba.
+- Registro de ultimos envios y errores.
+
+El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multipart/form-data`.
+El token puede enviarse como campo `token` o cabecera `X-Membora-Token`.

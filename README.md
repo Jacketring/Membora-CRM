@@ -17,9 +17,10 @@ Pantallas disponibles:
 - Login.
 - Panel de control del gimnasio.
 - Leads con filtros, conversion a socio, notas y acciones.
+- Captacion Web con webhook para recibir leads externos.
 - Socios con foto, edicion y eliminacion controlada.
 - Membresias con planes, precios, duracion y caducidad automatica.
-- Clases con listado y calendario mensual.
+- Clases con listado, calendario mensual y reservas de socios.
 - Tareas con filtros, responsables y varios socios vinculados.
 - Usuarios internos del gimnasio.
 - Perfil de usuario.
@@ -29,7 +30,6 @@ Pantallas disponibles:
 Pendiente o futuro:
 
 - Pagos completos.
-- Reservas.
 - Check-ins.
 - Alertas de riesgo.
 - Auditoria de acciones.
@@ -180,12 +180,13 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Dashboard con KPIs principales.
 - Buscador global superior.
 - Gestion de leads.
+- Captacion Web por webhook con token por tenant, ejemplos copiables y logs.
 - Pipeline comercial.
 - Conversion de lead a socio.
 - Notas en leads.
 - Gestion de socios con foto.
 - Membresias y suscripciones.
-- Clases y calendario mensual.
+- Clases, calendario mensual y reservas.
 - Tareas con varios socios vinculados.
 - Usuarios internos y roles.
 - Perfil, imagen de usuario y configuracion visual.

@@ -78,6 +78,34 @@
         <?php endforeach; ?>
       </div>
     </div>
+    <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
+      <?php
+        $sourceOptions = [
+          '' => 'Todos',
+          'WALK_IN' => 'Visita',
+          'WEBSITE' => 'Web',
+          'WEB' => 'Web externa',
+          'LANDING' => 'Landing',
+          'FORMULARIO_WEB' => 'Formulario web',
+          'PHONE' => 'Telefono',
+          'SOCIAL_MEDIA' => 'Redes',
+          'REFERRAL' => 'Recomendacion',
+          'OTHER' => 'Otro',
+        ];
+      ?>
+      <input type="hidden" name="source" value="<?= e($filters['source']) ?>" data-custom-select-value>
+      <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
+        <small>Origen</small>
+        <span data-custom-select-label><?= e($sourceOptions[$filters['source']] ?? 'Todos') ?></span>
+      </button>
+      <div class="custom-select-menu" data-custom-select-menu hidden>
+        <?php foreach ($sourceOptions as $sourceValue => $sourceLabel): ?>
+          <button class="custom-select-option <?= $filters['source'] === $sourceValue ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($sourceValue) ?>">
+            <?= e($sourceLabel) ?>
+          </button>
+        <?php endforeach; ?>
+      </div>
+    </div>
     <label class="filter-control filter-control--date date-filter-control">
       <span>Desde</span>
       <input name="date_from" type="date" value="<?= e($filters['date_from']) ?>" aria-label="Fecha desde" data-auto-filter-input>
@@ -231,7 +259,7 @@
         <label class="field">
           <span>Origen</span>
           <select name="source">
-            <?php foreach (['WALK_IN', 'WEBSITE', 'PHONE', 'SOCIAL_MEDIA', 'REFERRAL', 'OTHER'] as $source): ?>
+            <?php foreach (['WALK_IN', 'WEBSITE', 'WEB', 'LANDING', 'FORMULARIO_WEB', 'PHONE', 'SOCIAL_MEDIA', 'REFERRAL', 'OTHER'] as $source): ?>
               <option value="<?= e($source) ?>" <?= $lead['source'] === $source ? 'selected' : '' ?>><?= e(source_label($source)) ?></option>
             <?php endforeach; ?>
           </select>
@@ -359,6 +387,9 @@
         <select name="source">
           <option value="WALK_IN">Visita presencial</option>
           <option value="WEBSITE">Web</option>
+          <option value="WEB">Web externa</option>
+          <option value="LANDING">Landing</option>
+          <option value="FORMULARIO_WEB">Formulario web</option>
           <option value="PHONE">Telefono</option>
           <option value="SOCIAL_MEDIA">Redes sociales</option>
           <option value="REFERRAL">Recomendacion</option>

@@ -3,6 +3,29 @@
 require __DIR__ . '/../src/bootstrap.php';
 require __DIR__ . '/../src/View.php';
 
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
+$isWebhookLeadRequest = $requestPath === '/webhook/lead' || ($_GET['action'] ?? '') === 'webhook_lead';
+if ($isWebhookLeadRequest) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json; charset=utf-8', true, 405);
+        echo json_encode(['success' => false, 'message' => 'Metodo no permitido'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $contentType = strtolower((string) ($_SERVER['CONTENT_TYPE'] ?? ''));
+    $payload = $_POST;
+    if (str_contains($contentType, 'application/json')) {
+        $raw = file_get_contents('php://input') ?: '';
+        $decoded = json_decode($raw, true);
+        $payload = is_array($decoded) ? $decoded : [];
+    }
+
+    $result = WebhookIntegrationRepository::handleIncoming($payload, $_SERVER['HTTP_X_MEMBORA_TOKEN'] ?? null);
+    header('Content-Type: application/json; charset=utf-8', true, !empty($result['success']) ? 200 : 400);
+    echo json_encode($result, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 Actions::handle();
 
 $route = $_GET['route'] ?? 'dashboard';
@@ -182,6 +205,7 @@ switch ($route) {
             'q' => trim((string) ($_GET['q'] ?? '')),
             'stage' => trim((string) ($_GET['stage'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
+            'source' => trim((string) ($_GET['source'] ?? '')),
             'date_from' => trim((string) ($_GET['date_from'] ?? '')),
             'date_to' => trim((string) ($_GET['date_to'] ?? '')),
         ];
@@ -190,6 +214,7 @@ switch ($route) {
             $filters['q'],
             $filters['stage'],
             $filters['status'],
+            $filters['source'],
             $filters['date_from'],
             $filters['date_to']
         );
@@ -199,6 +224,27 @@ switch ($route) {
             'metrics' => LeadRepository::metrics($tenantId),
             'leads' => $leads,
             'leadNotes' => LeadRepository::notesByLeadIds($tenantId, array_column($leads, 'id')),
+        ]);
+        break;
+
+    case 'web-integration':
+        if (is_platform_admin($currentUser)) {
+            redirect('platform-dashboard');
+        }
+
+        $tenantId = Auth::tenantId();
+        $settings = WebhookIntegrationRepository::settings($tenantId);
+        $newToken = $_SESSION['webhook_new_token'] ?? null;
+        unset($_SESSION['webhook_new_token']);
+        $token = (string) ($newToken ?: ($settings['token'] ?? ''));
+        $webhookUrl = app_base_url() . '/webhook/lead';
+        render_layout('Captacion web', 'web-integration', [
+            'settings' => $settings,
+            'token' => $token,
+            'webhookUrl' => $webhookUrl,
+            'htmlExample' => WebhookIntegrationRepository::sampleHtml($webhookUrl, $token ?: 'TOKEN_DEL_GIMNASIO'),
+            'jsExample' => WebhookIntegrationRepository::sampleJavascript($webhookUrl, $token ?: 'TOKEN_DEL_GIMNASIO'),
+            'logs' => WebhookIntegrationRepository::recentLogs($tenantId),
         ]);
         break;
 

@@ -1924,6 +1924,100 @@ a.global-search-result:hover {
 .reservation-actions {
   justify-content: flex-end;
 }
+.webhook-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.webhook-grid--bottom {
+  margin-top: 18px;
+}
+.webhook-card {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+.webhook-card--wide {
+  grid-column: 1 / -1;
+}
+.webhook-card-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.webhook-card-header h3 {
+  margin: 0 0 5px;
+}
+.webhook-card-header p {
+  color: var(--muted);
+  margin: 0;
+}
+.webhook-copy-list {
+  display: grid;
+  gap: 14px;
+}
+.copy-field {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.copy-field input {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+.webhook-actions {
+  align-items: center;
+  border-top: 1px solid var(--outline);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+  padding-top: 16px;
+}
+.webhook-actions form {
+  margin: 0;
+}
+.code-sample {
+  background: #09182b;
+  border-radius: 14px;
+  color: #e8eef8;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  max-height: 360px;
+  overflow: auto;
+  padding: 16px;
+  white-space: pre-wrap;
+}
+.webhook-log-list {
+  display: grid;
+  gap: 10px;
+}
+.webhook-log-item {
+  align-items: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 12px 14px;
+}
+.webhook-log-item strong,
+.webhook-log-item span,
+.webhook-log-item small {
+  display: block;
+}
+.webhook-log-item span,
+.webhook-log-item small {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
 
 .modal-card {
   background: #fff;
@@ -2521,6 +2615,7 @@ body[data-theme="dark"] .platform-insight-card,
 body[data-theme="dark"] .platform-panel,
 body[data-theme="dark"] .platform-module-card,
 body[data-theme="dark"] .platform-plan-card,
+body[data-theme="dark"] .webhook-card,
 body[data-theme="dark"] .activity-item,
 body[data-theme="dark"] .modal-card,
 body[data-theme="dark"] .confirm-dialog,
@@ -2632,6 +2727,7 @@ body[data-theme="dark"] .member-picker-empty,
 body[data-theme="dark"] .phone-prefix-options button,
 body[data-theme="dark"] .notes-list article,
 body[data-theme="dark"] .note-item,
+body[data-theme="dark"] .webhook-log-item,
 body[data-theme="dark"] .confirm-dialog,
 body[data-theme="dark"] .confirm-dialog form {
   background: var(--surface-soft);
@@ -2650,6 +2746,10 @@ body[data-theme="dark"] .member-picker label:hover {
 }
 body[data-theme="dark"] .member-picker input {
   accent-color: var(--primary);
+}
+body[data-theme="dark"] .code-sample {
+  background: #050b15;
+  border: 1px solid var(--outline);
 }
 body[data-theme="dark"] .empresa-modal {
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.44);
@@ -2730,7 +2830,7 @@ body[data-density="compact"] .leads-table td { padding: 10px 12px; }
   .sidebar { min-height: auto; position: static; width: 100%; }
   .workspace { margin-left: 0; width: 100%; }
   .content { padding: 24px; }
-  .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid, .platform-module-grid, .platform-dashboard-grid, .platform-plan-cards { grid-template-columns: 1fr; }
+  .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid, .platform-module-grid, .platform-dashboard-grid, .platform-plan-cards, .webhook-grid { grid-template-columns: 1fr; }
   .dashboard-hero { align-items: flex-start; flex-direction: column; gap: 18px; }
   .dashboard-hero-actions { flex-wrap: wrap; }
   .funnel-row {
@@ -2744,6 +2844,13 @@ body[data-density="compact"] .leads-table td { padding: 10px 12px; }
   }
   .reservations-heading {
     flex-direction: column;
+  }
+  .copy-field,
+  .webhook-log-item {
+    grid-template-columns: 1fr;
+  }
+  .webhook-card--wide {
+    grid-column: auto;
   }
   .reservation-actions {
     justify-content: flex-start;

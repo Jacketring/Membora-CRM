@@ -35,6 +35,9 @@ final class Actions
             'convert_lead' => self::convertLead(),
             'mark_lead_lost' => self::markLeadLost(),
             'delete_lead' => self::deleteLead(),
+            'regenerate_webhook_token' => self::regenerateWebhookToken(),
+            'update_webhook_settings' => self::updateWebhookSettings(),
+            'test_webhook_lead' => self::testWebhookLead(),
             'create_member' => self::createMember(),
             'update_member' => self::updateMember(),
             'delete_member' => self::deleteMember(),
@@ -703,6 +706,43 @@ final class Actions
 
         flash('Lead eliminado.');
         redirect('leads');
+    }
+
+    private static function regenerateWebhookToken(): never
+    {
+        $token = WebhookIntegrationRepository::regenerateToken(Auth::tenantId());
+        $_SESSION['webhook_new_token'] = $token;
+        flash('Token de captacion web regenerado correctamente.');
+        redirect('web-integration');
+    }
+
+    private static function updateWebhookSettings(): never
+    {
+        WebhookIntegrationRepository::setActive(Auth::tenantId(), post_value('is_active') === '1');
+        flash('Configuracion de captacion web actualizada.');
+        redirect('web-integration');
+    }
+
+    private static function testWebhookLead(): never
+    {
+        $settings = WebhookIntegrationRepository::settings(Auth::tenantId());
+        $token = (string) (($settings['token'] ?? '') ?: ($_SESSION['webhook_new_token'] ?? ''));
+
+        $payload = [
+            'token' => $token,
+            'nombre' => post_value('nombre', 'Lead de prueba'),
+            'apellidos' => post_value('apellidos', ''),
+            'email' => post_value('email', ''),
+            'telefono' => post_value('telefono', ''),
+            'mensaje' => post_value('mensaje', 'Prueba interna desde Membora CRM'),
+            'origen' => 'FORMULARIO_WEB',
+            'acepta_rgpd' => '1',
+            'url_origen' => app_base_url() . '/index.php?route=web-integration',
+        ];
+
+        $result = WebhookIntegrationRepository::handleIncoming($payload);
+        flash($result['message'] ?? 'Prueba enviada.', !empty($result['success']) ? 'success' : 'error');
+        redirect('web-integration');
     }
 
     private static function createMember(): never

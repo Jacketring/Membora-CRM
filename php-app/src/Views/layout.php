@@ -40,6 +40,7 @@ $isPlatformAdmin = is_platform_admin($user);
         <?php else: ?>
           <a class="<?= $route === 'dashboard' ? 'active' : '' ?>" href="index.php?route=dashboard">Panel</a>
           <a class="<?= $route === 'leads' ? 'active' : '' ?>" href="index.php?route=leads">Leads</a>
+          <a class="<?= $route === 'web-integration' ? 'active' : '' ?>" href="index.php?route=web-integration">Captacion Web</a>
           <a class="<?= $route === 'users' ? 'active' : '' ?>" href="index.php?route=users">Usuarios</a>
           <a class="<?= $route === 'members' ? 'active' : '' ?>" href="index.php?route=members">Socios</a>
           <a class="<?= $route === 'memberships' ? 'active' : '' ?>" href="index.php?route=memberships">Membresias</a>
