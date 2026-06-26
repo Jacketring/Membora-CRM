@@ -53,28 +53,34 @@ $taskCompletionRate = (int) round(((int) $summary['completedTasks'] / $taskTotal
     </header>
     <div class="funnel-stack">
       <div class="funnel-row">
-        <div>
-          <strong>Abiertos</strong>
-          <span><?= (int) $summary['openLeads'] ?> leads</span>
+        <div class="funnel-row-head">
+          <div>
+            <strong>Abiertos</strong>
+            <span><?= (int) $summary['openLeads'] ?> leads</span>
+          </div>
+          <b><?= $openLeadRate ?>%</b>
         </div>
         <div class="progress-track"><span style="width: <?= $openLeadRate ?>%"></span></div>
-        <b><?= $openLeadRate ?>%</b>
       </div>
       <div class="funnel-row">
-        <div>
-          <strong>Convertidos</strong>
-          <span><?= (int) $summary['convertedLeads'] ?> leads</span>
+        <div class="funnel-row-head">
+          <div>
+            <strong>Convertidos</strong>
+            <span><?= (int) $summary['convertedLeads'] ?> leads</span>
+          </div>
+          <b><?= $conversionRate ?>%</b>
         </div>
         <div class="progress-track progress-track--green"><span style="width: <?= $conversionRate ?>%"></span></div>
-        <b><?= $conversionRate ?>%</b>
       </div>
       <div class="funnel-row">
-        <div>
-          <strong>Perdidos</strong>
-          <span><?= (int) $summary['lostLeads'] ?> leads</span>
+        <div class="funnel-row-head">
+          <div>
+            <strong>Perdidos</strong>
+            <span><?= (int) $summary['lostLeads'] ?> leads</span>
+          </div>
+          <b><?= $lostLeadRate ?>%</b>
         </div>
         <div class="progress-track progress-track--red"><span style="width: <?= $lostLeadRate ?>%"></span></div>
-        <b><?= $lostLeadRate ?>%</b>
       </div>
     </div>
   </article>

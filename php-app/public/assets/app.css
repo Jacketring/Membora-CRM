@@ -749,13 +749,21 @@ a.global-search-result:hover {
 }
 .funnel-stack {
   display: grid;
-  gap: 18px;
+  gap: 12px;
 }
 .funnel-row {
-  align-items: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--outline);
+  border-radius: 14px;
   display: grid;
-  gap: 18px;
-  grid-template-columns: 130px minmax(180px, 1fr) 52px;
+  gap: 12px;
+  padding: 14px;
+}
+.funnel-row-head {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
 }
 .funnel-row strong,
 .funnel-row span {
@@ -767,15 +775,23 @@ a.global-search-result:hover {
   margin-top: 3px;
 }
 .funnel-row b {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 999px;
   color: var(--text);
-  font-size: 14px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 13px;
   font-weight: 950;
-  text-align: right;
+  justify-content: center;
+  min-width: 54px;
+  padding: 6px 10px;
 }
 .progress-track {
-  background: #edf3ff;
+  background: #e8eef8;
   border-radius: 999px;
-  height: 10px;
+  height: 8px;
   overflow: hidden;
   width: 100%;
 }
@@ -784,7 +800,7 @@ a.global-search-result:hover {
   border-radius: inherit;
   display: block;
   height: 100%;
-  min-width: 4px;
+  min-width: 8px;
 }
 .progress-track--green span { background: var(--secondary); }
 .progress-track--red span { background: var(--danger); }
@@ -2547,8 +2563,16 @@ body[data-theme="dark"] .platform-list-item {
 body[data-theme="dark"] .platform-plan-list i {
   background: linear-gradient(90deg, var(--primary) var(--plan-width), rgba(255, 255, 255, 0.08) var(--plan-width));
 }
+body[data-theme="dark"] .funnel-row {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--outline);
+}
+body[data-theme="dark"] .funnel-row b {
+  background: var(--surface);
+  border-color: var(--outline);
+}
 body[data-theme="dark"] .progress-track {
-  background: rgba(226, 235, 248, 0.92);
+  background: rgba(255, 255, 255, 0.12);
 }
 body[data-theme="dark"] .status-badge--active,
 body[data-theme="dark"] .status-badge--paid,
@@ -2587,13 +2611,9 @@ body[data-density="compact"] .leads-table td { padding: 10px 12px; }
   .dashboard-hero { align-items: flex-start; flex-direction: column; gap: 18px; }
   .dashboard-hero-actions { flex-wrap: wrap; }
   .funnel-row {
-    gap: 8px 12px;
-    grid-template-columns: 1fr 52px;
+    padding: 12px;
   }
-  .funnel-row > div:first-child {
-    grid-column: 1 / -1;
-  }
-  .funnel-row b { text-align: right; }
+  .funnel-row-head { align-items: flex-start; }
   .task-health { grid-template-columns: 1fr; }
   .activity-item--task { grid-template-columns: 40px minmax(0, 1fr); }
   .activity-item--task em { justify-self: flex-start; }
