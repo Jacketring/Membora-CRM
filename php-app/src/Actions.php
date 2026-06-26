@@ -45,6 +45,8 @@ final class Actions
             'create_class_session' => self::createClassSession(),
             'update_class_session' => self::updateClassSession(),
             'delete_class_session' => self::deleteClassSession(),
+            'create_reservation' => self::createReservation(),
+            'update_reservation_status' => self::updateReservationStatus(),
             'create_task' => self::createTask(),
             'update_task' => self::updateTask(),
             'update_task_status' => self::updateTaskStatus(),
@@ -824,6 +826,7 @@ final class Actions
         MemberRepository::ensurePhotoColumn();
         MembershipRepository::ensureTables();
         TaskRepository::ensureMemberLinksTable();
+        ReservationRepository::ensureTable();
         $pdo->beginTransaction();
         try {
             $memberStmt = $pdo->prepare('SELECT lead_id, photo_path FROM members WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
@@ -840,6 +843,9 @@ final class Actions
 
             $cancelSubscriptions = $pdo->prepare('UPDATE subscriptions SET status = "CANCELLED", updated_at = NOW() WHERE member_id = :id AND tenant_id = :tenant_id');
             $cancelSubscriptions->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
+
+            $deleteReservations = $pdo->prepare('DELETE FROM reservations WHERE member_id = :id AND tenant_id = :tenant_id');
+            $deleteReservations->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
 
             $deleteMember = $pdo->prepare('DELETE FROM members WHERE id = :id AND tenant_id = :tenant_id');
             $deleteMember->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
@@ -1151,11 +1157,75 @@ final class Actions
     private static function deleteClassSession(): never
     {
         ClassRepository::ensureTables();
-        $stmt = Database::connection()->prepare('DELETE FROM class_sessions WHERE id = :id AND tenant_id = :tenant_id');
-        $stmt->execute(['id' => post_value('id'), 'tenant_id' => Auth::tenantId()]);
+        ReservationRepository::ensureTable();
+        $tenantId = Auth::tenantId();
+        $sessionId = post_value('id');
+        $pdo = Database::connection();
+
+        $pdo->beginTransaction();
+        try {
+            $deleteReservations = $pdo->prepare('DELETE FROM reservations WHERE class_session_id = :id AND tenant_id = :tenant_id');
+            $deleteReservations->execute(['id' => $sessionId, 'tenant_id' => $tenantId]);
+
+            $stmt = $pdo->prepare('DELETE FROM class_sessions WHERE id = :id AND tenant_id = :tenant_id');
+            $stmt->execute(['id' => $sessionId, 'tenant_id' => $tenantId]);
+            $pdo->commit();
+        } catch (Throwable $exception) {
+            $pdo->rollBack();
+            flash('No se pudo eliminar la clase.', 'error');
+            self::redirectAfterClassAction();
+        }
 
         flash('Clase eliminada correctamente.');
         self::redirectAfterClassAction();
+    }
+
+    private static function createReservation(): never
+    {
+        $tenantId = Auth::tenantId();
+        $sessionId = post_value('class_session_id', '');
+        $memberId = post_value('member_id', '');
+
+        if ($sessionId === '' || $memberId === '') {
+            flash('Selecciona una clase y un socio para crear la reserva.', 'error');
+            self::redirectAfterReservationAction($sessionId);
+        }
+
+        try {
+            ReservationRepository::create($tenantId, $memberId, $sessionId);
+            flash('Reserva creada correctamente.');
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo crear la reserva.', 'error');
+        }
+
+        self::redirectAfterReservationAction($sessionId);
+    }
+
+    private static function updateReservationStatus(): never
+    {
+        $tenantId = Auth::tenantId();
+        $sessionId = post_value('class_session_id', '');
+        $reservationId = post_value('reservation_id', '');
+        $status = post_value('status', '');
+
+        if ($reservationId === '' || $sessionId === '') {
+            flash('No se encontro la reserva seleccionada.', 'error');
+            self::redirectAfterReservationAction($sessionId);
+        }
+
+        try {
+            ReservationRepository::updateStatus($tenantId, $reservationId, $status);
+            flash(match ($status) {
+                'cancelled' => 'Reserva cancelada correctamente.',
+                'attended' => 'Asistencia marcada correctamente.',
+                'no_show' => 'No-show marcado correctamente.',
+                default => 'Reserva actualizada correctamente.',
+            });
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo actualizar la reserva.', 'error');
+        }
+
+        self::redirectAfterReservationAction($sessionId);
     }
 
     private static function classDateTimesFromPost(): array
@@ -1194,6 +1264,20 @@ final class Actions
         }
 
         redirect('classes');
+    }
+
+    private static function redirectAfterReservationAction(string $sessionId): never
+    {
+        if ($sessionId === '') {
+            redirect('classes');
+        }
+
+        $stmt = Database::connection()->prepare('SELECT DATE(starts_at) FROM class_sessions WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
+        $stmt->execute(['id' => $sessionId, 'tenant_id' => Auth::tenantId()]);
+        $date = (string) ($stmt->fetchColumn() ?: date('Y-m-d'));
+
+        header('Location: index.php?route=classes&date_from=' . urlencode($date) . '&date_to=' . urlencode($date) . '&month=' . urlencode(substr($date, 0, 7)) . '&modal=class-detail-' . urlencode($sessionId));
+        exit;
     }
 
     private static function createTask(): never

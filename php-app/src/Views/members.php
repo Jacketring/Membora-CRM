@@ -281,6 +281,36 @@ $memberStatusOptions = [
         <?php endif; ?>
       </div>
 
+      <?php $memberReservations = $reservationHistory[$member['id']] ?? []; ?>
+      <section class="reservations-panel reservations-panel--member" aria-labelledby="member-reservations-title-<?= e($member['id']) ?>">
+        <div class="reservations-heading">
+          <div>
+            <h3 id="member-reservations-title-<?= e($member['id']) ?>">Historial de reservas</h3>
+            <p>Clases reservadas, asistidas, canceladas o marcadas como no-show.</p>
+          </div>
+        </div>
+        <div class="reservation-list">
+          <?php foreach ($memberReservations as $reservation): ?>
+            <article class="reservation-item reservation-item--<?= e($reservation['status']) ?>">
+              <div>
+                <strong><?= e($reservation['class_name']) ?></strong>
+                <span>
+                  <?= e(format_date_short($reservation['starts_at'])) ?>
+                  &middot;
+                  <?= e(format_time($reservation['starts_at'])) ?> - <?= e(format_time($reservation['ends_at'])) ?>
+                  &middot;
+                  <?= e($reservation['instructor_name'] ?: 'Sin instructor') ?>
+                </span>
+              </div>
+              <span class="status-badge status-badge--<?= e(str_replace('_', '-', $reservation['status'])) ?>"><?= e(status_label($reservation['status'])) ?></span>
+            </article>
+          <?php endforeach; ?>
+          <?php if (!$memberReservations): ?>
+            <p class="empty-note">Este socio todavia no tiene reservas.</p>
+          <?php endif; ?>
+        </div>
+      </section>
+
       <button class="primary-action" type="submit">Guardar cambios</button>
     </form>
   </dialog>

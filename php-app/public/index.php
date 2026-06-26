@@ -272,6 +272,7 @@ switch ($route) {
             'metrics' => MemberRepository::metrics($tenantId),
             'members' => $members,
             'membershipPlans' => MembershipRepository::plans($tenantId, '', 'ACTIVE'),
+            'reservationHistory' => ReservationRepository::byMemberIds($tenantId, array_column($members, 'id')),
         ]);
         break;
 
@@ -298,19 +299,22 @@ switch ($route) {
             'date_to' => trim((string) ($_GET['date_to'] ?? date('Y-m-d', strtotime('+14 days')))),
             'month' => trim((string) ($_GET['month'] ?? date('Y-m'))),
         ];
+        $sessions = ClassRepository::sessions(
+            $tenantId,
+            $filters['q'],
+            $filters['type'],
+            $filters['date_from'],
+            $filters['date_to']
+        );
         render_layout('Clases', 'classes', [
             'filters' => $filters,
             'staff' => StaffRepository::all($tenantId),
+            'members' => MemberRepository::all($tenantId, '', 'ACTIVE'),
             'classTypes' => ClassRepository::types($tenantId),
             'activeClassTypes' => ClassRepository::types($tenantId, true),
             'metrics' => ClassRepository::metrics($tenantId),
-            'sessions' => ClassRepository::sessions(
-                $tenantId,
-                $filters['q'],
-                $filters['type'],
-                $filters['date_from'],
-                $filters['date_to']
-            ),
+            'sessions' => $sessions,
+            'reservationsBySession' => ReservationRepository::bySessionIds($tenantId, array_column($sessions, 'id')),
             'calendar' => ClassRepository::calendar($tenantId, $filters['month']),
         ]);
         break;

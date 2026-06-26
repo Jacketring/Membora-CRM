@@ -111,7 +111,14 @@ foreach ($classTypes as $type) {
             <td><?= e(format_date_short($session['starts_at'])) ?></td>
             <td><?= e(format_time($session['starts_at'])) ?> - <?= e(format_time($session['ends_at'])) ?></td>
             <td><?= e($session['instructor_name'] ?: 'Sin instructor') ?></td>
-            <td><?= (int) $session['capacity'] ?> plazas</td>
+            <?php
+              $sessionReservations = $reservationsBySession[$session['id']] ?? [];
+              $activeReservationCount = count(array_filter($sessionReservations, fn ($reservation) => in_array($reservation['status'], ['reserved', 'attended', 'no_show'], true)));
+            ?>
+            <td>
+              <strong><?= $activeReservationCount ?>/<?= (int) $session['capacity'] ?></strong>
+              <small class="table-subtext">reservas activas</small>
+            </td>
             <td><span class="status-badge status-badge--<?= e(strtolower($session['status'])) ?>"><?= e(status_label($session['status'])) ?></span></td>
             <td>
               <div class="row-actions">
@@ -144,6 +151,11 @@ foreach ($classTypes as $type) {
 </section>
 
 <?php foreach ($sessions as $session): ?>
+  <?php
+    $sessionReservations = $reservationsBySession[$session['id']] ?? [];
+    $activeReservationCount = count(array_filter($sessionReservations, fn ($reservation) => in_array($reservation['status'], ['reserved', 'attended', 'no_show'], true)));
+    $availableSeats = max(0, (int) $session['capacity'] - $activeReservationCount);
+  ?>
   <dialog id="class-detail-<?= e($session['id']) ?>" class="modal-card" aria-labelledby="class-title-<?= e($session['id']) ?>">
     <form method="post">
       <input type="hidden" name="action" value="update_class_session">
@@ -160,6 +172,100 @@ foreach ($classTypes as $type) {
       <?php $editingSession = $session; require __DIR__ . '/partials/class-session-form.php'; ?>
       <button class="primary-action" type="submit">Guardar cambios</button>
     </form>
+
+    <section class="reservations-panel" aria-labelledby="reservations-title-<?= e($session['id']) ?>">
+      <div class="reservations-heading">
+        <div>
+          <h3 id="reservations-title-<?= e($session['id']) ?>">Reservas</h3>
+          <p><?= $activeReservationCount ?> de <?= (int) $session['capacity'] ?> plazas ocupadas. <?= $availableSeats ?> libres.</p>
+        </div>
+        <span class="status-badge <?= $availableSeats > 0 ? 'status-badge--active' : 'status-badge--lost' ?>">
+          <?= $availableSeats > 0 ? 'Aforo disponible' : 'Clase llena' ?>
+        </span>
+      </div>
+
+      <form class="reservation-create-form" method="post">
+        <input type="hidden" name="action" value="create_reservation">
+        <input type="hidden" name="class_session_id" value="<?= e($session['id']) ?>">
+        <div class="field field--wide">
+          <span>Anadir socio</span>
+          <div class="member-picker-shell" data-member-picker>
+            <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o telefono" data-member-search <?= $availableSeats <= 0 ? 'disabled' : '' ?>>
+            <div class="member-picker member-picker--radio">
+              <?php foreach ($members as $member): ?>
+                <?php
+                  $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
+                  $searchText = strtolower($memberName . ' ' . ($member['email'] ?? '') . ' ' . ($member['phone'] ?? ''));
+                ?>
+                <label data-member-option data-search="<?= e($searchText) ?>">
+                  <input type="radio" name="member_id" value="<?= e($member['id']) ?>" <?= $availableSeats <= 0 ? 'disabled' : '' ?>>
+                  <span>
+                    <strong><?= e($memberName) ?></strong>
+                    <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
+                  </span>
+                </label>
+              <?php endforeach; ?>
+              <?php if (!$members): ?>
+                <p>No hay socios activos disponibles.</p>
+              <?php endif; ?>
+              <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la busqueda.</p>
+            </div>
+          </div>
+        </div>
+        <button class="primary-action primary-action--compact" type="submit" <?= $availableSeats <= 0 || !$members ? 'disabled' : '' ?>>Crear reserva</button>
+      </form>
+
+      <div class="reservation-list">
+        <?php foreach ($sessionReservations as $reservation): ?>
+          <?php $reservationMemberName = trim($reservation['first_name'] . ' ' . ($reservation['last_name'] ?? '')); ?>
+          <article class="reservation-item reservation-item--<?= e($reservation['status']) ?>">
+            <div>
+              <strong><?= e($reservationMemberName) ?></strong>
+              <span><?= e($reservation['email'] ?: ($reservation['phone'] ?: 'Sin contacto')) ?></span>
+            </div>
+            <span class="status-badge status-badge--<?= e(str_replace('_', '-', $reservation['status'])) ?>"><?= e(status_label($reservation['status'])) ?></span>
+            <div class="row-actions reservation-actions">
+              <?php if ($reservation['status'] !== 'cancelled' && $reservation['status'] !== 'attended'): ?>
+                <form method="post">
+                  <input type="hidden" name="action" value="update_reservation_status">
+                  <input type="hidden" name="reservation_id" value="<?= e($reservation['id']) ?>">
+                  <input type="hidden" name="class_session_id" value="<?= e($session['id']) ?>">
+                  <input type="hidden" name="status" value="attended">
+                  <button class="icon-action" type="submit" title="Marcar asistencia" aria-label="Marcar asistencia de <?= e($reservationMemberName) ?>">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9.55 17.6-5.3-5.3 1.4-1.4 3.9 3.9 8.8-8.8 1.4 1.4-10.2 10.2Z"/></svg>
+                  </button>
+                </form>
+              <?php endif; ?>
+              <?php if ($reservation['status'] !== 'cancelled' && $reservation['status'] !== 'no_show'): ?>
+                <form method="post">
+                  <input type="hidden" name="action" value="update_reservation_status">
+                  <input type="hidden" name="reservation_id" value="<?= e($reservation['id']) ?>">
+                  <input type="hidden" name="class_session_id" value="<?= e($session['id']) ?>">
+                  <input type="hidden" name="status" value="no_show">
+                  <button class="icon-action" type="submit" title="Marcar no-show" aria-label="Marcar no-show de <?= e($reservationMemberName) ?>">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2v-6Z"/></svg>
+                  </button>
+                </form>
+              <?php endif; ?>
+              <?php if ($reservation['status'] !== 'cancelled'): ?>
+                <form method="post" data-confirm-message="Cancelar esta reserva?">
+                  <input type="hidden" name="action" value="update_reservation_status">
+                  <input type="hidden" name="reservation_id" value="<?= e($reservation['id']) ?>">
+                  <input type="hidden" name="class_session_id" value="<?= e($session['id']) ?>">
+                  <input type="hidden" name="status" value="cancelled">
+                  <button class="icon-action danger-action" type="submit" title="Cancelar reserva" aria-label="Cancelar reserva de <?= e($reservationMemberName) ?>">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6.4 19-1.4-1.4 5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19Z"/></svg>
+                  </button>
+                </form>
+              <?php endif; ?>
+            </div>
+          </article>
+        <?php endforeach; ?>
+        <?php if (!$sessionReservations): ?>
+          <p class="empty-note">Todavia no hay socios reservados en esta clase.</p>
+        <?php endif; ?>
+      </div>
+    </section>
   </dialog>
 <?php endforeach; ?>
 

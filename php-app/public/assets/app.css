@@ -1225,9 +1225,10 @@ a.global-search-result:hover {
   font-weight: 900;
   padding: 6px 9px;
 }
-.status-badge--converted, .status-badge--completed, .status-badge--active, .status-badge--customer, .status-badge--qualified { background: #dcfce7; color: #047857; }
+.status-badge--converted, .status-badge--completed, .status-badge--active, .status-badge--customer, .status-badge--qualified, .status-badge--attended { background: #dcfce7; color: #047857; }
 .status-badge--lost, .status-badge--cancelled, .status-badge--inactive, .status-badge--archived { background: #fee2e2; color: var(--danger); }
-.status-badge--pending, .status-badge--open, .status-badge--scheduled, .status-badge--lead { background: #eef4ff; color: var(--primary); }
+.status-badge--pending, .status-badge--open, .status-badge--scheduled, .status-badge--lead, .status-badge--reserved { background: #eef4ff; color: var(--primary); }
+.status-badge--no-show { background: #ffedd5; color: #c2410c; }
 .status-badge--trial { background: #e0f2fe; color: #0369a1; }
 .status-badge--suspended, .status-badge--overdue { background: #fee2e2; color: var(--danger); }
 .status-badge--paid { background: #dcfce7; color: #047857; }
@@ -1861,6 +1862,68 @@ a.global-search-result:hover {
   font-size: 12px;
   margin: 0;
 }
+.reservations-panel {
+  border-top: 1px solid var(--outline);
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 20px;
+}
+.reservations-panel--member {
+  margin-bottom: 18px;
+}
+.reservations-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+.reservations-heading h3 {
+  margin: 0 0 5px;
+}
+.reservations-heading p {
+  color: var(--muted);
+  margin: 0;
+}
+.reservation-create-form {
+  background: #f8faff;
+  border: 1px solid #e1e8f5;
+  border-radius: 14px;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 14px;
+}
+.reservation-list {
+  display: grid;
+  gap: 10px;
+}
+.reservation-item {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e1e8f5;
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  padding: 12px 14px;
+}
+.reservation-item--attended { border-left-color: var(--secondary); }
+.reservation-item--cancelled { border-left-color: var(--danger); opacity: 0.72; }
+.reservation-item--no_show { border-left-color: #f97316; }
+.reservation-item strong,
+.reservation-item span {
+  display: block;
+}
+.reservation-item > div:first-child span {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+.reservation-actions {
+  justify-content: flex-end;
+}
 
 .modal-card {
   background: #fff;
@@ -2482,6 +2545,8 @@ body[data-theme="dark"] .global-search-dropdown,
 body[data-theme="dark"] .custom-select-menu,
 body[data-theme="dark"] .phone-prefix-menu,
 body[data-theme="dark"] .member-picker,
+body[data-theme="dark"] .reservation-create-form,
+body[data-theme="dark"] .reservation-item,
 body[data-theme="dark"] .calendar-day,
 body[data-theme="dark"] .task-health-list span,
 body[data-theme="dark"] .risk-list div {
@@ -2577,7 +2642,8 @@ body[data-theme="dark"] .progress-track {
 body[data-theme="dark"] .status-badge--active,
 body[data-theme="dark"] .status-badge--paid,
 body[data-theme="dark"] .status-badge--customer,
-body[data-theme="dark"] .status-badge--qualified {
+body[data-theme="dark"] .status-badge--qualified,
+body[data-theme="dark"] .status-badge--attended {
   background: rgba(16, 185, 129, 0.18);
   color: #7dd3ac;
 }
@@ -2586,9 +2652,14 @@ body[data-theme="dark"] .status-badge--trial {
   color: #7dd3fc;
 }
 body[data-theme="dark"] .status-badge--pending,
-body[data-theme="dark"] .status-badge--lead {
+body[data-theme="dark"] .status-badge--lead,
+body[data-theme="dark"] .status-badge--reserved {
   background: rgba(245, 158, 11, 0.18);
   color: #fbbf24;
+}
+body[data-theme="dark"] .status-badge--no-show {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fdba74;
 }
 body[data-theme="dark"] .status-badge--suspended,
 body[data-theme="dark"] .status-badge--overdue,
@@ -2614,6 +2685,17 @@ body[data-density="compact"] .leads-table td { padding: 10px 12px; }
     padding: 12px;
   }
   .funnel-row-head { align-items: flex-start; }
+  .reservations-heading,
+  .reservation-item {
+    align-items: flex-start;
+    grid-template-columns: 1fr;
+  }
+  .reservations-heading {
+    flex-direction: column;
+  }
+  .reservation-actions {
+    justify-content: flex-start;
+  }
   .task-health { grid-template-columns: 1fr; }
   .activity-item--task { grid-template-columns: 40px minmax(0, 1fr); }
   .activity-item--task em { justify-self: flex-start; }
