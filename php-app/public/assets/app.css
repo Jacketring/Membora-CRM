@@ -2569,6 +2569,30 @@ body[data-theme="dark"] .platform-plan-card dd,
 body[data-theme="dark"] .platform-plan-card > strong {
   color: var(--text);
 }
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] strong,
+body[data-theme="dark"] label,
+body[data-theme="dark"] .modal-card,
+body[data-theme="dark"] .modal-card header h2,
+body[data-theme="dark"] .reservations-heading h3,
+body[data-theme="dark"] .member-picker strong,
+body[data-theme="dark"] .reservation-item strong {
+  color: var(--text);
+}
+body[data-theme="dark"] p,
+body[data-theme="dark"] small,
+body[data-theme="dark"] .field span,
+body[data-theme="dark"] .member-picker small,
+body[data-theme="dark"] .member-picker p,
+body[data-theme="dark"] .reservation-item > div:first-child span,
+body[data-theme="dark"] .reservations-heading p,
+body[data-theme="dark"] .empty-note,
+body[data-theme="dark"] .table-subtext {
+  color: var(--muted);
+}
 body[data-theme="dark"] .leads-table th {
   background: var(--surface-soft);
 }
@@ -2587,6 +2611,7 @@ body[data-theme="dark"] .dashboard-card-header p {
 body[data-theme="dark"] .field input,
 body[data-theme="dark"] .field select,
 body[data-theme="dark"] .field textarea,
+body[data-theme="dark"] .field .member-picker-search,
 body[data-theme="dark"] .custom-select-trigger,
 body[data-theme="dark"] .date-filter-control,
 body[data-theme="dark"] .filter-control,
@@ -2596,8 +2621,35 @@ body[data-theme="dark"] .phone-prefix-trigger {
   color: var(--text);
 }
 body[data-theme="dark"] .field input::placeholder,
-body[data-theme="dark"] .field textarea::placeholder {
+body[data-theme="dark"] .field textarea::placeholder,
+body[data-theme="dark"] .field .member-picker-search::placeholder {
   color: #7f8da0;
+}
+body[data-theme="dark"] .modal-card header button,
+body[data-theme="dark"] .member-picker-shell,
+body[data-theme="dark"] .member-picker label,
+body[data-theme="dark"] .member-picker-empty,
+body[data-theme="dark"] .phone-prefix-options button,
+body[data-theme="dark"] .notes-list article,
+body[data-theme="dark"] .note-item,
+body[data-theme="dark"] .confirm-dialog,
+body[data-theme="dark"] .confirm-dialog form {
+  background: var(--surface-soft);
+  border-color: var(--outline);
+  color: var(--text);
+}
+body[data-theme="dark"] .phone-prefix-options button:hover,
+body[data-theme="dark"] .phone-prefix-options button:focus-visible,
+body[data-theme="dark"] .custom-select-option:hover,
+body[data-theme="dark"] .custom-select-option:focus-visible {
+  background: rgba(255, 255, 255, 0.04);
+}
+body[data-theme="dark"] .member-picker label:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: #49627f;
+}
+body[data-theme="dark"] .member-picker input {
+  accent-color: var(--primary);
 }
 body[data-theme="dark"] .empresa-modal {
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.44);
