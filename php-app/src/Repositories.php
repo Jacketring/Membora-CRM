@@ -448,44 +448,6 @@ final class EmpresaRepository
         return $empresa ?: null;
     }
 
-    public static function publicWebsite(?string $key = null): ?array
-    {
-        self::ensureTables();
-        $key = trim((string) $key);
-
-        if ($key !== '') {
-            $stmt = Database::connection()->prepare(
-                'SELECT empresas.*, tenants.name AS tenant_name, tenants.primary_color
-                 FROM empresas
-                 LEFT JOIN tenants ON tenants.id = empresas.tenant_id
-                 WHERE empresas.id = :key OR empresas.tenant_id = :key
-                 LIMIT 1'
-            );
-            $stmt->execute(['key' => $key]);
-            $empresa = $stmt->fetch();
-
-            return $empresa ?: null;
-        }
-
-        $stmt = Database::connection()->query(
-            'SELECT empresas.*, tenants.name AS tenant_name, tenants.primary_color
-             FROM empresas
-             LEFT JOIN tenants ON tenants.id = empresas.tenant_id
-             WHERE empresas.tenant_id IS NOT NULL
-             AND empresas.status IN ("ACTIVE", "TRIAL")
-             ORDER BY empresas.status = "ACTIVE" DESC, empresas.created_at ASC
-             LIMIT 1'
-        );
-        $empresa = $stmt->fetch();
-
-        return $empresa ?: null;
-    }
-
-    public static function publicWebsiteUrl(array $empresa): string
-    {
-        return app_base_url() . '/index.php?route=web&empresa=' . urlencode((string) $empresa['id']);
-    }
-
     public static function create(array $data): void
     {
         self::ensureTables();

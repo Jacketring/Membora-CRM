@@ -30,20 +30,6 @@ Actions::handle();
 
 $route = $_GET['route'] ?? 'dashboard';
 
-if ($route === 'web') {
-    try {
-        $empresa = EmpresaRepository::publicWebsite(trim((string) ($_GET['empresa'] ?? '')));
-    } catch (Throwable) {
-        $empresa = null;
-    }
-    $flash = flash();
-    render('public-website', [
-        'empresa' => $empresa,
-        'flash' => $flash,
-    ]);
-    exit;
-}
-
 if ($route === 'login') {
     if (Auth::user()) {
         redirect(is_platform_admin(Auth::user()) ? 'platform-dashboard' : 'dashboard');

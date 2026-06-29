@@ -118,10 +118,6 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
             <td>
               <div class="platform-row-actions">
                 <?php if ($empresa['tenant_id']): ?>
-                  <a class="support-web-action" href="<?= e(EmpresaRepository::publicWebsiteUrl($empresa)) ?>" target="_blank" rel="noopener" aria-label="Ver web publica de <?= e($empresa['name']) ?>">
-                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15 15 0 0 0-1.2-5 8.04 8.04 0 0 1 4.3 5ZM12 4.1c.7 1 1.4 2.6 1.7 4.9h-3.4c.3-2.3 1-3.9 1.7-4.9ZM4.3 13h3.1c.1 1.8.5 3.5 1.2 5a8.04 8.04 0 0 1-4.3-5Zm3.1-2H4.3a8.04 8.04 0 0 1 4.3-5 15 15 0 0 0-1.2 5Zm4.6 8.9c-.7-1-1.4-2.6-1.7-4.9h3.4c-.3 2.3-1 3.9-1.7 4.9Zm2-6.9h-4c0-.3-.1-.7-.1-1s0-.7.1-1h4c0 .3.1.7.1 1s0 .7-.1 1Zm1.4 5c.7-1.5 1.1-3.2 1.2-5h3.1a8.04 8.04 0 0 1-4.3 5Z"/></svg>
-                    <span>Web</span>
-                  </a>
                   <form method="post">
                     <input type="hidden" name="action" value="enter_empresa_crm">
                     <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">

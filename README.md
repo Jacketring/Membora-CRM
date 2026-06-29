@@ -17,7 +17,7 @@ Pantallas disponibles:
 - Login.
 - Panel de control del gimnasio.
 - Leads con filtros, conversion a socio, notas y acciones.
-- Captacion Web con pagina publica incluida y webhook para recibir leads externos.
+- Captacion Web con webhook para recibir leads externos.
 - Socios con foto, edicion y eliminacion controlada.
 - Membresias con planes, precios, duracion y caducidad automatica.
 - Clases con listado, calendario mensual y reservas de socios.
@@ -180,7 +180,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Dashboard con KPIs principales.
 - Buscador global superior.
 - Gestion de leads.
-- Captacion Web por pagina publica del centro y webhook con token por tenant, ejemplos copiables y logs.
+- Captacion Web por webhook con token por tenant, ejemplos copiables y logs.
 - Pipeline comercial.
 - Conversion de lead a socio.
 - Notas en leads.
@@ -206,7 +206,6 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Seccion `Pagos` para registrar cobros SaaS, vencimientos, pagados, pendientes y cancelados.
 - Seccion `Planes` para definir catalogo comercial, precio mensual, setup, limites y prestaciones.
 - Acceso de soporte al CRM de una empresa conectada.
-- Enlace directo a la web publica de captacion de cada empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 
 ## Documentacion

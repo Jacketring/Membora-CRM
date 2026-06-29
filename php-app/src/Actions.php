@@ -35,7 +35,6 @@ final class Actions
             'convert_lead' => self::convertLead(),
             'mark_lead_lost' => self::markLeadLost(),
             'delete_lead' => self::deleteLead(),
-            'public_web_lead' => self::publicWebLead(),
             'regenerate_webhook_token' => self::regenerateWebhookToken(),
             'update_webhook_settings' => self::updateWebhookSettings(),
             'test_webhook_lead' => self::testWebhookLead(),
@@ -707,66 +706,6 @@ final class Actions
 
         flash('Lead eliminado.');
         redirect('leads');
-    }
-
-    private static function publicWebLead(): never
-    {
-        $empresaId = post_value('empresa_id', '');
-        try {
-            $empresa = EmpresaRepository::publicWebsite($empresaId);
-        } catch (Throwable) {
-            flash('No se pudo conectar con el CRM. Intentalo mas tarde.', 'error');
-            self::redirectPublicWebsite($empresaId);
-        }
-
-        if (!$empresa || empty($empresa['tenant_id'])) {
-            flash('No se pudo enviar la solicitud. La pagina no esta conectada a ningun CRM.', 'error');
-            self::redirectPublicWebsite($empresaId);
-        }
-
-        if (!in_array((string) $empresa['status'], ['ACTIVE', 'TRIAL'], true)) {
-            flash('Esta pagina no acepta solicitudes en este momento.', 'error');
-            self::redirectPublicWebsite($empresaId);
-        }
-
-        $settings = WebhookIntegrationRepository::settings((string) $empresa['tenant_id']);
-        $token = (string) ($settings['token'] ?? '');
-        if ($token === '') {
-            flash('No se pudo enviar la solicitud. Falta configurar la captacion web.', 'error');
-            self::redirectPublicWebsite($empresaId);
-        }
-
-        $payload = [
-            'token' => $token,
-            'nombre' => post_value('nombre', ''),
-            'apellidos' => post_value('apellidos', ''),
-            'email' => post_value('email', ''),
-            'telefono' => trim((string) post_value('telefono', '')),
-            'mensaje' => post_value('mensaje', ''),
-            'origen' => 'LANDING',
-            'acepta_rgpd' => post_value('acepta_rgpd', ''),
-            'website' => post_value('website', ''),
-            'utm_source' => post_value('utm_source', ''),
-            'utm_medium' => post_value('utm_medium', ''),
-            'utm_campaign' => post_value('utm_campaign', ''),
-            'url_origen' => EmpresaRepository::publicWebsiteUrl($empresa),
-        ];
-
-        $result = WebhookIntegrationRepository::handleIncoming($payload);
-        flash(
-            !empty($result['success'])
-                ? 'Solicitud enviada correctamente. El equipo del centro la vera en Leads.'
-                : ($result['message'] ?? 'No se pudo enviar la solicitud.'),
-            !empty($result['success']) ? 'success' : 'error'
-        );
-
-        self::redirectPublicWebsite($empresaId);
-    }
-
-    private static function redirectPublicWebsite(string $empresaId): never
-    {
-        header('Location: index.php?route=web&empresa=' . urlencode($empresaId) . '#contacto');
-        exit;
     }
 
     private static function regenerateWebhookToken(): never

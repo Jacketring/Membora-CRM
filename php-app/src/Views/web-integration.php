@@ -5,20 +5,6 @@
   </div>
 </div>
 
-<section class="webhook-card webhook-card--wide public-site-card">
-  <header class="webhook-card-header">
-    <div>
-      <h3>Pagina publica incluida</h3>
-      <p>Ademas del webhook, este CRM ya tiene una pagina de captacion lista para compartir.</p>
-    </div>
-    <a class="primary-action primary-action--compact" href="index.php?route=web&empresa=<?= urlencode(Auth::tenantId()) ?>" target="_blank" rel="noopener">Ver pagina</a>
-  </header>
-  <div class="copy-field">
-    <input readonly value="<?= e(app_base_url() . '/index.php?route=web&empresa=' . Auth::tenantId()) ?>" data-copy-source="public-site-url">
-    <button class="secondary-action" type="button" data-copy-target="public-site-url">Copiar enlace</button>
-  </div>
-</section>
-
 <section class="webhook-grid">
   <article class="webhook-card webhook-card--wide">
     <header class="webhook-card-header">

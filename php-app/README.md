@@ -53,7 +53,7 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Login.
 - Dashboard del gimnasio.
 - Leads.
-- Captacion Web con pagina publica y webhook para recibir leads externos.
+- Captacion Web para recibir leads externos por webhook.
 - Socios.
 - Membresias.
 - Clases y calendario.
@@ -111,15 +111,12 @@ Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones N
 
 Cada gimnasio dispone de una seccion `Captacion Web` con:
 
-- Pagina publica lista para compartir: `index.php?route=web&empresa=ID_EMPRESA`.
 - URL publica del webhook: `/webhook/lead`.
 - Token secreto por tenant.
 - Regeneracion de token.
 - Ejemplo HTML y JavaScript copiables.
 - Formulario interno de prueba.
 - Registro de ultimos envios y errores.
-
-Desde `Admin CRM > Empresas`, cada empresa conectada al CRM incluye un boton `Web` para abrir su pagina publica. El formulario de esa pagina crea o actualiza leads directamente en el CRM del tenant correspondiente.
 
 El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multipart/form-data`.
 El token puede enviarse como campo `token` o cabecera `X-Membora-Token`.
