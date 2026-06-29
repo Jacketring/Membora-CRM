@@ -218,7 +218,7 @@ final class Mailer
         $safeCompany = $company !== '' ? e($company) : 'tu centro';
         $safeLeadId = e($leadId);
         $webUrl = e((string) (getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev'));
-        $logoUrl = e(app_base_url() . '/assets/favicon.svg');
+        $emailLogo = self::emailLogoHtml(48);
 
         return <<<HTML
 <!doctype html>
@@ -235,7 +235,7 @@ final class Mailer
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#ffffff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;box-shadow:0 20px 50px rgba(15,23,42,.10);">
             <tr>
               <td style="background:#0754d6;padding:28px 32px;color:#ffffff;">
-                <img src="{$logoUrl}" width="48" height="48" alt="Membora CRM" style="display:inline-block;width:48px;height:48px;border-radius:14px;background:#ffffff;vertical-align:middle;margin-right:12px;">
+                {$emailLogo}
                 <span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span>
               </td>
             </tr>
@@ -276,7 +276,7 @@ HTML;
 
     private static function debugTemplate(): string
     {
-        $logoUrl = e(app_base_url() . '/assets/favicon.svg');
+        $emailLogo = self::emailLogoHtml(44);
 
         return <<<HTML
 <!doctype html>
@@ -288,7 +288,7 @@ HTML;
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;border:1px solid #dce6f5;overflow:hidden;">
             <tr>
               <td style="background:#0754d6;padding:24px 28px;color:#ffffff;">
-                <img src="{$logoUrl}" width="44" height="44" alt="Membora CRM" style="width:44px;height:44px;border-radius:12px;background:#ffffff;vertical-align:middle;margin-right:10px;">
+                {$emailLogo}
                 <span style="font-size:22px;font-weight:900;vertical-align:middle;">Membora CRM</span>
               </td>
             </tr>
@@ -317,6 +317,16 @@ HTML;
 
         $host = parse_url(app_base_url(), PHP_URL_HOST) ?: 'josehurtado.dev';
         return 'no-reply@' . $host;
+    }
+
+    private static function emailLogoHtml(int $size): string
+    {
+        $innerSize = max(36, $size);
+        $fontSize = $size >= 48 ? 24 : 22;
+        $radius = $size >= 48 ? 14 : 12;
+        $margin = $size >= 48 ? 12 : 10;
+
+        return '<span aria-label="Membora CRM" style="display:inline-block;width:' . $innerSize . 'px;height:' . $innerSize . 'px;line-height:' . $innerSize . 'px;border-radius:' . $radius . 'px;background:#ffffff;color:#0754d6;text-align:center;font-size:' . $fontSize . 'px;font-weight:900;vertical-align:middle;margin-right:' . $margin . 'px;">M</span>';
     }
 
     private static function encodedSubject(string $subject): string
