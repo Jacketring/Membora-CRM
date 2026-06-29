@@ -27,6 +27,10 @@ final class Mailer
         $subject = 'Hemos recibido tu solicitud en Membora CRM';
         $html = self::webLeadTemplate($name, $company, $leadId);
 
+        if (self::usesResend()) {
+            return self::sendResend($email, $subject, $html);
+        }
+
         if (self::usesSmtp()) {
             return self::sendSmtp($email, $subject, $html);
         }
@@ -45,9 +49,10 @@ final class Mailer
 
         return [
             'enabled' => strtolower((string) (getenv('MAIL_ENABLED') ?: 'true')) !== 'false' ? 'Si' : 'No',
-            'transport' => self::usesSmtp() ? 'SMTP' : 'PHP mail()',
+            'transport' => self::transportLabel(),
             'from_email' => self::fromEmail(),
             'reply_to' => trim((string) (getenv('MAIL_REPLY_TO') ?: self::fromEmail())),
+            'resend_api_key' => trim((string) (getenv('RESEND_API_KEY') ?: '')) === '' ? 'Sin configurar' : 'Configurada',
             'smtp_host' => trim((string) (getenv('SMTP_HOST') ?: 'Sin configurar')),
             'smtp_port' => (string) (getenv('SMTP_PORT') ?: '587'),
             'smtp_encryption' => trim((string) (getenv('SMTP_ENCRYPTION') ?: 'tls')),
@@ -66,6 +71,10 @@ final class Mailer
         }
 
         $html = self::debugTemplate();
+        if (self::usesResend()) {
+            return self::sendResend($email, 'Prueba de correo - Membora CRM', $html);
+        }
+
         if (self::usesSmtp()) {
             return self::sendSmtp($email, 'Prueba de correo - Membora CRM', $html);
         }
@@ -92,6 +101,103 @@ final class Mailer
         }
 
         return $sent;
+    }
+
+    private static function sendResend(string $to, string $subject, string $html): bool
+    {
+        $apiKey = trim((string) (getenv('RESEND_API_KEY') ?: ''));
+        if ($apiKey === '') {
+            self::$lastError = 'RESEND_API_KEY no esta configurada.';
+            return false;
+        }
+
+        $payload = json_encode([
+            'from' => self::headerText((string) (getenv('MAIL_FROM_NAME') ?: 'Membora CRM')) . ' <' . self::fromEmail() . '>',
+            'to' => [$to],
+            'subject' => $subject,
+            'html' => $html,
+            'reply_to' => trim((string) (getenv('MAIL_REPLY_TO') ?: self::fromEmail())),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        if ($payload === false) {
+            self::$lastError = 'No se pudo generar el JSON del email.';
+            return false;
+        }
+
+        if (function_exists('curl_init')) {
+            return self::sendResendWithCurl($apiKey, $payload);
+        }
+
+        return self::sendResendWithStreams($apiKey, $payload);
+    }
+
+    private static function sendResendWithCurl(string $apiKey, string $payload): bool
+    {
+        $curl = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($curl, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 25,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . $apiKey,
+                'Content-Type: application/json',
+                'User-Agent: MemboraCRM/1.0',
+            ],
+            CURLOPT_POSTFIELDS => $payload,
+        ]);
+
+        $body = curl_exec($curl);
+        $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+
+        return self::handleResendResponse($status, $body === false ? '' : (string) $body, $error);
+    }
+
+    private static function sendResendWithStreams(string $apiKey, string $payload): bool
+    {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'timeout' => 25,
+                'header' => implode("\r\n", [
+                    'Authorization: Bearer ' . $apiKey,
+                    'Content-Type: application/json',
+                    'User-Agent: MemboraCRM/1.0',
+                ]),
+                'content' => $payload,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $body = @file_get_contents('https://api.resend.com/emails', false, $context);
+        $status = 0;
+        foreach (($http_response_header ?? []) as $header) {
+            if (preg_match('/^HTTP\/\S+\s+(\d+)/', $header, $matches)) {
+                $status = (int) $matches[1];
+                break;
+            }
+        }
+
+        return self::handleResendResponse($status, $body === false ? '' : (string) $body, $body === false ? 'No se pudo conectar con Resend API.' : '');
+    }
+
+    private static function handleResendResponse(int $status, string $body, string $transportError = ''): bool
+    {
+        if ($status >= 200 && $status < 300) {
+            return true;
+        }
+
+        $message = $transportError !== '' ? $transportError : trim($body);
+        if ($body !== '') {
+            $decoded = json_decode($body, true);
+            if (is_array($decoded)) {
+                $message = (string) ($decoded['message'] ?? $decoded['error'] ?? $message);
+            }
+        }
+
+        self::$lastError = 'Resend API respondio HTTP ' . ($status ?: 'sin estado') . ': ' . ($message ?: 'sin detalle');
+        return false;
     }
 
     private static function sendSmtp(string $to, string $subject, string $html): bool
@@ -210,6 +316,24 @@ final class Mailer
     private static function usesSmtp(): bool
     {
         return strtolower((string) (getenv('MAIL_MAILER') ?: '')) === 'smtp' || trim((string) (getenv('SMTP_HOST') ?: '')) !== '';
+    }
+
+    private static function usesResend(): bool
+    {
+        return strtolower((string) (getenv('MAIL_MAILER') ?: '')) === 'resend' || trim((string) (getenv('RESEND_API_KEY') ?: '')) !== '';
+    }
+
+    private static function transportLabel(): string
+    {
+        if (self::usesResend()) {
+            return 'Resend API';
+        }
+
+        if (self::usesSmtp()) {
+            return 'SMTP';
+        }
+
+        return 'PHP mail()';
     }
 
     private static function webLeadTemplate(string $name, string $company, string $leadId): string

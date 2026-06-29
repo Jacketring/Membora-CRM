@@ -29,10 +29,11 @@ DB_DATABASE="membora_crm"
 DB_USERNAME="usuario"
 DB_PASSWORD="password"
 MAIL_ENABLED="true"
-MAIL_MAILER="smtp"
+MAIL_MAILER="resend"
 MAIL_FROM_EMAIL="no-reply@josehurtado.dev"
 MAIL_FROM_NAME="Membora CRM"
 MAIL_REPLY_TO="contacto@josehurtado.dev"
+RESEND_API_KEY="re_xxxxxxxxxxxxxxxxx"
 SMTP_HOST="mail.josehurtado.dev"
 SMTP_PORT="587"
 SMTP_ENCRYPTION="tls"
@@ -134,6 +135,6 @@ El formulario de `web-app/public` envia al webhook:
 El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multipart/form-data`.
 No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Admin CRM > Leads`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.
 
-Cuando la solicitud incluye un email valido, el CRM intenta enviar una confirmacion HTML al contacto. Para produccion se recomienda usar SMTP con `MAIL_MAILER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD`. Si Plesk no tiene correo saliente configurado, el lead se crea igualmente y el fallo de correo queda registrado en `Admin CRM > Web`.
+Cuando la solicitud incluye un email valido, el CRM intenta enviar una confirmacion HTML al contacto. Para no depender del correo saliente de Plesk se recomienda `MAIL_MAILER="resend"` con `RESEND_API_KEY`. Tambien se mantiene SMTP como alternativa. Si el envio falla, el lead se crea igualmente y el fallo de correo queda registrado en `Admin CRM > Web`.
 
 Para depurar el correo, entra en `Admin CRM > Web` y usa `Prueba de correo`. La pantalla muestra la configuracion detectada de correo y registra el resultado en `Ultimos envios tecnicos`.
