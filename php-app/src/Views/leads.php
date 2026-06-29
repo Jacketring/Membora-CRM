@@ -174,7 +174,9 @@
                 <?php if ($lead['status'] !== 'CONVERTED'): ?>
                   <form method="post">
                     <input type="hidden" name="id" value="<?= e($lead['id']) ?>">
-                    <button name="action" value="convert_lead" aria-label="Convertir a socio a <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">Convertir</button>
+                    <button class="icon-action success-action" name="action" value="convert_lead" type="submit" title="Convertir a socio" aria-label="Convertir a socio a <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">
+                      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.2 16.6 4.9 12.3l-1.4 1.4 5.7 5.7L21 7.6l-1.4-1.4L9.2 16.6Z"/></svg>
+                    </button>
                   </form>
                 <?php endif; ?>
                 <form method="post" data-confirm-message="Eliminar este lead? Esta accion no se puede deshacer.">
