@@ -216,7 +216,6 @@ final class Mailer
     {
         $safeName = e($name);
         $safeCompany = $company !== '' ? e($company) : 'tu centro';
-        $safeLeadId = e($leadId);
         $webUrl = e((string) (getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev'));
         $emailLogo = self::emailLogoHtml(48);
 
@@ -254,7 +253,6 @@ final class Mailer
                     <li>Resolveremos dudas sobre leads, socios, clases y membresias.</li>
                   </ul>
                 </div>
-                <p style="margin:0;color:#64748b;font-size:14px;line-height:1.6;">Referencia interna de solicitud: <strong style="color:#0b172a;">{$safeLeadId}</strong></p>
               </td>
             </tr>
             <tr>
