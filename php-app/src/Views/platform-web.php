@@ -1,5 +1,6 @@
 <?php
 $logs = $logs ?? [];
+$mailDiagnostics = $mailDiagnostics ?? [];
 $webhookUrl = $webhookUrl ?? app_base_url() . '/webhook/lead';
 $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
 ?>
@@ -76,6 +77,24 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
       <button class="primary-action" type="submit">Enviar prueba</button>
     </form>
   </article>
+
+  <article class="platform-panel">
+    <header>
+      <div>
+        <h3>Configuracion detectada</h3>
+        <p>Valores actuales leidos desde `php-app/.env`.</p>
+      </div>
+      <span><?= e($mailDiagnostics['transport'] ?? 'Sin dato') ?></span>
+    </header>
+    <div class="web-info-list">
+      <?php foreach ($mailDiagnostics as $label => $value): ?>
+        <div>
+          <span><?= e(str_replace('_', ' ', ucfirst($label))) ?></span>
+          <strong><?= e((string) $value) ?></strong>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  </article>
 </section>
 
 <section class="leads-table-card">
@@ -98,7 +117,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
       <tbody>
         <?php foreach ($logs as $log): ?>
           <?php $status = (string) ($log['status'] ?? ''); ?>
-          <?php $statusClass = $status === 'success' || $status === 'duplicate' ? 'active' : ($status === 'email_error' ? 'pending' : 'cancelled'); ?>
+          <?php $statusClass = in_array($status, ['success', 'duplicate', 'email_test'], true) ? 'active' : ($status === 'email_error' ? 'pending' : 'cancelled'); ?>
           <tr>
             <td><?= e(format_date($log['created_at'])) ?></td>
             <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(webhook_status_label($status)) ?></span></td>

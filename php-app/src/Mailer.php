@@ -39,6 +39,23 @@ final class Mailer
         return self::$lastError;
     }
 
+    public static function diagnostics(): array
+    {
+        $password = (string) (getenv('SMTP_PASSWORD') ?: '');
+
+        return [
+            'enabled' => strtolower((string) (getenv('MAIL_ENABLED') ?: 'true')) !== 'false' ? 'Si' : 'No',
+            'transport' => self::usesSmtp() ? 'SMTP' : 'PHP mail()',
+            'from_email' => self::fromEmail(),
+            'reply_to' => trim((string) (getenv('MAIL_REPLY_TO') ?: self::fromEmail())),
+            'smtp_host' => trim((string) (getenv('SMTP_HOST') ?: 'Sin configurar')),
+            'smtp_port' => (string) (getenv('SMTP_PORT') ?: '587'),
+            'smtp_encryption' => trim((string) (getenv('SMTP_ENCRYPTION') ?: 'tls')),
+            'smtp_username' => trim((string) (getenv('SMTP_USERNAME') ?: 'Sin configurar')),
+            'smtp_password' => $password === '' ? 'Sin configurar' : str_repeat('*', min(12, max(6, strlen($password)))),
+        ];
+    }
+
     public static function sendDebugEmail(string $email): bool
     {
         self::$lastError = '';

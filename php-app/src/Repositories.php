@@ -2097,6 +2097,20 @@ final class WebhookIntegrationRepository
         return $stmt->fetchAll();
     }
 
+    public static function logPlatformEmailDiagnostic(string $status, string $message, string $email): void
+    {
+        self::ensureTables();
+        self::log(
+            null,
+            null,
+            $status,
+            $message,
+            ['email' => $email, 'diagnostics' => Mailer::diagnostics()],
+            substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 64),
+            substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500)
+        );
+    }
+
     private static function settingsByToken(string $token): ?array
     {
         $stmt = Database::connection()->query('SELECT * FROM webhook_settings');

@@ -136,4 +136,4 @@ No es necesario copiar tokens en la web. El CRM valida el origen configurado en 
 
 Cuando la solicitud incluye un email valido, el CRM intenta enviar una confirmacion HTML al contacto. Para produccion se recomienda usar SMTP con `MAIL_MAILER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD`. Si Plesk no tiene correo saliente configurado, el lead se crea igualmente y el fallo de correo queda registrado en `Admin CRM > Web`.
 
-Para depurar el correo, entra en `Admin CRM > Web` y usa `Prueba de correo`. Si falla, la pantalla mostrara el error SMTP exacto.
+Para depurar el correo, entra en `Admin CRM > Web` y usa `Prueba de correo`. La pantalla muestra la configuracion detectada de correo y registra el resultado en `Ultimos envios tecnicos`.

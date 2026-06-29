@@ -250,10 +250,12 @@ final class Actions
         }
 
         if (Mailer::sendDebugEmail($email)) {
+            WebhookIntegrationRepository::logPlatformEmailDiagnostic('email_test', 'Correo de prueba aceptado por el transporte de envio.', $email);
             flash('Correo de prueba enviado a ' . $email . '. Revisa tambien spam/promociones.');
             redirect('platform-web');
         }
 
+        WebhookIntegrationRepository::logPlatformEmailDiagnostic('email_error', 'Prueba de correo fallida. ' . Mailer::lastError(), $email);
         flash('No se pudo enviar el correo de prueba: ' . Mailer::lastError(), 'error');
         redirect('platform-web');
     }
