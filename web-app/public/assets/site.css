@@ -477,6 +477,7 @@ button, input, textarea { font: inherit; }
   display: grid;
   gap: 10px;
   grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
   padding: 20px;
 }
 .module-list b {
@@ -486,6 +487,7 @@ button, input, textarea { font: inherit; }
   color: var(--primary);
   display: flex;
   font-size: 13px;
+  grid-row: 1 / span 2;
   height: 52px;
   justify-content: center;
 }
@@ -493,9 +495,14 @@ button, input, textarea { font: inherit; }
 .module-list span {
   display: block;
 }
+.module-list strong {
+  align-self: end;
+}
 .module-list span {
   color: var(--muted);
+  grid-column: 2;
   line-height: 1.5;
+  max-width: 36rem;
 }
 .center-action {
   justify-content: center;
