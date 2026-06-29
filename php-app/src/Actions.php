@@ -14,6 +14,8 @@ final class Actions
             'login' => self::login(),
             'logout' => self::logout(),
             'update_profile' => self::updateProfile(),
+            'update_platform_lead' => self::updatePlatformLead(),
+            'convert_platform_lead' => self::convertPlatformLead(),
             'create_platform_client' => self::createPlatformClient(),
             'update_platform_client' => self::updatePlatformClient(),
             'create_empresa' => self::createEmpresa(),
@@ -22,7 +24,6 @@ final class Actions
             'update_platform_payment' => self::updatePlatformPayment(),
             'create_platform_plan' => self::createPlatformPlan(),
             'update_platform_plan' => self::updatePlatformPlan(),
-            'update_platform_web_settings' => self::updatePlatformWebSettings(),
             'enter_empresa_crm' => self::enterEmpresaCrm(),
             'exit_empresa_crm' => self::exitEmpresaCrm(),
             'create_user' => self::createUser(),
@@ -185,6 +186,42 @@ final class Actions
         redirect('platform-companies');
     }
 
+    private static function updatePlatformLead(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '') {
+            flash('No se encontro el lead seleccionado.', 'error');
+            redirect('platform-leads');
+        }
+
+        PlatformLeadRepository::update($id, $_POST);
+        flash('Lead actualizado correctamente.');
+        redirect('platform-leads');
+    }
+
+    private static function convertPlatformLead(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '') {
+            flash('No se encontro el lead seleccionado.', 'error');
+            redirect('platform-leads');
+        }
+
+        try {
+            $clientId = PlatformLeadRepository::convertToClient($id);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo convertir el lead en cliente.', 'error');
+            redirect('platform-leads');
+        }
+
+        flash('Lead convertido en cliente correctamente.');
+        redirect('platform-clients');
+    }
+
     private static function createPlatformClient(): never
     {
         self::requirePlatformAdmin();
@@ -270,27 +307,6 @@ final class Actions
         PlatformPlanRepository::update($id, $_POST);
         flash('Plan actualizado correctamente.');
         redirect('platform-plans');
-    }
-
-    private static function updatePlatformWebSettings(): never
-    {
-        self::requirePlatformAdmin();
-        $empresaId = post_value('empresa_id', '');
-
-        if ($empresaId === '') {
-            flash('Selecciona la empresa que recibira los leads de la web.', 'error');
-            redirect('platform-web');
-        }
-
-        try {
-            PlatformWebRepository::setTargetEmpresa($empresaId);
-        } catch (Throwable $exception) {
-            flash($exception->getMessage() ?: 'No se pudo actualizar la configuracion de la web.', 'error');
-            redirect('platform-web');
-        }
-
-        flash('La web publica enviara los leads a la empresa seleccionada.');
-        redirect('platform-web');
     }
 
     private static function enterEmpresaCrm(): never

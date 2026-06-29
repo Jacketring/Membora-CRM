@@ -87,6 +87,11 @@ $arpa = count($activeCustomers) > 0 ? (float) $metrics['mrr'] / count($activeCus
 </section>
 
 <section class="platform-module-grid" aria-label="Secciones de administracion">
+  <a class="platform-module-card" href="index.php?route=platform-leads">
+    <span>Leads</span>
+    <strong>Solicitudes web</strong>
+    <small>Contactos recibidos desde la web publica antes de convertirlos en clientes.</small>
+  </a>
   <a class="platform-module-card" href="index.php?route=platform-companies">
     <span>Empresas</span>
     <strong>Clientes CRM</strong>
@@ -105,7 +110,7 @@ $arpa = count($activeCustomers) > 0 ? (float) $metrics['mrr'] / count($activeCus
   <a class="platform-module-card" href="index.php?route=platform-web">
     <span>Web</span>
     <strong>Formulario publico</strong>
-    <small>Empresa receptora de leads y registros de formularios enviados.</small>
+    <small>Estado tecnico del formulario publico y registros de envios recibidos.</small>
   </a>
 </section>
 

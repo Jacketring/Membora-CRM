@@ -63,7 +63,7 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Usuarios internos.
 - Perfil.
 - Configuracion visual.
-- Panel de administracion SaaS con resumen, clientes, empresas, pagos, planes y web comercial.
+- Panel de administracion SaaS con resumen, leads web, clientes, empresas, pagos, planes y web comercial.
 
 ## Administracion SaaS
 
@@ -81,7 +81,8 @@ La app crea y usa tablas de administracion SaaS para controlar clientes, empresa
 - Creacion de tenant y usuario administrador al pasar de cliente a empresa.
 - Pagos SaaS por empresa: concepto, importe, vencimiento, fecha de pago y estado.
 - Planes SaaS: codigo, precio mensual, coste de alta, limites y prestaciones.
-- Web comercial: empresa receptora de formularios y logs de envios recibidos.
+- Leads web: solicitudes comerciales recibidas desde la web publica.
+- Web comercial: estado tecnico del formulario publico y logs de envios recibidos.
 
 Usuario de administracion de plataforma:
 
@@ -95,11 +96,11 @@ Password: MemboraAdmin2026!
 La aplicacion crea algunas tablas o columnas auxiliares si no existen, por ejemplo:
 
 - `empresas`.
+- `platform_leads`.
 - `platform_clients`.
 - `empresa_payments`.
 - `saas_plans`.
 - `lead_notes`.
-- `platform_settings`.
 - `webhook_logs`.
 - `task_members`.
 - `membership_plans`.
@@ -112,13 +113,13 @@ Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones N
 
 ## Web comercial
 
-La captacion web se configura desde el panel de administradores de Membora CRM, no desde cada gimnasio cliente.
+La captacion web se revisa desde el panel de administradores de Membora CRM, no desde cada gimnasio cliente.
 
-En `Admin CRM > Web` se selecciona la empresa que recibira los formularios de la web publica. El formulario de `web-app/public` envia al webhook:
+El formulario de `web-app/public` envia al webhook:
 
 ```text
 /webhook/lead
 ```
 
 El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multipart/form-data`.
-No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea el lead en la empresa seleccionada por el administrador.
+No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Admin CRM > Leads`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.

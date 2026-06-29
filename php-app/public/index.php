@@ -62,6 +62,15 @@ if ($route === 'global-search') {
     $query = trim((string) ($_GET['q'] ?? ''));
     $items = [];
     if (is_platform_admin($currentUser)) {
+        foreach (array_slice(PlatformLeadRepository::all($query), 0, 8) as $lead) {
+            $items[] = [
+                'type' => 'Lead',
+                'kind' => 'lead',
+                'title' => $lead['company_name'] ?: $lead['contact_name'],
+                'description' => platform_lead_status_label($lead['status']) . ' - ' . ($lead['email'] ?: ($lead['phone'] ?: 'Sin contacto')),
+                'href' => 'index.php?route=platform-leads&q=' . urlencode($query),
+            ];
+        }
         foreach (array_slice(PlatformClientRepository::all($query), 0, 8) as $client) {
             $items[] = [
                 'type' => 'Cliente',
@@ -149,6 +158,22 @@ switch ($route) {
         ]);
         break;
 
+    case 'platform-leads':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+        ];
+        render_layout('Leads CRM', 'platform-leads', [
+            'filters' => $filters,
+            'metrics' => PlatformLeadRepository::metrics(),
+            'leads' => PlatformLeadRepository::all($filters['q'], $filters['status']),
+        ]);
+        break;
+
     case 'platform-companies':
         if (!is_platform_admin($currentUser)) {
             redirect('dashboard');
@@ -211,9 +236,6 @@ switch ($route) {
         }
 
         render_layout('Web comercial', 'platform-web', [
-            'settings' => PlatformWebRepository::settings(),
-            'targetEmpresa' => PlatformWebRepository::targetEmpresa(),
-            'empresas' => EmpresaRepository::all(),
             'logs' => WebhookIntegrationRepository::recentPlatformLogs(),
             'webhookUrl' => app_base_url() . '/webhook/lead',
             'webUrl' => getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev',

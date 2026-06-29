@@ -313,6 +313,17 @@ function platform_client_status_label(?string $status): string
     ]);
 }
 
+function platform_lead_status_label(?string $status): string
+{
+    return enum_label((string) $status, [
+        'NEW' => 'Nuevo',
+        'CONTACTED' => 'Contactado',
+        'QUALIFIED' => 'Cualificado',
+        'CONVERTED' => 'Convertido',
+        'LOST' => 'Perdido',
+    ]);
+}
+
 function platform_payment_status_label(?string $status): string
 {
     return enum_label((string) $status, [

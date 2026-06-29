@@ -25,7 +25,7 @@ Pantallas disponibles:
 - Usuarios internos del gimnasio.
 - Perfil de usuario.
 - Configuracion visual personal.
-- Panel de administracion de Membora CRM separado en resumen, clientes, empresas, pagos, planes y web comercial.
+- Panel de administracion de Membora CRM separado en resumen, leads web, clientes, empresas, pagos, planes y web comercial.
 
 Pendiente o futuro:
 
@@ -65,7 +65,7 @@ La aplicacion PHP usa una estructura monolitica sencilla:
 - `public/assets/app.css`: estilos de la interfaz.
 - `public/assets/app.js`: interacciones de modales, buscadores y controles.
 
-La base de datos mantiene separacion por `tenant_id` para datos de gimnasios. La administracion SaaS usa `platform_clients`, `empresas`, `empresa_payments` y `saas_plans` para controlar clientes comerciales, empresas con CRM, planes comerciales, pagos, facturacion mensual y acceso de soporte.
+La base de datos mantiene separacion por `tenant_id` para datos de gimnasios. La administracion SaaS usa `platform_leads`, `platform_clients`, `empresas`, `empresa_payments` y `saas_plans` para controlar solicitudes web, clientes comerciales, empresas con CRM, planes comerciales, pagos, facturacion mensual y acceso de soporte.
 
 ## Estructura
 
@@ -159,7 +159,7 @@ Configurar `app.web.josehurtado.dev` como sitio web separado y apuntar la raiz d
 web-app/public
 ```
 
-No hay que editar tokens en la web. El formulario envia al webhook del CRM y el panel `Admin CRM > Web` decide que empresa recibe los leads.
+No hay que editar tokens en la web. El formulario envia al webhook del CRM y las solicitudes aparecen en `Admin CRM > Leads`.
 
 En el `.env` del CRM debe existir `WEB_APP_URL="https://app.web.josehurtado.dev"` para permitir el envio del formulario entre subdominios.
 
@@ -217,6 +217,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 
 - Panel `Admin CRM`.
 - Resumen SaaS con MRR, ARR, ARPA, riesgo, cobros y prioridades.
+- Seccion `Leads` para solicitudes de la web publica, con estados comerciales y conversion a cliente.
 - Seccion `Clientes` para contactos comerciales antes de crear su CRM.
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente desde un cliente comercial.
@@ -227,7 +228,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - MRR estimado.
 - Seccion `Pagos` para registrar cobros SaaS, vencimientos, pagados, pendientes y cancelados.
 - Seccion `Planes` para definir catalogo comercial, precio mensual, setup, limites y prestaciones.
-- Seccion `Web` para elegir que empresa recibe los formularios de la web publica y revisar envios recientes.
+- Seccion `Web` para revisar el estado tecnico del formulario publico y envios recientes.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 

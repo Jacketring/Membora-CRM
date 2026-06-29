@@ -1,6 +1,6 @@
 # Estado actual de la version PHP - Membora CRM
 
-Fecha de actualizacion: 25/06/2026.
+Fecha de actualizacion: 29/06/2026.
 
 ## 1. Resumen
 
@@ -79,6 +79,8 @@ No se usa Node.js en produccion.
 - Creacion desde un dia del calendario.
 - Edicion y eliminacion de sesiones.
 - El calendario permanece abierto tras crear o editar sesiones desde el modal.
+- Reservas de socios por sesion con control de aforo.
+- Cancelacion, asistencia y no-show por reserva.
 
 ### Tareas
 
@@ -98,8 +100,11 @@ No se usa Node.js en produccion.
 
 ### Administracion SaaS de Membora CRM
 
-- Panel `Admin CRM` separado en resumen, clientes, empresas, pagos y planes.
+- Panel `Admin CRM` separado en resumen, leads web, clientes, empresas, pagos, planes y web comercial.
 - Resumen ejecutivo con MRR, ARR, ARPA, pagos pendientes, cobrado en el mes y prioridades.
+- Tabla `platform_leads` para solicitudes recibidas desde la web publica.
+- Gestion de leads web con estados nuevo, contactado, cualificado, convertido o perdido.
+- Conversion de lead web a cliente comercial.
 - Tabla `platform_clients` para contactos comerciales del SaaS antes de crear su CRM.
 - Alta y edicion de clientes comerciales con estado lead, cualificado, cliente o perdido.
 - Tabla `empresas`.
@@ -113,13 +118,14 @@ No se usa Node.js en produccion.
 - Registro y edicion de pagos con concepto, importe, vencimiento, fecha de pago, estado y notas.
 - Tabla `saas_plans` para catalogo comercial.
 - Gestion de planes con precio mensual, setup, limites de usuarios/socios, estado y prestaciones.
+- Web comercial externa en `web-app/public`.
+- Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Leads`.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 
 ## 4. Modulos pendientes
 
 - Pagos completos del gimnasio.
-- Reservas de clase.
 - Check-ins.
 - Alertas de riesgo.
 - Integraciones avanzadas de facturacion SaaS.
@@ -161,6 +167,7 @@ Password: MemboraAdmin2026!
 La aplicacion PHP puede crear de forma incremental:
 
 - `empresas`.
+- `platform_leads`.
 - `platform_clients`.
 - `empresa_payments`.
 - `saas_plans`.
@@ -170,6 +177,7 @@ La aplicacion PHP puede crear de forma incremental:
 - `subscriptions`.
 - `class_types`.
 - `class_sessions`.
+- `reservations`.
 
 Tambien puede anadir columnas auxiliares para imagenes y configuracion visual si faltan.
 

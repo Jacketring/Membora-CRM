@@ -18,6 +18,7 @@ function payloadFromForm(formElement) {
   return {
     nombre: String(data.get('nombre') || '').trim(),
     apellidos: String(data.get('apellidos') || '').trim(),
+    empresa: String(data.get('empresa') || '').trim(),
     email: String(data.get('email') || '').trim(),
     telefono: String(data.get('telefono') || '').trim(),
     mensaje: [
