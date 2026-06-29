@@ -117,11 +117,10 @@ DB_DATABASE="nombre_base_datos"
 DB_USERNAME="usuario_base_datos"
 DB_PASSWORD="password_base_datos"
 MAIL_ENABLED="true"
-MAIL_MAILER="resend"
+MAIL_MAILER="smtp"
 MAIL_FROM_EMAIL="no-reply@josehurtado.dev"
 MAIL_FROM_NAME="Membora CRM"
 MAIL_REPLY_TO="contacto@josehurtado.dev"
-RESEND_API_KEY="re_xxxxxxxxxxxxxxxxx"
 SMTP_HOST="mail.josehurtado.dev"
 SMTP_PORT="587"
 SMTP_ENCRYPTION="tls"
@@ -171,7 +170,7 @@ web-app/public
 ```
 
 No hay que editar tokens en la web. El formulario envia al webhook del CRM y las solicitudes aparecen en `Admin CRM > Leads`.
-Si `MAIL_ENABLED` esta activo y el envio por API/SMTP esta configurado, la persona que rellena el formulario recibe un email HTML de confirmacion indicando que el equipo revisara su solicitud y contactara en 24-48 horas. Los fallos de correo quedan visibles en `Admin CRM > Web`.
+Si `MAIL_ENABLED` esta activo y el SMTP esta configurado, la persona que rellena el formulario recibe un email HTML de confirmacion indicando que el equipo revisara su solicitud y contactara en 24-48 horas. Los fallos de correo quedan visibles en `Admin CRM > Web`.
 La seccion `Admin CRM > Web` incluye una prueba de correo para enviar un email tecnico a una direccion concreta, ver la configuracion detectada y registrar el error SMTP exacto si falla.
 
 En el `.env` del CRM debe existir `WEB_APP_URL="https://app.web.josehurtado.dev"` para permitir el envio del formulario entre subdominios.
