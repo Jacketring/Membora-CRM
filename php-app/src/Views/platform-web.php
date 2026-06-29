@@ -58,6 +58,24 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
       </div>
     </div>
   </article>
+
+  <article class="platform-panel platform-panel--wide">
+    <header>
+      <div>
+        <h3>Prueba de correo</h3>
+        <p>Envia un email tecnico para comprobar SMTP sin rellenar el formulario publico.</p>
+      </div>
+      <span>Email</span>
+    </header>
+    <form class="lead-toolbar platform-toolbar" method="post">
+      <input type="hidden" name="action" value="send_platform_test_email">
+      <label class="field platform-search">
+        <span>Destino</span>
+        <input name="email" type="email" value="josehur2003@gmail.com" placeholder="correo@ejemplo.com" required>
+      </label>
+      <button class="primary-action" type="submit">Enviar prueba</button>
+    </form>
+  </article>
 </section>
 
 <section class="leads-table-card">

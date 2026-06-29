@@ -171,6 +171,7 @@ web-app/public
 
 No hay que editar tokens en la web. El formulario envia al webhook del CRM y las solicitudes aparecen en `Admin CRM > Leads`.
 Si `MAIL_ENABLED` esta activo y el SMTP esta configurado, la persona que rellena el formulario recibe un email HTML de confirmacion indicando que el equipo revisara su solicitud y contactara en 24-48 horas. Los fallos de SMTP quedan visibles en `Admin CRM > Web`.
+La seccion `Admin CRM > Web` incluye una prueba de correo para enviar un email tecnico a una direccion concreta y ver el error SMTP exacto si falla.
 
 En el `.env` del CRM debe existir `WEB_APP_URL="https://app.web.josehurtado.dev"` para permitir el envio del formulario entre subdominios.
 

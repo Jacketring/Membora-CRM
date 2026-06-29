@@ -135,3 +135,5 @@ El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multip
 No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Admin CRM > Leads`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.
 
 Cuando la solicitud incluye un email valido, el CRM intenta enviar una confirmacion HTML al contacto. Para produccion se recomienda usar SMTP con `MAIL_MAILER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD`. Si Plesk no tiene correo saliente configurado, el lead se crea igualmente y el fallo de correo queda registrado en `Admin CRM > Web`.
+
+Para depurar el correo, entra en `Admin CRM > Web` y usa `Prueba de correo`. Si falla, la pantalla mostrara el error SMTP exacto.

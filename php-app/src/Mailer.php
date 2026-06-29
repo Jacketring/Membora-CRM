@@ -39,6 +39,23 @@ final class Mailer
         return self::$lastError;
     }
 
+    public static function sendDebugEmail(string $email): bool
+    {
+        self::$lastError = '';
+        $email = strtolower(trim($email));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            self::$lastError = 'Email de prueba no valido.';
+            return false;
+        }
+
+        $html = self::debugTemplate();
+        if (self::usesSmtp()) {
+            return self::sendSmtp($email, 'Prueba de correo - Membora CRM', $html);
+        }
+
+        return self::sendNativeMail($email, 'Prueba de correo - Membora CRM', $html);
+    }
+
     private static function sendNativeMail(string $to, string $subject, string $html): bool
     {
         $fromEmail = self::fromEmail();
@@ -230,6 +247,40 @@ final class Mailer
             </tr>
             <tr>
               <td style="padding:22px 32px;background:#f8fafc;color:#64748b;font-size:13px;line-height:1.5;">Este correo confirma que el formulario se ha enviado correctamente. Si no has solicitado informacion sobre Membora CRM, puedes ignorarlo.</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+HTML;
+    }
+
+    private static function debugTemplate(): string
+    {
+        $logoUrl = e(app_base_url() . '/assets/favicon.svg');
+
+        return <<<HTML
+<!doctype html>
+<html lang="es">
+  <body style="margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0b172a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:30px 14px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;border:1px solid #dce6f5;overflow:hidden;">
+            <tr>
+              <td style="background:#0754d6;padding:24px 28px;color:#ffffff;">
+                <img src="{$logoUrl}" width="44" height="44" alt="Membora CRM" style="width:44px;height:44px;border-radius:12px;background:#ffffff;vertical-align:middle;margin-right:10px;">
+                <span style="font-size:22px;font-weight:900;vertical-align:middle;">Membora CRM</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:30px 28px;">
+                <p style="margin:0 0 10px;color:#0754d6;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Prueba tecnica</p>
+                <h1 style="margin:0 0 14px;font-size:26px;color:#071327;">El correo de Membora CRM funciona</h1>
+                <p style="margin:0;color:#334155;font-size:16px;line-height:1.6;">Si estas viendo este mensaje, el SMTP configurado en Plesk esta enviando correctamente correos desde el CRM.</p>
+              </td>
             </tr>
           </table>
         </td>

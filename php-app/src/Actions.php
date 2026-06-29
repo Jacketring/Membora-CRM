@@ -17,6 +17,7 @@ final class Actions
             'update_platform_lead' => self::updatePlatformLead(),
             'convert_platform_lead' => self::convertPlatformLead(),
             'delete_platform_lead' => self::deletePlatformLead(),
+            'send_platform_test_email' => self::sendPlatformTestEmail(),
             'create_platform_client' => self::createPlatformClient(),
             'update_platform_client' => self::updatePlatformClient(),
             'create_empresa' => self::createEmpresa(),
@@ -236,6 +237,25 @@ final class Actions
         PlatformLeadRepository::delete($id);
         flash('Lead eliminado correctamente.');
         redirect('platform-leads');
+    }
+
+    private static function sendPlatformTestEmail(): never
+    {
+        self::requirePlatformAdmin();
+        $email = strtolower(post_value('email', ''));
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            flash('Indica un email valido para la prueba.', 'error');
+            redirect('platform-web');
+        }
+
+        if (Mailer::sendDebugEmail($email)) {
+            flash('Correo de prueba enviado a ' . $email . '. Revisa tambien spam/promociones.');
+            redirect('platform-web');
+        }
+
+        flash('No se pudo enviar el correo de prueba: ' . Mailer::lastError(), 'error');
+        redirect('platform-web');
     }
 
     private static function createPlatformClient(): never
