@@ -8,9 +8,9 @@ El proyecto se ha migrado a una app PHP monolitica para simplificar el despliegu
 
 ```text
 Aplicacion PHP funcional en migracion avanzada.
-Despliegue previsto/actual: https://app.crm.josehurtado.dev
+Despliegue: https://app.crm.josehurtado.dev
 Produccion sin Node.js, sin npm install y sin npm run build.
-Web comercial externa prevista: https://app.web.josehurtado.dev
+Web comercial externa: https://app.web.josehurtado.dev
 ```
 
 Pantallas disponibles:
@@ -20,6 +20,7 @@ Pantallas disponibles:
 - Leads con filtros, conversion a socio, notas y acciones.
 - Socios con foto, edicion y eliminacion controlada.
 - Membresias con planes, precios, duracion y caducidad automatica.
+- Pagos de socios con importe, metodo, estado, vencimiento e historial.
 - Clases con listado, calendario mensual y reservas de socios.
 - Tareas con filtros, responsables y varios socios vinculados.
 - Usuarios internos del gimnasio.
@@ -29,7 +30,6 @@ Pantallas disponibles:
 
 Pendiente o futuro:
 
-- Pagos completos.
 - Check-ins.
 - Alertas de riesgo.
 - Auditoria de acciones.
@@ -221,6 +221,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Notas en leads.
 - Gestion de socios con foto.
 - Membresias y suscripciones.
+- Pagos de socios, vencimientos y cobros pendientes.
 - Clases, calendario mensual y reservas.
 - Tareas con varios socios vinculados.
 - Usuarios internos y roles.
@@ -254,6 +255,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - `docs/03-historias-usuario.md`: historias de usuario.
 - `docs/04-modelo-datos.md`: modelo de datos.
 - `docs/05-pruebas.md`: plan de pruebas.
+- `docs/06-api-backend.md`: rutas, acciones POST y webhook de la version PHP.
 - `docs/07-estado-actual-php.md`: estado actual de la version PHP.
 - `docs/08-auditoria-testing-2026-06-29.md`: auditoria tecnica y checklist manual de testing.
 - `docs/09-seguridad-y-captacion-web.md`: medidas de seguridad y estrategia webhook/base de datos.

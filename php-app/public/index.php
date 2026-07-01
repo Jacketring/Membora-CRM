@@ -370,6 +370,23 @@ switch ($route) {
         ]);
         break;
 
+    case 'payments':
+        $tenantId = Auth::tenantId();
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? '')),
+            'date_from' => trim((string) ($_GET['date_from'] ?? '')),
+            'date_to' => trim((string) ($_GET['date_to'] ?? '')),
+        ];
+        render_layout('Pagos', 'payments', [
+            'filters' => $filters,
+            'metrics' => PaymentRepository::metrics($tenantId),
+            'payments' => PaymentRepository::all($tenantId, $filters['q'], $filters['status'], $filters['date_from'], $filters['date_to']),
+            'members' => PaymentRepository::memberOptions($tenantId),
+            'subscriptions' => PaymentRepository::subscriptionOptions($tenantId),
+        ]);
+        break;
+
     case 'classes':
         $tenantId = Auth::tenantId();
         $filters = [

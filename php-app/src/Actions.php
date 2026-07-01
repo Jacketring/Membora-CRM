@@ -47,6 +47,9 @@ final class Actions
             'create_membership_plan' => self::createMembershipPlan(),
             'update_membership_plan' => self::updateMembershipPlan(),
             'delete_membership_plan' => self::deleteMembershipPlan(),
+            'create_payment' => self::createPayment(),
+            'update_payment' => self::updatePayment(),
+            'delete_payment' => self::deletePayment(),
             'create_class_type' => self::createClassType(),
             'create_class_session' => self::createClassSession(),
             'update_class_session' => self::updateClassSession(),
@@ -905,6 +908,7 @@ final class Actions
         MembershipRepository::ensureTables();
         TaskRepository::ensureMemberLinksTable();
         ReservationRepository::ensureTable();
+        PaymentRepository::ensureTable();
         $pdo->beginTransaction();
         try {
             $memberStmt = $pdo->prepare('SELECT lead_id, photo_path FROM members WHERE id = :id AND tenant_id = :tenant_id LIMIT 1');
@@ -924,6 +928,9 @@ final class Actions
 
             $deleteReservations = $pdo->prepare('DELETE FROM reservations WHERE member_id = :id AND tenant_id = :tenant_id');
             $deleteReservations->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
+
+            $deletePayments = $pdo->prepare('DELETE FROM payments WHERE member_id = :id AND tenant_id = :tenant_id');
+            $deletePayments->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
 
             $deleteMember = $pdo->prepare('DELETE FROM members WHERE id = :id AND tenant_id = :tenant_id');
             $deleteMember->execute(['id' => $memberId, 'tenant_id' => $tenantId]);
@@ -1134,6 +1141,51 @@ final class Actions
     {
         $price = str_replace(',', '.', post_value('price', '0') ?? '0');
         return number_format(max(0, (float) $price), 2, '.', '');
+    }
+
+    private static function createPayment(): never
+    {
+        try {
+            PaymentRepository::create(Auth::tenantId(), $_POST);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo registrar el pago.', 'error');
+            redirect('payments');
+        }
+
+        flash('Pago registrado correctamente.');
+        redirect('payments');
+    }
+
+    private static function updatePayment(): never
+    {
+        $id = post_value('id', '');
+        if ($id === '') {
+            flash('No se encontro el pago seleccionado.', 'error');
+            redirect('payments');
+        }
+
+        try {
+            PaymentRepository::update(Auth::tenantId(), $id, $_POST);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo actualizar el pago.', 'error');
+            redirect('payments');
+        }
+
+        flash('Pago actualizado correctamente.');
+        redirect('payments');
+    }
+
+    private static function deletePayment(): never
+    {
+        $id = post_value('id', '');
+        if ($id === '') {
+            flash('No se encontro el pago seleccionado.', 'error');
+            redirect('payments');
+        }
+
+        PaymentRepository::delete(Auth::tenantId(), $id);
+        flash('Pago eliminado correctamente.');
+        redirect('payments');
     }
 
     private static function createClassType(): never

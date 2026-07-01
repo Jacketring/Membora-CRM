@@ -65,12 +65,13 @@ Recorrido recomendado:
 3. Leads: filtros, notas, cambio de etapa y conversion a socio.
 4. Socios: ficha, foto y membresia.
 5. Membresias: precio, duracion y caducidad.
-6. Clases: calendario, creacion y edicion.
-7. Tareas: varios socios vinculados y acciones.
-8. Usuarios internos.
-9. Perfil y configuracion visual.
-10. Login como administrador de plataforma.
-11. Panel `Admin CRM`, empresas, pagos y acceso de soporte.
+6. Pagos: importe, metodo, estado y vencimiento.
+7. Clases: calendario, creacion, edicion y reservas.
+8. Tareas: varios socios vinculados y acciones.
+9. Usuarios internos.
+10. Perfil y configuracion visual.
+11. Login como administrador de plataforma.
+12. Panel `Admin CRM`, leads web, empresas, pagos, web comercial y acceso de soporte.
 
 ## 5. Slides
 
@@ -124,10 +125,11 @@ Guion recomendado:
 - [x] `docs/04-modelo-datos.md`
 - [x] `docs/05-pruebas.md`
 - [x] `docs/07-estado-actual-php.md`
+- [x] `docs/08-auditoria-testing-2026-06-29.md`
+- [x] `docs/09-seguridad-y-captacion-web.md`
 
 ## 8. Riesgos pendientes
 
-- El modulo de pagos completo todavia no esta cerrado.
-- Reservas, check-ins y alertas quedan como pendiente o mejora futura.
+- Check-ins y alertas quedan como pendiente o mejora futura.
 - Hay que validar credenciales y URL final antes de grabar el video.
 - Hay que revisar que el README final incluya slides, video, nombre y email del alumno.

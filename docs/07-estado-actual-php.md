@@ -1,6 +1,6 @@
 # Estado actual de la version PHP - Membora CRM
 
-Fecha de actualizacion: 29/06/2026.
+Fecha de actualizacion: 30/06/2026.
 
 ## 1. Resumen
 
@@ -71,6 +71,17 @@ No se usa Node.js en produccion.
 - Calculo automatico de fecha de caducidad al asignar membresia.
 - Suscripciones activas por socio.
 
+### Pagos de gimnasio
+
+- Registro de pagos manuales por socio.
+- Asociacion opcional a una suscripcion activa.
+- Importe en EUR.
+- Metodo: efectivo, tarjeta, transferencia, Bizum u otro.
+- Estados pagado, pendiente, vencido o cancelado.
+- Fecha de vencimiento, fecha de pago y notas.
+- Filtros por texto, estado y fechas.
+- Indicadores de cobrado este mes, importe pendiente y vencidos.
+
 ### Clases
 
 - Tipos de clase.
@@ -127,7 +138,6 @@ No se usa Node.js en produccion.
 
 ## 4. Modulos pendientes
 
-- Pagos completos del gimnasio.
 - Check-ins.
 - Alertas de riesgo.
 - Integraciones avanzadas de facturacion SaaS.
@@ -174,9 +184,12 @@ La aplicacion PHP puede crear de forma incremental:
 - `empresa_payments`.
 - `saas_plans`.
 - `lead_notes`.
+- `webhook_settings`.
+- `webhook_logs`.
 - `task_members`.
 - `membership_plans`.
 - `subscriptions`.
+- `payments`.
 - `class_types`.
 - `class_sessions`.
 - `reservations`.

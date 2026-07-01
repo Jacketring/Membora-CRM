@@ -1,704 +1,204 @@
-# API backend - Membora CRM
+# Backend PHP, rutas y acciones - Membora CRM
 
-## 1. Introduccion
+Fecha de actualizacion: 30/06/2026.
 
-Este documento recoge los endpoints backend implementados para el MVP de Membora CRM.
+## 1. Estado actual
 
-La API esta construida con NestJS, Prisma y MariaDB. Todas las rutas de negocio estan protegidas con JWT y aplican aislamiento por `tenantId`.
-
-URL base en despliegue:
+La version actual no usa una API NestJS/JWT separada. El backend activo es una aplicacion PHP monolitica con entrada unica en:
 
 ```text
-https://crm.josehurtado.dev/api
+php-app/public/index.php
 ```
 
-URL base local prevista:
+La navegacion se resuelve con el parametro `route` y las acciones de escritura se envian por `POST` con un campo `action`. La sesion PHP identifica al usuario autenticado y fija el contexto de gimnasio mediante `tenant_id`.
+
+## 2. Rutas de pantalla
+
+Rutas publicas o especiales:
+
+- `?route=login`: formulario de login.
+- `/webhook/lead`: endpoint publico para solicitudes desde la web comercial.
+- `?action=webhook_lead`: alias compatible del webhook.
+
+Rutas de gimnasio:
+
+- `?route=dashboard`: panel principal.
+- `?route=leads`: gestion de leads.
+- `?route=members`: socios.
+- `?route=memberships`: planes y suscripciones.
+- `?route=payments`: pagos manuales de socios.
+- `?route=classes`: tipos de clase, calendario, sesiones y reservas.
+- `?route=tasks`: tareas.
+- `?route=users`: usuarios internos.
+- `?route=profile`: perfil del usuario.
+- `?route=settings`: configuracion visual.
+- `?route=global-search&q=...`: buscador global en JSON.
+
+Rutas de administracion SaaS:
+
+- `?route=platform-dashboard`: resumen de Admin CRM.
+- `?route=platform-leads`: leads recibidos desde la web publica.
+- `?route=platform-clients`: clientes comerciales.
+- `?route=platform-companies`: empresas cliente.
+- `?route=platform-payments`: cobros SaaS.
+- `?route=platform-plans`: catalogo de planes SaaS.
+- `?route=platform-web`: estado tecnico de la web, webhook y correo.
+
+## 3. Acciones POST principales
+
+Autenticacion y perfil:
+
+- `login`
+- `logout`
+- `update_profile`
+
+Administracion SaaS:
+
+- `update_platform_lead`
+- `convert_platform_lead`
+- `delete_platform_lead`
+- `send_platform_test_email`
+- `create_platform_client`
+- `update_platform_client`
+- `create_empresa`
+- `update_empresa`
+- `create_platform_payment`
+- `update_platform_payment`
+- `create_platform_plan`
+- `update_platform_plan`
+- `enter_empresa_crm`
+- `exit_empresa_crm`
+
+Gimnasio:
+
+- `create_user`
+- `update_user`
+- `create_lead`
+- `update_lead`
+- `add_lead_note`
+- `update_lead_note`
+- `delete_lead_note`
+- `update_lead_stage`
+- `convert_lead`
+- `mark_lead_lost`
+- `delete_lead`
+- `create_member`
+- `update_member`
+- `delete_member`
+- `create_membership_plan`
+- `update_membership_plan`
+- `delete_membership_plan`
+- `create_payment`
+- `update_payment`
+- `delete_payment`
+- `create_class_type`
+- `create_class_session`
+- `update_class_session`
+- `delete_class_session`
+- `create_reservation`
+- `update_reservation_status`
+- `create_task`
+- `update_task`
+- `update_task_status`
+- `delete_task`
+
+## 4. Webhook publico
+
+Endpoint:
 
 ```text
-http://localhost:3001/api
+POST /webhook/lead
 ```
 
-## 2. Autenticacion
+Formatos aceptados:
 
-La autenticacion usa JWT.
+- `application/json`
+- `application/x-www-form-urlencoded`
+- `multipart/form-data`
 
-Para acceder a rutas protegidas se debe enviar:
+Comportamiento:
 
-```http
-Authorization: Bearer <ACCESS_TOKEN>
-```
+- Valida origen contra `WEB_APP_URL` cuando el navegador envia `Origin`.
+- Acepta `OPTIONS` para CORS.
+- Aplica validaciones anti-abuso en el repositorio de integracion.
+- Crea o actualiza una entrada en `platform_leads`.
+- Intenta enviar email HTML de confirmacion si hay email valido y SMTP configurado.
+- Registra resultados tecnicos en `webhook_logs`.
 
-Credenciales demo:
-
-```text
-Admin gimnasio
-Email: admin@nexofit.demo
-Password: MemboraDemo2026!
-
-Recepcion / comercial
-Email: recepcion@nexofit.demo
-Password: MemboraDemo2026!
-
-Entrenador
-Email: entrenador@nexofit.demo
-Password: MemboraDemo2026!
-
-Superadmin
-Email: superadmin@membora.demo
-Password: MemboraDemo2026!
-```
-
-Nota: las rutas de negocio actuales requieren usuario con `tenantId`. El superadmin global existe para el modelo SaaS, pero no se usa todavia para operar sobre datos de un gimnasio.
-
-## 3. Reglas multiempresa
-
-Reglas aplicadas:
-
-- El `tenantId` se obtiene desde el JWT.
-- El frontend no debe enviar `tenantId` para crear o consultar datos.
-- Las rutas de negocio filtran siempre por el `tenantId` del usuario autenticado.
-- Las relaciones se validan dentro del mismo tenant antes de crear datos.
-- Si un usuario no tiene `tenantId`, la ruta de negocio responde con error de permisos.
-
-## 4. Health
-
-### GET `/health`
-
-Comprueba que el backend esta levantado.
-
-No requiere JWT.
-
-Respuesta ejemplo:
+Respuesta JSON:
 
 ```json
 {
-  "status": "ok",
-  "service": "membora-crm-backend",
-  "timestamp": "2026-06-22T05:50:33.612Z"
+  "success": true,
+  "message": "Solicitud recibida correctamente"
 }
 ```
 
-## 5. Auth
+## 5. Seguridad de backend
 
-### POST `/auth/login`
+- Sesiones PHP con cookies `HttpOnly`, `SameSite=Lax` y `Secure` si hay HTTPS.
+- Regeneracion de ID de sesion tras login.
+- Validacion de `Origin`/`Referer` en POST internos con `APP_URL`.
+- `APP_STRICT_POST_ORIGIN` permite endurecer el bloqueo de POST sin origen.
+- Consultas preparadas PDO.
+- Escape de salida con `e($value)` en vistas.
+- Validacion de uploads de imagen por tamano y MIME real.
+- Aislamiento de datos operativos por `tenant_id`.
+- Acceso a `Admin CRM` restringido a superadmin de plataforma.
 
-Inicia sesion y devuelve token JWT.
+## 6. Configuracion relacionada
 
-Body:
+Variables principales:
 
-```json
-{
-  "email": "admin@nexofit.demo",
-  "password": "MemboraDemo2026!"
-}
+```env
+APP_URL="https://app.crm.josehurtado.dev"
+WEB_APP_URL="https://app.web.josehurtado.dev"
+APP_STRICT_POST_ORIGIN="false"
+DB_HOST="localhost"
+DB_PORT="3306"
+DB_DATABASE="membora_crm"
+DB_USERNAME="usuario"
+DB_PASSWORD="password"
+MAIL_ENABLED="true"
+MAIL_MAILER="smtp"
+MAIL_FROM_EMAIL="no-reply@josehurtado.dev"
+MAIL_FROM_NAME="Membora CRM"
+MAIL_REPLY_TO="contacto@josehurtado.dev"
+SMTP_HOST="mail.josehurtado.dev"
+SMTP_PORT="587"
+SMTP_ENCRYPTION="tls"
+SMTP_USERNAME="no-reply@josehurtado.dev"
+SMTP_PASSWORD="password"
 ```
 
-Respuesta:
+Tambien se admite `DATABASE_URL` para la conexion MariaDB.
 
-```json
-{
-  "accessToken": "jwt...",
-  "user": {
-    "id": "user_id",
-    "tenantId": "tenant_id",
-    "tenantName": "NexoFit Studio",
-    "role": "GYM_ADMIN",
-    "name": "Laura Martin",
-    "email": "admin@nexofit.demo"
-  }
-}
+## 7. Pruebas tecnicas recomendadas
+
+Antes de desplegar cambios:
+
+```bash
+php -l php-app/public/index.php
+php -l php-app/src/Actions.php
+php -l php-app/src/Repositories.php
+php -l php-app/src/Auth.php
+php -l php-app/src/Support.php
+node --check php-app/public/assets/app.js
+node --check web-app/public/assets/site.js
+node --check web-app/public/assets/demo.js
+git diff --check
 ```
 
-### GET `/auth/me`
-
-Devuelve el usuario autenticado desde el token.
-
-Requiere JWT.
-
-## 6. Dashboard
-
-### GET `/dashboard`
-
-Devuelve KPIs principales y listas resumidas para la pantalla inicial.
-
-Requiere JWT.
-
-KPIs incluidos:
-
-- `activeMembers`
-- `openLeads`
-- `newMembersThisMonth`
-- `pendingPayments`
-- `overduePayments`
-- `overdueTasks`
-- `upcomingReservations`
-- `weeklyCheckIns`
-- `openAlerts`
-- `estimatedMrr`
-
-Tambien devuelve:
-
-- `recentLeads`
-- `upcomingTasks`
-- `openRiskAlerts`
-
-## 7. Pipeline stages
-
-### GET `/pipeline-stages`
-
-Devuelve las etapas comerciales del tenant autenticado.
-
-Requiere JWT.
-
-Respuesta ejemplo:
-
-```json
-[
-  {
-    "id": "stage_id",
-    "name": "Nuevo lead",
-    "key": "NEW_LEAD",
-    "order": 1,
-    "isFinal": false
-  }
-]
-```
-
-## 8. Leads
-
-### GET `/leads`
-
-Lista leads del tenant autenticado.
-
-Requiere JWT.
-
-Incluye:
-
-- etapa de pipeline
-- usuario asignado
-
-### GET `/leads/:id`
-
-Devuelve detalle de un lead del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- etapa de pipeline
-- usuario asignado
-- tareas
-- comunicaciones
-
-### POST `/leads`
-
-Crea un lead.
-
-Requiere JWT.
-
-Body minimo:
-
-```json
-{
-  "pipelineStageId": "stage_id",
-  "firstName": "Lucia"
-}
-```
-
-Body completo ejemplo:
-
-```json
-{
-  "pipelineStageId": "stage_id",
-  "assignedUserId": "user_id",
-  "firstName": "Lucia",
-  "lastName": "Romero",
-  "email": "lucia.romero@example.com",
-  "phone": "+34 688 888 888",
-  "source": "WALK_IN",
-  "interest": "Prueba gratuita",
-  "nextActionAt": "2026-06-24T10:00:00.000Z"
-}
-```
-
-Reglas:
-
-- `pipelineStageId` debe pertenecer al mismo tenant.
-- `assignedUserId`, si se envia, debe pertenecer al mismo tenant.
-- `tenantId` se asigna desde el token.
-
-### PATCH `/leads/:id`
-
-Actualiza un lead o lo mueve de etapa.
-
-Requiere JWT.
-
-Body ejemplo:
-
-```json
-{
-  "pipelineStageId": "stage_contacted_id",
-  "status": "OPEN"
-}
-```
-
-### POST `/leads/:id/convert`
-
-Convierte un lead en socio.
-
-Requiere JWT.
-
-Reglas:
-
-- El lead debe pertenecer al tenant.
-- El lead no debe estar convertido previamente.
-- Crea un `Member` con los datos del lead.
-- Guarda `leadId` en `Member`.
-- Cambia el lead a `CONVERTED`.
-- Mueve el lead a la etapa `CONVERTED`.
-
-### POST `/leads/:id/revert-conversion`
-
-Revierte una conversion hecha por error.
-
-Requiere JWT.
-
-Reglas:
-
-- El lead debe pertenecer al tenant.
-- El lead debe estar convertido o tener un socio vinculado.
-- Cancela y desvincula el socio generado desde el lead.
-- Cambia el lead de nuevo a `OPEN`.
-- Mueve el lead a una etapa comercial abierta.
-
-### DELETE `/leads/:id`
-
-Elimina un lead del tenant.
-
-Requiere JWT.
-
-Reglas:
-
-- El lead debe pertenecer al tenant.
-- Si el lead tiene un socio vinculado, primero debe revertirse la conversion.
-- Elimina tareas, alertas y comunicaciones asociadas al lead.
-
-## 9. Members
-
-### GET `/members`
-
-Lista socios del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- lead de origen
-- suscripciones
-- plan asociado
-
-### GET `/members/:id`
-
-Devuelve ficha completa del socio.
-
-Requiere JWT.
-
-Incluye:
-
-- lead de origen
-- suscripciones
-- pagos
-- reservas
-- check-ins
-- tareas
-- comunicaciones
-- alertas
-
-## 10. Membership plans
-
-### GET `/membership-plans`
-
-Lista planes de membresia del tenant.
-
-Requiere JWT.
-
-## 11. Subscriptions
-
-### GET `/subscriptions`
-
-Lista suscripciones del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- socio
-- plan
-- pagos
-
-### POST `/subscriptions`
-
-Asigna un plan a un socio.
-
-Requiere JWT.
-
-Body:
-
-```json
-{
-  "memberId": "member_id",
-  "membershipPlanId": "plan_id",
-  "status": "ACTIVE",
-  "startDate": "2026-06-22T00:00:00.000Z"
-}
-```
-
-Reglas:
-
-- El socio debe pertenecer al tenant.
-- El plan debe pertenecer al tenant y estar activo.
-- No se permite otra suscripcion activa para el mismo socio.
-- Si no se envia `endDate`, se calcula con `durationDays` del plan.
-
-## 12. Payments
-
-### GET `/payments`
-
-Lista pagos del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- socio
-- suscripcion
-- plan asociado
-
-### POST `/payments`
-
-Registra un pago manual.
-
-Requiere JWT.
-
-Body:
-
-```json
-{
-  "memberId": "member_id",
-  "subscriptionId": "subscription_id",
-  "amount": "49.90",
-  "currency": "EUR",
-  "paymentMethod": "CARD",
-  "status": "PAID",
-  "paidAt": "2026-06-22T10:00:00.000Z",
-  "notes": "Pago mensual"
-}
-```
-
-Reglas:
-
-- El socio debe pertenecer al tenant.
-- La suscripcion, si se envia, debe pertenecer al mismo socio y tenant.
-- `amount` debe ser mayor que cero.
-- Si `status` es `PAID` y no se envia `paidAt`, se usa la fecha actual.
-
-## 13. Class types
-
-### GET `/class-types`
-
-Lista tipos de clase del tenant.
-
-Requiere JWT.
-
-## 14. Class sessions
-
-### GET `/class-sessions`
-
-Lista sesiones de clase del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- tipo de clase
-- entrenador
-- reservas
-
-### POST `/class-sessions`
-
-Crea una sesion de clase.
-
-Requiere JWT.
-
-Body:
-
-```json
-{
-  "classTypeId": "class_type_id",
-  "trainerUserId": "trainer_user_id",
-  "startsAt": "2026-06-25T18:00:00.000Z",
-  "endsAt": "2026-06-25T19:00:00.000Z",
-  "capacity": 12,
-  "status": "SCHEDULED"
-}
-```
-
-Reglas:
-
-- El tipo de clase debe pertenecer al tenant y estar activo.
-- El entrenador, si se envia, debe pertenecer al tenant y tener rol `TRAINER`.
-- `capacity` debe ser mayor que cero.
-- `endsAt` debe ser posterior a `startsAt`.
-
-## 15. Reservations
-
-### GET `/reservations`
-
-Lista reservas del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- socio
-- sesion
-- tipo de clase
-- entrenador
-
-### POST `/reservations`
-
-Crea una reserva.
-
-Requiere JWT.
-
-Body:
-
-```json
-{
-  "memberId": "member_id",
-  "classSessionId": "class_session_id"
-}
-```
-
-Reglas:
-
-- El socio debe pertenecer al tenant.
-- La sesion debe pertenecer al tenant.
-- La sesion debe estar `SCHEDULED`.
-- No se permite duplicado activo del mismo socio en la misma sesion.
-- No se permite superar el aforo.
-
-## 16. Check-ins
-
-### GET `/check-ins`
-
-Lista check-ins del tenant.
-
-Requiere JWT.
-
-### POST `/check-ins`
-
-Registra un check-in manual o QR.
-
-Requiere JWT.
-
-Body con reserva:
-
-```json
-{
-  "memberId": "member_id",
-  "reservationId": "reservation_id",
-  "method": "QR"
-}
-```
-
-Body sin reserva:
-
-```json
-{
-  "memberId": "member_id",
-  "method": "MANUAL"
-}
-```
-
-Reglas:
-
-- El socio debe pertenecer al tenant.
-- La reserva, si se envia, debe pertenecer al mismo socio y tenant.
-- La sesion, si se envia, debe pertenecer al tenant.
-- No se permite check-in duplicado para una reserva.
-- Si hay reserva, esta pasa a `ATTENDED`.
-
-## 17. Tasks
-
-### GET `/users`
-
-Lista usuarios activos del tenant para asignar responsables a tareas, leads u operaciones internas.
-
-Requiere JWT.
-
-Devuelve:
-
-- id
-- nombre
-- email
-- estado
-- rol
-
-### GET `/tasks`
-
-Lista tareas del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- usuario asignado
-- lead asociado
-- socio asociado
-- socios vinculados en `taskMembers`
-
-### POST `/tasks`
-
-Crea una tarea.
-
-Requiere JWT.
-
-Body:
-
-```json
-{
-  "assignedUserId": "user_id",
-  "leadId": "lead_id",
-  "memberIds": ["member_id_1", "member_id_2"],
-  "title": "Llamar al lead",
-  "description": "Confirmar interes y agendar prueba",
-  "type": "SALES",
-  "status": "PENDING",
-  "dueAt": "2026-06-24T10:00:00.000Z"
-}
-```
-
-Reglas:
-
-- El usuario asignado debe pertenecer al tenant.
-- El lead, si se envia, debe pertenecer al tenant.
-- El socio, si se envia como `memberId`, debe pertenecer al tenant.
-- Los socios, si se envian como `memberIds`, deben pertenecer al tenant.
-- `memberIds` permite vincular una unica tarea a varios socios.
-
-### PATCH `/tasks/:id`
-
-Actualiza una tarea.
-
-Requiere JWT.
-
-Body ejemplo:
-
-```json
-{
-  "status": "COMPLETED"
-}
-```
-
-Si una tarea pasa a `COMPLETED` y no se envia `completedAt`, se asigna la fecha actual.
-
-Tambien se puede reemplazar la lista de socios vinculados enviando `memberIds`.
-
-### DELETE `/tasks/:id`
-
-Elimina una tarea del tenant.
-
-Requiere JWT.
-
-Reglas:
-
-- La tarea debe pertenecer al tenant.
-- Si existen alertas de riesgo asociadas a la tarea, se eliminan junto con la tarea.
-- Si existen socios vinculados en `taskMembers`, se eliminan los vinculos junto con la tarea.
-
-## 18. Risk alerts
-
-### GET `/risk-alerts`
-
-Lista alertas del tenant.
-
-Requiere JWT.
-
-Incluye:
-
-- lead asociado
-- socio asociado
-- tarea asociada
-
-### PATCH `/risk-alerts/:id`
-
-Actualiza una alerta.
-
-Requiere JWT.
-
-Body:
-
-```json
-{
-  "status": "RESOLVED"
-}
-```
-
-Si una alerta pasa a `RESOLVED` y no se envia `resolvedAt`, se asigna la fecha actual.
-
-## 19. Flujo recomendado de prueba manual
-
-1. `GET /health`
-2. `POST /auth/login`
-3. Copiar `accessToken`.
-4. `GET /dashboard`
-5. `GET /pipeline-stages`
-6. `POST /leads`
-7. `PATCH /leads/:id`
-8. `POST /leads/:id/convert`
-9. `GET /members`
-10. `GET /membership-plans`
-11. `POST /subscriptions`
-12. `POST /payments`
-13. `GET /class-types`
-14. `GET /class-sessions`
-15. `POST /reservations`
-16. `POST /check-ins`
-17. `POST /tasks`
-18. `GET /risk-alerts`
-19. `GET /dashboard`
-
-## 20. Enums principales
-
-Roles:
-
-```text
-SUPERADMIN
-GYM_ADMIN
-SALES_RECEPTION
-TRAINER
-```
-
-Estados relevantes:
-
-```text
-LeadStatus: OPEN, CONVERTED, LOST
-MemberStatus: ACTIVE, INACTIVE, AT_RISK, CANCELLED, PAYMENT_PENDING
-SubscriptionStatus: ACTIVE, PENDING, EXPIRED, CANCELLED
-PaymentStatus: PAID, PENDING, OVERDUE
-ReservationStatus: RESERVED, CANCELLED, ATTENDED, NO_SHOW
-CheckInMethod: MANUAL, QR
-TaskStatus: PENDING, COMPLETED, CANCELLED
-RiskAlertStatus: OPEN, RESOLVED, DISMISSED
-```
-
-## 21. Notas pendientes
-
-Pendientes razonables antes de una version final:
-
-- Validacion con DTOs de clase usando `class-validator`.
-- Filtros y paginacion en listados grandes.
-- Tests automatizados de servicios principales.
-- OpenAPI/Swagger si se quiere documentacion interactiva.
-- Endpoints de administracion global para `SUPERADMIN`.
+Pruebas manuales clave:
+
+- Login de administrador de gimnasio.
+- Login de superadmin.
+- Creacion y conversion de lead.
+- Creacion/edicion de socio con foto.
+- Asignacion de membresia.
+- Registro y edicion de pagos de socios.
+- Creacion de clase desde calendario.
+- Reserva, asistencia, no-show y cancelacion.
+- Creacion de tarea con varios socios.
+- Formulario de la web publica hacia `/webhook/lead`.
+- Prueba de correo desde `Admin CRM > Web`.

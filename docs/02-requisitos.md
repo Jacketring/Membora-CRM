@@ -1,5 +1,7 @@
 # Requisitos - Membora CRM
 
+> Nota de estado: este documento combina requisitos del MVP y requisitos previstos. El estado implementado actual esta resumido en `docs/07-estado-actual-php.md`; la arquitectura PHP activa esta documentada en `docs/06-api-backend.md`.
+
 ## 1. Objetivo
 
 Membora CRM debe ser una aplicacion web SaaS responsive para gimnasios y centros fitness pequenos o medianos. El sistema debe centralizar la gestion comercial y operativa basica del centro: leads, socios, membresias, pagos manuales, clases, reservas, check-ins, tareas, alertas y dashboard.

@@ -144,7 +144,25 @@ Resultado esperado:
 - El precio se guarda.
 - La caducidad se calcula automaticamente desde la fecha actual o la fecha de inicio.
 
-### PF-05 Clases y calendario
+### PF-04B Pagos
+
+Pasos:
+
+1. Abrir Pagos.
+2. Crear un pago para un socio activo.
+3. Asociarlo a una membresia si existe.
+4. Marcarlo como pendiente, pagado, vencido o cancelado.
+5. Editar importe, metodo, vencimiento y fecha de pago.
+6. Filtrar por estado y fechas.
+
+Resultado esperado:
+
+- El pago aparece vinculado al socio correcto.
+- Los importes se muestran en EUR.
+- Los indicadores de cobrado este mes, pendiente y vencidos se actualizan.
+- El dashboard cuenta pagos pendientes o vencidos.
+
+### PF-05 Clases, calendario y reservas
 
 Pasos:
 
@@ -155,12 +173,17 @@ Pasos:
 5. Editar clase.
 6. Eliminar clase.
 7. Cambiar de mes.
+8. Crear una reserva para un socio activo.
+9. Marcar asistencia, no-show y cancelacion.
 
 Resultado esperado:
 
 - La clase aparece en el calendario correcto.
 - El calendario no se cierra al crear desde calendario.
 - Al cambiar de mes no desaparecen clases activas fuera del rango incorrectamente.
+- No se permite superar el aforo.
+- No se permite duplicar una reserva activa para el mismo socio y sesion.
+- El historial de reservas aparece en la ficha del socio.
 
 ### PF-06 Tareas
 
@@ -252,6 +275,7 @@ Resultado esperado:
 
 ## 7. Riesgos pendientes
 
-- Pagos completos, reservas, check-ins y alertas no estan terminados.
+- Check-ins y alertas no estan terminados.
+- Las reservas estan implementadas dentro del modulo de clases, pero conviene validarlas en produccion con datos reales.
 - La aplicacion crea tablas auxiliares automaticamente; conviene validar permisos de usuario MariaDB en Plesk.
 - Hay que validar el flujo completo en produccion justo antes de grabar el video final.

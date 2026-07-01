@@ -377,6 +377,17 @@ function platform_payment_status_label(?string $status): string
     ]);
 }
 
+function payment_method_label(?string $method): string
+{
+    return enum_label((string) $method, [
+        'CASH' => 'Efectivo',
+        'CARD' => 'Tarjeta',
+        'TRANSFER' => 'Transferencia',
+        'BIZUM' => 'Bizum',
+        'OTHER' => 'Otro',
+    ]);
+}
+
 function platform_plan_status_label(?string $status): string
 {
     return enum_label((string) $status, [
