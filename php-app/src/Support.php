@@ -426,7 +426,9 @@ function risk_alert_severity_label(?string $severity): string
 
 function audit_action_label(?string $action): string
 {
-    return enum_label((string) $action, [
+    $value = (string) $action;
+    $labels = [
+        'SEED_DEMO_TENANT' => 'Carga de datos demo',
         'login' => 'Inicio de sesion',
         'logout' => 'Cierre de sesion',
         'update_profile' => 'Actualizacion de perfil',
@@ -477,7 +479,16 @@ function audit_action_label(?string $action): string
         'update_platform_plan' => 'Actualizacion de plan CRM',
         'enter_empresa_crm' => 'Entrada en soporte',
         'exit_empresa_crm' => 'Salida de soporte',
-    ]);
+    ];
+
+    if (isset($labels[$value])) {
+        return $labels[$value];
+    }
+
+    $readable = strtolower(str_replace(['_', '-'], ' ', $value));
+    $readable = trim(preg_replace('/\s+/', ' ', $readable) ?: '');
+
+    return $readable !== '' ? ucfirst($readable) : 'Accion no identificada';
 }
 
 function platform_plan_status_label(?string $status): string
