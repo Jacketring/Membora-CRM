@@ -28,6 +28,7 @@ Rutas de gimnasio:
 - `?route=memberships`: planes y suscripciones.
 - `?route=payments`: pagos manuales de socios.
 - `?route=checkins`: entradas y asistencias de socios.
+- `?route=alerts`: alertas de riesgo operativas.
 - `?route=classes`: tipos de clase, calendario, sesiones y reservas.
 - `?route=tasks`: tareas.
 - `?route=users`: usuarios internos.
@@ -94,6 +95,7 @@ Gimnasio:
 - `delete_payment`
 - `create_checkin`
 - `delete_checkin`
+- `update_risk_alert_status`
 - `create_class_type`
 - `create_class_session`
 - `update_class_session`
@@ -201,6 +203,7 @@ Pruebas manuales clave:
 - Asignacion de membresia.
 - Registro y edicion de pagos de socios.
 - Registro y eliminacion de check-ins.
+- Generacion, resolucion y descarte de alertas de riesgo.
 - Creacion de clase desde calendario.
 - Reserva, asistencia, no-show y cancelacion.
 - Creacion de tarea con varios socios.

@@ -202,6 +202,23 @@ Resultado esperado:
 - El selector de reservas se filtra por el socio elegido.
 - Las metricas de hoy, ultimos 7 dias, manuales y con clase se actualizan.
 
+### PF-05C Alertas
+
+Pasos:
+
+1. Abrir Alertas.
+2. Revisar alertas abiertas.
+3. Filtrar por tipo y estado.
+4. Resolver una alerta.
+5. Descartar una alerta.
+6. Volver al dashboard y revisar el contador de alertas abiertas.
+
+Resultado esperado:
+
+- La pantalla genera alertas desde pagos, tareas, membresias, leads, check-ins y clases.
+- Las alertas resueltas dejan de aparecer como abiertas.
+- Las metricas se actualizan tras resolver o descartar.
+
 ### PF-06 Tareas
 
 Pasos:
@@ -292,7 +309,7 @@ Resultado esperado:
 
 ## 7. Riesgos pendientes
 
-- Alertas no estan terminadas.
+- Auditoria exhaustiva y permisos finos quedan como mejoras futuras.
 - Las reservas estan implementadas dentro del modulo de clases, pero conviene validarlas en produccion con datos reales.
 - La aplicacion crea tablas auxiliares automaticamente; conviene validar permisos de usuario MariaDB en Plesk.
 - Hay que validar el flujo completo en produccion justo antes de grabar el video final.

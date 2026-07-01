@@ -52,6 +52,7 @@ final class Actions
             'delete_payment' => self::deletePayment(),
             'create_checkin' => self::createCheckin(),
             'delete_checkin' => self::deleteCheckin(),
+            'update_risk_alert_status' => self::updateRiskAlertStatus(),
             'create_class_type' => self::createClassType(),
             'create_class_session' => self::createClassSession(),
             'update_class_session' => self::updateClassSession(),
@@ -759,6 +760,7 @@ final class Actions
         $tenantId = Auth::tenantId();
 
         LeadRepository::ensureNotesTable();
+        RiskAlertRepository::ensureTable();
         $pdo->beginTransaction();
         try {
             $deleteAlerts = $pdo->prepare('DELETE FROM risk_alerts WHERE lead_id = :id AND tenant_id = :tenant_id');
@@ -1220,6 +1222,24 @@ final class Actions
         redirect('checkins');
     }
 
+    private static function updateRiskAlertStatus(): never
+    {
+        $id = post_value('id', '');
+        $status = post_value('status', 'OPEN');
+        if ($id === '') {
+            flash('No se encontro la alerta seleccionada.', 'error');
+            redirect('alerts');
+        }
+
+        RiskAlertRepository::updateStatus(Auth::tenantId(), $id, $status);
+        flash(match ($status) {
+            'RESOLVED' => 'Alerta resuelta correctamente.',
+            'DISMISSED' => 'Alerta descartada correctamente.',
+            default => 'Alerta reabierta correctamente.',
+        });
+        redirect('alerts');
+    }
+
     private static function createClassType(): never
     {
         ClassRepository::ensureTables();
@@ -1584,6 +1604,7 @@ final class Actions
         $taskId = post_value('id');
         $tenantId = Auth::tenantId();
         TaskRepository::ensureMemberLinksTable();
+        RiskAlertRepository::ensureTable();
         $deleteLinks = $pdo->prepare('DELETE FROM task_members WHERE task_id = :id AND tenant_id = :tenant_id');
         $deleteLinks->execute(['id' => $taskId, 'tenant_id' => $tenantId]);
         $alerts = $pdo->prepare('DELETE FROM risk_alerts WHERE task_id = :id AND tenant_id = :tenant_id');

@@ -1,6 +1,6 @@
 # Historias de usuario - Membora CRM
 
-> Nota de estado: estas historias recogen el alcance funcional del producto. Algunas historias, como alertas completas, quedan como mejora futura en la version PHP actual.
+> Nota de estado: estas historias recogen el alcance funcional del producto. La version PHP actual cubre el flujo principal y deja permisos finos/auditoria exhaustiva como mejoras futuras.
 
 ## 1. Autenticacion y roles
 

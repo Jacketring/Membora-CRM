@@ -403,6 +403,21 @@ switch ($route) {
         ]);
         break;
 
+    case 'alerts':
+        $tenantId = Auth::tenantId();
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'status' => trim((string) ($_GET['status'] ?? 'OPEN')),
+            'type' => trim((string) ($_GET['type'] ?? '')),
+        ];
+        render_layout('Alertas', 'alerts', [
+            'filters' => $filters,
+            'metrics' => RiskAlertRepository::metrics($tenantId),
+            'typeOptions' => RiskAlertRepository::typeOptions(),
+            'alerts' => RiskAlertRepository::all($tenantId, $filters['q'], $filters['status'], $filters['type']),
+        ]);
+        break;
+
     case 'classes':
         $tenantId = Auth::tenantId();
         $filters = [

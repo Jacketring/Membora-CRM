@@ -91,6 +91,18 @@ No se usa Node.js en produccion.
 - Filtros por texto y fechas.
 - Indicadores de hoy, ultimos 7 dias, manuales y con clase.
 
+### Alertas de riesgo
+
+- Generacion automatica al abrir dashboard o pantalla de alertas.
+- Pagos vencidos.
+- Tareas vencidas.
+- Membresias caducadas.
+- Socios sin check-in reciente.
+- Leads sin seguimiento reciente.
+- Clases llenas.
+- Estados abierta, resuelta o descartada.
+- Filtros por texto, estado y tipo.
+
 ### Clases
 
 - Tipos de clase.
@@ -147,7 +159,6 @@ No se usa Node.js en produccion.
 
 ## 4. Modulos pendientes
 
-- Alertas de riesgo.
 - Integraciones avanzadas de facturacion SaaS.
 - Auditoria de acciones.
 - Permisos finos por rol.
@@ -199,6 +210,7 @@ La aplicacion PHP puede crear de forma incremental:
 - `subscriptions`.
 - `payments`.
 - `checkins`.
+- `risk_alerts`.
 - `class_types`.
 - `class_sessions`.
 - `reservations`.

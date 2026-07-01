@@ -280,6 +280,8 @@ function status_label(?string $status): string
         'LOST' => 'Perdido',
         'PENDING' => 'Pendiente',
         'COMPLETED' => 'Completada',
+        'RESOLVED' => 'Resuelta',
+        'DISMISSED' => 'Descartada',
         'CANCELLED' => 'Cancelada',
         'SCHEDULED' => 'Programada',
         'reserved' => 'Reservada',
@@ -393,6 +395,27 @@ function checkin_method_label(?string $method): string
     return enum_label((string) $method, [
         'MANUAL' => 'Manual',
         'QR' => 'QR',
+    ]);
+}
+
+function risk_alert_type_label(?string $type): string
+{
+    return enum_label((string) $type, [
+        'PAYMENT_OVERDUE' => 'Pago vencido',
+        'TASK_OVERDUE' => 'Tarea vencida',
+        'MEMBERSHIP_EXPIRED' => 'Membresia caducada',
+        'MEMBER_INACTIVE' => 'Socio sin actividad',
+        'LEAD_STALE' => 'Lead sin seguimiento',
+        'CLASS_FULL' => 'Clase llena',
+    ]);
+}
+
+function risk_alert_severity_label(?string $severity): string
+{
+    return enum_label((string) $severity, [
+        'HIGH' => 'Alta',
+        'MEDIUM' => 'Media',
+        'LOW' => 'Baja',
     ]);
 }
 

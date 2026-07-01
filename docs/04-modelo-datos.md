@@ -36,7 +36,7 @@ Estas tablas pertenecen a un gimnasio concreto y deben consultarse siempre con `
 - `reservations`: reservas de socios en clases.
 - `tasks`: tareas comerciales u operativas.
 - `task_members`: relacion N:M entre tareas y varios socios.
-- `risk_alerts`: alertas previstas o existentes en la base de datos original.
+- `risk_alerts`: alertas generadas para priorizar riesgos operativos.
 - `payments`: pagos manuales de socios, vencimientos y cobros.
 - `checkins`: entradas/asistencias manuales de socios.
 
@@ -79,6 +79,7 @@ Estas tablas son globales de Membora CRM y no representan datos internos de un g
 - `ClassSession` 0..N -> N `CheckIn`.
 - `Member` 1 -> N `Reservation`.
 - `Task` N <-> N `Member` mediante `task_members`.
+- `RiskAlert` 0..N -> `Member`, `Lead`, `Task`, `Payment` o `ClassSession`.
 - `PlatformLead` 0..1 -> 1 `PlatformClient` al convertir una solicitud web.
 - `PlatformClient` 0..N -> N `Empresa` como origen comercial.
 - `Empresa` 0..1 -> 1 `Tenant` cuando el CRM esta creado.
@@ -137,6 +138,12 @@ Tareas:
 PENDING, COMPLETED, CANCELLED
 ```
 
+Alertas:
+
+```text
+OPEN, RESOLVED, DISMISSED
+```
+
 Leads web de plataforma:
 
 ```text
@@ -176,6 +183,7 @@ Automatismos principales:
 - Crea `platform_leads`, `platform_clients`, `empresas`, `empresa_payments` y `saas_plans`.
 - Crea `lead_notes`, `task_members`, `membership_plans`, `subscriptions`, `class_types`, `class_sessions` y `reservations`.
 - Crea `checkins` para entradas manuales y asistencias asociadas a reservas.
+- Crea `risk_alerts` para pagos vencidos, tareas vencidas, membresias caducadas, leads sin seguimiento, socios sin actividad y clases llenas.
 - Crea `webhook_settings` y `webhook_logs` para integraciones y diagnostico.
 - Anade columnas auxiliares de imagen, color, planes, clases y suscripciones si faltan.
 

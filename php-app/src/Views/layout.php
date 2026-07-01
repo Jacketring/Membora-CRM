@@ -49,6 +49,7 @@ $isPlatformAdmin = is_platform_admin($user);
           <a class="<?= $route === 'checkins' ? 'active' : '' ?>" href="index.php?route=checkins">Check-ins</a>
           <a class="<?= $route === 'classes' ? 'active' : '' ?>" href="index.php?route=classes">Clases</a>
           <a class="<?= $route === 'tasks' ? 'active' : '' ?>" href="index.php?route=tasks">Tareas</a>
+          <a class="<?= $route === 'alerts' ? 'active' : '' ?>" href="index.php?route=alerts">Alertas</a>
         <?php endif; ?>
       </nav>
 

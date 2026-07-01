@@ -67,12 +67,13 @@ Recorrido recomendado:
 5. Membresias: precio, duracion y caducidad.
 6. Pagos: importe, metodo, estado y vencimiento.
 7. Check-ins: entrada manual y asociacion a reservas.
-8. Clases: calendario, creacion, edicion y reservas.
-9. Tareas: varios socios vinculados y acciones.
-10. Usuarios internos.
-11. Perfil y configuracion visual.
-12. Login como administrador de plataforma.
-13. Panel `Admin CRM`, leads web, empresas, pagos, web comercial y acceso de soporte.
+8. Alertas: pagos vencidos, tareas, membresias, leads, actividad y clases llenas.
+9. Clases: calendario, creacion, edicion y reservas.
+10. Tareas: varios socios vinculados y acciones.
+11. Usuarios internos.
+12. Perfil y configuracion visual.
+13. Login como administrador de plataforma.
+14. Panel `Admin CRM`, leads web, empresas, pagos, web comercial y acceso de soporte.
 
 ## 5. Slides
 
@@ -131,6 +132,5 @@ Guion recomendado:
 
 ## 8. Riesgos pendientes
 
-- Alertas quedan como pendiente o mejora futura.
 - Hay que validar credenciales y URL final antes de grabar el video.
 - Hay que revisar que el README final incluya slides, video, nombre y email del alumno.
