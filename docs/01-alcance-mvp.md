@@ -30,6 +30,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Pagos de socios con importe, metodo, estado, vencimiento, fecha de pago y notas.
 - Check-ins manuales de socios, con asociacion opcional a reservas de clase.
 - Alertas de riesgo para pagos vencidos, tareas vencidas, membresias caducadas, leads sin seguimiento, socios sin actividad y clases llenas.
+- Auditoria de acciones internas con usuario, tenant, accion, entidad, ruta, IP, navegador y datos sanitizados.
 - Tipos de clase.
 - Sesiones de clase con fecha, hora, entrenador, aforo y estado.
 - Calendario mensual de clases.
@@ -65,7 +66,6 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 
 Quedan como mejora futura o no estan cerrados como modulo completo de gimnasio:
 
-- Auditoria exhaustiva de acciones.
 - Permisos granulares por accion.
 - Portal para socios.
 - App movil nativa.
@@ -137,6 +137,7 @@ Tablas operativas principales:
 - `reservations`
 - `tasks`
 - `risk_alerts`
+- `audit_logs`
 
 Tablas SaaS principales:
 
@@ -159,10 +160,11 @@ Tablas SaaS principales:
 8. Revisar y resolver alertas de riesgo.
 9. Reservar plaza para un socio y marcar asistencia/no-show.
 10. Crear una tarea vinculada a varios socios.
-11. Revisar usuarios internos, perfil y configuracion.
-12. Entrar como administrador de plataforma.
-13. Revisar leads web, clientes, empresas, pagos, planes y web comercial.
-14. Entrar en modo soporte sobre una empresa y volver a Admin CRM.
+11. Revisar auditoria para comprobar las acciones registradas.
+12. Revisar usuarios internos, perfil y configuracion.
+13. Entrar como administrador de plataforma.
+14. Revisar leads web, clientes, empresas, pagos, planes y web comercial.
+15. Entrar en modo soporte sobre una empresa y volver a Admin CRM.
 
 ## 9. Criterios de aceptacion del MVP
 

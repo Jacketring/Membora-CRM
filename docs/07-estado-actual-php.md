@@ -103,6 +103,14 @@ No se usa Node.js en produccion.
 - Estados abierta, resuelta o descartada.
 - Filtros por texto, estado y tipo.
 
+### Auditoria
+
+- Registro automatico de acciones POST internas.
+- Guarda usuario, tenant, accion, tipo de entidad, identificador, ruta, IP y navegador.
+- Sanitiza contrasenas y tokens antes de guardar metadatos.
+- Filtros por texto, accion, usuario y fechas.
+- Indicadores de actividad de hoy, ultimos 7 dias, cambios y eliminaciones.
+
 ### Clases
 
 - Tipos de clase.
@@ -160,7 +168,6 @@ No se usa Node.js en produccion.
 ## 4. Modulos pendientes
 
 - Integraciones avanzadas de facturacion SaaS.
-- Auditoria de acciones.
 - Permisos finos por rol.
 
 ## 5. Credenciales principales
@@ -211,6 +218,7 @@ La aplicacion PHP puede crear de forma incremental:
 - `payments`.
 - `checkins`.
 - `risk_alerts`.
+- `audit_logs`.
 - `class_types`.
 - `class_sessions`.
 - `reservations`.

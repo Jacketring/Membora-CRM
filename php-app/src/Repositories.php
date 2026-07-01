@@ -35,6 +35,190 @@ final class DashboardRepository
     }
 }
 
+final class AuditLogRepository
+{
+    public static function ensureTable(): void
+    {
+        Database::connection()->exec(
+            'CREATE TABLE IF NOT EXISTS audit_logs (
+                id VARCHAR(191) NOT NULL PRIMARY KEY,
+                tenant_id VARCHAR(191) NULL,
+                user_id VARCHAR(191) NULL,
+                action VARCHAR(96) NOT NULL,
+                entity_type VARCHAR(96) NULL,
+                entity_id VARCHAR(191) NULL,
+                route VARCHAR(96) NULL,
+                ip_address VARCHAR(64) NULL,
+                user_agent VARCHAR(255) NULL,
+                metadata TEXT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX audit_logs_tenant_id_idx (tenant_id),
+                INDEX audit_logs_user_id_idx (user_id),
+                INDEX audit_logs_action_idx (action),
+                INDEX audit_logs_created_at_idx (created_at)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+        );
+    }
+
+    public static function record(string $action, array $payload = []): void
+    {
+        self::ensureTable();
+
+        $user = Auth::user();
+        $sanitizedPayload = self::sanitizePayload($payload);
+        $stmt = Database::connection()->prepare(
+            'INSERT INTO audit_logs (id, tenant_id, user_id, action, entity_type, entity_id, route, ip_address, user_agent, metadata)
+             VALUES (:id, :tenant_id, :user_id, :action, :entity_type, :entity_id, :route, :ip_address, :user_agent, :metadata)'
+        );
+        $stmt->execute([
+            'id' => cuid(),
+            'tenant_id' => $user['tenant_id'] ?? null,
+            'user_id' => $user['id'] ?? null,
+            'action' => $action,
+            'entity_type' => self::entityType($action),
+            'entity_id' => self::entityId($payload),
+            'route' => trim((string) ($_GET['route'] ?? '')),
+            'ip_address' => substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 64),
+            'user_agent' => substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
+            'metadata' => json_encode($sanitizedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        ]);
+    }
+
+    public static function metrics(?string $tenantId): array
+    {
+        self::ensureTable();
+        $tenantWhere = self::tenantWhere($tenantId);
+
+        return [
+            'today' => self::count($tenantWhere['sql'] . ' AND DATE(created_at) = CURDATE()', $tenantWhere['params']),
+            'week' => self::count($tenantWhere['sql'] . ' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)', $tenantWhere['params']),
+            'writes' => self::count($tenantWhere['sql'] . ' AND (action LIKE "create_%" OR action LIKE "update_%" OR action LIKE "delete_%" OR action LIKE "convert_%" OR action LIKE "mark_%")', $tenantWhere['params']),
+            'deletes' => self::count($tenantWhere['sql'] . ' AND action LIKE "delete_%"', $tenantWhere['params']),
+        ];
+    }
+
+    public static function all(?string $tenantId, string $query = '', string $action = '', string $userId = '', string $dateFrom = '', string $dateTo = '', int $limit = 250): array
+    {
+        self::ensureTable();
+
+        $tenantWhere = self::tenantWhere($tenantId, 'audit_logs');
+        $where = [$tenantWhere['sql']];
+        $params = $tenantWhere['params'];
+
+        if ($query !== '') {
+            $where[] = '(audit_logs.action LIKE :query OR audit_logs.entity_type LIKE :query OR audit_logs.entity_id LIKE :query OR audit_logs.metadata LIKE :query OR users.name LIKE :query OR users.email LIKE :query)';
+            $params['query'] = '%' . $query . '%';
+        }
+
+        if ($action !== '') {
+            $where[] = 'audit_logs.action = :action';
+            $params['action'] = $action;
+        }
+
+        if ($userId !== '') {
+            $where[] = 'audit_logs.user_id = :user_id';
+            $params['user_id'] = $userId;
+        }
+
+        if ($dateFrom !== '') {
+            $where[] = 'DATE(audit_logs.created_at) >= :date_from';
+            $params['date_from'] = $dateFrom;
+        }
+
+        if ($dateTo !== '') {
+            $where[] = 'DATE(audit_logs.created_at) <= :date_to';
+            $params['date_to'] = $dateTo;
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT audit_logs.*, users.name AS user_name, users.email AS user_email
+             FROM audit_logs
+             LEFT JOIN users ON users.id = audit_logs.user_id
+             WHERE ' . implode(' AND ', $where) . '
+             ORDER BY audit_logs.created_at DESC
+             LIMIT ' . max(1, min($limit, 500))
+        );
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    public static function actionOptions(?string $tenantId): array
+    {
+        self::ensureTable();
+        $tenantWhere = self::tenantWhere($tenantId);
+        $stmt = Database::connection()->prepare(
+            'SELECT DISTINCT action FROM audit_logs WHERE ' . $tenantWhere['sql'] . ' ORDER BY action ASC LIMIT 200'
+        );
+        $stmt->execute($tenantWhere['params']);
+
+        $options = ['' => 'Todas'];
+        foreach ($stmt->fetchAll() as $row) {
+            $options[$row['action']] = audit_action_label($row['action']);
+        }
+
+        return $options;
+    }
+
+    private static function count(string $where, array $params): int
+    {
+        $stmt = Database::connection()->prepare('SELECT COUNT(*) FROM audit_logs WHERE ' . $where);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    private static function tenantWhere(?string $tenantId, string $alias = ''): array
+    {
+        $prefix = $alias !== '' ? $alias . '.' : '';
+        if ($tenantId === null || $tenantId === '') {
+            return ['sql' => $prefix . 'tenant_id IS NULL', 'params' => []];
+        }
+
+        return ['sql' => $prefix . 'tenant_id = :tenant_id', 'params' => ['tenant_id' => $tenantId]];
+    }
+
+    private static function sanitizePayload(array $payload): array
+    {
+        $blocked = ['password', 'password_hash', 'token', 'csrf', 'form_token', 'webhook_token'];
+        $sanitized = [];
+
+        foreach ($payload as $key => $value) {
+            $normalizedKey = strtolower((string) $key);
+            if (in_array($normalizedKey, $blocked, true) || str_contains($normalizedKey, 'password') || str_contains($normalizedKey, 'token')) {
+                $sanitized[$key] = '[redacted]';
+                continue;
+            }
+
+            if (is_array($value)) {
+                $sanitized[$key] = self::sanitizePayload($value);
+                continue;
+            }
+
+            $sanitized[$key] = is_scalar($value) || $value === null ? substr((string) $value, 0, 500) : '[unsupported]';
+        }
+
+        return $sanitized;
+    }
+
+    private static function entityType(string $action): ?string
+    {
+        $action = preg_replace('/^(create|update|delete|convert|mark|add|send|enter|exit)_/', '', $action) ?: $action;
+        return $action !== '' ? $action : null;
+    }
+
+    private static function entityId(array $payload): ?string
+    {
+        foreach (['id', 'member_id', 'lead_id', 'task_id', 'payment_id', 'reservation_id', 'class_session_id', 'empresa_id', 'client_id', 'plan_id'] as $key) {
+            if (!empty($payload[$key]) && is_scalar($payload[$key])) {
+                return (string) $payload[$key];
+            }
+        }
+
+        return null;
+    }
+}
+
 final class RiskAlertRepository
 {
     public static function ensureTable(): void

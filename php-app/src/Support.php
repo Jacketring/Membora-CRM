@@ -424,6 +424,62 @@ function risk_alert_severity_label(?string $severity): string
     ]);
 }
 
+function audit_action_label(?string $action): string
+{
+    return enum_label((string) $action, [
+        'login' => 'Inicio de sesion',
+        'logout' => 'Cierre de sesion',
+        'update_profile' => 'Actualizacion de perfil',
+        'create_user' => 'Creacion de usuario',
+        'update_user' => 'Actualizacion de usuario',
+        'create_lead' => 'Creacion de lead',
+        'update_lead' => 'Actualizacion de lead',
+        'add_lead_note' => 'Nota de lead',
+        'update_lead_note' => 'Actualizacion de nota',
+        'delete_lead_note' => 'Eliminacion de nota',
+        'update_lead_stage' => 'Cambio de etapa',
+        'convert_lead' => 'Conversion de lead',
+        'mark_lead_lost' => 'Lead perdido',
+        'delete_lead' => 'Eliminacion de lead',
+        'create_member' => 'Creacion de socio',
+        'update_member' => 'Actualizacion de socio',
+        'delete_member' => 'Eliminacion de socio',
+        'create_membership_plan' => 'Creacion de membresia',
+        'update_membership_plan' => 'Actualizacion de membresia',
+        'delete_membership_plan' => 'Eliminacion de membresia',
+        'create_payment' => 'Creacion de pago',
+        'update_payment' => 'Actualizacion de pago',
+        'delete_payment' => 'Eliminacion de pago',
+        'create_checkin' => 'Creacion de check-in',
+        'delete_checkin' => 'Eliminacion de check-in',
+        'update_risk_alert_status' => 'Cambio de alerta',
+        'create_class_type' => 'Creacion de tipo de clase',
+        'create_class_session' => 'Creacion de clase',
+        'update_class_session' => 'Actualizacion de clase',
+        'delete_class_session' => 'Eliminacion de clase',
+        'create_reservation' => 'Creacion de reserva',
+        'update_reservation_status' => 'Cambio de reserva',
+        'create_task' => 'Creacion de tarea',
+        'update_task' => 'Actualizacion de tarea',
+        'update_task_status' => 'Cambio de tarea',
+        'delete_task' => 'Eliminacion de tarea',
+        'update_platform_lead' => 'Actualizacion de lead web',
+        'convert_platform_lead' => 'Conversion de lead web',
+        'delete_platform_lead' => 'Eliminacion de lead web',
+        'send_platform_test_email' => 'Prueba de email',
+        'create_platform_client' => 'Creacion de cliente CRM',
+        'update_platform_client' => 'Actualizacion de cliente CRM',
+        'create_empresa' => 'Creacion de empresa',
+        'update_empresa' => 'Actualizacion de empresa',
+        'create_platform_payment' => 'Creacion de pago CRM',
+        'update_platform_payment' => 'Actualizacion de pago CRM',
+        'create_platform_plan' => 'Creacion de plan CRM',
+        'update_platform_plan' => 'Actualizacion de plan CRM',
+        'enter_empresa_crm' => 'Entrada en soporte',
+        'exit_empresa_crm' => 'Salida de soporte',
+    ]);
+}
+
 function platform_plan_status_label(?string $status): string
 {
     return enum_label((string) $status, [

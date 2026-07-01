@@ -11,6 +11,7 @@ final class Actions
         enforce_internal_post_security();
 
         $action = post_value('action', '');
+        self::auditPostAction($action);
 
         match ($action) {
             'login' => self::login(),
@@ -65,6 +66,19 @@ final class Actions
             'delete_task' => self::deleteTask(),
             default => null,
         };
+    }
+
+    private static function auditPostAction(string $action): void
+    {
+        if ($action === '') {
+            return;
+        }
+
+        try {
+            AuditLogRepository::record($action, $_POST);
+        } catch (Throwable) {
+            // La auditoria no debe bloquear la operacion principal del usuario.
+        }
     }
 
     private static function login(): never

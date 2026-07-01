@@ -2960,6 +2960,26 @@ body[data-density="compact"] .panel-card,
 body[data-density="compact"] .modal-card { padding: 18px; }
 body[data-density="compact"] .leads-table td { padding: 10px 12px; }
 
+.audit-details summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.audit-details pre {
+  background: var(--surface-soft);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 8px 0 0;
+  max-width: 360px;
+  overflow: auto;
+  padding: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 @media (max-width: 900px) {
   .app-shell { display: block; }
   .sidebar { min-height: auto; position: static; width: 100%; }

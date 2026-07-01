@@ -39,6 +39,7 @@ Estas tablas pertenecen a un gimnasio concreto y deben consultarse siempre con `
 - `risk_alerts`: alertas generadas para priorizar riesgos operativos.
 - `payments`: pagos manuales de socios, vencimientos y cobros.
 - `checkins`: entradas/asistencias manuales de socios.
+- `audit_logs`: registro de acciones internas con datos sanitizados.
 
 Columnas auxiliares que PHP puede anadir:
 
@@ -80,6 +81,7 @@ Estas tablas son globales de Membora CRM y no representan datos internos de un g
 - `Member` 1 -> N `Reservation`.
 - `Task` N <-> N `Member` mediante `task_members`.
 - `RiskAlert` 0..N -> `Member`, `Lead`, `Task`, `Payment` o `ClassSession`.
+- `AuditLog` 0..N -> `User` y opcionalmente a una entidad funcional mediante `entity_type` y `entity_id`.
 - `PlatformLead` 0..1 -> 1 `PlatformClient` al convertir una solicitud web.
 - `PlatformClient` 0..N -> N `Empresa` como origen comercial.
 - `Empresa` 0..1 -> 1 `Tenant` cuando el CRM esta creado.
@@ -184,6 +186,7 @@ Automatismos principales:
 - Crea `lead_notes`, `task_members`, `membership_plans`, `subscriptions`, `class_types`, `class_sessions` y `reservations`.
 - Crea `checkins` para entradas manuales y asistencias asociadas a reservas.
 - Crea `risk_alerts` para pagos vencidos, tareas vencidas, membresias caducadas, leads sin seguimiento, socios sin actividad y clases llenas.
+- Crea `audit_logs` para registrar acciones POST internas, usuario, ruta, IP, navegador y datos sin contrasenas ni tokens.
 - Crea `webhook_settings` y `webhook_logs` para integraciones y diagnostico.
 - Anade columnas auxiliares de imagen, color, planes, clases y suscripciones si faltan.
 
@@ -195,6 +198,5 @@ Requisito operativo:
 
 No estan cerrados todavia como modulos completos de gimnasio:
 
-- Auditoria exhaustiva de acciones.
 - Permisos granulares por accion.
 - Integraciones de facturacion externa.

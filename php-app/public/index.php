@@ -418,6 +418,24 @@ switch ($route) {
         ]);
         break;
 
+    case 'audit':
+        $tenantId = Auth::tenantId();
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'action' => trim((string) ($_GET['action_filter'] ?? '')),
+            'user_id' => trim((string) ($_GET['user_id'] ?? '')),
+            'date_from' => trim((string) ($_GET['date_from'] ?? '')),
+            'date_to' => trim((string) ($_GET['date_to'] ?? '')),
+        ];
+        render_layout('Auditoria', 'audit', [
+            'filters' => $filters,
+            'metrics' => AuditLogRepository::metrics($tenantId),
+            'actionOptions' => AuditLogRepository::actionOptions($tenantId),
+            'staff' => StaffRepository::all($tenantId),
+            'logs' => AuditLogRepository::all($tenantId, $filters['q'], $filters['action'], $filters['user_id'], $filters['date_from'], $filters['date_to']),
+        ]);
+        break;
+
     case 'classes':
         $tenantId = Auth::tenantId();
         $filters = [
