@@ -271,7 +271,12 @@ switch ($route) {
         ];
         try {
             AuditLogRepository::record('view_audit', ['scope' => 'platform', 'filters' => $filters]);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            $_SESSION['audit_log_error'] = $exception->getMessage();
+        }
+        if (!empty($_SESSION['audit_log_error'])) {
+            flash('La auditoria no se esta guardando: ' . $_SESSION['audit_log_error'], 'error');
+            unset($_SESSION['audit_log_error']);
         }
         render_layout('Logs CRM', 'platform-audit', [
             'filters' => $filters,
@@ -478,7 +483,12 @@ switch ($route) {
         ];
         try {
             AuditLogRepository::record('view_audit', ['scope' => 'tenant', 'filters' => $filters]);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            $_SESSION['audit_log_error'] = $exception->getMessage();
+        }
+        if (!empty($_SESSION['audit_log_error'])) {
+            flash('La auditoria no se esta guardando: ' . $_SESSION['audit_log_error'], 'error');
+            unset($_SESSION['audit_log_error']);
         }
         render_layout('Auditoria', 'audit', [
             'filters' => $filters,

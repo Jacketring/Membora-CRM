@@ -98,6 +98,7 @@ final class AuditLogRepository
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
         );
 
+        self::ensureColumn('audit_logs', 'id', 'VARCHAR(191) NULL');
         self::ensureColumn('audit_logs', 'tenant_id', 'VARCHAR(191) NULL');
         self::ensureColumn('audit_logs', 'user_id', 'VARCHAR(191) NULL');
         self::ensureColumn('audit_logs', 'action', 'VARCHAR(96) NOT NULL DEFAULT ""');
@@ -110,6 +111,7 @@ final class AuditLogRepository
         self::ensureColumn('audit_logs', 'created_at', 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
         self::modifyColumn('audit_logs', 'tenant_id', 'VARCHAR(191) NULL');
         self::modifyColumn('audit_logs', 'user_id', 'VARCHAR(191) NULL');
+        self::relaxLegacyRequiredColumns('audit_logs');
     }
 
     public static function record(string $action, array $payload = []): void
@@ -411,6 +413,43 @@ final class AuditLogRepository
     {
         try {
             Database::connection()->exec('ALTER TABLE ' . $table . ' MODIFY COLUMN ' . $column . ' ' . $definition);
+        } catch (Throwable) {
+        }
+    }
+
+    private static function relaxLegacyRequiredColumns(string $table): void
+    {
+        $managedColumns = [
+            'id',
+            'tenant_id',
+            'user_id',
+            'action',
+            'entity_type',
+            'entity_id',
+            'route',
+            'ip_address',
+            'user_agent',
+            'metadata',
+            'created_at',
+        ];
+
+        try {
+            $stmt = Database::connection()->query('SHOW COLUMNS FROM ' . $table);
+            foreach ($stmt->fetchAll() as $column) {
+                $field = (string) ($column['Field'] ?? '');
+                $type = (string) ($column['Type'] ?? '');
+                $isRequired = strtoupper((string) ($column['Null'] ?? '')) === 'NO';
+                $hasDefault = array_key_exists('Default', $column) && $column['Default'] !== null;
+                $extra = strtolower((string) ($column['Extra'] ?? ''));
+
+                if ($field === '' || $type === '' || in_array($field, $managedColumns, true)) {
+                    continue;
+                }
+
+                if ($isRequired && !$hasDefault && !str_contains($extra, 'auto_increment')) {
+                    Database::connection()->exec('ALTER TABLE `' . $table . '` MODIFY COLUMN `' . $field . '` ' . $type . ' NULL');
+                }
+            }
         } catch (Throwable) {
         }
     }

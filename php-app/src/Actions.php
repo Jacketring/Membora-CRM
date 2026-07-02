@@ -83,7 +83,8 @@ final class Actions
 
         try {
             AuditLogRepository::record($action, $_POST);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            $_SESSION['audit_log_error'] = $exception->getMessage();
             // La auditoria no debe bloquear la operacion principal del usuario.
         }
     }
