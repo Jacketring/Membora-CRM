@@ -48,6 +48,7 @@ Rutas de administracion SaaS:
 - `?route=platform-payments`: cobros SaaS.
 - `?route=platform-plans`: catalogo de planes SaaS.
 - `?route=platform-web`: estado tecnico de la web, webhook y correo.
+- `?route=platform-audit`: logs de actividad de empresas cliente y plataforma.
 
 ## 3. Acciones POST principales
 

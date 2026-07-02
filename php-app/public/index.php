@@ -257,6 +257,27 @@ switch ($route) {
         ]);
         break;
 
+    case 'platform-audit':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
+        $filters = [
+            'q' => trim((string) ($_GET['q'] ?? '')),
+            'tenant_id' => trim((string) ($_GET['tenant_id'] ?? '')),
+            'action' => trim((string) ($_GET['action_filter'] ?? '')),
+            'date_from' => trim((string) ($_GET['date_from'] ?? '')),
+            'date_to' => trim((string) ($_GET['date_to'] ?? '')),
+        ];
+        render_layout('Logs CRM', 'platform-audit', [
+            'filters' => $filters,
+            'metrics' => AuditLogRepository::platformMetrics($filters['tenant_id']),
+            'tenantOptions' => AuditLogRepository::tenantOptions(),
+            'actionOptions' => AuditLogRepository::platformActionOptions($filters['tenant_id']),
+            'logs' => AuditLogRepository::platformAll($filters['tenant_id'], $filters['q'], $filters['action'], $filters['date_from'], $filters['date_to']),
+        ]);
+        break;
+
     case 'dashboard':
         if (is_platform_admin($currentUser)) {
             redirect('platform-dashboard');

@@ -770,6 +770,59 @@ button, input, textarea { font: inherit; }
   gap: 16px;
 }
 
+.legal-page {
+  background:
+    linear-gradient(180deg, rgba(7, 84, 214, 0.08), rgba(16, 185, 129, 0.04)),
+    #f6f8fc;
+  min-height: 100vh;
+  padding: clamp(24px, 6vw, 72px) 20px;
+}
+
+.legal-shell {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+  margin: 0 auto;
+  max-width: 920px;
+  padding: clamp(24px, 5vw, 54px);
+}
+
+.legal-back {
+  color: var(--primary);
+  display: inline-flex;
+  font-weight: 950;
+  margin-bottom: 22px;
+}
+
+.legal-shell h1 {
+  color: var(--ink);
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1;
+  margin: 0 0 18px;
+}
+
+.legal-shell h2 {
+  color: var(--ink);
+  font-size: 22px;
+  margin: 34px 0 10px;
+}
+
+.legal-shell p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 12px;
+}
+
+.legal-note {
+  background: var(--soft);
+  border: 1px solid #d5e3fb;
+  border-radius: 14px;
+  color: #28476f !important;
+  font-weight: 800;
+  padding: 16px;
+}
+
 .demo-body {
   background: #071426;
   color: #e8f1ff;

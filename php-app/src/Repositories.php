@@ -160,9 +160,110 @@ final class AuditLogRepository
         return $options;
     }
 
+    public static function platformMetrics(string $tenantId = ''): array
+    {
+        self::ensureTable();
+        $filter = self::platformWhere($tenantId);
+
+        return [
+            'today' => self::count($filter['sql'] . ' AND DATE(created_at) = CURDATE()', $filter['params']),
+            'week' => self::count($filter['sql'] . ' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)', $filter['params']),
+            'writes' => self::count($filter['sql'] . ' AND (action LIKE "create_%" OR action LIKE "update_%" OR action LIKE "delete_%" OR action LIKE "convert_%" OR action LIKE "mark_%" OR action LIKE "sync_%")', $filter['params']),
+            'tenants' => self::countDistinctTenants($filter['sql'], $filter['params']),
+        ];
+    }
+
+    public static function platformAll(string $tenantId = '', string $query = '', string $action = '', string $dateFrom = '', string $dateTo = '', int $limit = 300): array
+    {
+        self::ensureTable();
+
+        $filter = self::platformWhere($tenantId, 'audit_logs');
+        $where = [$filter['sql']];
+        $params = $filter['params'];
+
+        if ($query !== '') {
+            $where[] = '(audit_logs.action LIKE :query OR audit_logs.entity_type LIKE :query OR audit_logs.entity_id LIKE :query OR audit_logs.metadata LIKE :query OR users.name LIKE :query OR users.email LIKE :query OR tenants.name LIKE :query)';
+            $params['query'] = '%' . $query . '%';
+        }
+
+        if ($action !== '') {
+            $where[] = 'audit_logs.action = :action';
+            $params['action'] = $action;
+        }
+
+        if ($dateFrom !== '') {
+            $where[] = 'DATE(audit_logs.created_at) >= :date_from';
+            $params['date_from'] = $dateFrom;
+        }
+
+        if ($dateTo !== '') {
+            $where[] = 'DATE(audit_logs.created_at) <= :date_to';
+            $params['date_to'] = $dateTo;
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT audit_logs.*,
+                    users.name AS user_name,
+                    users.email AS user_email,
+                    tenants.name AS tenant_name
+             FROM audit_logs
+             LEFT JOIN users ON users.id = audit_logs.user_id
+             LEFT JOIN tenants ON tenants.id = audit_logs.tenant_id
+             WHERE ' . implode(' AND ', $where) . '
+             ORDER BY audit_logs.created_at DESC
+             LIMIT ' . max(1, min($limit, 600))
+        );
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    public static function platformActionOptions(string $tenantId = ''): array
+    {
+        self::ensureTable();
+        $filter = self::platformWhere($tenantId);
+        $stmt = Database::connection()->prepare(
+            'SELECT DISTINCT action FROM audit_logs WHERE ' . $filter['sql'] . ' ORDER BY action ASC LIMIT 300'
+        );
+        $stmt->execute($filter['params']);
+
+        $options = ['' => 'Todas'];
+        foreach ($stmt->fetchAll() as $row) {
+            $options[$row['action']] = audit_action_label($row['action']);
+        }
+
+        return $options;
+    }
+
+    public static function tenantOptions(): array
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->query(
+            'SELECT DISTINCT tenants.id, tenants.name
+             FROM audit_logs
+             INNER JOIN tenants ON tenants.id = audit_logs.tenant_id
+             ORDER BY tenants.name ASC'
+        );
+
+        $options = ['' => 'Todas las empresas', '__platform' => 'Admin CRM'];
+        foreach ($stmt->fetchAll() as $tenant) {
+            $options[$tenant['id']] = $tenant['name'];
+        }
+
+        return $options;
+    }
+
     private static function count(string $where, array $params): int
     {
         $stmt = Database::connection()->prepare('SELECT COUNT(*) FROM audit_logs WHERE ' . $where);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    private static function countDistinctTenants(string $where, array $params): int
+    {
+        $stmt = Database::connection()->prepare('SELECT COUNT(DISTINCT tenant_id) FROM audit_logs WHERE ' . $where . ' AND tenant_id IS NOT NULL');
         $stmt->execute($params);
 
         return (int) $stmt->fetchColumn();
@@ -176,6 +277,20 @@ final class AuditLogRepository
         }
 
         return ['sql' => $prefix . 'tenant_id = :tenant_id', 'params' => ['tenant_id' => $tenantId]];
+    }
+
+    private static function platformWhere(string $tenantId = '', string $alias = ''): array
+    {
+        $prefix = $alias !== '' ? $alias . '.' : '';
+        if ($tenantId === '__platform') {
+            return ['sql' => $prefix . 'tenant_id IS NULL', 'params' => []];
+        }
+
+        if ($tenantId !== '') {
+            return ['sql' => $prefix . 'tenant_id = :tenant_id', 'params' => ['tenant_id' => $tenantId]];
+        }
+
+        return ['sql' => '1 = 1', 'params' => []];
     }
 
     private static function sanitizePayload(array $payload): array

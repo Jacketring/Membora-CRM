@@ -177,10 +177,12 @@ No se usa Node.js en produccion.
 - Tabla `saas_plans` para catalogo comercial.
 - Gestion de planes con precio mensual, setup, limites de usuarios/socios, estado y prestaciones.
 - Web comercial externa en `web-app/public`.
+- Web comercial con enlaces a aviso legal, privacidad y cookies.
 - Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Leads`.
 - Email HTML automatico de confirmacion para el visitante cuando envia el formulario web.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
+- Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
 
 ## 4. Modulos pendientes
 

@@ -31,7 +31,7 @@ Pantallas disponibles:
 - Usuarios internos del gimnasio.
 - Perfil de usuario.
 - Configuracion visual personal.
-- Panel de administracion de Membora CRM separado en resumen, leads web, clientes, empresas, pagos, planes y web comercial.
+- Panel de administracion de Membora CRM separado en resumen, leads web, clientes, empresas, pagos, planes, web comercial y logs.
 
 Pendiente o futuro:
 
@@ -175,6 +175,7 @@ web-app/public
 No hay que editar tokens en la web. El formulario envia al webhook del CRM y las solicitudes aparecen en `Admin CRM > Leads`.
 Si `MAIL_ENABLED` esta activo y el SMTP esta configurado, la persona que rellena el formulario recibe un email HTML de confirmacion indicando que el equipo revisara su solicitud y contactara en 24-48 horas. Los fallos de correo quedan visibles en `Admin CRM > Web`.
 La seccion `Admin CRM > Web` incluye una prueba de correo para enviar un email tecnico a una direccion concreta, ver la configuracion detectada y registrar el error SMTP exacto si falla.
+La web publica incluye enlaces a textos legales basicos: aviso legal, privacidad y cookies.
 
 En el `.env` del CRM debe existir `WEB_APP_URL="https://app.web.josehurtado.dev"` para permitir el envio del formulario entre subdominios.
 
@@ -251,6 +252,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Seccion `Pagos` para registrar cobros SaaS, vencimientos, pagados, pendientes y cancelados.
 - Seccion `Planes` para definir catalogo comercial, precio mensual, setup, limites y prestaciones.
 - Seccion `Web` para revisar el estado tecnico del formulario publico y envios recientes.
+- Seccion `Logs` para filtrar actividad por empresa, accion, fecha y texto.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 

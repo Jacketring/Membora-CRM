@@ -75,7 +75,8 @@ Recorrido recomendado:
 13. Usuarios internos y permisos por rol.
 14. Perfil y configuracion visual.
 15. Login como administrador de plataforma.
-16. Panel `Admin CRM`, leads web, empresas, pagos, web comercial y acceso de soporte.
+16. Panel `Admin CRM`, leads web, empresas, pagos, logs, web comercial y acceso de soporte.
+17. Web publica: formulario, opiniones y enlaces legales.
 
 ## 5. Slides
 
