@@ -620,6 +620,119 @@ function audit_action_label(?string $action): string
     return $readable !== '' ? ucfirst($readable) : 'Accion no identificada';
 }
 
+function audit_entity_label(?string $entity): string
+{
+    return enum_label((string) $entity, [
+        'user' => 'Usuario',
+        'users' => 'Usuario',
+        'member' => 'Socio',
+        'members' => 'Socio',
+        'membership_plan' => 'Membresia',
+        'membership_plans' => 'Membresia',
+        'checkin' => 'Check-in',
+        'checkins' => 'Check-in',
+        'class_type' => 'Tipo de clase',
+        'class_session' => 'Clase',
+        'class_sessions' => 'Clase',
+        'task' => 'Tarea',
+        'tasks' => 'Tarea',
+        'risk_alert' => 'Alerta',
+        'risk_alert_status' => 'Alerta',
+        'empresa' => 'Empresa',
+        'empresa_crm' => 'Empresa',
+        'platform_client' => 'Cliente CRM',
+        'platform_lead' => 'Lead web',
+        'platform_payment' => 'Pago CRM',
+        'platform_plan' => 'Plan CRM',
+        'audit' => 'Auditoria',
+    ], 'General');
+}
+
+function audit_area_label(?string $route): string
+{
+    return enum_label((string) $route, [
+        'users' => 'Usuarios',
+        'members' => 'Socios',
+        'memberships' => 'Membresias',
+        'checkins' => 'Check-ins',
+        'classes' => 'Clases',
+        'tasks' => 'Tareas',
+        'alerts' => 'Alertas',
+        'audit' => 'Auditoria',
+        'platform-audit' => 'Logs CRM',
+        'platform-companies' => 'Empresas',
+        'platform-clients' => 'Clientes CRM',
+        'platform-leads' => 'Leads web',
+        'platform-payments' => 'Pagos CRM',
+        'platform-plans' => 'Planes CRM',
+        'platform-web' => 'Web comercial',
+        'dashboard' => 'Panel',
+        'profile' => 'Perfil',
+        'settings' => 'Configuracion',
+    ], 'CRM');
+}
+
+function audit_metadata_summary(?string $metadata): string
+{
+    if (!$metadata) {
+        return 'Sin detalles visibles';
+    }
+
+    $data = json_decode($metadata, true);
+    if (!is_array($data)) {
+        return 'Detalle interno oculto';
+    }
+
+    $blockedKeys = ['id', 'tenant_id', 'user_id', 'role_id', 'member_id', 'lead_id', 'task_id', 'payment_id', 'reservation_id', 'class_session_id', 'empresa_id', 'client_id', 'plan_id', 'form_token', 'csrf', 'token', 'password', 'password_hash', 'route', 'action'];
+    $labels = [
+        'name' => 'Nombre',
+        'first_name' => 'Nombre',
+        'last_name' => 'Apellidos',
+        'email' => 'Email',
+        'phone' => 'Telefono',
+        'status' => 'Estado',
+        'title' => 'Titulo',
+        'type' => 'Tipo',
+        'method' => 'Metodo',
+        'notes' => 'Notas',
+        'description' => 'Descripcion',
+        'due_at' => 'Fecha limite',
+        'checked_in_at' => 'Fecha de check-in',
+        'starts_at' => 'Inicio',
+        'ends_at' => 'Fin',
+        'capacity' => 'Aforo',
+        'plan' => 'Plan',
+        'payment_status' => 'Estado de pago',
+        'contact_email' => 'Email de contacto',
+        'admin_email' => 'Email administrador',
+        'admin_name' => 'Administrador',
+    ];
+
+    $parts = [];
+    foreach ($data as $key => $value) {
+        $normalizedKey = strtolower((string) $key);
+        if (in_array($normalizedKey, $blockedKeys, true) || str_contains($normalizedKey, 'token') || str_contains($normalizedKey, 'password')) {
+            continue;
+        }
+
+        if (is_array($value)) {
+            continue;
+        }
+
+        $text = trim((string) $value);
+        if ($text === '') {
+            continue;
+        }
+
+        $parts[] = ($labels[$normalizedKey] ?? ucfirst(str_replace('_', ' ', $normalizedKey))) . ': ' . $text;
+        if (count($parts) >= 4) {
+            break;
+        }
+    }
+
+    return $parts ? implode(' · ', $parts) : 'Detalle interno oculto';
+}
+
 function platform_plan_status_label(?string $status): string
 {
     return enum_label((string) $status, [

@@ -87,9 +87,9 @@
           <th scope="col">Empresa</th>
           <th scope="col">Usuario</th>
           <th scope="col">Accion</th>
-          <th scope="col">Entidad</th>
-          <th scope="col">Ruta</th>
-          <th scope="col">Datos</th>
+          <th scope="col">Modulo</th>
+          <th scope="col">Area</th>
+          <th scope="col">Detalle</th>
         </tr>
       </thead>
       <tbody>
@@ -98,7 +98,6 @@
             <td><?= e(format_date($log['created_at'])) ?></td>
             <td>
               <strong><?= e($log['tenant_name'] ?: 'Admin CRM') ?></strong>
-              <small class="table-subtext"><?= e($log['tenant_id'] ?: 'Plataforma') ?></small>
             </td>
             <td>
               <strong><?= e($log['user_name'] ?: 'Sistema') ?></strong>
@@ -106,16 +105,13 @@
             </td>
             <td><?= e(audit_action_label($log['action'])) ?></td>
             <td>
-              <strong><?= e($log['entity_type'] ?: 'General') ?></strong>
-              <?php if (!empty($log['entity_id'])): ?>
-                <small class="table-subtext"><?= e($log['entity_id']) ?></small>
-              <?php endif; ?>
+              <strong><?= e(audit_entity_label($log['entity_type'])) ?></strong>
             </td>
-            <td><?= e($log['route'] ?: 'Sin ruta') ?></td>
+            <td><?= e(audit_area_label($log['route'])) ?></td>
             <td>
               <details class="audit-details">
                 <summary>Ver</summary>
-                <pre><?= e($log['metadata'] ?: '{}') ?></pre>
+                <p><?= e(audit_metadata_summary($log['metadata'])) ?></p>
               </details>
             </td>
           </tr>
