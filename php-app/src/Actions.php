@@ -356,7 +356,11 @@ final class Actions
         }
 
         PlatformClientRepository::update($id, $_POST);
-        flash('Cliente actualizado correctamente.');
+        if (post_value('status') === 'LEAD') {
+            flash('Cliente devuelto a Leads correctamente.');
+        } else {
+            flash('Cliente actualizado correctamente.');
+        }
         redirect('platform-clients');
     }
 

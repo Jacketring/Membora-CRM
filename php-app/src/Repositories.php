@@ -2284,16 +2284,23 @@ final class PlatformClientRepository
     public static function create(array $data): void
     {
         self::ensureTable();
+        $params = self::clientParams($data);
+        $clientId = cuid();
         $stmt = Database::connection()->prepare(
             'INSERT INTO platform_clients (id, company_name, contact_name, email, phone, status, notes, created_at, updated_at)
              VALUES (:id, :company_name, :contact_name, :email, :phone, :status, :notes, NOW(), NOW())'
         );
-        $stmt->execute(self::clientParams($data) + ['id' => cuid()]);
+        $stmt->execute($params + ['id' => $clientId]);
+
+        if ($params['status'] === 'LEAD') {
+            self::syncLeadFromClient($clientId, $params);
+        }
     }
 
     public static function update(string $id, array $data): void
     {
         self::ensureTable();
+        $params = self::clientParams($data);
         $stmt = Database::connection()->prepare(
             'UPDATE platform_clients
              SET company_name = :company_name,
@@ -2305,7 +2312,11 @@ final class PlatformClientRepository
                  updated_at = NOW()
              WHERE id = :id'
         );
-        $stmt->execute(self::clientParams($data) + ['id' => $id]);
+        $stmt->execute($params + ['id' => $id]);
+
+        if ($params['status'] === 'LEAD') {
+            self::syncLeadFromClient($id, $params);
+        }
     }
 
     public static function markCustomer(string $id): void
@@ -2329,6 +2340,54 @@ final class PlatformClientRepository
             'status' => $status,
             'notes' => trim((string) ($data['notes'] ?? '')) ?: null,
         ];
+    }
+
+    private static function syncLeadFromClient(string $clientId, array $client): void
+    {
+        PlatformLeadRepository::ensureTable();
+        $pdo = Database::connection();
+
+        $existing = $pdo->prepare('SELECT id FROM platform_leads WHERE client_id = :client_id LIMIT 1');
+        $existing->execute(['client_id' => $clientId]);
+        $leadId = $existing->fetchColumn();
+
+        if ($leadId) {
+            $update = $pdo->prepare(
+                'UPDATE platform_leads
+                 SET company_name = :company_name,
+                     contact_name = :contact_name,
+                     email = :email,
+                     phone = :phone,
+                     message = :message,
+                     status = "NEW",
+                     converted_at = NULL,
+                     updated_at = NOW()
+                 WHERE id = :id'
+            );
+            $update->execute([
+                'company_name' => $client['company_name'],
+                'contact_name' => $client['contact_name'] ?: $client['company_name'],
+                'email' => $client['email'],
+                'phone' => $client['phone'],
+                'message' => $client['notes'] ?: 'Cliente devuelto a lead desde el panel CRM.',
+                'id' => $leadId,
+            ]);
+            return;
+        }
+
+        $insert = $pdo->prepare(
+            'INSERT INTO platform_leads (id, company_name, contact_name, email, phone, message, status, client_id, converted_at, created_at, updated_at)
+             VALUES (:id, :company_name, :contact_name, :email, :phone, :message, "NEW", :client_id, NULL, NOW(), NOW())'
+        );
+        $insert->execute([
+            'id' => cuid(),
+            'company_name' => $client['company_name'],
+            'contact_name' => $client['contact_name'] ?: $client['company_name'],
+            'email' => $client['email'],
+            'phone' => $client['phone'],
+            'message' => $client['notes'] ?: 'Cliente devuelto a lead desde el panel CRM.',
+            'client_id' => $clientId,
+        ]);
     }
 
     private static function count(PDO $pdo, string $where): int
