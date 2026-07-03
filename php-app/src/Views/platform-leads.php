@@ -17,7 +17,6 @@ $statusOptions = [
     <h2>Leads comerciales</h2>
     <p>Solicitudes recibidas desde la web publica de Membora CRM antes de convertirlas en clientes.</p>
   </div>
-  <a class="secondary-action" href="index.php?route=platform-web">Configuracion web</a>
 </div>
 
 <section class="dashboard-metrics">

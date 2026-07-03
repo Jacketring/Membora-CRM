@@ -265,13 +265,7 @@ switch ($route) {
             redirect('dashboard');
         }
 
-        render_layout('Web comercial', 'platform-web', [
-            'logs' => WebhookIntegrationRepository::recentPlatformLogs(),
-            'mailDiagnostics' => Mailer::diagnostics(),
-            'webhookUrl' => app_base_url() . '/webhook/lead',
-            'webUrl' => getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev',
-        ]);
-        break;
+        redirect('platform-dashboard');
 
     case 'platform-audit':
         if (!is_platform_admin($currentUser)) {

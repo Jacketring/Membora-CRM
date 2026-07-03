@@ -38,7 +38,6 @@ $isPlatformAdmin = is_platform_admin($user);
           <a class="<?= $route === 'platform-companies' ? 'active' : '' ?>" href="index.php?route=platform-companies">Empresas</a>
           <a class="<?= $route === 'platform-payments' ? 'active' : '' ?>" href="index.php?route=platform-payments">Pagos</a>
           <a class="<?= $route === 'platform-plans' ? 'active' : '' ?>" href="index.php?route=platform-plans">Planes</a>
-          <a class="<?= $route === 'platform-web' ? 'active' : '' ?>" href="index.php?route=platform-web">Web</a>
           <a class="<?= $route === 'platform-audit' ? 'active' : '' ?>" href="index.php?route=platform-audit">Logs</a>
         <?php else: ?>
           <?php foreach ([
