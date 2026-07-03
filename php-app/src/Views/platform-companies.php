@@ -92,7 +92,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
           <th>Estado CRM</th>
           <th>Pago</th>
           <th>Precio mensual</th>
-          <th>Proximo pago</th>
+          <th>Proximo pago / prueba</th>
           <th>Notas</th>
           <th>Acciones</th>
         </tr>
@@ -102,8 +102,10 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
           <?php
             $statusClass = strtolower((string) $empresa['status']);
             $paymentClass = strtolower((string) $empresa['payment_status']);
+            $isTrialPlan = strtoupper((string) $empresa['plan']) === 'TRIAL';
             $nextPaymentTime = !empty($empresa['next_payment_at']) ? strtotime((string) $empresa['next_payment_at']) : false;
-            $canRenew = $nextPaymentTime !== false
+            $canRenew = !$isTrialPlan
+                && $nextPaymentTime !== false
                 && $nextPaymentTime <= strtotime(date('Y-m-d'))
                 && in_array((string) $empresa['status'], ['ACTIVE', 'TRIAL'], true)
                 && (float) $empresa['monthly_price'] > 0;
@@ -118,7 +120,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
             <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(empresa_status_label($empresa['status'])) ?></span></td>
             <td><span class="status-badge status-badge--<?= e($paymentClass) ?>"><?= e(empresa_payment_status_label($empresa['payment_status'])) ?></span></td>
             <td><?= e(money_amount($empresa['monthly_price'])) ?></td>
-            <td><?= e(format_date_short($empresa['next_payment_at'])) ?></td>
+            <td><?= e($isTrialPlan ? 'Duracion: 1 mes' : format_date_short($empresa['next_payment_at'])) ?></td>
             <td><?= e($empresa['notes'] ? substr($empresa['notes'], 0, 60) . (strlen($empresa['notes']) > 60 ? '...' : '') : 'Sin notas') ?></td>
             <td>
               <div class="platform-row-actions">

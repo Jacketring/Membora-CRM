@@ -509,6 +509,10 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
   const planSelect = form.querySelector('[data-plan-price-select]');
   const priceInput = form.querySelector('[data-plan-price-input]');
   const nextPaymentInput = form.querySelector('[data-next-payment-input]');
+  const nextPaymentField = form.querySelector('[data-next-payment-field]');
+  const trialPlanNote = form.querySelector('[data-trial-plan-note]');
+  const crmStatusSelect = form.querySelector('select[name="status"]');
+  const paymentStatusSelect = form.querySelector('select[name="payment_status"]');
 
   if (!planSelect || !priceInput) {
     return;
@@ -533,6 +537,24 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
     }
   };
 
+  const syncTrialPlanFields = () => {
+    const isTrialPlan = planSelect.value === 'TRIAL';
+    if (nextPaymentField) {
+      nextPaymentField.hidden = isTrialPlan;
+    }
+    if (trialPlanNote) {
+      trialPlanNote.hidden = !isTrialPlan;
+    }
+    if (isTrialPlan && nextPaymentInput) {
+      nextPaymentInput.value = '';
+      nextPaymentInput.dataset.autoNextPayment = 'false';
+    }
+    if (isTrialPlan) {
+      if (crmStatusSelect) crmStatusSelect.value = 'TRIAL';
+      if (paymentStatusSelect) paymentStatusSelect.value = 'TRIAL';
+    }
+  };
+
   const nextMonthPaymentDate = () => {
     const now = new Date();
     const lastDayOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0).getDate();
@@ -547,6 +569,7 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
 
   const shouldAutoFillNextPayment = () => nextPaymentInput
     && planSelect.value
+    && planSelect.value !== 'TRIAL'
     && (nextPaymentInput.value.trim() === '' || nextPaymentInput.dataset.autoNextPayment === 'true');
 
   const applyNextPaymentDate = () => {
@@ -562,7 +585,9 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
     applyPlanPrice();
   }
 
-  if (nextPaymentInput && nextPaymentInput.value.trim() === '') {
+  syncTrialPlanFields();
+
+  if (planSelect.value !== 'TRIAL' && nextPaymentInput && nextPaymentInput.value.trim() === '') {
     applyNextPaymentDate();
   }
 
@@ -572,6 +597,7 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
 
   planSelect.addEventListener('change', () => {
     applyPlanPrice();
+    syncTrialPlanFields();
     applyNextPaymentDate();
   });
 });

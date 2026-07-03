@@ -3004,7 +3004,12 @@ final class EmpresaRepository
         $price = str_replace(',', '.', (string) ($data['monthly_price'] ?? '0'));
         $plan = strtoupper(trim((string) ($data['plan'] ?? 'BASIC'))) ?: 'BASIC';
         $nextPaymentAt = trim((string) ($data['next_payment_at'] ?? '')) ?: null;
-        if ($nextPaymentAt === null && $status !== 'CANCELLED' && $plan !== '') {
+        if ($plan === 'TRIAL') {
+            $status = 'TRIAL';
+            $paymentStatus = 'TRIAL';
+            $price = '0';
+            $nextPaymentAt = null;
+        } elseif ($nextPaymentAt === null && $status !== 'CANCELLED' && $plan !== '') {
             $nextPaymentAt = self::defaultNextPaymentDate();
         }
 
@@ -3029,6 +3034,7 @@ final class EmpresaRepository
                  updated_at = NOW()
              WHERE status IN ("ACTIVE", "TRIAL")
                AND payment_status IN ("PAID", "PENDING")
+               AND plan <> "TRIAL"
                AND monthly_price > 0
                AND next_payment_at IS NOT NULL
                AND next_payment_at < CURDATE()'
@@ -3492,7 +3498,7 @@ final class PlatformPlanRepository
             $options[$plan['code']] = $plan['name'];
         }
 
-        return $options ?: ['BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', 'ENTERPRISE' => 'Enterprise'];
+        return $options ?: ['TRIAL' => 'Prueba', 'BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', 'ENTERPRISE' => 'Enterprise'];
     }
 
     public static function priceMap(): array
@@ -3503,6 +3509,7 @@ final class PlatformPlanRepository
         }
 
         return $prices ?: [
+            'TRIAL' => '0.00',
             'BASIC' => '49.00',
             'PRO' => '89.00',
             'BUSINESS' => '149.00',
@@ -3542,17 +3549,13 @@ final class PlatformPlanRepository
     private static function seedDefaults(): void
     {
         $pdo = Database::connection();
-        $count = (int) $pdo->query('SELECT COUNT(*) FROM saas_plans')->fetchColumn();
-        if ($count > 0) {
-            return;
-        }
-
         $insert = $pdo->prepare(
-            'INSERT INTO saas_plans (id, code, name, monthly_price, setup_price, max_users, max_members, status, features, created_at, updated_at)
+            'INSERT IGNORE INTO saas_plans (id, code, name, monthly_price, setup_price, max_users, max_members, status, features, created_at, updated_at)
              VALUES (:id, :code, :name, :monthly_price, :setup_price, :max_users, :max_members, "ACTIVE", :features, NOW(), NOW())'
         );
 
         foreach ([
+            ['TRIAL', 'Prueba', '0.00', '0.00', 2, 100, 'Plan de prueba de 1 mes sin cobro ni renovacion automatica.'],
             ['BASIC', 'Basico', '49.00', '0.00', 3, 300, 'Leads, socios, tareas y membresias base.'],
             ['PRO', 'Pro', '89.00', '99.00', 8, 1000, 'Calendario de clases, usuarios y soporte prioritario.'],
             ['BUSINESS', 'Business', '149.00', '199.00', 20, 3000, 'Multi-equipo, reporting avanzado y soporte preferente.'],
@@ -3569,6 +3572,17 @@ final class PlatformPlanRepository
                 'features' => $plan[6],
             ]);
         }
+
+        $pdo->exec(
+            'UPDATE saas_plans
+             SET name = "Prueba",
+                 monthly_price = 0,
+                 setup_price = 0,
+                 status = "ACTIVE",
+                 features = "Plan de prueba de 1 mes sin cobro ni renovacion automatica.",
+                 updated_at = NOW()
+             WHERE code = "TRIAL"'
+        );
     }
 
     private static function planParams(array $data): array
