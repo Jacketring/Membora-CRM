@@ -114,6 +114,9 @@ $paymentStatusOptions = [
                 <button class="icon-action" data-open-modal="payment-detail-<?= e($payment['id']) ?>" type="button" title="Editar pago" aria-label="Editar pago de <?= e($memberName) ?>">
                   <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-2v-1.95l7.25-7.25 1.95 1.95L7.95 18H6Zm10.6-8.65L14.65 7.4 16 6.05 17.95 8l-1.35 1.35Z"/></svg>
                 </button>
+                <a class="icon-action success-action" href="index.php?route=payment-invoice&id=<?= urlencode($payment['id']) ?>" target="_blank" rel="noopener" title="Crear factura PDF" aria-label="Crear factura PDF del pago de <?= e($memberName) ?>">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2Zm8 1.5V8h4.5L14 3.5ZM8 11h8v2H8v-2Zm0 4h8v2H8v-2Zm0-8h4v2H8V7Z"/></svg>
+                </a>
                 <form method="post" data-confirm-message="Eliminar este pago? Esta accion no se puede deshacer.">
                   <input type="hidden" name="action" value="delete_payment">
                   <input type="hidden" name="id" value="<?= e($payment['id']) ?>">

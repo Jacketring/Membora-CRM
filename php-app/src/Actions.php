@@ -51,6 +51,7 @@ final class Actions
             'create_member' => self::createMember(),
             'update_member' => self::updateMember(),
             'delete_member' => self::deleteMember(),
+            'renew_member_subscription' => self::renewMemberSubscription(),
             'create_membership_plan' => self::createMembershipPlan(),
             'update_membership_plan' => self::updateMembershipPlan(),
             'delete_membership_plan' => self::deleteMembershipPlan(),
@@ -1018,6 +1019,25 @@ final class Actions
         }
 
         flash('Socio eliminado correctamente. Si venia de un lead, se ha reactivado en Leads.');
+        redirect('members');
+    }
+
+    private static function renewMemberSubscription(): never
+    {
+        $memberId = post_value('id', '');
+        if ($memberId === '') {
+            flash('No se encontro el socio seleccionado.', 'error');
+            redirect('members');
+        }
+
+        try {
+            MembershipRepository::renewMemberSubscription(Auth::tenantId(), $memberId);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo renovar la membresia.', 'error');
+            redirect('members');
+        }
+
+        flash('Membresia renovada y pago registrado correctamente.');
         redirect('members');
     }
 

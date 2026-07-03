@@ -92,7 +92,14 @@ $memberStatusOptions = [
       </thead>
       <tbody>
         <?php foreach ($members as $member): ?>
-          <?php $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')); ?>
+          <?php
+            $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
+            $membershipEndTime = !empty($member['membership_ends_at']) ? strtotime((string) $member['membership_ends_at']) : false;
+            $canRenewMembership = $membershipEndTime !== false
+                && $membershipEndTime <= strtotime('+7 days', strtotime(date('Y-m-d')))
+                && !empty($member['subscription_id'])
+                && !empty($member['membership_name']);
+          ?>
           <tr class="lead-data-row clickable-row" data-open-modal="member-detail-<?= e($member['id']) ?>" data-live-search-row>
             <td>
               <div class="member-identity">
@@ -135,6 +142,15 @@ $memberStatusOptions = [
                 <button class="icon-action" data-open-modal="member-detail-<?= e($member['id']) ?>" type="button" title="Editar socio" aria-label="Editar socio <?= e($memberName) ?>">
                   <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-2v-1.95l7.25-7.25 1.95 1.95L7.95 18H6Zm10.6-8.65L14.65 7.4 16 6.05 17.95 8l-1.35 1.35Z"/></svg>
                 </button>
+                <?php if ($canRenewMembership): ?>
+                  <form method="post" data-confirm-message="Se renovara la membresia y se registrara el pago asociado.">
+                    <input type="hidden" name="action" value="renew_member_subscription">
+                    <input type="hidden" name="id" value="<?= e($member['id']) ?>">
+                    <button class="icon-action success-action" type="submit" title="Renovar membresia" aria-label="Renovar membresia de <?= e($memberName) ?>">
+                      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.2L13 11h8V3l-3.3 3.3ZM11 7h2v5.6l4 2.4-1 1.7-5-3V7Z"/></svg>
+                    </button>
+                  </form>
+                <?php endif; ?>
                 <form method="post" data-confirm-message="Eliminar este socio? Esta accion no se puede deshacer.">
                   <input type="hidden" name="action" value="delete_member">
                   <input type="hidden" name="id" value="<?= e($member['id']) ?>">

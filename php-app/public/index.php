@@ -441,6 +441,19 @@ switch ($route) {
         ]);
         break;
 
+    case 'payment-invoice':
+        $tenantId = Auth::tenantId();
+        $payment = PaymentRepository::findWithMember($tenantId, trim((string) ($_GET['id'] ?? '')));
+        if (!$payment) {
+            flash('No se encontro el pago para generar la factura.', 'error');
+            redirect('payments');
+        }
+
+        render('payment-invoice', [
+            'payment' => $payment,
+        ]);
+        break;
+
     case 'billing':
         $tenantId = Auth::tenantId();
         render_layout('Facturacion', 'billing', [
