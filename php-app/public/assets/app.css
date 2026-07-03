@@ -135,6 +135,8 @@ summary:focus-visible {
   border: 1px solid #bfd3f8;
   border-radius: 10px;
   cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
   font-weight: 900;
   min-height: 44px;
   padding: 0 12px;
@@ -149,6 +151,11 @@ summary:focus-visible {
 }
 .demo-login-action:hover {
   filter: brightness(0.98);
+}
+@media (max-width: 520px) {
+  .demo-login-actions {
+    grid-template-columns: 1fr;
+  }
 }
 .demo-fill-action {
   background: #fff;
