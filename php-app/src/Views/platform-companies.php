@@ -102,6 +102,11 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
           <?php
             $statusClass = strtolower((string) $empresa['status']);
             $paymentClass = strtolower((string) $empresa['payment_status']);
+            $nextPaymentTime = !empty($empresa['next_payment_at']) ? strtotime((string) $empresa['next_payment_at']) : false;
+            $canRenew = $nextPaymentTime !== false
+                && $nextPaymentTime <= strtotime(date('Y-m-d'))
+                && in_array((string) $empresa['status'], ['ACTIVE', 'TRIAL'], true)
+                && (float) $empresa['monthly_price'] > 0;
           ?>
           <tr class="lead-data-row clickable-row" tabindex="0" data-open-modal="empresa-edit-<?= e($empresa['id']) ?>">
             <td>
@@ -131,6 +136,16 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
                   <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
                   <span>Editar</span>
                 </button>
+                <?php if ($canRenew): ?>
+                  <form method="post" data-confirm-message="Se creara un pago pagado y se movera el proximo pago al mes siguiente.">
+                    <input type="hidden" name="action" value="renew_empresa_subscription">
+                    <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">
+                    <button class="support-renew-action" type="submit" aria-label="Renovar suscripcion de <?= e($empresa['name']) ?>">
+                      <svg viewBox="0 0 24 24"><path d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.2L13 11h8V3l-3.3 3.3ZM11 7h2v5.6l4 2.4-1 1.7-5-3V7Z"/></svg>
+                      <span>Renovacion</span>
+                    </button>
+                  </form>
+                <?php endif; ?>
               </div>
             </td>
           </tr>

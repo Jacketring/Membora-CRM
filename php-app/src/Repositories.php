@@ -44,7 +44,7 @@ final class AuditLogRepository
         ],
         'companies' => [
             'label' => 'Empresas',
-            'actions' => ['create_empresa', 'update_empresa', 'enter_empresa_crm', 'exit_empresa_crm'],
+            'actions' => ['create_empresa', 'update_empresa', 'renew_empresa_subscription', 'enter_empresa_crm', 'exit_empresa_crm'],
         ],
         'members' => [
             'label' => 'Socios',
@@ -508,7 +508,7 @@ final class AuditLogRepository
 
     private static function entityType(string $action): ?string
     {
-        $action = preg_replace('/^(create|update|delete|convert|mark|add|send|enter|exit)_/', '', $action) ?: $action;
+        $action = preg_replace('/^(create|update|delete|convert|mark|add|send|enter|exit|renew)_/', '', $action) ?: $action;
         return $action !== '' ? $action : null;
     }
 
@@ -2244,6 +2244,83 @@ final class EmpresaRepository
              WHERE id = :id'
         );
         $stmt->execute(self::empresaParams($data) + ['id' => $id]);
+    }
+
+    public static function renewSubscription(string $id): void
+    {
+        self::ensureTables();
+        PlatformPaymentRepository::ensureTable();
+        $empresa = self::find($id);
+
+        if (!$empresa) {
+            throw new RuntimeException('No se encontro la empresa.');
+        }
+
+        if (!in_array((string) $empresa['status'], ['ACTIVE', 'TRIAL'], true)) {
+            throw new RuntimeException('Solo se pueden renovar empresas activas o en prueba.');
+        }
+
+        $dueDate = trim((string) ($empresa['next_payment_at'] ?? ''));
+        if ($dueDate === '') {
+            throw new RuntimeException('La empresa no tiene fecha de proximo pago.');
+        }
+
+        $due = DateTimeImmutable::createFromFormat('Y-m-d', $dueDate);
+        if (!$due) {
+            throw new RuntimeException('La fecha de proximo pago no es valida.');
+        }
+
+        $today = new DateTimeImmutable('today');
+        if ($due > $today) {
+            throw new RuntimeException('La renovacion solo esta disponible cuando el pago vence hoy o esta vencido.');
+        }
+
+        $amount = (float) ($empresa['monthly_price'] ?? 0);
+        if ($amount <= 0) {
+            throw new RuntimeException('La empresa no tiene precio mensual configurado.');
+        }
+
+        $nextPaymentAt = $due->modify('+1 month')->format('Y-m-d');
+        $concept = 'Renovacion suscripcion CRM - ' . $due->format('m/Y');
+        $notes = 'Renovacion creada desde Admin CRM para ' . $empresa['name'] . '.';
+
+        $pdo = Database::connection();
+        $pdo->beginTransaction();
+
+        try {
+            $payment = $pdo->prepare(
+                'INSERT INTO empresa_payments (id, empresa_id, concept, amount, status, due_at, paid_at, notes, created_at, updated_at)
+                 VALUES (:id, :empresa_id, :concept, :amount, "PAID", :due_at, CURDATE(), :notes, NOW(), NOW())'
+            );
+            $payment->execute([
+                'id' => cuid(),
+                'empresa_id' => $id,
+                'concept' => $concept,
+                'amount' => number_format($amount, 2, '.', ''),
+                'due_at' => $due->format('Y-m-d'),
+                'notes' => $notes,
+            ]);
+
+            $update = $pdo->prepare(
+                'UPDATE empresas
+                 SET payment_status = "PAID",
+                     next_payment_at = :next_payment_at,
+                     updated_at = NOW()
+                 WHERE id = :id'
+            );
+            $update->execute([
+                'id' => $id,
+                'next_payment_at' => $nextPaymentAt,
+            ]);
+
+            $pdo->commit();
+        } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            throw $exception;
+        }
     }
 
     private static function syncFromTenants(): void

@@ -30,6 +30,7 @@ final class Actions
             'update_platform_client' => self::updatePlatformClient(),
             'create_empresa' => self::createEmpresa(),
             'update_empresa' => self::updateEmpresa(),
+            'renew_empresa_subscription' => self::renewEmpresaSubscription(),
             'create_platform_payment' => self::createPlatformPayment(),
             'update_platform_payment' => self::updatePlatformPayment(),
             'create_platform_plan' => self::createPlatformPlan(),
@@ -215,6 +216,27 @@ final class Actions
 
         EmpresaRepository::update($id, $_POST);
         flash('Empresa actualizada correctamente.');
+        redirect('platform-companies');
+    }
+
+    private static function renewEmpresaSubscription(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '') {
+            flash('No se encontro la empresa que quieres renovar.', 'error');
+            redirect('platform-companies');
+        }
+
+        try {
+            EmpresaRepository::renewSubscription($id);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo renovar la suscripcion.', 'error');
+            redirect('platform-companies');
+        }
+
+        flash('Renovacion registrada y proximo pago actualizado.');
         redirect('platform-companies');
     }
 

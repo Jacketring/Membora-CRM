@@ -1655,7 +1655,8 @@ td.empty-state,
   margin: 0;
 }
 .support-enter-action,
-.support-edit-action {
+.support-edit-action,
+.support-renew-action {
   align-items: center;
   border-radius: 10px;
   display: inline-flex;
@@ -1684,8 +1685,19 @@ td.empty-state,
   border-color: #9bb7ec;
   color: var(--primary);
 }
+.support-renew-action {
+  background: #ecfdf5;
+  border: 1px solid #9be6c5;
+  color: #047857;
+  font-weight: 900;
+}
+.support-renew-action:hover {
+  background: #d1fae5;
+  border-color: #34d399;
+}
 .support-enter-action svg,
-.support-edit-action svg {
+.support-edit-action svg,
+.support-renew-action svg {
   fill: currentColor;
   height: 16px;
   width: 16px;
