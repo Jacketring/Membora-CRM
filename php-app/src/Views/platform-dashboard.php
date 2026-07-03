@@ -24,7 +24,7 @@ $riskCompanies = array_values(array_filter($allEmpresas, static function (array 
     }
 
     $date = new DateTimeImmutable(date('Y-m-d', $timestamp));
-    return $date >= $today && $date <= $nextWeek;
+    return $date <= $nextWeek;
 }));
 usort($riskCompanies, static fn (array $a, array $b): int => strcmp((string) ($a['next_payment_at'] ?? '9999-12-31'), (string) ($b['next_payment_at'] ?? '9999-12-31')));
 
