@@ -1656,7 +1656,8 @@ td.empty-state,
 }
 .support-enter-action,
 .support-edit-action,
-.support-renew-action {
+.support-renew-action,
+.support-invoice-action {
   align-items: center;
   border-radius: 10px;
   display: inline-flex;
@@ -1695,9 +1696,21 @@ td.empty-state,
   background: #d1fae5;
   border-color: #34d399;
 }
+.support-invoice-action {
+  background: #eef4ff;
+  border: 1px solid #bfd3ff;
+  color: var(--primary);
+  font-weight: 900;
+  text-decoration: none;
+}
+.support-invoice-action:hover {
+  background: #dbeafe;
+  border-color: #8fb3ff;
+}
 .support-enter-action svg,
 .support-edit-action svg,
-.support-renew-action svg {
+.support-renew-action svg,
+.support-invoice-action svg {
   fill: currentColor;
   height: 16px;
   width: 16px;

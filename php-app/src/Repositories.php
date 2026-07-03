@@ -2695,6 +2695,24 @@ final class PlatformPaymentRepository
         return $stmt->fetchAll();
     }
 
+    public static function findWithEmpresa(string $id): ?array
+    {
+        self::ensureTable();
+        EmpresaRepository::ensureTables();
+
+        $stmt = Database::connection()->prepare(
+            'SELECT p.*, e.name AS empresa_name, e.contact_email, e.plan, e.monthly_price, e.status AS empresa_status
+             FROM empresa_payments p
+             INNER JOIN empresas e ON e.id = p.empresa_id
+             WHERE p.id = :id
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $id]);
+        $payment = $stmt->fetch();
+
+        return $payment ?: null;
+    }
+
     public static function create(array $data): void
     {
         self::ensureTable();

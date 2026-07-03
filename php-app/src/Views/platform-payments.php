@@ -96,10 +96,16 @@ $statusOptions = [
             <td><?= e(format_date_short($payment['paid_at'])) ?></td>
             <td><?= e($payment['notes'] ? substr($payment['notes'], 0, 70) . (strlen($payment['notes']) > 70 ? '...' : '') : 'Sin notas') ?></td>
             <td>
-              <button class="support-edit-action" type="button" data-open-modal="payment-edit-<?= e($payment['id']) ?>" aria-label="Editar pago <?= e($payment['concept']) ?>">
-                <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
-                <span>Editar</span>
-              </button>
+              <div class="platform-row-actions">
+                <a class="support-invoice-action" href="index.php?route=platform-payment-invoice&id=<?= urlencode($payment['id']) ?>" target="_blank" rel="noopener" aria-label="Generar factura del pago <?= e($payment['concept']) ?>">
+                  <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2Zm8 1.8V8h4.2L14 3.8ZM8 11h8v2H8v-2Zm0 4h8v2H8v-2Zm0 4h5v1H8v-1Z"/></svg>
+                  <span>Factura PDF</span>
+                </a>
+                <button class="support-edit-action" type="button" data-open-modal="payment-edit-<?= e($payment['id']) ?>" aria-label="Editar pago <?= e($payment['concept']) ?>">
+                  <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
+                  <span>Editar</span>
+                </button>
+              </div>
             </td>
           </tr>
         <?php endforeach; ?>

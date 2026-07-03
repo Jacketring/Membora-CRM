@@ -228,6 +228,22 @@ switch ($route) {
         ]);
         break;
 
+    case 'platform-payment-invoice':
+        if (!is_platform_admin($currentUser)) {
+            redirect('dashboard');
+        }
+
+        $payment = PlatformPaymentRepository::findWithEmpresa(trim((string) ($_GET['id'] ?? '')));
+        if (!$payment) {
+            flash('No se encontro el pago para generar la factura.', 'error');
+            redirect('platform-payments');
+        }
+
+        render('platform-payment-invoice', [
+            'payment' => $payment,
+        ]);
+        break;
+
     case 'platform-plans':
         if (!is_platform_admin($currentUser)) {
             redirect('dashboard');
