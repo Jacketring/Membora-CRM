@@ -1,7 +1,7 @@
 <div class="page-heading">
   <div>
     <h2>Tareas</h2>
-    <p>Organiza seguimientos comerciales, pagos pendientes y acciones operativas del centro.</p>
+    <p>Organiza acciones internas del equipo, responsables, vencimientos y seguimiento operativo.</p>
   </div>
   <button class="primary-action primary-action--compact" data-open-modal="task-modal" type="button">Nueva tarea</button>
 </div>
@@ -46,7 +46,7 @@ $taskStatusOptions = [
   <input type="hidden" name="route" value="tasks">
   <div class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Titulo, descripcion, socio, lead o responsable" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Titulo, descripcion o responsable" data-auto-filter-input>
   </div>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
@@ -89,7 +89,7 @@ $taskStatusOptions = [
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
       <input type="hidden" name="assigned_user_id" value="<?= e($filters['assigned_user_id']) ?>" data-custom-select-value>
       <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
-        <small>Responsable</small>
+        <small>Usuario responsable</small>
         <span data-custom-select-label><?= e($selectedStaffLabel) ?></span>
       </button>
       <div class="custom-select-menu" data-custom-select-menu hidden>
@@ -127,8 +127,7 @@ $taskStatusOptions = [
         <tr>
           <th>Tarea</th>
           <th>Tipo</th>
-          <th>Vinculado a</th>
-          <th>Responsable</th>
+          <th>Usuario responsable</th>
           <th>Vencimiento</th>
           <th>Estado</th>
           <th>Creacion</th>
@@ -137,47 +136,12 @@ $taskStatusOptions = [
       </thead>
       <tbody>
         <?php foreach ($tasks as $task): ?>
-          <?php
-            $leadName = trim(($task['lead_first_name'] ?? '') . ' ' . ($task['lead_last_name'] ?? ''));
-            $memberName = trim(($task['member_first_name'] ?? '') . ' ' . ($task['member_last_name'] ?? ''));
-            $linkedMembers = array_values(array_filter(array_map('trim', explode('||', (string) ($task['linked_member_names'] ?? '')))));
-            $linkedMemberIds = array_values(array_filter(array_map('trim', explode('||', (string) ($task['linked_member_ids'] ?? '')))));
-            if (!$linkedMembers && $memberName !== '') {
-                $linkedMembers = [$memberName];
-                if (!empty($task['member_id'])) {
-                    $linkedMemberIds = [$task['member_id']];
-                }
-            }
-          ?>
           <tr class="lead-data-row clickable-row" data-open-modal="task-detail-<?= e($task['id']) ?>" tabindex="0" role="button" aria-label="Editar tarea <?= e($task['title']) ?>" data-live-search-row>
             <td>
               <strong><?= e($task['title']) ?></strong>
               <small class="task-description"><?= e($task['description'] ?: 'Sin descripcion') ?></small>
             </td>
             <td><span class="source-badge"><?= e(task_type_label($task['type'])) ?></span></td>
-            <td>
-              <?php if ($linkedMembers): ?>
-                <details class="linked-members">
-                  <summary>
-                    <span><?= e($linkedMembers[0]) ?></span>
-                    <?php if (count($linkedMembers) > 1): ?>
-                      <strong>+<?= count($linkedMembers) - 1 ?></strong>
-                    <?php endif; ?>
-                  </summary>
-                  <?php if (count($linkedMembers) > 1): ?>
-                    <div>
-                      <?php foreach ($linkedMembers as $linkedMember): ?>
-                        <span><?= e($linkedMember) ?></span>
-                      <?php endforeach; ?>
-                    </div>
-                  <?php endif; ?>
-                </details>
-              <?php elseif ($leadName !== ''): ?>
-                <?= e($leadName) ?>
-              <?php else: ?>
-                <span class="muted-text">Sin vincular</span>
-              <?php endif; ?>
-            </td>
             <td><?= e($task['assigned_name'] ?: 'Sin asignar') ?></td>
             <td><?= e(format_date($task['due_at'])) ?></td>
             <td>
@@ -223,11 +187,11 @@ $taskStatusOptions = [
 
         <?php if (!$tasks): ?>
           <tr data-live-search-empty>
-            <td class="leads-empty-cell" colspan="8">No hay tareas que coincidan con los filtros actuales.</td>
+            <td class="leads-empty-cell" colspan="7">No hay tareas que coincidan con los filtros actuales.</td>
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="8">No hay tareas que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="7">No hay tareas que coincidan con la busqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
@@ -236,12 +200,6 @@ $taskStatusOptions = [
 </section>
 
 <?php foreach ($tasks as $task): ?>
-  <?php
-    $selectedMemberIds = array_values(array_filter(array_map('trim', explode('||', (string) ($task['linked_member_ids'] ?? '')))));
-    if (!$selectedMemberIds && !empty($task['member_id'])) {
-        $selectedMemberIds = [$task['member_id']];
-    }
-  ?>
   <dialog id="task-detail-<?= e($task['id']) ?>" class="modal-card lead-detail-modal">
     <form method="post">
       <input type="hidden" name="action" value="update_task">
@@ -292,7 +250,7 @@ $taskStatusOptions = [
           <input name="due_at" type="datetime-local" value="<?= $task['due_at'] ? e(date('Y-m-d\TH:i', strtotime($task['due_at']))) : '' ?>">
         </label>
         <div class="field">
-          <span>Responsable</span>
+          <span>Usuario responsable</span>
           <div class="custom-select custom-select--field" data-custom-select>
             <input type="hidden" name="assigned_user_id" value="<?= e($task['assigned_user_id'] ?? '') ?>" data-custom-select-value>
             <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
@@ -303,31 +261,6 @@ $taskStatusOptions = [
             <?php foreach ($staff as $staffUser): ?>
               <button class="custom-select-option <?= $task['assigned_user_id'] === $staffUser['id'] ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($staffUser['id']) ?>"><?= e($staffUser['name']) ?> - <?= e(role_label($staffUser['role_key'])) ?></button>
             <?php endforeach; ?>
-            </div>
-          </div>
-        </div>
-        <div class="field field--wide">
-          <span>Socios vinculados</span>
-          <div class="member-picker-shell" data-member-picker>
-            <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o telefono" data-member-search>
-            <div class="member-picker">
-              <?php foreach ($members as $member): ?>
-                <?php
-                  $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
-                  $searchText = strtolower($memberName . ' ' . ($member['email'] ?? '') . ' ' . ($member['phone'] ?? ''));
-                ?>
-                <label data-member-option data-search="<?= e($searchText) ?>">
-                  <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>" <?= in_array($member['id'], $selectedMemberIds, true) ? 'checked' : '' ?>>
-                  <span>
-                    <strong><?= e($memberName) ?></strong>
-                    <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
-                  </span>
-                </label>
-              <?php endforeach; ?>
-              <?php if (!$members): ?>
-                <p>No hay socios disponibles para vincular.</p>
-              <?php endif; ?>
-              <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la busqueda.</p>
             </div>
           </div>
         </div>
@@ -374,7 +307,7 @@ $taskStatusOptions = [
         <input name="due_at" type="datetime-local">
       </label>
       <div class="field field--wide">
-        <span>Responsable</span>
+        <span>Usuario responsable</span>
         <div class="custom-select custom-select--field" data-custom-select>
           <input type="hidden" name="assigned_user_id" value="" data-custom-select-value>
           <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
@@ -385,31 +318,6 @@ $taskStatusOptions = [
           <?php foreach ($staff as $staffUser): ?>
             <button class="custom-select-option" type="button" data-custom-select-option data-value="<?= e($staffUser['id']) ?>"><?= e($staffUser['name']) ?> - <?= e(role_label($staffUser['role_key'])) ?></button>
           <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-      <div class="field field--wide">
-        <span>Socios vinculados</span>
-        <div class="member-picker-shell" data-member-picker>
-          <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o telefono" data-member-search>
-          <div class="member-picker">
-            <?php foreach ($members as $member): ?>
-              <?php
-                $memberName = trim($member['first_name'] . ' ' . ($member['last_name'] ?? ''));
-                $searchText = strtolower($memberName . ' ' . ($member['email'] ?? '') . ' ' . ($member['phone'] ?? ''));
-              ?>
-              <label data-member-option data-search="<?= e($searchText) ?>">
-                <input type="checkbox" name="member_ids[]" value="<?= e($member['id']) ?>">
-                <span>
-                  <strong><?= e($memberName) ?></strong>
-                  <small><?= e($member['email'] ?: ($member['phone'] ?: 'Sin contacto')) ?></small>
-                </span>
-              </label>
-            <?php endforeach; ?>
-            <?php if (!$members): ?>
-              <p>No hay socios disponibles para vincular.</p>
-            <?php endif; ?>
-            <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la busqueda.</p>
           </div>
         </div>
       </div>

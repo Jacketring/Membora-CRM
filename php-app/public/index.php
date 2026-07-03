@@ -349,7 +349,6 @@ switch ($route) {
         render_layout('Tareas', 'tasks', [
             'filters' => $filters,
             'staff' => StaffRepository::all($tenantId),
-            'members' => MemberRepository::all($tenantId),
             'metrics' => TaskRepository::metrics($tenantId),
             'tasks' => TaskRepository::all(
                 $tenantId,

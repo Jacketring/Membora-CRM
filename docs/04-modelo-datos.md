@@ -35,7 +35,7 @@ Estas tablas pertenecen a un gimnasio concreto y deben consultarse siempre con `
 - `class_sessions`: sesiones programadas.
 - `reservations`: reservas de socios en clases.
 - `tasks`: tareas comerciales u operativas.
-- `task_members`: relacion N:M entre tareas y varios socios.
+- `task_members`: tabla historica de compatibilidad para tareas antiguas vinculadas a socios.
 - `risk_alerts`: alertas generadas para priorizar riesgos operativos.
 - `payments`: pagos manuales de socios, vencimientos y cobros.
 - `billing_integrations`: configuracion de proveedor externo de facturacion por tenant.
@@ -82,7 +82,8 @@ Estas tablas son globales de Membora CRM y no representan datos internos de un g
 - `ClassSession` 1 -> N `Reservation`.
 - `ClassSession` 0..N -> N `CheckIn`.
 - `Member` 1 -> N `Reservation`.
-- `Task` N <-> N `Member` mediante `task_members`.
+- `Task` N -> 1 `User` mediante `assigned_user_id` como responsable interno.
+- `Task` puede conservar enlaces historicos con `Member` mediante `task_members`, pero la interfaz actual prioriza usuarios internos.
 - `RiskAlert` 0..N -> `Member`, `Lead`, `Task`, `Payment` o `ClassSession`.
 - `AuditLog` 0..N -> `User` y opcionalmente a una entidad funcional mediante `entity_type` y `entity_id`.
 - `PlatformLead` 0..1 -> 1 `PlatformClient` al convertir una solicitud web.

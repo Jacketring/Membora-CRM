@@ -27,7 +27,7 @@ Pantallas disponibles:
 - Auditoria de acciones internas.
 - Permisos por rol para rutas y acciones.
 - Clases con listado, calendario mensual y reservas de socios.
-- Tareas con filtros, responsables y varios socios vinculados.
+- Tareas internas con filtros, usuario responsable, estado y vencimiento.
 - Usuarios internos del gimnasio.
 - Perfil de usuario.
 - Configuracion visual personal.
@@ -231,7 +231,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Auditoria de acciones internas con datos sanitizados.
 - Permisos por rol en rutas y acciones POST.
 - Clases, calendario mensual y reservas.
-- Tareas con varios socios vinculados.
+- Tareas internas asignadas a usuarios del equipo.
 - Usuarios internos y roles.
 - Perfil, imagen de usuario y configuracion visual.
 

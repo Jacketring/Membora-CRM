@@ -70,7 +70,7 @@ Recorrido recomendado:
 8. Check-ins: entrada manual y asociacion a reservas.
 9. Alertas: pagos vencidos, tareas, membresias, leads, actividad y clases llenas.
 10. Clases: calendario, creacion, edicion y reservas.
-11. Tareas: varios socios vinculados y acciones.
+11. Tareas: usuario responsable, vencimiento, estados y acciones.
 12. Auditoria: acciones registradas y filtros.
 13. Usuarios internos y permisos por rol.
 14. Perfil y configuracion visual.

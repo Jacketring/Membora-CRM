@@ -4113,14 +4113,7 @@ final class TaskRepository
         $where = ['tasks.tenant_id = :tenant_id'];
 
         if ($query !== '') {
-            $where[] = '(tasks.title LIKE :query OR tasks.description LIKE :query OR leads.first_name LIKE :query OR leads.last_name LIKE :query OR legacy_members.first_name LIKE :query OR legacy_members.last_name LIKE :query OR users.name LIKE :query OR EXISTS (
-                SELECT 1
-                FROM task_members tm_search
-                INNER JOIN members member_search ON member_search.id = tm_search.member_id
-                WHERE tm_search.task_id = tasks.id
-                AND tm_search.tenant_id = tasks.tenant_id
-                AND (member_search.first_name LIKE :query OR member_search.last_name LIKE :query)
-            ))';
+            $where[] = '(tasks.title LIKE :query OR tasks.description LIKE :query OR users.name LIKE :query)';
             $params['query'] = '%' . $query . '%';
         }
 
@@ -4149,26 +4142,9 @@ final class TaskRepository
             $params['date_to'] = $dateTo;
         }
 
-        $sql = 'SELECT tasks.*, users.name AS assigned_name,
-                       leads.first_name AS lead_first_name, leads.last_name AS lead_last_name,
-                       legacy_members.first_name AS member_first_name, legacy_members.last_name AS member_last_name,
-                       (
-                           SELECT GROUP_CONCAT(DISTINCT CONCAT(linked_members.first_name, " ", COALESCE(linked_members.last_name, "")) ORDER BY linked_members.first_name SEPARATOR "||")
-                           FROM task_members
-                           INNER JOIN members linked_members ON linked_members.id = task_members.member_id
-                           WHERE task_members.task_id = tasks.id
-                           AND task_members.tenant_id = tasks.tenant_id
-                       ) AS linked_member_names,
-                       (
-                           SELECT GROUP_CONCAT(task_members.member_id SEPARATOR "||")
-                           FROM task_members
-                           WHERE task_members.task_id = tasks.id
-                           AND task_members.tenant_id = tasks.tenant_id
-                       ) AS linked_member_ids
+        $sql = 'SELECT tasks.*, users.name AS assigned_name
                 FROM tasks
                 LEFT JOIN users ON users.id = tasks.assigned_user_id
-                LEFT JOIN leads ON leads.id = tasks.lead_id
-                LEFT JOIN members legacy_members ON legacy_members.id = tasks.member_id
                 WHERE ' . implode(' AND ', $where) . '
                 ORDER BY tasks.status ASC, tasks.due_at ASC, tasks.created_at DESC
                 LIMIT ' . max(1, min($limit, 200));

@@ -212,6 +212,6 @@ Pruebas manuales clave:
 - Generacion, resolucion y descarte de alertas de riesgo.
 - Creacion de clase desde calendario.
 - Reserva, asistencia, no-show y cancelacion.
-- Creacion de tarea con varios socios.
+- Creacion de tarea interna asignada a un usuario responsable.
 - Formulario de la web publica hacia `/webhook/lead`.
 - Prueba de correo desde `Admin CRM > Web`.

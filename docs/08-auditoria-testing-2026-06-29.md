@@ -354,7 +354,7 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 - [ ] Membresias: crear plan, editar, calcular caducidad.
 - [ ] Clases: crear tipo, crear clase, editar, calendario, eliminar.
 - [ ] Reservas: crear, cancelar, asistencia, no-show, aforo.
-- [ ] Tareas: crear con varios socios, editar, iconos, eliminar.
+- [ ] Tareas: crear con usuario responsable, editar, iconos, estados y eliminar.
 - [ ] Usuarios: crear, editar rol en espanol, desactivar.
 - [ ] Perfil: editar datos, foto, password.
 - [ ] Configuracion: claro/oscuro, color, compactar.

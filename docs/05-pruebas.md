@@ -224,14 +224,14 @@ Resultado esperado:
 Pasos:
 
 1. Crear una tarea.
-2. Vincular varios socios.
+2. Asignar un usuario responsable.
 3. Editar la tarea.
 4. Cambiar estado.
 5. Eliminar con confirmacion visual.
 
 Resultado esperado:
 
-- Se crea una sola tarea con varios socios vinculados.
+- Se crea una tarea interna asignada al usuario responsable.
 - No se duplican tareas.
 - Las acciones se muestran con iconos.
 

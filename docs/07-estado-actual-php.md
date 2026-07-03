@@ -146,7 +146,8 @@ No se usa Node.js en produccion.
 - Creacion y edicion.
 - Acciones con iconos.
 - Confirmacion visual de eliminacion.
-- Vinculacion a varios socios mediante tabla `task_members`.
+- Asignacion de tareas a usuarios internos mediante `assigned_user_id`.
+- La tabla `task_members` queda como compatibilidad historica para datos antiguos.
 
 ### Usuarios internos
 

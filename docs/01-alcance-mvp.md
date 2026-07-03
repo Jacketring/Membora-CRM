@@ -36,7 +36,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Sesiones de clase con fecha, hora, entrenador, aforo y estado.
 - Calendario mensual de clases.
 - Reservas de socios con control de aforo, asistencia, no-show y cancelacion.
-- Tareas con responsable, estado, fecha y varios socios vinculados.
+- Tareas internas con usuario responsable, estado, fecha y seguimiento operativo.
 - Usuarios internos del gimnasio.
 - Permisos por rol para rutas y acciones internas.
 - Perfil de usuario con imagen.
@@ -162,7 +162,7 @@ Tablas SaaS principales:
 8. Registrar un check-in manual o asociado a reserva.
 9. Revisar y resolver alertas de riesgo.
 10. Reservar plaza para un socio y marcar asistencia/no-show.
-11. Crear una tarea vinculada a varios socios.
+11. Crear una tarea interna asignada a un usuario del equipo.
 12. Revisar auditoria para comprobar las acciones registradas.
 13. Revisar usuarios internos, perfil y configuracion.
 14. Entrar como administrador de plataforma.

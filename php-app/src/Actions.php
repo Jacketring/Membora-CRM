@@ -1564,7 +1564,6 @@ final class Actions
 
         TaskRepository::ensureMemberLinksTable();
         $tenantId = Auth::tenantId();
-        $memberIds = self::taskMemberIdsFromPost();
         $taskId = cuid();
         $pdo = Database::connection();
 
@@ -1578,14 +1577,14 @@ final class Actions
                 'id' => $taskId,
                 'tenant_id' => $tenantId,
                 'assigned_user_id' => post_value('assigned_user_id') ?: null,
-                'member_id' => $memberIds[0] ?? null,
+                'member_id' => null,
                 'title' => $title,
                 'description' => post_value('description') ?: null,
                 'type' => post_value('type', 'OTHER'),
                 'due_at' => post_value('due_at') ?: null,
             ]);
 
-            self::syncTaskMembers($pdo, $tenantId, $taskId, $memberIds);
+            self::syncTaskMembers($pdo, $tenantId, $taskId, []);
 
             $pdo->commit();
         } catch (Throwable $exception) {
@@ -1612,7 +1611,6 @@ final class Actions
         TaskRepository::ensureMemberLinksTable();
         $tenantId = Auth::tenantId();
         $taskId = post_value('id');
-        $memberIds = self::taskMemberIdsFromPost();
         $status = post_value('status', 'PENDING');
         $allowedStatuses = ['PENDING', 'COMPLETED', 'CANCELLED'];
         if (!in_array($status, $allowedStatuses, true)) {
@@ -1638,7 +1636,7 @@ final class Actions
             );
             $stmt->execute([
                 'assigned_user_id' => post_value('assigned_user_id') ?: null,
-                'member_id' => $memberIds[0] ?? null,
+                'member_id' => null,
                 'title' => $title,
                 'description' => post_value('description') ?: null,
                 'type' => post_value('type', 'OTHER'),
@@ -1650,7 +1648,7 @@ final class Actions
                 'tenant_id' => $tenantId,
             ]);
 
-            self::syncTaskMembers($pdo, $tenantId, (string) $taskId, $memberIds);
+            self::syncTaskMembers($pdo, $tenantId, (string) $taskId, []);
             $pdo->commit();
         } catch (Throwable $exception) {
             if ($pdo->inTransaction()) {
@@ -1695,14 +1693,6 @@ final class Actions
         $stmt = $pdo->prepare('DELETE FROM tasks WHERE id = :id AND tenant_id = :tenant_id');
         $stmt->execute(['id' => $taskId, 'tenant_id' => $tenantId]);
         redirect('tasks');
-    }
-
-    private static function taskMemberIdsFromPost(): array
-    {
-        return array_values(array_unique(array_filter(array_map(
-            static fn ($value): string => trim((string) $value),
-            is_array($_POST['member_ids'] ?? null) ? $_POST['member_ids'] : []
-        ))));
     }
 
     private static function syncTaskMembers(PDO $pdo, string $tenantId, string $taskId, array $memberIds): void
