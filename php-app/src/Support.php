@@ -816,10 +816,10 @@ function source_label(?string $source): string
 function task_type_label(?string $type): string
 {
     return enum_label((string) $type, [
-        'SALES' => 'Comercial',
-        'RETENTION' => 'Retencion',
-        'PAYMENT' => 'Pago',
-        'OPERATIONAL' => 'Operativa',
+        'SALES' => 'Bienvenida / alta',
+        'RETENTION' => 'Seguimiento de socio',
+        'PAYMENT' => 'Cobro o renovacion',
+        'OPERATIONAL' => 'Operacion interna',
         'OTHER' => 'Otra',
     ]);
 }

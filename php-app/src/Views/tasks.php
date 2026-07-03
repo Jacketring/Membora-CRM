@@ -224,12 +224,13 @@ $taskStatusOptions = [
             <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
               <span data-custom-select-label><?= e(task_type_label($task['type'])) ?></span>
             </button>
-            <div class="custom-select-menu" data-custom-select-menu hidden>
+          <div class="custom-select-menu" data-custom-select-menu hidden>
             <?php foreach (['SALES', 'RETENTION', 'PAYMENT', 'OPERATIONAL', 'OTHER'] as $type): ?>
               <button class="custom-select-option <?= $task['type'] === $type ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($type) ?>"><?= e(task_type_label($type)) ?></button>
             <?php endforeach; ?>
             </div>
           </div>
+          <small>Categoria de trabajo para organizar el equipo.</small>
         </div>
         <div class="field">
           <span>Estado</span>
@@ -286,7 +287,7 @@ $taskStatusOptions = [
     <div class="form-grid">
       <label class="field field--wide">
         <span>Titulo</span>
-        <input name="title" required placeholder="Ej. Llamar para confirmar renovacion">
+        <input name="title" required placeholder="Ej. Acompanhar a socio nuevo en su primer dia">
       </label>
       <div class="field">
         <span>Tipo</span>
@@ -301,6 +302,7 @@ $taskStatusOptions = [
             <?php endforeach; ?>
           </div>
         </div>
+        <small>Usalo para indicar si es bienvenida, seguimiento, cobro u operacion interna.</small>
       </div>
       <label class="field">
         <span>Vencimiento</span>

@@ -143,8 +143,8 @@ El sistema debe permitir crear tareas comerciales, operativas y de retencion.
 
 Criterios:
 
-- Asociar tareas a lead o socio.
-- Asignar responsable.
+- Asignar tareas a un usuario interno responsable.
+- Clasificar la tarea como bienvenida/alta, seguimiento de socio, cobro/renovacion, operacion interna u otra categoria.
 - Definir vencimiento.
 - Marcar como completada o cancelada.
 
