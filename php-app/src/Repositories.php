@@ -207,7 +207,7 @@ final class DemoRepository
         $stages = [
             ['NEW', 'Nuevo', 1],
             ['CONTACTED', 'Contactado', 2],
-            ['CONVERTED', 'Convertido', 3],
+            ['CONVERTED', 'Cliente', 3],
             ['LOST', 'Perdido', 4],
         ];
         $insert = $pdo->prepare(
@@ -2502,13 +2502,14 @@ final class PlatformLeadRepository
         }
 
         if (!empty($lead['client_id'])) {
+            PlatformClientRepository::markCustomer((string) $lead['client_id']);
             return (string) $lead['client_id'];
         }
 
         $clientId = cuid();
         $stmt = Database::connection()->prepare(
             'INSERT INTO platform_clients (id, company_name, contact_name, email, phone, status, notes, created_at, updated_at)
-             VALUES (:id, :company_name, :contact_name, :email, :phone, "LEAD", :notes, NOW(), NOW())'
+             VALUES (:id, :company_name, :contact_name, :email, :phone, "CUSTOMER", :notes, NOW(), NOW())'
         );
         $stmt->execute([
             'id' => $clientId,
@@ -2657,6 +2658,7 @@ final class EmpresaRepository
         self::ensureColumn('empresas', 'client_id', 'ALTER TABLE empresas ADD COLUMN client_id VARCHAR(191) NULL AFTER tenant_id');
         self::syncFromTenants();
         self::markOverduePayments();
+        self::normalizeConvertedLeadStages();
     }
 
     public static function ensurePlatformAdmin(): void
@@ -2972,6 +2974,19 @@ final class EmpresaRepository
         );
     }
 
+    private static function normalizeConvertedLeadStages(): void
+    {
+        try {
+            Database::connection()->exec(
+                'UPDATE pipeline_stages
+                 SET name = "Cliente"
+                 WHERE `key` = "CONVERTED"
+                   AND name IN ("Convertido", "Convertido a socio")'
+            );
+        } catch (Throwable) {
+        }
+    }
+
     private static function defaultNextPaymentDate(): string
     {
         $today = new DateTimeImmutable('today');
@@ -3124,7 +3139,7 @@ final class EmpresaRepository
             ['CONTACTED', 'Contactado'],
             ['TRIAL_SCHEDULED', 'Visita o prueba agendada'],
             ['PROPOSAL', 'Alta propuesta'],
-            ['CONVERTED', 'Convertido a socio'],
+            ['CONVERTED', 'Cliente'],
             ['LOST', 'Perdido'],
         ] as $index => $stage) {
             $insert->execute([

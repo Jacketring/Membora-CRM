@@ -276,7 +276,7 @@ function status_label(?string $status): string
 {
     return enum_label((string) $status, [
         'OPEN' => 'Abierto',
-        'CONVERTED' => 'Convertido',
+        'CONVERTED' => 'Cliente',
         'LOST' => 'Perdido',
         'PENDING' => 'Pendiente',
         'COMPLETED' => 'Completada',
@@ -468,7 +468,7 @@ function platform_lead_status_label(?string $status): string
         'NEW' => 'Nuevo',
         'CONTACTED' => 'Contactado',
         'QUALIFIED' => 'Cualificado',
-        'CONVERTED' => 'Convertido',
+        'CONVERTED' => 'Cliente',
         'LOST' => 'Perdido',
     ]);
 }

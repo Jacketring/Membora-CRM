@@ -1,7 +1,7 @@
 <div class="page-heading">
   <div>
     <h2>Leads</h2>
-    <p>Gestiona oportunidades comerciales desde el primer contacto hasta el alta como socio.</p>
+    <p>Gestiona oportunidades comerciales desde el primer contacto hasta convertirlas en clientes.</p>
   </div>
   <button class="primary-action primary-action--compact" data-open-modal="lead-modal" type="button">Nuevo lead</button>
 </div>
@@ -11,8 +11,8 @@
     <span>Abiertos</span>
     <strong><?= (int) $metrics['open'] ?></strong>
   </article>
-  <article class="lead-metric lead-metric--green" aria-label="Leads convertidos: <?= (int) $metrics['converted'] ?>">
-    <span>Convertidos</span>
+  <article class="lead-metric lead-metric--green" aria-label="Clientes conseguidos: <?= (int) $metrics['converted'] ?>">
+    <span>Clientes</span>
     <strong><?= (int) $metrics['converted'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--orange" aria-label="Leads perdidos: <?= (int) $metrics['lost'] ?>">
@@ -61,7 +61,7 @@
         $statusOptions = [
           '' => 'Todos',
           'OPEN' => 'Abiertos',
-          'CONVERTED' => 'Convertidos',
+          'CONVERTED' => 'Clientes',
           'LOST' => 'Perdidos',
         ];
       ?>
@@ -174,7 +174,7 @@
                 <?php if ($lead['status'] !== 'CONVERTED'): ?>
                   <form method="post">
                     <input type="hidden" name="id" value="<?= e($lead['id']) ?>">
-                    <button class="icon-action success-action" name="action" value="convert_lead" type="submit" title="Convertir a socio" aria-label="Convertir a socio a <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">
+                    <button class="icon-action success-action" name="action" value="convert_lead" type="submit" title="Convertir en cliente" aria-label="Convertir en cliente a <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">
                       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.2 16.6 4.9 12.3l-1.4 1.4 5.7 5.7L21 7.6l-1.4-1.4L9.2 16.6Z"/></svg>
                     </button>
                   </form>

@@ -792,7 +792,7 @@ final class Actions
                 'id' => $leadId,
                 'tenant_id' => $tenantId,
             ]);
-            flash('Lead convertido a socio.');
+            flash('Lead convertido a cliente.');
         } else {
             flash('El lead ya estaba convertido o no existe.', 'error');
         }
