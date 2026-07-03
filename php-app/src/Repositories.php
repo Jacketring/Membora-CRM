@@ -2707,6 +2707,7 @@ final class EmpresaRepository
                 payment_status VARCHAR(32) NOT NULL DEFAULT "PAID",
                 monthly_price DECIMAL(10,2) NOT NULL DEFAULT 0,
                 next_payment_at DATE NULL,
+                trial_days INT NOT NULL DEFAULT 30,
                 notes TEXT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -2717,6 +2718,7 @@ final class EmpresaRepository
         );
 
         self::ensureColumn('empresas', 'client_id', 'ALTER TABLE empresas ADD COLUMN client_id VARCHAR(191) NULL AFTER tenant_id');
+        self::ensureColumn('empresas', 'trial_days', 'ALTER TABLE empresas ADD COLUMN trial_days INT NOT NULL DEFAULT 30 AFTER next_payment_at');
         self::syncFromTenants();
         self::markOverduePayments();
         self::normalizeConvertedLeadStages();
@@ -2834,8 +2836,8 @@ final class EmpresaRepository
         }
 
         $stmt = Database::connection()->prepare(
-            'INSERT INTO empresas (id, tenant_id, client_id, name, contact_email, plan, status, payment_status, monthly_price, next_payment_at, notes, created_at, updated_at)
-             VALUES (:id, :tenant_id, :client_id, :name, :contact_email, :plan, :status, :payment_status, :monthly_price, :next_payment_at, :notes, NOW(), NOW())'
+            'INSERT INTO empresas (id, tenant_id, client_id, name, contact_email, plan, status, payment_status, monthly_price, next_payment_at, trial_days, notes, created_at, updated_at)
+             VALUES (:id, :tenant_id, :client_id, :name, :contact_email, :plan, :status, :payment_status, :monthly_price, :next_payment_at, :trial_days, :notes, NOW(), NOW())'
         );
         $stmt->execute($params + ['id' => cuid(), 'tenant_id' => $tenantId]);
 
@@ -2857,6 +2859,7 @@ final class EmpresaRepository
                  payment_status = :payment_status,
                  monthly_price = :monthly_price,
                  next_payment_at = :next_payment_at,
+                 trial_days = :trial_days,
                  notes = :notes,
                  updated_at = NOW()
              WHERE id = :id'
@@ -3004,6 +3007,7 @@ final class EmpresaRepository
         $price = str_replace(',', '.', (string) ($data['monthly_price'] ?? '0'));
         $plan = strtoupper(trim((string) ($data['plan'] ?? 'BASIC'))) ?: 'BASIC';
         $nextPaymentAt = trim((string) ($data['next_payment_at'] ?? '')) ?: null;
+        $trialDays = max(1, min(365, (int) ($data['trial_days'] ?? 30)));
         if ($plan === 'TRIAL') {
             $status = 'TRIAL';
             $paymentStatus = 'TRIAL';
@@ -3022,6 +3026,7 @@ final class EmpresaRepository
             'payment_status' => $paymentStatus,
             'monthly_price' => number_format(max(0, (float) $price), 2, '.', ''),
             'next_payment_at' => $nextPaymentAt,
+            'trial_days' => $trialDays,
             'notes' => trim((string) ($data['notes'] ?? '')) ?: null,
         ];
     }
@@ -3555,7 +3560,7 @@ final class PlatformPlanRepository
         );
 
         foreach ([
-            ['TRIAL', 'Prueba', '0.00', '0.00', 2, 100, 'Plan de prueba de 1 mes sin cobro ni renovacion automatica.'],
+            ['TRIAL', 'Prueba', '0.00', '0.00', 2, 100, 'Plan de prueba configurable sin cobro ni renovacion automatica.'],
             ['BASIC', 'Basico', '49.00', '0.00', 3, 300, 'Leads, socios, tareas y membresias base.'],
             ['PRO', 'Pro', '89.00', '99.00', 8, 1000, 'Calendario de clases, usuarios y soporte prioritario.'],
             ['BUSINESS', 'Business', '149.00', '199.00', 20, 3000, 'Multi-equipo, reporting avanzado y soporte preferente.'],
@@ -3579,7 +3584,7 @@ final class PlatformPlanRepository
                  monthly_price = 0,
                  setup_price = 0,
                  status = "ACTIVE",
-                 features = "Plan de prueba de 1 mes sin cobro ni renovacion automatica.",
+                 features = "Plan de prueba configurable sin cobro ni renovacion automatica.",
                  updated_at = NOW()
              WHERE code = "TRIAL"'
         );

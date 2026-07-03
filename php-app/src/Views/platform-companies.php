@@ -120,7 +120,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
             <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(empresa_status_label($empresa['status'])) ?></span></td>
             <td><span class="status-badge status-badge--<?= e($paymentClass) ?>"><?= e(empresa_payment_status_label($empresa['payment_status'])) ?></span></td>
             <td><?= e(money_amount($empresa['monthly_price'])) ?></td>
-            <td><?= e($isTrialPlan ? 'Duracion: 1 mes' : format_date_short($empresa['next_payment_at'])) ?></td>
+            <td><?= e($isTrialPlan ? ('Prueba: ' . (int) ($empresa['trial_days'] ?? 30) . ' dias') : format_date_short($empresa['next_payment_at'])) ?></td>
             <td><?= e($empresa['notes'] ? substr($empresa['notes'], 0, 60) . (strlen($empresa['notes']) > 60 ? '...' : '') : 'Sin notas') ?></td>
             <td>
               <div class="platform-row-actions">

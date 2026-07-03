@@ -12,6 +12,7 @@ $empresaValues = $isEditingEmpresa ? $empresa : [
     'payment_status' => 'TRIAL',
     'monthly_price' => '0.00',
     'next_payment_at' => '',
+    'trial_days' => '30',
     'notes' => '',
 ];
 $selectedClientId = (string) ($empresaValues['client_id'] ?? '');
@@ -117,10 +118,10 @@ foreach (($clients ?? []) as $clientOption) {
     <span>Proximo pago</span>
     <input name="next_payment_at" type="date" value="<?= e($empresaValues['next_payment_at'] ? date('Y-m-d', strtotime($empresaValues['next_payment_at'])) : '') ?>" data-next-payment-input>
   </label>
-  <div class="form-full demo-note empresa-trial-note" data-trial-plan-note hidden>
-    <strong>Duracion de la prueba</strong>
-    <span>1 mes sin proximo pago ni renovacion automatica.</span>
-  </div>
+  <label class="field" data-trial-plan-field hidden>
+    <span>Dias de prueba</span>
+    <input name="trial_days" type="number" min="1" max="365" step="1" value="<?= e((string) ($empresaValues['trial_days'] ?? 30)) ?>" placeholder="30">
+  </label>
   <label class="field form-full">
     <span>Notas internas</span>
     <textarea name="notes" rows="4" placeholder="Contrato, incidencias de pago, contacto decisor..."><?= e($empresaValues['notes']) ?></textarea>

@@ -510,7 +510,7 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
   const priceInput = form.querySelector('[data-plan-price-input]');
   const nextPaymentInput = form.querySelector('[data-next-payment-input]');
   const nextPaymentField = form.querySelector('[data-next-payment-field]');
-  const trialPlanNote = form.querySelector('[data-trial-plan-note]');
+  const trialPlanField = form.querySelector('[data-trial-plan-field]');
   const crmStatusSelect = form.querySelector('select[name="status"]');
   const paymentStatusSelect = form.querySelector('select[name="payment_status"]');
 
@@ -542,8 +542,8 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
     if (nextPaymentField) {
       nextPaymentField.hidden = isTrialPlan;
     }
-    if (trialPlanNote) {
-      trialPlanNote.hidden = !isTrialPlan;
+    if (trialPlanField) {
+      trialPlanField.hidden = !isTrialPlan;
     }
     if (isTrialPlan && nextPaymentInput) {
       nextPaymentInput.value = '';
