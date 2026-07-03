@@ -40,34 +40,31 @@ $platformAdminPassword = EmpresaRepository::PLATFORM_ADMIN_PASSWORD;
           <div class="input-shell"><input name="password" type="password" required value="<?= e($platformAdminPassword) ?>" data-login-password></div>
         </label>
         <button class="primary-action" type="submit">Iniciar sesion</button>
-        <div class="demo-note demo-note--platform">
-          <div>
-            <strong>Administrador de empresas</strong>
-            <span>Email: <?= e($platformAdminEmail) ?></span>
-            <span>Contrasena: <?= e($platformAdminPassword) ?></span>
-          </div>
-          <button
-            class="demo-fill-action"
-            type="button"
-            data-fill-login
-            data-email="<?= e($platformAdminEmail) ?>"
-            data-password="<?= e($platformAdminPassword) ?>"
-          >
-            Usar estas credenciales
+        <div class="demo-login-actions" aria-label="Accesos demo">
+          <button class="demo-login-action demo-login-action--client" type="submit" form="demo-client-login">
+            Demo cliente
+          </button>
+          <button class="demo-login-action demo-login-action--admin" type="submit" form="demo-admin-login">
+            Demo administrador
           </button>
         </div>
+        <div class="demo-note demo-note--platform">
+          <div>
+            <strong>Acceso de evaluacion</strong>
+            <span>La demo cliente se reinicia automaticamente cada 24 horas.</span>
+            <span>La demo administrador abre el panel SaaS.</span>
+          </div>
+        </div>
+      </form>
+      <form id="demo-client-login" method="post" hidden>
+        <input type="hidden" name="action" value="demo_login">
+        <input type="hidden" name="demo_type" value="client">
+      </form>
+      <form id="demo-admin-login" method="post" hidden>
+        <input type="hidden" name="action" value="demo_login">
+        <input type="hidden" name="demo_type" value="admin">
       </form>
     </section>
   </main>
-  <script>
-    document.querySelector('[data-fill-login]')?.addEventListener('click', (event) => {
-      const trigger = event.currentTarget;
-      const emailInput = document.querySelector('[data-login-email]');
-      const passwordInput = document.querySelector('[data-login-password]');
-      if (emailInput) emailInput.value = trigger.dataset.email || '';
-      if (passwordInput) passwordInput.value = trigger.dataset.password || '';
-      emailInput?.focus();
-    });
-  </script>
 </body>
 </html>

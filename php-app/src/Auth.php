@@ -86,6 +86,17 @@ final class Auth
         return true;
     }
 
+    public static function attemptDemo(string $type): bool
+    {
+        if ($type === 'admin') {
+            DemoRepository::prepareAdminDemo();
+            return self::attempt(EmpresaRepository::PLATFORM_ADMIN_EMAIL, EmpresaRepository::PLATFORM_ADMIN_PASSWORD);
+        }
+
+        DemoRepository::prepareClientDemo();
+        return self::attempt(DemoRepository::CLIENT_EMAIL, DemoRepository::CLIENT_PASSWORD);
+    }
+
     public static function logout(): void
     {
         unset($_SESSION['user'], $_SESSION['platform_admin_user']);

@@ -20,6 +20,7 @@ final class Actions
 
         match ($action) {
             'login' => self::login(),
+            'demo_login' => self::demoLogin(),
             'logout' => self::logout(),
             'update_profile' => self::updateProfile(),
             'update_platform_lead' => self::updatePlatformLead(),
@@ -106,6 +107,23 @@ final class Actions
         }
 
         flash('Credenciales incorrectas.', 'error');
+        redirect('login');
+    }
+
+    private static function demoLogin(): never
+    {
+        $type = post_value('demo_type', 'client') === 'admin' ? 'admin' : 'client';
+
+        try {
+            if (Auth::attemptDemo($type)) {
+                redirect($type === 'admin' ? 'platform-dashboard' : 'dashboard');
+            }
+        } catch (Throwable $exception) {
+            flash('No se pudo preparar la demo. Revisa la base de datos.', 'error');
+            redirect('login');
+        }
+
+        flash('No se pudo iniciar la demo.', 'error');
         redirect('login');
     }
 

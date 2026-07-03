@@ -372,7 +372,7 @@ function can_perform_action(string $action, ?array $user = null): bool
     $user = $user ?? Auth::user();
     $role = user_role_key($user);
 
-    if (in_array($action, ['login', 'logout', 'update_profile'], true)) {
+    if (in_array($action, ['login', 'demo_login', 'logout', 'update_profile'], true)) {
         return true;
     }
 
@@ -555,6 +555,7 @@ function audit_action_label(?string $action): string
     $labels = [
         'SEED_DEMO_TENANT' => 'Carga de datos demo',
         'login' => 'Inicio de sesion',
+        'demo_login' => 'Inicio de demo',
         'logout' => 'Cierre de sesion',
         'update_profile' => 'Actualizacion de perfil',
         'create_user' => 'Crear usuario',

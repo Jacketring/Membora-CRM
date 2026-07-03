@@ -125,6 +125,31 @@ summary:focus-visible {
   display: grid;
   gap: 4px;
 }
+.demo-login-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 12px;
+}
+.demo-login-action {
+  border: 1px solid #bfd3f8;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 44px;
+  padding: 0 12px;
+}
+.demo-login-action--client {
+  background: #0754d6;
+  color: #fff;
+}
+.demo-login-action--admin {
+  background: #fff;
+  color: var(--primary);
+}
+.demo-login-action:hover {
+  filter: brightness(0.98);
+}
 .demo-fill-action {
   background: #fff;
   border: 1px solid #bfd3f8;
