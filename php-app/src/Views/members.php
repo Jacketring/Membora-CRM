@@ -143,7 +143,7 @@ $memberStatusOptions = [
                   <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-2v-1.95l7.25-7.25 1.95 1.95L7.95 18H6Zm10.6-8.65L14.65 7.4 16 6.05 17.95 8l-1.35 1.35Z"/></svg>
                 </button>
                 <?php if ($canRenewMembership): ?>
-                  <form method="post" data-confirm-message="Se renovara la membresia y se registrara el pago asociado.">
+                  <form method="post" data-confirm-message="Se renovara la membresia y se registrara el pago asociado." data-confirm-action-label="Confirmar">
                     <input type="hidden" name="action" value="renew_member_subscription">
                     <input type="hidden" name="id" value="<?= e($member['id']) ?>">
                     <button class="icon-action success-action" type="submit" title="Renovar membresia" aria-label="Renovar membresia de <?= e($memberName) ?>">

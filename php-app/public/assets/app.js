@@ -917,6 +917,9 @@ if (confirmDialog) {
     if (confirmText) {
       confirmText.textContent = form.dataset.confirmMessage || 'Esta accion no se puede deshacer.';
     }
+    if (acceptButton) {
+      acceptButton.textContent = form.dataset.confirmActionLabel || 'Eliminar';
+    }
     confirmDialog.showModal();
   });
 

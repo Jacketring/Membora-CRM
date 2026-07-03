@@ -137,7 +137,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
                   <span>Editar</span>
                 </button>
                 <?php if ($canRenew): ?>
-                  <form method="post" data-confirm-message="Se creara un pago pagado y se movera el proximo pago al mes siguiente.">
+                  <form method="post" data-confirm-message="Se creara un pago pagado y se movera el proximo pago al mes siguiente." data-confirm-action-label="Confirmar">
                     <input type="hidden" name="action" value="renew_empresa_subscription">
                     <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">
                     <button class="support-renew-action" type="submit" aria-label="Renovar suscripcion de <?= e($empresa['name']) ?>">
