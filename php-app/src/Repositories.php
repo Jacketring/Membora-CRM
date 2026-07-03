@@ -563,6 +563,10 @@ final class RiskAlertRepository
         self::ensureColumn('risk_alerts', 'resolved_at', 'DATETIME NULL');
         self::ensureColumn('risk_alerts', 'created_at', 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
         self::ensureColumn('risk_alerts', 'updated_at', 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP');
+
+        foreach (['member_id', 'lead_id', 'task_id', 'payment_id', 'class_session_id'] as $field) {
+            Database::connection()->exec('UPDATE risk_alerts SET ' . $field . ' = NULL WHERE ' . $field . ' = ""');
+        }
     }
 
     public static function generate(string $tenantId): void
@@ -571,11 +575,16 @@ final class RiskAlertRepository
         PaymentRepository::ensureTable();
         MembershipRepository::ensureTables();
         CheckinRepository::ensureTable();
+        self::deduplicate($tenantId);
 
-        foreach (self::paymentAlerts($tenantId) as $alert) {
+        $paymentAlerts = self::paymentAlerts($tenantId);
+        self::closeStaleEntityAlerts($tenantId, 'PAYMENT_OVERDUE', 'payment_id', array_column($paymentAlerts, 'payment_id'));
+        foreach ($paymentAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
-        foreach (self::taskAlerts($tenantId) as $alert) {
+        $taskAlerts = self::taskAlerts($tenantId);
+        self::closeStaleEntityAlerts($tenantId, 'TASK_OVERDUE', 'task_id', array_column($taskAlerts, 'task_id'));
+        foreach ($taskAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
         $membershipAlerts = self::membershipAlerts($tenantId);
@@ -583,15 +592,23 @@ final class RiskAlertRepository
         foreach ($membershipAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
-        foreach (self::inactiveMemberAlerts($tenantId) as $alert) {
+        $inactiveMemberAlerts = self::inactiveMemberAlerts($tenantId);
+        self::closeStaleEntityAlerts($tenantId, 'MEMBER_INACTIVE', 'member_id', array_column($inactiveMemberAlerts, 'member_id'));
+        foreach ($inactiveMemberAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
-        foreach (self::staleLeadAlerts($tenantId) as $alert) {
+        $staleLeadAlerts = self::staleLeadAlerts($tenantId);
+        self::closeStaleEntityAlerts($tenantId, 'LEAD_STALE', 'lead_id', array_column($staleLeadAlerts, 'lead_id'));
+        foreach ($staleLeadAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
-        foreach (self::classCapacityAlerts($tenantId) as $alert) {
+        $classCapacityAlerts = self::classCapacityAlerts($tenantId);
+        self::closeStaleEntityAlerts($tenantId, 'CLASS_FULL', 'class_session_id', array_column($classCapacityAlerts, 'class_session_id'));
+        foreach ($classCapacityAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
+
+        self::deduplicate($tenantId);
     }
 
     public static function metrics(string $tenantId): array
@@ -691,6 +708,7 @@ final class RiskAlertRepository
 
     private static function createIfOpenMissing(string $tenantId, array $alert): void
     {
+        $alert = self::normalizeAlert($alert);
         $where = ['tenant_id = :tenant_id', 'type = :type'];
         $params = [
             'tenant_id' => $tenantId,
@@ -714,7 +732,6 @@ final class RiskAlertRepository
                 'UPDATE risk_alerts
                  SET severity = :severity,
                      message = :message,
-                     detected_at = NOW(),
                      updated_at = NOW()
                  WHERE ' . implode(' AND ', $openWhere)
             );
@@ -761,6 +778,75 @@ final class RiskAlertRepository
             'severity' => $alert['severity'],
             'message' => $alert['message'],
         ]);
+    }
+
+    private static function normalizeAlert(array $alert): array
+    {
+        foreach (['member_id', 'lead_id', 'task_id', 'payment_id', 'class_session_id'] as $field) {
+            $value = trim((string) ($alert[$field] ?? ''));
+            $alert[$field] = $value !== '' ? $value : null;
+        }
+
+        return $alert;
+    }
+
+    private static function deduplicate(string $tenantId): void
+    {
+        $pdo = Database::connection();
+        $groups = $pdo->prepare(
+            'SELECT type,
+                    COALESCE(member_id, "") AS member_id,
+                    COALESCE(lead_id, "") AS lead_id,
+                    COALESCE(task_id, "") AS task_id,
+                    COALESCE(payment_id, "") AS payment_id,
+                    COALESCE(class_session_id, "") AS class_session_id,
+                    COUNT(*) AS total
+             FROM risk_alerts
+             WHERE tenant_id = :tenant_id
+             GROUP BY type,
+                      COALESCE(member_id, ""),
+                      COALESCE(lead_id, ""),
+                      COALESCE(task_id, ""),
+                      COALESCE(payment_id, ""),
+                      COALESCE(class_session_id, "")
+             HAVING total > 1
+             LIMIT 200'
+        );
+        $groups->execute(['tenant_id' => $tenantId]);
+
+        $delete = $pdo->prepare('DELETE FROM risk_alerts WHERE tenant_id = :tenant_id AND id = :id');
+        foreach ($groups->fetchAll() as $group) {
+            $params = [
+                'tenant_id' => $tenantId,
+                'type' => $group['type'],
+                'member_id' => $group['member_id'] !== '' ? $group['member_id'] : null,
+                'lead_id' => $group['lead_id'] !== '' ? $group['lead_id'] : null,
+                'task_id' => $group['task_id'] !== '' ? $group['task_id'] : null,
+                'payment_id' => $group['payment_id'] !== '' ? $group['payment_id'] : null,
+                'class_session_id' => $group['class_session_id'] !== '' ? $group['class_session_id'] : null,
+            ];
+            $alerts = $pdo->prepare(
+                'SELECT id
+                 FROM risk_alerts
+                 WHERE tenant_id = :tenant_id
+                   AND type = :type
+                   AND member_id <=> :member_id
+                   AND lead_id <=> :lead_id
+                   AND task_id <=> :task_id
+                   AND payment_id <=> :payment_id
+                   AND class_session_id <=> :class_session_id
+                 ORDER BY FIELD(status, "OPEN", "DISMISSED", "RESOLVED"),
+                          updated_at DESC,
+                          created_at DESC'
+            );
+            $alerts->execute($params);
+            $ids = array_column($alerts->fetchAll(), 'id');
+            array_shift($ids);
+
+            foreach ($ids as $id) {
+                $delete->execute(['tenant_id' => $tenantId, 'id' => $id]);
+            }
+        }
     }
 
     private static function closeStaleEntityAlerts(string $tenantId, string $type, string $entityField, array $activeEntityIds): void
@@ -876,14 +962,15 @@ final class RiskAlertRepository
     private static function inactiveMemberAlerts(string $tenantId): array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT members.id, members.first_name, members.last_name, MAX(checkins.checked_in_at) AS last_checkin
+            'SELECT members.id, members.first_name, members.last_name, members.created_at, MAX(checkins.checked_in_at) AS last_checkin
              FROM members
              LEFT JOIN checkins ON checkins.member_id = members.id AND checkins.tenant_id = members.tenant_id
              WHERE members.tenant_id = :tenant_id
-             AND members.status <> "INACTIVE"
-             GROUP BY members.id, members.first_name, members.last_name
-             HAVING last_checkin IS NULL OR last_checkin < DATE_SUB(NOW(), INTERVAL 30 DAY)
-             LIMIT 50'
+             AND members.status = "ACTIVE"
+             GROUP BY members.id, members.first_name, members.last_name, members.created_at
+             HAVING (last_checkin IS NULL AND members.created_at < DATE_SUB(NOW(), INTERVAL 30 DAY))
+                 OR last_checkin < DATE_SUB(NOW(), INTERVAL 30 DAY)
+             LIMIT 20'
         );
         $stmt->execute(['tenant_id' => $tenantId]);
 
