@@ -578,7 +578,9 @@ final class RiskAlertRepository
         foreach (self::taskAlerts($tenantId) as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
-        foreach (self::membershipAlerts($tenantId) as $alert) {
+        $membershipAlerts = self::membershipAlerts($tenantId);
+        self::closeStaleEntityAlerts($tenantId, 'MEMBERSHIP_EXPIRED', 'member_id', array_column($membershipAlerts, 'member_id'));
+        foreach ($membershipAlerts as $alert) {
             self::createIfOpenMissing($tenantId, $alert);
         }
         foreach (self::inactiveMemberAlerts($tenantId) as $alert) {
@@ -704,9 +706,42 @@ final class RiskAlertRepository
             }
         }
 
-        $exists = Database::connection()->prepare('SELECT COUNT(*) FROM risk_alerts WHERE ' . implode(' AND ', $where));
+        $openWhere = array_merge($where, ['status = "OPEN"']);
+        $exists = Database::connection()->prepare('SELECT COUNT(*) FROM risk_alerts WHERE ' . implode(' AND ', $openWhere));
         $exists->execute($params);
         if ((int) $exists->fetchColumn() > 0) {
+            $update = Database::connection()->prepare(
+                'UPDATE risk_alerts
+                 SET severity = :severity,
+                     message = :message,
+                     detected_at = NOW(),
+                     updated_at = NOW()
+                 WHERE ' . implode(' AND ', $openWhere)
+            );
+            $update->execute($params + [
+                'severity' => $alert['severity'],
+                'message' => $alert['message'],
+            ]);
+            return;
+        }
+
+        $closedWhere = array_merge($where, ['status IN ("RESOLVED", "DISMISSED")']);
+        $reopen = Database::connection()->prepare(
+            'UPDATE risk_alerts
+             SET severity = :severity,
+                 status = "OPEN",
+                 message = :message,
+                 detected_at = NOW(),
+                 resolved_at = NULL,
+                 updated_at = NOW()
+             WHERE ' . implode(' AND ', $closedWhere) . '
+             LIMIT 1'
+        );
+        $reopen->execute($params + [
+            'severity' => $alert['severity'],
+            'message' => $alert['message'],
+        ]);
+        if ($reopen->rowCount() > 0) {
             return;
         }
 
@@ -726,6 +761,39 @@ final class RiskAlertRepository
             'severity' => $alert['severity'],
             'message' => $alert['message'],
         ]);
+    }
+
+    private static function closeStaleEntityAlerts(string $tenantId, string $type, string $entityField, array $activeEntityIds): void
+    {
+        $activeEntityIds = array_values(array_unique(array_filter(array_map(
+            static fn ($value): string => trim((string) $value),
+            $activeEntityIds
+        ))));
+
+        $params = [
+            'tenant_id' => $tenantId,
+            'type' => $type,
+        ];
+        $where = ['tenant_id = :tenant_id', 'type = :type', 'status = "OPEN"'];
+
+        if ($activeEntityIds) {
+            $placeholders = [];
+            foreach ($activeEntityIds as $index => $id) {
+                $key = 'entity_' . $index;
+                $placeholders[] = ':' . $key;
+                $params[$key] = $id;
+            }
+            $where[] = $entityField . ' NOT IN (' . implode(', ', $placeholders) . ')';
+        }
+
+        $stmt = Database::connection()->prepare(
+            'UPDATE risk_alerts
+             SET status = "RESOLVED",
+                 resolved_at = NOW(),
+                 updated_at = NOW()
+             WHERE ' . implode(' AND ', $where)
+        );
+        $stmt->execute($params);
     }
 
     private static function paymentAlerts(string $tenantId): array
