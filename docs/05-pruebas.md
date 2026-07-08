@@ -278,7 +278,26 @@ Resultado esperado:
 - Se abre `Admin CRM`.
 - La barra lateral no muestra modulos de gimnasio.
 
-### PA-02 Empresas cliente
+### PA-02 Contactos
+
+Pasos:
+
+1. Abrir `Admin CRM > Contactos`.
+2. Comprobar que aparecen solicitudes web y clientes comerciales en una misma tabla.
+3. Filtrar por tipo `Lead web`.
+4. Filtrar por tipo `Cliente CRM`.
+5. Convertir un lead web en cliente.
+6. Crear un contacto manual.
+7. Editar el estado de un contacto.
+
+Resultado esperado:
+
+- La seccion se llama `Contactos`.
+- No existen pantallas separadas visibles de `Leads` y `Clientes` en el menu de administracion.
+- Los leads web y clientes comerciales se gestionan desde la misma tabla.
+- Al convertir un lead, el contacto pasa a cliente comercial.
+
+### PA-03 Empresas cliente
 
 Pasos:
 
@@ -293,7 +312,7 @@ Resultado esperado:
 - La empresa queda en tabla `empresas`.
 - Los indicadores se actualizan.
 
-### PA-03 Acceso de soporte
+### PA-04 Acceso de soporte
 
 Pasos:
 

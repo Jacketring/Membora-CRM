@@ -31,7 +31,7 @@ Pantallas disponibles:
 - Usuarios internos del gimnasio.
 - Perfil de usuario.
 - Configuracion visual personal.
-- Panel de administracion de Membora CRM separado en resumen, leads web, clientes, empresas, pagos, planes, web comercial y logs.
+- Panel de administracion de Membora CRM separado en resumen, contactos, empresas, pagos, planes, web comercial y logs.
 - Demo funcional desde la web publica con login automatico, contador de 20 minutos y retorno automatico a la web.
 
 Pendiente o futuro:
@@ -173,7 +173,7 @@ Configurar `app.web.josehurtado.dev` como sitio web separado y apuntar la raiz d
 web-app/public
 ```
 
-No hay que editar tokens en la web. El formulario envia al webhook del CRM y las solicitudes aparecen en `Admin CRM > Leads`.
+No hay que editar tokens en la web. El formulario envia al webhook del CRM y las solicitudes aparecen en `Admin CRM > Contactos`.
 Si `MAIL_ENABLED` esta activo y el SMTP esta configurado, la persona que rellena el formulario recibe un email HTML de confirmacion indicando que el equipo revisara su solicitud y contactara en 24-48 horas. Los fallos de correo quedan visibles en `Admin CRM > Web`.
 La seccion `Admin CRM > Web` incluye una prueba de correo para enviar un email tecnico a una direccion concreta, ver la configuracion detectada y registrar el error SMTP exacto si falla.
 La web publica incluye enlaces a textos legales basicos: aviso legal, privacidad y cookies.
@@ -241,9 +241,9 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 
 - Panel `Admin CRM`.
 - Resumen SaaS con MRR, ARR, ARPA, riesgo, cobros y prioridades.
-- Seccion `Leads` para solicitudes de la web publica, con estados comerciales, conversion a cliente y eliminacion controlada.
+- Seccion `Contactos` para unificar solicitudes web y clientes comerciales, con estados, filtros, conversion a cliente y eliminacion controlada de leads.
 - Email automatico de confirmacion para solicitudes recibidas desde la web publica.
-- Seccion `Clientes` para contactos comerciales antes de crear su CRM.
+- Alta manual de contactos comerciales antes de crear su CRM.
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente desde un cliente comercial.
 - Creacion de tenant y usuario administrador al crear una empresa CRM.

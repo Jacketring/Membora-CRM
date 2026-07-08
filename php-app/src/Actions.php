@@ -265,13 +265,13 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el lead seleccionado.', 'error');
-            redirect('platform-leads');
+            flash('No se encontro el contacto seleccionado.', 'error');
+            redirect('platform-contacts');
         }
 
         PlatformLeadRepository::update($id, $_POST);
-        flash('Lead actualizado correctamente.');
-        redirect('platform-leads');
+        flash('Contacto actualizado correctamente.');
+        redirect('platform-contacts');
     }
 
     private static function convertPlatformLead(): never
@@ -280,19 +280,19 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el lead seleccionado.', 'error');
-            redirect('platform-leads');
+            flash('No se encontro el contacto seleccionado.', 'error');
+            redirect('platform-contacts');
         }
 
         try {
             $clientId = PlatformLeadRepository::convertToClient($id);
         } catch (Throwable $exception) {
-            flash($exception->getMessage() ?: 'No se pudo convertir el lead en cliente.', 'error');
-            redirect('platform-leads');
+            flash($exception->getMessage() ?: 'No se pudo convertir el contacto en cliente.', 'error');
+            redirect('platform-contacts');
         }
 
-        flash('Lead convertido en cliente correctamente.');
-        redirect('platform-clients');
+        flash('Contacto convertido en cliente correctamente.');
+        redirect('platform-contacts');
     }
 
     private static function deletePlatformLead(): never
@@ -301,13 +301,13 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el lead seleccionado.', 'error');
-            redirect('platform-leads');
+            flash('No se encontro el contacto seleccionado.', 'error');
+            redirect('platform-contacts');
         }
 
         PlatformLeadRepository::delete($id);
-        flash('Lead eliminado correctamente.');
-        redirect('platform-leads');
+        flash('Contacto eliminado correctamente.');
+        redirect('platform-contacts');
     }
 
     private static function sendPlatformTestEmail(): never
@@ -336,13 +336,13 @@ final class Actions
         self::requirePlatformAdmin();
 
         if (post_value('company_name', '') === '') {
-            flash('Indica el nombre de la empresa cliente.', 'error');
-            redirect('platform-clients');
+            flash('Indica el nombre de la empresa del contacto.', 'error');
+            redirect('platform-contacts');
         }
 
         PlatformClientRepository::create($_POST);
-        flash('Cliente creado correctamente.');
-        redirect('platform-clients');
+        flash('Contacto creado correctamente.');
+        redirect('platform-contacts');
     }
 
     private static function updatePlatformClient(): never
@@ -351,17 +351,17 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '' || post_value('company_name', '') === '') {
-            flash('Indica el cliente que quieres actualizar.', 'error');
-            redirect('platform-clients');
+            flash('Indica el contacto que quieres actualizar.', 'error');
+            redirect('platform-contacts');
         }
 
         PlatformClientRepository::update($id, $_POST);
         if (post_value('status') === 'LEAD') {
-            flash('Cliente devuelto a Leads correctamente.');
+            flash('Contacto devuelto a lead correctamente.');
         } else {
-            flash('Cliente actualizado correctamente.');
+            flash('Contacto actualizado correctamente.');
         }
-        redirect('platform-clients');
+        redirect('platform-contacts');
     }
 
     private static function createPlatformPayment(): never

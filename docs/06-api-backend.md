@@ -42,8 +42,8 @@ Rutas de gimnasio:
 Rutas de administracion SaaS:
 
 - `?route=platform-dashboard`: resumen de Admin CRM.
-- `?route=platform-leads`: leads recibidos desde la web publica.
-- `?route=platform-clients`: clientes comerciales.
+- `?route=platform-contacts`: contactos unificados con leads web y clientes comerciales.
+- `?route=platform-leads` y `?route=platform-clients`: rutas antiguas redirigidas a `platform-contacts`.
 - `?route=platform-companies`: empresas cliente.
 - `?route=platform-payments`: cobros SaaS.
 - `?route=platform-plans`: catalogo de planes SaaS.

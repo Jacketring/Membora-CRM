@@ -46,9 +46,9 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 
 - Panel `Admin CRM`.
 - Resumen con MRR, ARR, ARPA, pagos y prioridades.
-- Leads web recibidos desde la web publica.
+- Contactos unificados con leads web y clientes comerciales.
 - Conversion de lead web a cliente comercial.
-- Clientes comerciales.
+- Alta y edicion de clientes comerciales desde la misma tabla de contactos.
 - Empresas cliente.
 - Creacion de tenant y usuario administrador al crear una empresa CRM.
 - Estados de CRM y pago.
@@ -169,7 +169,7 @@ La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba
 12. Revisar auditoria para comprobar las acciones registradas.
 13. Revisar usuarios internos, perfil y configuracion.
 14. Entrar como administrador de plataforma.
-15. Revisar leads web, clientes, empresas, pagos, planes y web comercial.
+15. Revisar contactos, empresas, pagos, planes y web comercial.
 16. Entrar en modo soporte sobre una empresa y volver a Admin CRM.
 
 ## 9. Criterios de aceptacion del MVP
@@ -178,5 +178,5 @@ La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba
 - El login funciona con credenciales demo.
 - Los datos de gimnasio se filtran por `tenant_id`.
 - Los formularios principales crean y editan datos sin errores 500.
-- La web publica registra leads en `Admin CRM > Leads`.
+- La web publica registra leads en `Admin CRM > Contactos`.
 - La documentacion explica instalacion, despliegue, credenciales, modelo de datos, pruebas y estado actual.

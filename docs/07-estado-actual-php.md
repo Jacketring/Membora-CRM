@@ -160,14 +160,12 @@ No se usa Node.js en produccion.
 
 ### Administracion SaaS de Membora CRM
 
-- Panel `Admin CRM` separado en resumen, leads web, clientes, empresas, pagos, planes y web comercial.
+- Panel `Admin CRM` separado en resumen, contactos, empresas, pagos, planes y web comercial.
 - Resumen ejecutivo con MRR, ARR, ARPA, pagos pendientes, cobrado en el mes y prioridades.
-- Tabla `platform_leads` para solicitudes recibidas desde la web publica.
-- Gestion de leads web con estados nuevo, contactado, cualificado, convertido o perdido.
-- Conversion de lead web a cliente comercial.
-- Eliminacion controlada de leads web desde el panel de administracion.
-- Tabla `platform_clients` para contactos comerciales del SaaS antes de crear su CRM.
-- Alta y edicion de clientes comerciales con estado lead, cualificado, cliente o perdido.
+- Tabla unificada de `Contactos` en la interfaz de administracion, combinando `platform_leads` y `platform_clients`.
+- Gestion de solicitudes web con estados nuevo, contactado, cualificado, convertido o perdido.
+- Gestion de clientes comerciales con estado lead, cualificado, cliente o perdido.
+- Conversion de lead web a cliente comercial y eliminacion controlada de leads web desde la misma seccion.
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente desde clientes comerciales.
 - Creacion de tenant y usuario administrador al crear una empresa con CRM.
@@ -183,7 +181,7 @@ No se usa Node.js en produccion.
 - Web comercial externa en `web-app/public`.
 - Web comercial con enlaces a aviso legal, privacidad y cookies.
 - Enlaces de demo desde la web publica hacia una sesion funcional del CRM durante 20 minutos.
-- Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Leads`.
+- Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Contactos`.
 - Email HTML automatico de confirmacion para el visitante cuando envia el formulario web.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.

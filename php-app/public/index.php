@@ -86,7 +86,7 @@ if ($route === 'global-search') {
                 'kind' => 'lead',
                 'title' => $lead['company_name'] ?: $lead['contact_name'],
                 'description' => platform_lead_status_label($lead['status']) . ' - ' . ($lead['email'] ?: ($lead['phone'] ?: 'Sin contacto')),
-                'href' => 'index.php?route=platform-leads&q=' . urlencode($query),
+                'href' => 'index.php?route=platform-contacts&q=' . urlencode($query) . '&type=lead',
             ];
         }
         foreach (array_slice(PlatformClientRepository::all($query), 0, 8) as $client) {
@@ -95,7 +95,7 @@ if ($route === 'global-search') {
                 'kind' => 'client',
                 'title' => $client['company_name'],
                 'description' => platform_client_status_label($client['status']) . ' - ' . ($client['email'] ?: 'Sin email'),
-                'href' => 'index.php?route=platform-clients&q=' . urlencode($query),
+                'href' => 'index.php?route=platform-contacts&q=' . urlencode($query) . '&type=client',
             ];
         }
         foreach (array_slice(EmpresaRepository::all($query), 0, 10) as $empresa) {
@@ -170,22 +170,10 @@ switch ($route) {
         break;
 
     case 'platform-clients':
-        if (!is_platform_admin($currentUser)) {
-            redirect('dashboard');
-        }
-
-        $filters = [
-            'q' => trim((string) ($_GET['q'] ?? '')),
-            'status' => trim((string) ($_GET['status'] ?? '')),
-        ];
-        render_layout('Clientes CRM', 'platform-clients', [
-            'filters' => $filters,
-            'metrics' => PlatformClientRepository::metrics(),
-            'clients' => PlatformClientRepository::all($filters['q'], $filters['status']),
-        ]);
-        break;
-
     case 'platform-leads':
+        redirect('platform-contacts');
+
+    case 'platform-contacts':
         if (!is_platform_admin($currentUser)) {
             redirect('dashboard');
         }
@@ -193,10 +181,13 @@ switch ($route) {
         $filters = [
             'q' => trim((string) ($_GET['q'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
+            'type' => trim((string) ($_GET['type'] ?? '')),
         ];
-        render_layout('Leads CRM', 'platform-leads', [
+        render_layout('Contactos CRM', 'platform-contacts', [
             'filters' => $filters,
-            'metrics' => PlatformLeadRepository::metrics(),
+            'metrics' => PlatformContactRepository::metrics(),
+            'contacts' => PlatformContactRepository::all($filters['q'], $filters['status'], $filters['type']),
+            'clients' => PlatformClientRepository::all($filters['q'], $filters['status']),
             'leads' => PlatformLeadRepository::all($filters['q'], $filters['status']),
         ]);
         break;

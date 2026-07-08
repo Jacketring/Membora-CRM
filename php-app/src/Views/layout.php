@@ -34,8 +34,7 @@ $demoRemainingSeconds = Auth::demoRemainingSeconds();
       <nav class="sidebar-nav">
         <?php if ($isPlatformAdmin): ?>
           <a class="<?= $route === 'platform-dashboard' ? 'active' : '' ?>" href="index.php?route=platform-dashboard">Resumen</a>
-          <a class="<?= $route === 'platform-leads' ? 'active' : '' ?>" href="index.php?route=platform-leads">Leads</a>
-          <a class="<?= $route === 'platform-clients' ? 'active' : '' ?>" href="index.php?route=platform-clients">Clientes</a>
+          <a class="<?= in_array($route, ['platform-contacts', 'platform-leads', 'platform-clients'], true) ? 'active' : '' ?>" href="index.php?route=platform-contacts">Contactos</a>
           <a class="<?= $route === 'platform-companies' ? 'active' : '' ?>" href="index.php?route=platform-companies">Empresas</a>
           <a class="<?= $route === 'platform-payments' ? 'active' : '' ?>" href="index.php?route=platform-payments">Pagos</a>
           <a class="<?= $route === 'platform-plans' ? 'active' : '' ?>" href="index.php?route=platform-plans">Planes</a>

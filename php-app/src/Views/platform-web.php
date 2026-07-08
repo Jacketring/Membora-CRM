@@ -11,7 +11,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
     <p>Estado de conexion entre la web publica de Membora CRM y los leads comerciales del administrador.</p>
   </div>
   <div class="platform-heading-actions">
-    <a class="secondary-action" href="index.php?route=platform-leads">Ver leads</a>
+    <a class="secondary-action" href="index.php?route=platform-contacts&type=lead">Ver contactos</a>
     <a class="primary-action" href="<?= e(rtrim((string) $webUrl, '/')) ?>" target="_blank" rel="noreferrer">Abrir web</a>
   </div>
 </div>
@@ -21,7 +21,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
     <header>
       <div>
         <h3>Flujo actual</h3>
-        <p>El formulario publico crea solicitudes comerciales en `Admin CRM > Leads`.</p>
+        <p>El formulario publico crea solicitudes comerciales en `Admin CRM > Contactos`.</p>
       </div>
       <span>Sin token</span>
     </header>
@@ -36,7 +36,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
       </div>
       <div>
         <span>3. El administrador la gestiona</span>
-        <strong>Admin CRM > Leads > Convertir en cliente</strong>
+        <strong>Admin CRM > Contactos > Convertir en cliente</strong>
       </div>
     </div>
   </article>

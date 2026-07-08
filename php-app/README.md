@@ -75,7 +75,7 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Usuarios internos.
 - Perfil.
 - Configuracion visual.
-- Panel de administracion SaaS con resumen, leads web, clientes, empresas, pagos, planes y web comercial.
+- Panel de administracion SaaS con resumen, contactos, empresas, pagos, planes y web comercial.
 
 ## Administracion SaaS
 
@@ -94,7 +94,7 @@ La app crea y usa tablas de administracion SaaS para controlar clientes, empresa
 - Creacion de tenant y usuario administrador al pasar de cliente a empresa.
 - Pagos SaaS por empresa: concepto, importe, vencimiento, fecha de pago y estado.
 - Planes SaaS: codigo, precio mensual, coste de alta, limites y prestaciones.
-- Leads web: solicitudes comerciales recibidas desde la web publica, con edicion, conversion a cliente y eliminacion controlada.
+- Contactos: tabla unificada de solicitudes web y clientes comerciales, con edicion, conversion a cliente, alta manual y eliminacion controlada de leads.
 - Web comercial: estado tecnico del formulario publico y logs de envios recibidos.
 
 Usuario de administracion de plataforma:
@@ -137,7 +137,7 @@ El formulario de `web-app/public` envia al webhook:
 ```
 
 El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multipart/form-data`.
-No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Admin CRM > Leads`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.
+No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Admin CRM > Contactos`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.
 
 Cuando la solicitud incluye un email valido, el CRM intenta enviar una confirmacion HTML al contacto. Para produccion se recomienda SMTP con `MAIL_MAILER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD`. Si el envio falla, el lead se crea igualmente y el fallo de correo queda registrado en `Admin CRM > Web`.
 

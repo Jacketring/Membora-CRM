@@ -91,8 +91,7 @@ Acciones principales conectadas:
 - Reservas.
 - Tareas.
 - Usuarios internos.
-- Leads comerciales de plataforma.
-- Clientes de plataforma.
+- Contactos de plataforma: leads web y clientes comerciales en una tabla unificada.
 - Empresas.
 - Pagos SaaS.
 - Planes SaaS.
@@ -181,7 +180,7 @@ Prueba pendiente:
 
 - Enviar formulario real desde la web.
 - Confirmar que llega el email al contacto.
-- Confirmar que aparece el lead en `Admin CRM > Leads`.
+- Confirmar que aparece el lead en `Admin CRM > Contactos`.
 - Confirmar si Plesk registra el envio en seguimiento de correo.
 
 ### H-04 Revisar modo oscuro despues de cambios visuales
@@ -323,7 +322,7 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 ### Admin CRM
 
 - [ ] Dashboard carga metricas.
-- [ ] Leads web lista solicitudes.
+- [ ] Contactos lista solicitudes web y clientes comerciales.
 - [ ] Crear cliente.
 - [ ] Convertir lead web a cliente.
 - [ ] Eliminar lead web con confirmacion.
@@ -341,7 +340,7 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 - [ ] Demo publica abre una sesion funcional con contador de 20 minutos.
 - [ ] Formulario envia solicitud.
 - [ ] Mensaje de exito aparece.
-- [ ] Lead aparece en `Admin CRM > Leads`.
+- [ ] Lead aparece en `Admin CRM > Contactos`.
 - [ ] Email de confirmacion llega al contacto.
 - [ ] Honeypot no es visible.
 

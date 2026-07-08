@@ -119,9 +119,9 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
 </section>
 
 <section class="admin-dashboard-actions" aria-label="Accesos de administracion">
-  <a href="index.php?route=platform-leads">
-    <span>Leads web</span>
-    <strong>Revisar solicitudes</strong>
+  <a href="index.php?route=platform-contacts">
+    <span>Contactos</span>
+    <strong>Leads y clientes</strong>
   </a>
   <a href="index.php?route=platform-companies">
     <span>Empresas</span>
@@ -135,7 +135,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
     <span>Planes</span>
     <strong>Packaging</strong>
   </a>
-  <a href="index.php?route=platform-logs">
+  <a href="index.php?route=platform-audit">
     <span>Logs</span>
     <strong>Actividad</strong>
   </a>

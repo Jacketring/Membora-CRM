@@ -54,6 +54,6 @@ $clientStatusOptions = [
 
   <div class="form-actions form-full">
     <button class="secondary-action" type="button" data-close-modal>Cancelar</button>
-    <button class="primary-action" type="submit"><?= $isEditingClient ? 'Guardar cliente' : 'Crear cliente' ?></button>
+    <button class="primary-action" type="submit"><?= $isEditingClient ? 'Guardar contacto' : 'Crear contacto' ?></button>
   </div>
 </form>
