@@ -746,6 +746,12 @@ document.querySelectorAll('[data-live-search-form]').forEach((form) => {
   }
 
   input.addEventListener('input', applyLiveSearch);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      applyLiveSearch();
+    }
+  });
   applyLiveSearch();
 });
 

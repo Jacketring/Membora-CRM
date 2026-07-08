@@ -63,15 +63,15 @@ $clientStatusOptions = [
   </article>
 </section>
 
-<form class="lead-toolbar platform-toolbar" method="get" action="index.php" data-auto-filter-form>
+<form class="lead-toolbar platform-toolbar" method="get" action="index.php" data-auto-filter-form data-live-search-form data-live-search-target="platform-contacts-table">
   <input type="hidden" name="route" value="platform-contacts">
   <label class="field platform-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, email, telefono o notas" data-auto-submit-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, email, telefono o notas" data-auto-filter-input>
   </label>
   <label class="field platform-filter-field">
     <span>Tipo</span>
-    <select name="type" data-auto-submit-input>
+    <select name="type" data-auto-filter-input>
       <?php foreach ($typeOptions as $value => $label): ?>
         <option value="<?= e($value) ?>" <?= $filters['type'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
       <?php endforeach; ?>
@@ -79,7 +79,7 @@ $clientStatusOptions = [
   </label>
   <label class="field platform-filter-field">
     <span>Estado</span>
-    <select name="status" data-auto-submit-input>
+    <select name="status" data-auto-filter-input>
       <?php foreach ($statusOptions as $value => $label): ?>
         <option value="<?= e($value) ?>" <?= $filters['status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
       <?php endforeach; ?>
@@ -92,11 +92,11 @@ $clientStatusOptions = [
   <header>
     <div>
       <h3>Listado de contactos</h3>
-      <span><?= count($contacts) ?> resultados</span>
+      <span data-live-search-count><?= count($contacts) ?> resultados</span>
     </div>
   </header>
   <div class="leads-table-wrap">
-    <table class="leads-table platform-table platform-table--payments">
+    <table class="leads-table platform-table platform-table--payments" id="platform-contacts-table">
       <thead>
         <tr>
           <th>Empresa</th>
@@ -115,7 +115,7 @@ $clientStatusOptions = [
             $modalId = $contact['type'] === 'lead' ? 'platform-lead-' . $contact['id'] : 'client-edit-' . $contact['id'];
             $notes = (string) ($contact['notes'] ?? '');
           ?>
-          <tr class="lead-data-row clickable-row" tabindex="0" data-open-modal="<?= e($modalId) ?>">
+          <tr class="lead-data-row clickable-row" tabindex="0" data-open-modal="<?= e($modalId) ?>" data-live-search-row>
             <td><strong><?= e($contact['company_name'] ?: 'Sin empresa') ?></strong></td>
             <td><?= e($contact['contact_name'] ?: 'Sin contacto') ?></td>
             <td><?= e($contact['email'] ?: 'Sin email') ?></td>
@@ -158,9 +158,7 @@ $clientStatusOptions = [
             </td>
           </tr>
         <?php endforeach; ?>
-        <?php if (!$contacts): ?>
-          <tr><td colspan="8" class="empty-state">No hay contactos que coincidan con los filtros actuales.</td></tr>
-        <?php endif; ?>
+        <tr data-live-search-empty <?= $contacts ? 'hidden' : '' ?>><td colspan="8" class="empty-state">No hay contactos que coincidan con los filtros actuales.</td></tr>
       </tbody>
     </table>
   </div>
