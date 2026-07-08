@@ -38,7 +38,6 @@ $demoRemainingSeconds = Auth::demoRemainingSeconds();
           <a class="<?= $route === 'platform-companies' ? 'active' : '' ?>" href="index.php?route=platform-companies">Empresas</a>
           <a class="<?= $route === 'platform-payments' ? 'active' : '' ?>" href="index.php?route=platform-payments">Pagos</a>
           <a class="<?= $route === 'platform-plans' ? 'active' : '' ?>" href="index.php?route=platform-plans">Planes</a>
-          <a class="<?= $route === 'platform-audit' ? 'active' : '' ?>" href="index.php?route=platform-audit">Logs</a>
         <?php else: ?>
           <?php foreach ([
             'dashboard' => 'Panel',
@@ -99,6 +98,10 @@ $demoRemainingSeconds = Auth::demoRemainingSeconds();
               <a href="index.php?route=platform-dashboard" role="menuitem">
                 <strong>Admin CRM</strong>
                 <small>Empresas, planes y pagos</small>
+              </a>
+              <a href="index.php?route=platform-audit" role="menuitem">
+                <strong>Logs CRM</strong>
+                <small>Actividad de empresas cliente</small>
               </a>
             <?php endif; ?>
             <form method="post" role="none">

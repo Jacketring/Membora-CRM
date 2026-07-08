@@ -135,10 +135,6 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
     <span>Planes</span>
     <strong>Packaging</strong>
   </a>
-  <a href="index.php?route=platform-audit">
-    <span>Logs</span>
-    <strong>Actividad</strong>
-  </a>
 </section>
 
 <section class="admin-dashboard-tables" aria-label="Seguimiento operativo">
