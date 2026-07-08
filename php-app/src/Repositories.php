@@ -2330,6 +2330,18 @@ final class PlatformClientRepository
         $stmt->execute(['id' => $id]);
     }
 
+    public static function delete(string $id): void
+    {
+        self::ensureTable();
+        PlatformLeadRepository::ensureTable();
+        EmpresaRepository::ensureTables();
+
+        $pdo = Database::connection();
+        $pdo->prepare('UPDATE empresas SET client_id = NULL, updated_at = NOW() WHERE client_id = :id')->execute(['id' => $id]);
+        $pdo->prepare('DELETE FROM platform_leads WHERE client_id = :id')->execute(['id' => $id]);
+        $pdo->prepare('DELETE FROM platform_clients WHERE id = :id')->execute(['id' => $id]);
+    }
+
     private static function clientParams(array $data): array
     {
         $status = in_array($data['status'] ?? '', ['LEAD', 'QUALIFIED', 'CUSTOMER', 'LOST'], true) ? $data['status'] : 'LEAD';
@@ -2433,6 +2445,7 @@ final class PlatformContactRepository
 {
     public static function metrics(): array
     {
+        PlatformClientRepository::syncLeadStatusClients();
         PlatformLeadRepository::ensureTable();
         PlatformClientRepository::ensureTable();
 
@@ -2440,7 +2453,7 @@ final class PlatformContactRepository
         $clientMetrics = PlatformClientRepository::metrics();
 
         return [
-            'new' => (int) $leadMetrics['new'] + (int) $clientMetrics['lead'],
+            'new' => (int) $leadMetrics['new'],
             'qualified' => (int) $leadMetrics['qualified'] + (int) $clientMetrics['qualified'],
             'customers' => self::convertedLeadsWithoutClient() + (int) $clientMetrics['customer'],
             'lost' => (int) $leadMetrics['lost'] + (int) $clientMetrics['lost'],
@@ -2452,10 +2465,10 @@ final class PlatformContactRepository
         PlatformClientRepository::syncLeadStatusClients();
 
         $contacts = [];
-        $leadStatus = self::leadStatus($status);
+        $leadStatus = $status === 'LEAD' ? '' : self::leadStatus($status);
         $clientStatus = self::clientStatus($status);
 
-        if (($type === '' || $type === 'lead') && ($status === '' || $leadStatus !== '')) {
+        if (($type === '' || $type === 'lead') && ($status === '' || $status === 'LEAD' || $leadStatus !== '')) {
             foreach (PlatformLeadRepository::all($query, $leadStatus) as $lead) {
                 if ($lead['status'] === 'CONVERTED' && !empty($lead['client_id'])) {
                     continue;

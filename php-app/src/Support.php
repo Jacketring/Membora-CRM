@@ -623,6 +623,7 @@ function audit_action_label(?string $action): string
         'send_platform_test_email' => 'Prueba de email',
         'create_platform_client' => 'Creacion de cliente CRM',
         'update_platform_client' => 'Actualizacion de cliente CRM',
+        'delete_platform_client' => 'Eliminacion de cliente CRM',
         'create_empresa' => 'Creacion de empresa',
         'update_empresa' => 'Actualizacion de empresa',
         'renew_empresa_subscription' => 'Renovacion de suscripcion',

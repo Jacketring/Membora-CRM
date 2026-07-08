@@ -29,6 +29,7 @@ final class Actions
             'send_platform_test_email' => self::sendPlatformTestEmail(),
             'create_platform_client' => self::createPlatformClient(),
             'update_platform_client' => self::updatePlatformClient(),
+            'delete_platform_client' => self::deletePlatformClient(),
             'create_empresa' => self::createEmpresa(),
             'update_empresa' => self::updateEmpresa(),
             'renew_empresa_subscription' => self::renewEmpresaSubscription(),
@@ -373,6 +374,21 @@ final class Actions
         } else {
             flash('Contacto actualizado correctamente.');
         }
+        redirect('platform-contacts');
+    }
+
+    private static function deletePlatformClient(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+
+        if ($id === '') {
+            flash('No se encontro el contacto que quieres eliminar.', 'error');
+            redirect('platform-contacts');
+        }
+
+        PlatformClientRepository::delete($id);
+        flash('Contacto eliminado correctamente.');
         redirect('platform-contacts');
     }
 

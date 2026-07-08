@@ -153,6 +153,14 @@ $clientStatusOptions = [
                       <svg viewBox="0 0 24 24"><path d="M9 4h6l1 2h4v2H4V6h4l1-2Zm1 6h2v8h-2v-8Zm4 0h2v8h-2v-8ZM7 10h2l1 10h4l1-10h2l-1.2 12H8.2L7 10Z"/></svg>
                     </button>
                   </form>
+                <?php else: ?>
+                  <form method="post" data-confirm-message="Eliminar este contacto comercial? Si tiene empresas vinculadas, se mantendran pero sin cliente asociado.">
+                    <input type="hidden" name="action" value="delete_platform_client">
+                    <input type="hidden" name="id" value="<?= e($contact['id']) ?>">
+                    <button class="note-delete-button" type="submit" aria-label="Eliminar contacto <?= e($contact['contact_name']) ?>">
+                      <svg viewBox="0 0 24 24"><path d="M9 4h6l1 2h4v2H4V6h4l1-2Zm1 6h2v8h-2v-8Zm4 0h2v8h-2v-8ZM7 10h2l1 10h4l1-10h2l-1.2 12H8.2L7 10Z"/></svg>
+                    </button>
+                  </form>
                 <?php endif; ?>
               </div>
             </td>
