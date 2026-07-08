@@ -2318,6 +2318,8 @@ final class PlatformClientRepository
 
         if ($params['status'] === 'LEAD') {
             self::syncLeadFromClient($id, $params);
+        } else {
+            self::markLinkedLeadConverted($id);
         }
     }
 
@@ -2340,6 +2342,19 @@ final class PlatformClientRepository
         $pdo->prepare('UPDATE empresas SET client_id = NULL, updated_at = NOW() WHERE client_id = :id')->execute(['id' => $id]);
         $pdo->prepare('DELETE FROM platform_leads WHERE client_id = :id')->execute(['id' => $id]);
         $pdo->prepare('DELETE FROM platform_clients WHERE id = :id')->execute(['id' => $id]);
+    }
+
+    private static function markLinkedLeadConverted(string $clientId): void
+    {
+        PlatformLeadRepository::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'UPDATE platform_leads
+             SET status = "CONVERTED",
+                 converted_at = COALESCE(converted_at, NOW()),
+                 updated_at = NOW()
+             WHERE client_id = :client_id'
+        );
+        $stmt->execute(['client_id' => $clientId]);
     }
 
     private static function clientParams(array $data): array
@@ -2470,6 +2485,10 @@ final class PlatformContactRepository
 
         if (($type === '' || $type === 'lead') && ($status === '' || $status === 'LEAD' || $leadStatus !== '')) {
             foreach (PlatformLeadRepository::all($query, $leadStatus) as $lead) {
+                if (!empty($lead['client_id']) && ($lead['client_status'] ?? '') !== 'LEAD') {
+                    continue;
+                }
+
                 if ($lead['status'] === 'CONVERTED' && !empty($lead['client_id'])) {
                     continue;
                 }
@@ -2609,7 +2628,9 @@ final class PlatformLeadRepository
         }
 
         $stmt = Database::connection()->prepare(
-            'SELECT platform_leads.*, platform_clients.company_name AS client_company_name
+            'SELECT platform_leads.*,
+                    platform_clients.company_name AS client_company_name,
+                    platform_clients.status AS client_status
              FROM platform_leads
              LEFT JOIN platform_clients ON platform_clients.id = platform_leads.client_id
              WHERE ' . implode(' AND ', $where) . '
