@@ -3617,6 +3617,8 @@ final class PlatformPlanRepository
                 name VARCHAR(191) NOT NULL,
                 monthly_price DECIMAL(10,2) NOT NULL DEFAULT 0,
                 setup_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+                discount_price DECIMAL(10,2) NULL,
+                discount_label VARCHAR(120) NULL,
                 max_users INT NULL,
                 max_members INT NULL,
                 status VARCHAR(32) NOT NULL DEFAULT "ACTIVE",
@@ -3627,6 +3629,8 @@ final class PlatformPlanRepository
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
         );
 
+        self::ensureColumn('discount_price', 'ALTER TABLE saas_plans ADD COLUMN discount_price DECIMAL(10,2) NULL AFTER setup_price');
+        self::ensureColumn('discount_label', 'ALTER TABLE saas_plans ADD COLUMN discount_label VARCHAR(120) NULL AFTER discount_price');
         self::seedDefaults();
     }
 
@@ -3683,7 +3687,7 @@ final class PlatformPlanRepository
     {
         $prices = [];
         foreach (self::all('', 'ACTIVE') as $plan) {
-            $prices[$plan['code']] = number_format((float) $plan['monthly_price'], 2, '.', '');
+            $prices[$plan['code']] = number_format(self::effectiveMonthlyPrice($plan), 2, '.', '');
         }
 
         return $prices ?: [
@@ -3699,8 +3703,8 @@ final class PlatformPlanRepository
     {
         self::ensureTable();
         $stmt = Database::connection()->prepare(
-            'INSERT INTO saas_plans (id, code, name, monthly_price, setup_price, max_users, max_members, status, features, created_at, updated_at)
-             VALUES (:id, :code, :name, :monthly_price, :setup_price, :max_users, :max_members, :status, :features, NOW(), NOW())'
+            'INSERT INTO saas_plans (id, code, name, monthly_price, setup_price, discount_price, discount_label, max_users, max_members, status, features, created_at, updated_at)
+             VALUES (:id, :code, :name, :monthly_price, :setup_price, :discount_price, :discount_label, :max_users, :max_members, :status, :features, NOW(), NOW())'
         );
         $stmt->execute(self::planParams($data) + ['id' => cuid()]);
     }
@@ -3714,6 +3718,8 @@ final class PlatformPlanRepository
                  name = :name,
                  monthly_price = :monthly_price,
                  setup_price = :setup_price,
+                 discount_price = :discount_price,
+                 discount_label = :discount_label,
                  max_users = :max_users,
                  max_members = :max_members,
                  status = :status,
@@ -3767,18 +3773,69 @@ final class PlatformPlanRepository
     {
         $monthlyPrice = str_replace(',', '.', (string) ($data['monthly_price'] ?? '0'));
         $setupPrice = str_replace(',', '.', (string) ($data['setup_price'] ?? '0'));
+        $discountPrice = str_replace(',', '.', trim((string) ($data['discount_price'] ?? '')));
         $status = in_array($data['status'] ?? '', ['ACTIVE', 'INACTIVE', 'ARCHIVED'], true) ? $data['status'] : 'ACTIVE';
+        $monthly = max(0, (float) $monthlyPrice);
+        $discount = $discountPrice !== '' ? max(0, (float) $discountPrice) : null;
+        if ($discount !== null && ($discount <= 0 || $discount >= $monthly)) {
+            $discount = null;
+        }
 
         return [
             'code' => strtoupper(preg_replace('/[^A-Z0-9_]/', '', trim((string) ($data['code'] ?? '')))) ?: 'CUSTOM',
             'name' => trim((string) ($data['name'] ?? '')),
-            'monthly_price' => number_format(max(0, (float) $monthlyPrice), 2, '.', ''),
+            'monthly_price' => number_format($monthly, 2, '.', ''),
             'setup_price' => number_format(max(0, (float) $setupPrice), 2, '.', ''),
+            'discount_price' => $discount !== null ? number_format($discount, 2, '.', '') : null,
+            'discount_label' => trim((string) ($data['discount_label'] ?? '')) ?: null,
             'max_users' => trim((string) ($data['max_users'] ?? '')) !== '' ? max(0, (int) $data['max_users']) : null,
             'max_members' => trim((string) ($data['max_members'] ?? '')) !== '' ? max(0, (int) $data['max_members']) : null,
             'status' => $status,
             'features' => trim((string) ($data['features'] ?? '')) ?: null,
         ];
+    }
+
+    public static function publicPlans(): array
+    {
+        $plans = [];
+        foreach (self::all('', 'ACTIVE') as $plan) {
+            if (strtoupper((string) $plan['code']) === 'TRIAL') {
+                continue;
+            }
+
+            $effectivePrice = self::effectiveMonthlyPrice($plan);
+            $monthlyPrice = (float) $plan['monthly_price'];
+            $features = array_values(array_filter(array_map('trim', preg_split('/[\r\n]+|;/', (string) ($plan['features'] ?? '')) ?: [])));
+            $plans[] = [
+                'code' => $plan['code'],
+                'name' => $plan['name'],
+                'monthly_price' => number_format($effectivePrice, 2, '.', ''),
+                'original_monthly_price' => $effectivePrice < $monthlyPrice ? number_format($monthlyPrice, 2, '.', '') : null,
+                'setup_price' => number_format((float) $plan['setup_price'], 2, '.', ''),
+                'discount_label' => $effectivePrice < $monthlyPrice ? ($plan['discount_label'] ?: 'Oferta activa') : null,
+                'max_users' => $plan['max_users'] !== null ? (int) $plan['max_users'] : null,
+                'max_members' => $plan['max_members'] !== null ? (int) $plan['max_members'] : null,
+                'features' => $features,
+            ];
+        }
+
+        return $plans;
+    }
+
+    private static function effectiveMonthlyPrice(array $plan): float
+    {
+        $monthlyPrice = (float) ($plan['monthly_price'] ?? 0);
+        $discountPrice = isset($plan['discount_price']) ? (float) $plan['discount_price'] : 0.0;
+
+        return $discountPrice > 0 && $discountPrice < $monthlyPrice ? $discountPrice : $monthlyPrice;
+    }
+
+    private static function ensureColumn(string $column, string $sql): void
+    {
+        $stmt = Database::connection()->query('SHOW COLUMNS FROM saas_plans LIKE ' . Database::connection()->quote($column));
+        if (!$stmt->fetch()) {
+            Database::connection()->exec($sql);
+        }
     }
 }
 

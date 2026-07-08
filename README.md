@@ -254,7 +254,7 @@ Este usuario se crea automaticamente desde la aplicacion PHP si no existe.
 - Plan de prueba con duracion configurable por dias; solo cuando el plan es `Prueba` se oculta el proximo pago y no aparece renovacion.
 - MRR estimado.
 - Seccion `Pagos` para registrar cobros SaaS, vencimientos, pagados, pendientes y cancelados.
-- Seccion `Planes` para definir catalogo comercial, precio mensual, setup, limites y prestaciones.
+- Seccion `Planes` para definir catalogo comercial, precio mensual, setup, rebajas, limites y prestaciones sincronizadas con la web publica.
 - Seccion `Web` para revisar el estado tecnico del formulario publico y envios recientes.
 - Seccion `Logs` para filtrar actividad por empresa, accion, fecha y texto.
 - Acceso de soporte al CRM de una empresa conectada.

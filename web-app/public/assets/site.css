@@ -693,6 +693,31 @@ button, input, textarea { font: inherit; }
   color: var(--primary);
   font-size: 24px;
 }
+.pricing-grid ul {
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 18px;
+}
+.web-plan-original-price {
+  color: var(--muted);
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+  text-decoration: line-through;
+}
+.web-plan-discount {
+  background: #dcfce7;
+  border-radius: 999px;
+  color: #047857;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 7px 10px;
+  width: fit-content;
+}
 .highlight-plan {
   border-color: #9cc0ff !important;
   box-shadow: 0 18px 44px rgba(7, 84, 214, 0.18) !important;

@@ -4,6 +4,41 @@ require __DIR__ . '/../src/bootstrap.php';
 require __DIR__ . '/../src/View.php';
 
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
+$isPublicPlansRequest = $requestPath === '/api/plans' || ($_GET['action'] ?? '') === 'public_plans';
+if ($isPublicPlansRequest) {
+    $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
+    $allowedOrigins = array_filter([
+        rtrim((string) (getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev'), '/'),
+        rtrim((string) (getenv('APP_WEB_URL') ?: ''), '/'),
+    ]);
+    if ($origin !== '' && in_array(rtrim($origin, '/'), $allowedOrigins, true)) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Access-Control-Allow-Headers: Content-Type');
+        header('Access-Control-Allow-Methods: GET, OPTIONS');
+        header('Vary: Origin');
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(204);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        header('Content-Type: application/json; charset=utf-8', true, 405);
+        echo json_encode(['success' => false, 'message' => 'Metodo no permitido'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    echo json_encode([
+        'success' => true,
+        'currency' => 'EUR',
+        'plans' => PlatformPlanRepository::publicPlans(),
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $isWebhookLeadRequest = $requestPath === '/webhook/lead' || ($_GET['action'] ?? '') === 'webhook_lead';
 if ($isWebhookLeadRequest) {
     $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');

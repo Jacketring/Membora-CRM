@@ -6,6 +6,8 @@ $planValues = $isEditingPlan ? $plan : [
     'name' => '',
     'monthly_price' => '0.00',
     'setup_price' => '0.00',
+    'discount_price' => '',
+    'discount_label' => '',
     'max_users' => '',
     'max_members' => '',
     'status' => 'ACTIVE',
@@ -39,6 +41,14 @@ $planStatusOptions = [
   <label class="field">
     <span>Alta / setup</span>
     <input name="setup_price" inputmode="decimal" value="<?= e((string) $planValues['setup_price']) ?>" placeholder="99.00">
+  </label>
+  <label class="field">
+    <span>Precio rebajado</span>
+    <input name="discount_price" inputmode="decimal" value="<?= e((string) ($planValues['discount_price'] ?? '')) ?>" placeholder="69.00">
+  </label>
+  <label class="field">
+    <span>Texto de rebaja</span>
+    <input name="discount_label" value="<?= e((string) ($planValues['discount_label'] ?? '')) ?>" placeholder="Oferta lanzamiento">
   </label>
   <label class="field">
     <span>Usuarios incluidos</span>

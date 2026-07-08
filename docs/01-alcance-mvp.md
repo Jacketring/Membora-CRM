@@ -54,7 +54,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Creacion de tenant y usuario administrador al crear una empresa CRM.
 - Estados de CRM y pago.
 - Plan de prueba configurable por dias, sin proximo pago visible solo cuando el plan seleccionado es `Prueba`.
-- Planes comerciales SaaS.
+- Planes comerciales SaaS con precio mensual, alta, rebajas y sincronizacion publica con la web comercial.
 - Pagos SaaS por empresa.
 - Web comercial: diagnostico de webhook, correo y ultimos envios.
 - Acceso de soporte al CRM de una empresa conectada.
@@ -63,6 +63,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 
 - Web estatica desplegable en `web-app/public`.
 - Acceso a demo funcional del CRM desde la web publica, con sesion temporal de 20 minutos.
+- Seccion de planes cargada desde el catalogo activo de `Admin CRM > Planes`.
 - Formulario publico conectado al webhook del CRM.
 - Email HTML de confirmacion cuando SMTP esta configurado.
 

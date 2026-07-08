@@ -60,6 +60,11 @@ $statusOptions = [
 
 <section class="platform-plan-cards">
   <?php foreach ($plans as $plan): ?>
+    <?php
+      $monthlyPrice = (float) ($plan['monthly_price'] ?? 0);
+      $discountPrice = (float) ($plan['discount_price'] ?? 0);
+      $hasDiscount = $discountPrice > 0 && $discountPrice < $monthlyPrice;
+    ?>
     <article class="platform-plan-card">
       <header>
         <div>
@@ -68,7 +73,17 @@ $statusOptions = [
         </div>
         <span class="status-badge status-badge--<?= e(strtolower((string) $plan['status'])) ?>"><?= e(platform_plan_status_label($plan['status'])) ?></span>
       </header>
-      <strong><?= e(money_amount($plan['monthly_price'])) ?><small>/mes</small></strong>
+      <strong>
+        <?php if ($hasDiscount): ?>
+          <span class="plan-original-price"><?= e(money_amount($monthlyPrice)) ?></span>
+          <?= e(money_amount($discountPrice)) ?><small>/mes</small>
+        <?php else: ?>
+          <?= e(money_amount($monthlyPrice)) ?><small>/mes</small>
+        <?php endif; ?>
+      </strong>
+      <?php if ($hasDiscount): ?>
+        <span class="plan-discount-badge"><?= e($plan['discount_label'] ?: 'Oferta activa') ?></span>
+      <?php endif; ?>
       <dl>
         <div><dt>Alta</dt><dd><?= e(money_amount($plan['setup_price'])) ?></dd></div>
         <div><dt>Usuarios</dt><dd><?= $plan['max_users'] !== null ? (int) $plan['max_users'] : 'Sin limite' ?></dd></div>

@@ -1,5 +1,6 @@
 const MEMBORA_WEBHOOK_URL = 'https://app.crm.josehurtado.dev/webhook/lead';
 const MEMBORA_DEMO_LOGIN_URL = 'https://app.crm.josehurtado.dev/index.php?route=login';
+const MEMBORA_PUBLIC_PLANS_URL = 'https://app.crm.josehurtado.dev/api/plans';
 
 function startDemoLogin(type = 'client') {
   const form = document.createElement('form');
@@ -28,6 +29,84 @@ document.querySelectorAll('[data-demo-login]').forEach((trigger) => {
     startDemoLogin(trigger.dataset.demoLogin || 'client');
   });
 });
+
+const pricingGrid = document.querySelector('[data-pricing-grid]');
+
+function formatPlanPrice(value) {
+  const amount = Number.parseFloat(String(value || '0'));
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return 'A medida';
+  }
+
+  return `${amount.toLocaleString('es-ES', {
+    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  })} EUR/mes`;
+}
+
+function renderPlanCard(plan, index) {
+  const article = document.createElement('article');
+  if (index === 1) {
+    article.className = 'highlight-plan';
+  }
+
+  const title = document.createElement('h3');
+  title.textContent = plan.name || 'Plan CRM';
+
+  const description = document.createElement('p');
+  const features = Array.isArray(plan.features) ? plan.features.filter(Boolean) : [];
+  description.textContent = features[0] || 'Plan comercial de Membora CRM.';
+
+  const price = document.createElement('strong');
+  if (plan.original_monthly_price) {
+    const original = document.createElement('span');
+    original.className = 'web-plan-original-price';
+    original.textContent = formatPlanPrice(plan.original_monthly_price);
+    price.appendChild(original);
+  }
+  price.append(formatPlanPrice(plan.monthly_price));
+
+  article.append(title, description, price);
+
+  if (plan.discount_label) {
+    const badge = document.createElement('span');
+    badge.className = 'web-plan-discount';
+    badge.textContent = plan.discount_label;
+    article.appendChild(badge);
+  }
+
+  if (features.length > 1) {
+    const list = document.createElement('ul');
+    features.slice(1, 4).forEach((feature) => {
+      const item = document.createElement('li');
+      item.textContent = feature;
+      list.appendChild(item);
+    });
+    article.appendChild(list);
+  }
+
+  return article;
+}
+
+async function loadPublicPlans() {
+  if (!pricingGrid) {
+    return;
+  }
+
+  try {
+    const response = await fetch(MEMBORA_PUBLIC_PLANS_URL, { headers: { Accept: 'application/json' } });
+    const result = await response.json();
+    if (!response.ok || !result.success || !Array.isArray(result.plans) || result.plans.length === 0) {
+      return;
+    }
+
+    pricingGrid.replaceChildren(...result.plans.map(renderPlanCard));
+  } catch (error) {
+    // La web mantiene los planes estaticos si el CRM no responde.
+  }
+}
+
+loadPublicPlans();
 
 const form = document.querySelector('[data-lead-form]');
 const alertBox = document.querySelector('[data-form-alert]');
