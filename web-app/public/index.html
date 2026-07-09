@@ -41,28 +41,58 @@
           <a class="dark-link" href="https://app.crm.josehurtado.dev/index.php?route=login" data-demo-login="client">Acceder al panel</a>
         </div>
       </div>
-      <aside class="hero-panel" aria-label="Mockup del panel de Membora">
-        <div class="mini-window product-mockup">
-          <div class="mini-window-bar"><span></span><span></span><span></span></div>
-          <div class="mockup-top">
-            <strong>Dashboard Membora</strong>
-            <span>Hoy</span>
+      <aside class="hero-panel" aria-label="Captura simulada del panel de administracion de Membora">
+        <div class="admin-shot">
+          <div class="admin-shot-head">
+            <div>
+              <strong>Administracion Membora</strong>
+              <span>Controla cartera, cobros y empresas que necesitan seguimiento.</span>
+            </div>
+            <div class="admin-shot-actions">
+              <span>Ver pagos</span>
+              <b>Gestionar empresas</b>
+            </div>
           </div>
-          <div class="mini-kpis">
-            <article><b>128</b><span>socios activos</span></article>
-            <article><b>71%</b><span>conversion</span></article>
-            <article><b>24</b><span>pagos mes</span></article>
+          <div class="admin-shot-grid">
+            <section class="admin-shot-card admin-shot-card--wide">
+              <small>Salud financiera</small>
+              <strong>289,00 EUR de MRR</strong>
+              <span>3.468,00 EUR ARR estimado con 3 empresas activas o en prueba.</span>
+              <div class="admin-shot-kpis">
+                <article><small>Cobrado este mes</small><b>240,00 EUR</b></article>
+                <article><small>Pendiente</small><b>0,00 EUR</b></article>
+                <article><small>ARPA</small><b>96,33 EUR</b></article>
+              </div>
+            </section>
+            <section class="admin-shot-card">
+              <small>Cartera</small>
+              <strong>3 empresas</strong>
+              <span>100% al dia en pagos.</span>
+              <div class="admin-shot-bars">
+                <i style="--w:100%"></i>
+                <i style="--w:8%"></i>
+                <i style="--w:4%"></i>
+              </div>
+            </section>
           </div>
-          <div class="mockup-table" aria-hidden="true">
-            <span>Lead</span><span>Estado</span><span>Proxima accion</span>
-            <b>Laura Martin</b><em>Prueba</em><small>Hoy 18:00</small>
-            <b>Pedro Ruiz</b><em>Contactado</em><small>Llamar</small>
-            <b>Ana Lopez</b><em>Alta</em><small>Cuota mensual</small>
+          <div class="admin-shot-tabs">
+            <span><b>Contactos</b>Leads y clientes</span>
+            <span><b>Empresas</b>Alta y soporte</span>
+            <span><b>Pagos</b>Cobros y facturas</span>
+            <span><b>Planes</b>Packaging</span>
           </div>
-          <div class="mini-funnel">
-            <div><span>Leads abiertos</span><i style="--w:72%"></i></div>
-            <div><span>Pruebas agendadas</span><i style="--w:48%"></i></div>
-            <div><span>Altas cerradas</span><i style="--w:34%"></i></div>
+          <div class="admin-shot-tables">
+            <section>
+              <small>Prioridad</small>
+              <strong>Empresas que requieren accion</strong>
+              <p>No hay empresas con incidencias ahora mismo.</p>
+            </section>
+            <section>
+              <small>Cobros</small>
+              <strong>Proximos movimientos</strong>
+              <div class="admin-shot-row"><span>Empresa ejemplo</span><b>Pagado</b><em>120,00 EUR</em></div>
+              <div class="admin-shot-row"><span>Charcuteria</span><b>Pagado</b><em>120,00 EUR</em></div>
+            </section>
           </div>
         </div>
       </aside>
@@ -89,9 +119,9 @@
         <p>Membora centraliza tus leads, socios, clases y pagos para que recepcion, comerciales, entrenadores y direccion tengan una unica fuente de informacion.</p>
       </div>
       <div class="pain-list" aria-label="Problemas que resuelve">
-        <article><span class="ui-icon icon-users" aria-hidden="true"></span><span>Leads sin seguimiento comercial claro.</span></article>
-        <article><span class="ui-icon icon-card" aria-hidden="true"></span><span>Membresias y vencimientos repartidos en varias hojas.</span></article>
-        <article><span class="ui-icon icon-calendar" aria-hidden="true"></span><span>Reservas, clases y tareas gestionadas manualmente.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Leads sin seguimiento comercial claro.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span>Membresias y vencimientos repartidos en varias hojas.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><span>Reservas, clases y tareas gestionadas manualmente.</span></article>
       </div>
     </section>
 
@@ -102,22 +132,22 @@
       </div>
       <div class="product-grid">
         <article class="feature-card feature-card--wide">
-          <span class="ui-icon icon-bolt" aria-hidden="true"></span>
+          <span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m13 2-9 14h8l-1 6 9-14h-8z"/></svg></span>
           <h3>Captacion y seguimiento de leads</h3>
           <p>Gestiona nuevos leads, contactados, pruebas agendadas, altas propuestas, convertidos y perdidos desde una misma tabla.</p>
         </article>
         <article class="feature-card">
-          <span class="ui-icon icon-chart" aria-hidden="true"></span>
+          <span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
           <h3>Metricas del gimnasio</h3>
           <p>KPIs de socios, conversion, tareas pendientes y atencion requerida.</p>
         </article>
         <article class="feature-card">
-          <span class="ui-icon icon-calendar" aria-hidden="true"></span>
+          <span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span>
           <h3>Clases y reservas</h3>
           <p>Clases, reservas, aforos, socios vinculados, tareas y notas internas.</p>
         </article>
         <article class="feature-card feature-card--dark">
-          <span class="ui-icon icon-shield" aria-hidden="true"></span>
+          <span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></span>
           <h3>SaaS multiempresa</h3>
           <p>Panel de administracion para controlar empresas cliente, planes, pagos y soporte.</p>
         </article>
@@ -186,14 +216,14 @@
         <h2>Funcionalidades clave para gestionar el gimnasio completo</h2>
       </div>
       <div class="module-list">
-        <article><span class="ui-icon icon-users" aria-hidden="true"></span><strong>CRM de leads</strong><span>Gestiona interesados, llamadas, WhatsApp, notas y estados comerciales.</span></article>
-        <article><span class="ui-icon icon-user" aria-hidden="true"></span><strong>Gestion de socios</strong><span>Controla datos, foto, membresias activas, vencimientos e historial.</span></article>
-        <article><span class="ui-icon icon-card" aria-hidden="true"></span><strong>Membresias y cuotas</strong><span>Planes, caducidades, renovaciones y control de pagos asociados.</span></article>
-        <article><span class="ui-icon icon-calendar" aria-hidden="true"></span><strong>Clases y reservas</strong><span>Organiza horarios, reservas, aforo y asistencia de cada sesion.</span></article>
-        <article><span class="ui-icon icon-check" aria-hidden="true"></span><strong>Check-ins</strong><span>Entrada rapida de socios al centro y control de actividad.</span></article>
-        <article><span class="ui-icon icon-eur" aria-hidden="true"></span><strong>Pagos registrados</strong><span>Registra pagos manuales, controla deudas y revisa proximos cobros.</span></article>
-        <article><span class="ui-icon icon-shield" aria-hidden="true"></span><strong>Panel de administracion</strong><span>Gestiona empresas cliente, planes, permisos y soporte desde un area separada.</span></article>
-        <article><span class="ui-icon icon-chart" aria-hidden="true"></span><strong>Metricas del gimnasio</strong><span>Dashboard claro para tomar decisiones sin revisar varias hojas.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><strong>CRM de leads</strong><span>Gestiona interesados, llamadas, WhatsApp, notas y estados comerciales.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span><strong>Gestion de socios</strong><span>Controla datos, foto, membresias activas, vencimientos e historial.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><strong>Membresias y cuotas</strong><span>Planes, caducidades, renovaciones y control de pagos asociados.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><strong>Clases y reservas</strong><span>Organiza horarios, reservas, aforo y asistencia de cada sesion.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><strong>Check-ins</strong><span>Entrada rapida de socios al centro y control de actividad.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 5a7 7 0 1 0 0 14"/><path d="M16 3h5"/><path d="M16 21h5"/></svg></span><strong>Pagos registrados</strong><span>Registra pagos manuales, controla deudas y revisa proximos cobros.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></span><strong>Panel de administracion</strong><span>Gestiona empresas cliente, planes, permisos y soporte desde un area separada.</span></article>
+        <article><span class="ui-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span><strong>Metricas del gimnasio</strong><span>Dashboard claro para tomar decisiones sin revisar varias hojas.</span></article>
       </div>
       <div class="center-action">
         <a class="primary-link" href="#contacto">Solicitar demo</a>
