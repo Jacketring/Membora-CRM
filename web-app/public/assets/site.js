@@ -108,6 +108,136 @@ async function loadPublicPlans() {
 
 loadPublicPlans();
 
+const clientFeatures = {
+  dashboard: {
+    tag: 'Panel operativo',
+    title: 'Dashboard',
+    description: 'Resumen diario del gimnasio con socios activos, conversion, reservas, tareas pendientes, pagos recientes y avisos importantes.',
+    items: [
+      'KPIs principales del centro en una sola vista.',
+      'Actividad reciente y proximas acciones del equipo.',
+      'Acceso rapido a leads, socios, clases, pagos y tareas.',
+    ],
+  },
+  leads: {
+    tag: 'Formulario comercial',
+    title: 'CRM de leads',
+    description: 'Pantalla para registrar interesados, hacer seguimiento comercial y convertir pruebas en socios.',
+    items: [
+      'Alta de lead con nombre, contacto, origen, interes y notas.',
+      'Estados comerciales: nuevo, contactado, prueba, propuesta, convertido o perdido.',
+      'Seguimiento de llamadas, WhatsApp, proxima accion y responsable interno.',
+    ],
+  },
+  members: {
+    tag: 'Ficha de cliente',
+    title: 'Gestion de socios',
+    description: 'Ficha centralizada para controlar datos personales, foto, membresia activa, historial, reservas y notas internas.',
+    items: [
+      'Alta y edicion de datos del socio.',
+      'Consulta de membresias, pagos, reservas, check-ins y tareas relacionadas.',
+      'Estado del socio, vencimientos y observaciones del equipo.',
+    ],
+  },
+  memberships: {
+    tag: 'Formulario de planes',
+    title: 'Membresias y cuotas',
+    description: 'Gestion de planes contratados, precios, fechas de inicio y fin, renovaciones y vencimientos.',
+    items: [
+      'Asignacion de plan a cada socio.',
+      'Control de caducidad, renovacion y cuotas pendientes.',
+      'Vista de planes mensuales, trimestrales, bonos o personalizados.',
+    ],
+  },
+  classes: {
+    tag: 'Calendario',
+    title: 'Clases y reservas',
+    description: 'Organizacion de sesiones, horarios, aforo, entrenadores y reservas de socios.',
+    items: [
+      'Creacion de clases con fecha, hora, aforo y entrenador.',
+      'Reserva de plaza y control de asistencia.',
+      'Vista de calendario para recepcion y equipo tecnico.',
+    ],
+  },
+  checkins: {
+    tag: 'Control de acceso',
+    title: 'Check-ins',
+    description: 'Registro rapido de entradas al centro para consultar actividad y asistencia real de los socios.',
+    items: [
+      'Entrada manual o desde busqueda de socio.',
+      'Historial de accesos por persona y por fecha.',
+      'Deteccion de socios activos, inactivos o con cuota pendiente.',
+    ],
+  },
+  payments: {
+    tag: 'Cobros',
+    title: 'Pagos y facturas',
+    description: 'Registro de pagos manuales, conceptos, importes, estados y justificantes para controlar la caja del centro.',
+    items: [
+      'Alta de pago por socio, concepto, fecha e importe.',
+      'Estados pagado, pendiente o vencido.',
+      'Generacion de justificante o factura PDF cuando aplica.',
+    ],
+  },
+  tasks: {
+    tag: 'Operacion interna',
+    title: 'Tareas internas',
+    description: 'Lista de acciones para recepcion, comerciales, entrenadores y administradores.',
+    items: [
+      'Tareas con responsable, prioridad, fecha y estado.',
+      'Seguimiento de llamadas, renovaciones, incidencias y gestiones pendientes.',
+      'Relaciones con leads o socios concretos.',
+    ],
+  },
+  alerts: {
+    tag: 'Avisos',
+    title: 'Alertas',
+    description: 'Panel de avisos para detectar vencimientos, pagos pendientes, tareas atrasadas y actividad que requiere atencion.',
+    items: [
+      'Avisos por membresias proximas a caducar.',
+      'Pagos pendientes o vencidos.',
+      'Tareas atrasadas y socios que requieren seguimiento.',
+    ],
+  },
+  users: {
+    tag: 'Configuracion',
+    title: 'Usuarios y roles',
+    description: 'Gestion del personal interno que accede al sistema con permisos segun su funcion.',
+    items: [
+      'Alta de administradores, recepcion, comerciales y entrenadores.',
+      'Permisos diferenciados por rol.',
+      'Control de acceso al panel privado del centro.',
+    ],
+  },
+};
+
+const clientFeatureSelect = document.querySelector('[data-client-feature-select]');
+const clientFeatureCard = document.querySelector('[data-client-feature-card]');
+
+function renderClientFeature(featureKey) {
+  const feature = clientFeatures[featureKey] || clientFeatures.dashboard;
+  if (!clientFeatureCard) {
+    return;
+  }
+
+  clientFeatureCard.querySelector('[data-client-feature-tag]').textContent = feature.tag;
+  clientFeatureCard.querySelector('[data-client-feature-title]').textContent = feature.title;
+  clientFeatureCard.querySelector('[data-client-feature-description]').textContent = feature.description;
+
+  const list = clientFeatureCard.querySelector('[data-client-feature-list]');
+  list.replaceChildren(...feature.items.map((text) => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }));
+}
+
+clientFeatureSelect?.addEventListener('change', (event) => {
+  renderClientFeature(event.target.value);
+});
+
+renderClientFeature(clientFeatureSelect?.value || 'dashboard');
+
 const form = document.querySelector('[data-lead-form]');
 const alertBox = document.querySelector('[data-form-alert]');
 

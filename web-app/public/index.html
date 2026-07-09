@@ -41,58 +41,54 @@
           <a class="dark-link" href="https://app.crm.josehurtado.dev/index.php?route=login" data-demo-login="client">Acceder al panel</a>
         </div>
       </div>
-      <aside class="hero-panel" aria-label="Captura simulada del panel de administracion de Membora">
-        <div class="admin-shot">
-          <div class="admin-shot-head">
-            <div>
-              <strong>Administracion Membora</strong>
-              <span>Controla cartera, cobros y empresas que necesitan seguimiento.</span>
+      <aside class="hero-panel" aria-label="Pantalla simulada del panel cliente de Membora">
+        <div class="product-shot">
+          <div class="product-browser">
+            <div class="browser-bar">
+              <span></span><span></span><span></span>
+              <b>app.membora.es/panel</b>
             </div>
-            <div class="admin-shot-actions">
-              <span>Ver pagos</span>
-              <b>Gestionar empresas</b>
+            <div class="product-app">
+              <nav class="product-sidebar" aria-hidden="true">
+                <strong><i>M</i> Membora</strong>
+                <span class="active">Dashboard</span>
+                <span>Leads</span>
+                <span>Socios</span>
+                <span>Membresias</span>
+                <span>Pagos</span>
+              </nav>
+              <div class="product-workspace">
+                <div class="workspace-head">
+                  <div>
+                    <strong>Panel del gimnasio</strong>
+                    <span>Ventas, socios y actividad de hoy</span>
+                  </div>
+                  <button type="button">Nuevo lead</button>
+                </div>
+                <div class="workspace-kpis">
+                  <article><small>Socios activos</small><b>128</b></article>
+                  <article><small>Conversion</small><b>71%</b></article>
+                  <article><small>Reservas hoy</small><b>24</b></article>
+                </div>
+                <div class="workspace-table">
+                  <div><span>Laura Martin</span><b>Prueba</b><em>Hoy 18:00</em></div>
+                  <div><span>Pedro Ruiz</span><b>Contactado</b><em>Llamar</em></div>
+                  <div><span>Ana Lopez</span><b>Alta</b><em>Mensual</em></div>
+                  <div><span>Miguel Torres</span><b>Socio</b><em>Check-in</em></div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="admin-shot-grid">
-            <section class="admin-shot-card admin-shot-card--wide">
-              <small>Salud financiera</small>
-              <strong>289,00 EUR de MRR</strong>
-              <span>3.468,00 EUR ARR estimado con 3 empresas activas o en prueba.</span>
-              <div class="admin-shot-kpis">
-                <article><small>Cobrado este mes</small><b>240,00 EUR</b></article>
-                <article><small>Pendiente</small><b>0,00 EUR</b></article>
-                <article><small>ARPA</small><b>96,33 EUR</b></article>
-              </div>
-            </section>
-            <section class="admin-shot-card">
-              <small>Cartera</small>
-              <strong>3 empresas</strong>
-              <span>100% al dia en pagos.</span>
-              <div class="admin-shot-bars">
-                <i style="--w:100%"></i>
-                <i style="--w:8%"></i>
-                <i style="--w:4%"></i>
-              </div>
-            </section>
-          </div>
-          <div class="admin-shot-tabs">
-            <span><b>Contactos</b>Leads y clientes</span>
-            <span><b>Empresas</b>Alta y soporte</span>
-            <span><b>Pagos</b>Cobros y facturas</span>
-            <span><b>Planes</b>Packaging</span>
-          </div>
-          <div class="admin-shot-tables">
-            <section>
-              <small>Prioridad</small>
-              <strong>Empresas que requieren accion</strong>
-              <p>No hay empresas con incidencias ahora mismo.</p>
-            </section>
-            <section>
-              <small>Cobros</small>
-              <strong>Proximos movimientos</strong>
-              <div class="admin-shot-row"><span>Empresa ejemplo</span><b>Pagado</b><em>120,00 EUR</em></div>
-              <div class="admin-shot-row"><span>Charcuteria</span><b>Pagado</b><em>120,00 EUR</em></div>
-            </section>
+          <div class="product-phone" aria-hidden="true">
+            <div class="phone-speaker"></div>
+            <strong>Ficha de socio</strong>
+            <span class="phone-avatar">MT</span>
+            <p>Mensual activa</p>
+            <dl>
+              <div><dt>Ultimo acceso</dt><dd>Hoy 09:20</dd></div>
+              <div><dt>Cuota</dt><dd>39,00 EUR</dd></div>
+              <div><dt>Estado</dt><dd>Al dia</dd></div>
+            </dl>
           </div>
         </div>
       </aside>
@@ -111,6 +107,38 @@
         <strong>Soporte y personalizacion</strong>
         <span>Preparado para adaptar planes, colores, empresas y procesos.</span>
       </article>
+    </section>
+
+    <section class="section client-explorer" aria-label="Explorador de funcionalidades del panel cliente">
+      <div class="client-explorer-copy">
+        <h2>Explora las funcionalidades del panel cliente</h2>
+        <p>Selecciona una parte de Membora para ver que formulario o pantalla usa el gimnasio en su gestion diaria.</p>
+      </div>
+      <div class="client-explorer-panel">
+        <label for="client-feature-select">Ver modulo</label>
+        <select id="client-feature-select" data-client-feature-select>
+          <option value="dashboard">Dashboard</option>
+          <option value="leads">CRM de leads</option>
+          <option value="members">Gestion de socios</option>
+          <option value="memberships">Membresias y cuotas</option>
+          <option value="classes">Clases y reservas</option>
+          <option value="checkins">Check-ins</option>
+          <option value="payments">Pagos y facturas</option>
+          <option value="tasks">Tareas internas</option>
+          <option value="alerts">Alertas</option>
+          <option value="users">Usuarios y roles</option>
+        </select>
+        <article class="client-feature-card" data-client-feature-card>
+          <span data-client-feature-tag>Panel operativo</span>
+          <h3 data-client-feature-title>Dashboard</h3>
+          <p data-client-feature-description>Resumen diario del gimnasio con socios activos, conversion, reservas, tareas pendientes y pagos recientes.</p>
+          <ul data-client-feature-list>
+            <li>KPIs principales del centro.</li>
+            <li>Actividad reciente y proximas acciones.</li>
+            <li>Acceso rapido a modulos clave.</li>
+          </ul>
+        </article>
+      </div>
     </section>
 
     <section class="section pain-section">
