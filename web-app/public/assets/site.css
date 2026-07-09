@@ -1251,32 +1251,22 @@ button, input, textarea { font: inherit; }
 }
 .module-list .ui-icon {
   align-self: center;
-  display: grid;
   grid-row: 2;
   height: 56px;
   margin: 0;
   overflow: hidden;
-  place-items: center;
-  position: static;
+  position: relative;
   transform: none;
   width: 56px;
 }
 .module-list .ui-icon svg {
-  display: none;
-}
-.module-list .ui-icon::before {
-  align-items: center;
-  color: #08746f;
-  content: attr(data-label);
-  display: flex;
-  font-size: 12px;
-  font-weight: 950;
-  height: 100%;
-  justify-content: center;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  text-align: center;
-  width: 100%;
+  display: block;
+  height: 28px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
 }
 .module-list strong,
 .module-list article > span:not(.ui-icon) {
