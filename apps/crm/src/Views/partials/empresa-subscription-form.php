@@ -75,12 +75,8 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       <input name="subscription_started_at" type="date" value="<?= e(!empty($empresaValues['subscription_started_at']) ? date('Y-m-d', strtotime($empresaValues['subscription_started_at'])) : date('Y-m-d')) ?>">
     </label>
     <label class="field">
-      <span>Paga desde</span>
-      <input name="paid_since" type="date" value="<?= e(!empty($empresaValues['paid_since']) ? date('Y-m-d', strtotime($empresaValues['paid_since'])) : '') ?>">
-    </label>
-    <label class="field">
       <span>Acceso hasta</span>
-      <input name="access_until" type="date" value="<?= e(!empty($empresaValues['access_until']) ? date('Y-m-d', strtotime($empresaValues['access_until'])) : '') ?>">
+      <input name="access_until" type="date" readonly value="<?= e(!empty($empresaValues['access_until']) ? date('Y-m-d', strtotime($empresaValues['access_until'])) : (!empty($empresaValues['next_payment_at']) ? date('Y-m-d', strtotime($empresaValues['next_payment_at'])) : '')) ?>" data-access-until-input>
     </label>
     <label class="field">
       <span>Renovacion</span>

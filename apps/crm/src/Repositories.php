@@ -3091,7 +3091,6 @@ final class EmpresaRepository
             'next_payment_at' => $data['next_payment_at'] ?? $empresa['next_payment_at'],
             'trial_days' => $data['trial_days'] ?? $empresa['trial_days'],
             'subscription_started_at' => $data['subscription_started_at'] ?? $empresa['subscription_started_at'],
-            'paid_since' => $data['paid_since'] ?? $empresa['paid_since'],
             'access_until' => $data['access_until'] ?? $empresa['access_until'],
             'renewal_period' => $data['renewal_period'] ?? $empresa['renewal_period'],
             'renewal_status' => $data['renewal_status'] ?? $empresa['renewal_status'],
@@ -3388,6 +3387,7 @@ final class EmpresaRepository
             $paymentStatus = 'TRIAL';
             $nextPaymentAt = null;
             $paidSince = null;
+            $accessUntil = null;
             $price = '0';
         } elseif ($nextPaymentAt === null && $status !== 'CANCELLED' && $plan !== '') {
             $nextPaymentAt = self::defaultNextPaymentDate($renewalPeriod);
@@ -3399,7 +3399,9 @@ final class EmpresaRepository
         if ($plan !== 'TRIAL' && $paidSince === null && in_array($paymentStatus, ['PAID', 'PENDING', 'OVERDUE'], true)) {
             $paidSince = date('Y-m-d');
         }
-        if ($accessUntil === null) {
+        if ($plan !== 'TRIAL') {
+            $accessUntil = $nextPaymentAt;
+        } elseif ($accessUntil === null) {
             $accessUntil = $nextPaymentAt;
         }
         if ($renewalStatus === 'CANCELLED' && $cancelledAt === null) {

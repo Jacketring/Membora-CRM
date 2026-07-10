@@ -510,6 +510,7 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
   const priceInput = form.querySelector('[data-plan-price-input]');
   const nextPaymentInput = form.querySelector('[data-next-payment-input]');
   const nextPaymentField = form.querySelector('[data-next-payment-field]');
+  const accessUntilInput = form.querySelector('[data-access-until-input]');
   const trialPlanField = form.querySelector('[data-trial-plan-field]');
   const crmStatusSelect = form.querySelector('select[name="status"]');
   const paymentStatusSelect = form.querySelector('select[name="payment_status"]');
@@ -550,6 +551,9 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
       nextPaymentInput.value = '';
       nextPaymentInput.dataset.autoNextPayment = 'false';
     }
+    if (isTrialPlan && accessUntilInput) {
+      accessUntilInput.value = '';
+    }
     if (isTrialPlan) {
       if (crmStatusSelect) crmStatusSelect.value = 'TRIAL';
       if (paymentStatusSelect) paymentStatusSelect.value = 'TRIAL';
@@ -579,11 +583,17 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
 
   const applyNextPaymentDate = () => {
     if (!shouldAutoFillNextPayment()) {
+      if (accessUntilInput && nextPaymentInput) {
+        accessUntilInput.value = nextPaymentInput.value;
+      }
       return;
     }
 
     nextPaymentInput.value = nextMonthPaymentDate();
     nextPaymentInput.dataset.autoNextPayment = 'true';
+    if (accessUntilInput) {
+      accessUntilInput.value = nextPaymentInput.value;
+    }
   };
 
   if (priceInput.value.trim() === '' || Number.parseFloat(priceInput.value.replace(',', '.')) === 0) {
@@ -594,10 +604,15 @@ document.querySelectorAll('[data-empresa-form]').forEach((form) => {
 
   if (planSelect.value !== 'TRIAL' && nextPaymentInput && nextPaymentInput.value.trim() === '') {
     applyNextPaymentDate();
+  } else if (accessUntilInput && nextPaymentInput) {
+    accessUntilInput.value = nextPaymentInput.value;
   }
 
   nextPaymentInput?.addEventListener('input', () => {
     nextPaymentInput.dataset.autoNextPayment = 'false';
+    if (accessUntilInput) {
+      accessUntilInput.value = nextPaymentInput.value;
+    }
   });
 
   planSelect.addEventListener('change', () => {
