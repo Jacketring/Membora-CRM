@@ -1,13 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Membora CRM">
-  <rect width="64" height="64" rx="16" fill="#0754d6"/>
-  <path d="M16 44V20h7l9 14 9-14h7v24h-7V31.8l-7 10.7h-4L23 31.8V44h-7Z" fill="#fff"/>
-  <g fill="none" stroke="#dbeafe" stroke-width="4" stroke-linecap="round">
-    <path d="M13 15v8"/>
-    <path d="M19 18h26"/>
-    <path d="M51 15v8"/>
-  </g>
-  <g fill="#dbeafe">
-    <rect x="8" y="14" width="5" height="10" rx="2"/>
-    <rect x="51" y="14" width="5" height="10" rx="2"/>
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 244.73 199.68">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #c6c6c6;
+      }
+
+      .cls-2 {
+        fill: #004bf2;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="24.32" y="23.71" width="203.81" height="154.4" rx="21.01" ry="21.01"/>
+  <path class="cls-2" d="M170.25,148.85l-.17-63.56-38.94,52.61h-9.82l-38.94-51.78v62.74h-21V52.96h18.12l47.07,63.56,46.23-63.56h18.12l.17,95.9h-20.83Z"/>
+  <circle cx="126.06" cy="64.49" r="11.9"/>
 </svg>

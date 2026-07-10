@@ -55,7 +55,7 @@ $initial = strtoupper(substr((string) ($user['name'] ?? 'U'), 0, 1));
         <label class="preference-card preference-card--color">
           <span>Color personal</span>
           <strong>Color de acento</strong>
-          <input class="color-setting" type="color" name="accent" value="<?= e(hex_color_or_default($user['tenant_primary_color'] ?? '#0754d6')) ?>" data-setting-accent>
+          <input class="color-setting" type="color" name="accent" value="<?= e(hex_color_or_default($user['tenant_primary_color'] ?? '#004bf2')) ?>" data-setting-accent>
         </label>
 
         <label class="preference-card preference-card--toggle">

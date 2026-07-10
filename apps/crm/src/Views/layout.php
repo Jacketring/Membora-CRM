@@ -9,13 +9,13 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0754d6">
+  <meta name="theme-color" content="#004bf2">
   <title><?= e($title) ?> - Membora CRM</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/app.css?v=<?= e($cssVersion) ?>">
 </head>
 <?php
-$tenantPrimaryColor = hex_color_or_default($user['tenant_primary_color'] ?? '#0754d6');
+$tenantPrimaryColor = hex_color_or_default($user['tenant_primary_color'] ?? '#004bf2');
 $isPlatformAdmin = is_platform_admin($user);
 $demoRemainingSeconds = Auth::demoRemainingSeconds();
 ?>
@@ -23,7 +23,7 @@ $demoRemainingSeconds = Auth::demoRemainingSeconds();
   <main class="app-shell">
     <aside class="sidebar">
       <div class="brand-lockup brand-lockup--sidebar">
-        <div class="brand-icon">M</div>
+        <img class="brand-logo brand-logo--sidebar" src="assets/membora-logo.svg" alt="Membora CRM">
         <div>
           <h1>Membora CRM</h1>
           <p><?= e($user['tenant_name'] ?? 'NexoFit Studio') ?></p>

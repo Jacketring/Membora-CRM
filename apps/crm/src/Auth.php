@@ -61,19 +61,19 @@ final class Auth
 
         if ($isPlatformAdmin) {
             $user['tenant_name'] = 'Membora CRM';
-            $user['tenant_primary_color'] = '#0754d6';
+            $user['tenant_primary_color'] = '#004bf2';
         } elseif (!$user['tenant_id']) {
             $tenant = self::fallbackTenant();
             $user['tenant_id'] = $tenant['id'] ?? null;
             $user['tenant_name'] = $tenant['name'] ?? 'Membora CRM';
-            $user['tenant_primary_color'] = $tenant['primary_color'] ?? '#0754d6';
+            $user['tenant_primary_color'] = $tenant['primary_color'] ?? '#004bf2';
         }
 
         $_SESSION['user'] = [
             'id' => $user['id'],
             'tenant_id' => $user['tenant_id'],
             'tenant_name' => $user['tenant_name'],
-            'tenant_primary_color' => $user['tenant_primary_color'] ?: '#0754d6',
+            'tenant_primary_color' => $user['tenant_primary_color'] ?: '#004bf2',
             'name' => $user['name'],
             'email' => $user['email'],
             'avatar_path' => $user['avatar_path'] ?? null,
@@ -182,7 +182,7 @@ final class Auth
 
         $_SESSION['user']['tenant_id'] = $tenant['id'];
         $_SESSION['user']['tenant_name'] = $tenant['name'];
-        $_SESSION['user']['tenant_primary_color'] = $tenant['primary_color'] ?? '#0754d6';
+        $_SESSION['user']['tenant_primary_color'] = $tenant['primary_color'] ?? '#004bf2';
         $_SESSION['user']['tenant_context'] = true;
         $_SESSION['user']['support_company_name'] = $empresa['name'];
     }
@@ -202,7 +202,7 @@ final class Auth
         if ($tenant && isset($_SESSION['user'])) {
             $_SESSION['user']['tenant_id'] = $tenant['id'];
             $_SESSION['user']['tenant_name'] = $tenant['name'];
-            $_SESSION['user']['tenant_primary_color'] = $tenant['primary_color'] ?? '#0754d6';
+            $_SESSION['user']['tenant_primary_color'] = $tenant['primary_color'] ?? '#004bf2';
         }
 
         return $tenant['id'] ?? null;

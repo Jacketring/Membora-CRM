@@ -1,5 +1,5 @@
 const crmSettingsKey = 'membora-crm-settings';
-const tenantAccent = document.body?.dataset.tenantAccent || '#0754d6';
+const tenantAccent = document.body?.dataset.tenantAccent || '#004bf2';
 const defaultCrmSettings = {
   theme: 'light',
   accent: tenantAccent,
@@ -18,7 +18,7 @@ function readCrmSettings() {
 function darkenHexColor(hex, amount = 34) {
   const clean = String(hex || defaultCrmSettings.accent).replace('#', '');
   if (!/^[0-9a-f]{6}$/i.test(clean)) {
-    return '#003ea8';
+    return '#003fcf';
   }
 
   const value = Number.parseInt(clean, 16);

@@ -20,7 +20,7 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
       --ink: #102033;
       --muted: #64748b;
       --line: #d9e2ef;
-      --primary: #0754d6;
+      --primary: #004bf2;
       --soft: #f5f8fd;
     }
     * { box-sizing: border-box; }

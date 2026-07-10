@@ -233,20 +233,20 @@ final class Mailer
         <td align="center">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#ffffff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;box-shadow:0 20px 50px rgba(15,23,42,.10);">
             <tr>
-              <td style="background:#0754d6;padding:28px 32px;color:#ffffff;">
+              <td style="background:#004bf2;padding:28px 32px;color:#ffffff;">
                 {$emailLogo}
                 <span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span>
               </td>
             </tr>
             <tr>
               <td style="padding:34px 32px 18px;">
-                <p style="margin:0 0 10px;color:#0754d6;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Solicitud recibida</p>
+                <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Solicitud recibida</p>
                 <h1 style="margin:0 0 16px;font-size:30px;line-height:1.18;color:#071327;">Gracias, {$safeName}</h1>
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#334155;">
                   Hemos recibido correctamente tu solicitud para <strong>{$safeCompany}</strong>. Una persona del equipo de Membora CRM revisara la informacion y contactara contigo en un plazo aproximado de <strong>24 a 48 horas</strong>.
                 </p>
                 <div style="margin:26px 0;padding:20px;border-radius:16px;background:#eef4ff;border:1px solid #cfe0ff;">
-                  <p style="margin:0 0 8px;font-size:14px;color:#0754d6;font-weight:800;">Que ocurre ahora</p>
+                  <p style="margin:0 0 8px;font-size:14px;color:#004bf2;font-weight:800;">Que ocurre ahora</p>
                   <ul style="margin:0;padding-left:20px;color:#1f3657;font-size:15px;line-height:1.7;">
                     <li>Revisaremos las necesidades de tu centro.</li>
                     <li>Te propondremos una demo o una llamada breve.</li>
@@ -257,7 +257,7 @@ final class Mailer
             </tr>
             <tr>
               <td style="padding:0 32px 34px;">
-                <a href="{$webUrl}" style="display:inline-block;background:#0754d6;color:#ffffff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Volver a Membora CRM</a>
+                <a href="{$webUrl}" style="display:inline-block;background:#004bf2;color:#ffffff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Volver a Membora CRM</a>
               </td>
             </tr>
             <tr>
@@ -285,14 +285,14 @@ HTML;
         <td align="center">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;border:1px solid #dce6f5;overflow:hidden;">
             <tr>
-              <td style="background:#0754d6;padding:24px 28px;color:#ffffff;">
+              <td style="background:#004bf2;padding:24px 28px;color:#ffffff;">
                 {$emailLogo}
                 <span style="font-size:22px;font-weight:900;vertical-align:middle;">Membora CRM</span>
               </td>
             </tr>
             <tr>
               <td style="padding:30px 28px;">
-                <p style="margin:0 0 10px;color:#0754d6;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Prueba tecnica</p>
+                <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Prueba tecnica</p>
                 <h1 style="margin:0 0 14px;font-size:26px;color:#071327;">El correo de Membora CRM funciona</h1>
                 <p style="margin:0;color:#334155;font-size:16px;line-height:1.6;">Si estas viendo este mensaje, el SMTP configurado en Plesk esta enviando correctamente correos desde el CRM.</p>
               </td>
@@ -324,7 +324,7 @@ HTML;
         $radius = $size >= 48 ? 14 : 12;
         $margin = $size >= 48 ? 12 : 10;
 
-        return '<span aria-label="Membora CRM" style="display:inline-block;width:' . $innerSize . 'px;height:' . $innerSize . 'px;line-height:' . $innerSize . 'px;border-radius:' . $radius . 'px;background:#ffffff;color:#0754d6;text-align:center;font-size:' . $fontSize . 'px;font-weight:900;vertical-align:middle;margin-right:' . $margin . 'px;">M</span>';
+        return '<span aria-label="Membora CRM" style="display:inline-block;width:' . $innerSize . 'px;height:' . $innerSize . 'px;line-height:' . $innerSize . 'px;border-radius:' . $radius . 'px;background:#ffffff;color:#004bf2;text-align:center;font-size:' . $fontSize . 'px;font-weight:900;vertical-align:middle;margin-right:' . $margin . 'px;">M</span>';
     }
 
     private static function encodedSubject(string $subject): string

@@ -8,7 +8,9 @@ $platformAdminPassword = EmpresaRepository::PLATFORM_ADMIN_PASSWORD;
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#004bf2">
   <title>Membora CRM - Login</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
@@ -16,7 +18,7 @@ $platformAdminPassword = EmpresaRepository::PLATFORM_ADMIN_PASSWORD;
     <div class="login-overlay"></div>
     <section class="login-panel">
       <div class="brand-lockup brand-lockup--login">
-        <div class="brand-icon">M</div>
+        <img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora CRM">
         <div>
           <h1>Membora CRM</h1>
           <p>Portal de gestion fitness</p>

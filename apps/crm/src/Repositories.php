@@ -112,14 +112,14 @@ final class DemoRepository
             $insertTenant->execute([
                 'id' => self::TENANT_ID,
                 'name' => 'Membora Demo Fitness',
-                'primary_color' => '#0754d6',
+                'primary_color' => '#004bf2',
             ]);
         } else {
             $updateTenant = $pdo->prepare('UPDATE tenants SET name = :name, primary_color = :primary_color, updated_at = NOW() WHERE id = :id');
             $updateTenant->execute([
                 'id' => self::TENANT_ID,
                 'name' => 'Membora Demo Fitness',
-                'primary_color' => '#0754d6',
+                'primary_color' => '#004bf2',
             ]);
         }
 
@@ -3295,7 +3295,7 @@ final class EmpresaRepository
             'id' => $tenantId,
             'name' => $companyName,
             'slug' => self::uniqueTenantSlug($companyName),
-            'primary_color' => '#0754d6',
+            'primary_color' => '#004bf2',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ];
