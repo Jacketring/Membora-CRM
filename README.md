@@ -132,7 +132,7 @@ Opcion recomendada en Plesk, especialmente si la contrasena tiene caracteres esp
 APP_NAME="Membora CRM"
 APP_ENV="production"
 APP_URL="https://app.crm.josehurtado.dev"
-WEB_APP_URL="https://app.web.josehurtado.dev"
+WEB_APP_URL="https://app.web.josehurtado.dev,https://membora.es,https://www.membora.es"
 APP_STRICT_POST_ORIGIN="false"
 DB_HOST="localhost"
 DB_PORT="3306"

@@ -9,6 +9,8 @@ function public_allowed_origins(): array
     foreach ([
         getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev',
         getenv('APP_WEB_URL') ?: '',
+        'https://membora.es',
+        'https://www.membora.es',
     ] as $value) {
         foreach (explode(',', (string) $value) as $origin) {
             $origin = rtrim(trim($origin), '/');
