@@ -274,7 +274,9 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
         </label>
         <output class="invoice-line-total" data-line-total><?= e(money_amount($item['total_amount'] ?? 0)) ?></output>
         <?php if (!$isIssued): ?>
-          <button class="note-delete-button" type="button" data-remove-invoice-line aria-label="Eliminar linea">Eliminar</button>
+          <button class="note-delete-button invoice-line-delete" type="button" data-remove-invoice-line aria-label="Eliminar linea" title="Eliminar linea">
+            <svg viewBox="0 0 24 24"><path d="M9 4h6l1 2h4v2H4V6h4l1-2Zm1 6h2v8h-2v-8Zm4 0h2v8h-2v-8ZM7 10h2l1 10h4l1-10h2l-1.2 12H8.2L7 10Z"/></svg>
+          </button>
         <?php endif; ?>
       </div>
     <?php endforeach; ?>

@@ -2110,6 +2110,10 @@ td.empty-state,
   padding-bottom: 12px;
   text-align: right;
 }
+.invoice-line-delete {
+  align-self: end;
+  margin-bottom: 8px;
+}
 .invoice-totals {
   background: var(--surface-soft);
   border: 1px solid var(--border);
