@@ -105,7 +105,7 @@ final class Actions
                 redirect(is_platform_admin(Auth::user()) ? 'platform-dashboard' : 'dashboard');
             }
         } catch (Throwable $exception) {
-            flash('No se pudo conectar con la base de datos. Revisa apps/crm/.env.', 'error');
+            flash('No se pudo conectar con la base de datos. Revisa apps/crm/.env o php-app/.env.', 'error');
             redirect('login');
         }
 
