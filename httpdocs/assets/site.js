@@ -1,6 +1,6 @@
 const MEMBORA_WEBHOOK_URL = 'https://app.crm.josehurtado.dev/webhook/lead';
 const MEMBORA_DEMO_LOGIN_URL = 'https://app.crm.josehurtado.dev/index.php?route=login';
-const MEMBORA_PUBLIC_PLANS_URL = 'https://app.crm.josehurtado.dev/api/plans';
+const MEMBORA_PUBLIC_PLANS_URL = window.MEMBORA_PUBLIC_PLANS_URL || 'https://app.crm.josehurtado.dev/api/plans';
 
 function startDemoLogin(type = 'client') {
   const form = document.createElement('form');
@@ -94,7 +94,12 @@ async function loadPublicPlans() {
   }
 
   try {
-    const response = await fetch(MEMBORA_PUBLIC_PLANS_URL, { headers: { Accept: 'application/json' } });
+    const plansUrl = new URL(MEMBORA_PUBLIC_PLANS_URL, window.location.href);
+    plansUrl.searchParams.set('_', String(Date.now()));
+    const response = await fetch(plansUrl.toString(), {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
     const result = await response.json();
     if (!response.ok || !result.success || !Array.isArray(result.plans) || result.plans.length === 0) {
       return;

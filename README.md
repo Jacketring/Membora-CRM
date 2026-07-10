@@ -198,7 +198,7 @@ La seccion `Admin CRM > Web` incluye una prueba de correo para enviar un email t
 La web publica incluye enlaces a textos legales basicos: aviso legal, privacidad y cookies.
 Los enlaces de demo de la web publica no abren una maqueta estatica: inician una sesion demo real del CRM durante 20 minutos. Al finalizar el contador, el CRM cierra la sesion y devuelve al usuario a `WEB_APP_URL`.
 
-En el `.env` del CRM debe existir `WEB_APP_URL="https://app.web.josehurtado.dev"` para permitir el envio del formulario entre subdominios.
+En el `.env` del CRM debe existir `WEB_APP_URL="https://app.web.josehurtado.dev"` para permitir el envio del formulario y la carga publica de planes entre subdominios. Si la web publica responde en varios dominios, se pueden indicar separados por comas, por ejemplo `WEB_APP_URL="https://app.web.josehurtado.dev,https://www.tudominio.com"`.
 
 ## Credenciales de prueba
 

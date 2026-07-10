@@ -3,20 +3,39 @@
 require __DIR__ . '/../src/bootstrap.php';
 require __DIR__ . '/../src/View.php';
 
+function public_allowed_origins(): array
+{
+    $origins = [];
+    foreach ([
+        getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev',
+        getenv('APP_WEB_URL') ?: '',
+    ] as $value) {
+        foreach (explode(',', (string) $value) as $origin) {
+            $origin = rtrim(trim($origin), '/');
+            if ($origin !== '') {
+                $origins[] = $origin;
+            }
+        }
+    }
+
+    return array_values(array_unique($origins));
+}
+
+function allow_public_origin(): void
+{
+    $origin = rtrim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''), '/');
+    if ($origin !== '' && in_array($origin, public_allowed_origins(), true)) {
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Access-Control-Allow-Headers: Content-Type');
+        header('Vary: Origin');
+    }
+}
+
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
 $isPublicPlansRequest = $requestPath === '/api/plans' || ($_GET['action'] ?? '') === 'public_plans';
 if ($isPublicPlansRequest) {
-    $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
-    $allowedOrigins = array_filter([
-        rtrim((string) (getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev'), '/'),
-        rtrim((string) (getenv('APP_WEB_URL') ?: ''), '/'),
-    ]);
-    if ($origin !== '' && in_array(rtrim($origin, '/'), $allowedOrigins, true)) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-        header('Access-Control-Allow-Headers: Content-Type');
-        header('Access-Control-Allow-Methods: GET, OPTIONS');
-        header('Vary: Origin');
-    }
+    allow_public_origin();
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
 
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(204);
@@ -41,17 +60,8 @@ if ($isPublicPlansRequest) {
 
 $isWebhookLeadRequest = $requestPath === '/webhook/lead' || ($_GET['action'] ?? '') === 'webhook_lead';
 if ($isWebhookLeadRequest) {
-    $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
-    $allowedOrigins = array_filter([
-        rtrim((string) (getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev'), '/'),
-        rtrim((string) (getenv('APP_WEB_URL') ?: ''), '/'),
-    ]);
-    if ($origin !== '' && in_array(rtrim($origin, '/'), $allowedOrigins, true)) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-        header('Access-Control-Allow-Headers: Content-Type');
-        header('Access-Control-Allow-Methods: POST, OPTIONS');
-        header('Vary: Origin');
-    }
+    allow_public_origin();
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
 
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(204);
