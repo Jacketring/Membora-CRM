@@ -1,6 +1,6 @@
 # Alcance del MVP - Membora CRM
 
-Fecha de actualizacion: 08/07/2026.
+Fecha de actualizacion: 10/07/2026.
 
 ## 1. Objetivo
 
@@ -58,6 +58,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Bloqueo visual del CRM cliente cuando la demo o el acceso contratado han caducado, con modal para elegir plan y continuar el proceso de contratacion.
 - Planes comerciales SaaS con precio mensual, alta, rebajas y sincronizacion publica con la web comercial.
 - Pagos SaaS por empresa.
+- Base funcional para checkout y cobros SaaS: la demo pide pocos datos y la contratacion debe completar datos fiscales, plan y forma de pago antes de activar el acceso.
 - Web comercial: diagnostico de webhook, correo y ultimos envios.
 - Acceso de soporte al CRM de una empresa conectada.
 
@@ -76,6 +77,8 @@ Quedan como mejora futura o no estan cerrados como modulo completo de gimnasio:
 - Portal para socios.
 - App movil nativa.
 - Pasarela de pagos real.
+- Integracion Stripe real con claves de produccion, webhooks, suscripciones recurrentes y checkout alojado.
+- Verifactu completo y envio fiscal certificado.
 - Importacion/exportacion CSV avanzada.
 - Multi-sede avanzada.
 
@@ -157,7 +160,64 @@ Tablas SaaS principales:
 
 La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba comercial. Si el plan de una empresa es `TRIAL`, el CRM oculta la fecha de proximo pago, no marca renovacion y muestra la duracion de prueba configurada. Tambien centraliza la suscripcion SaaS con `subscription_started_at`, `paid_since`, `access_until`, `renewal_period`, `renewal_status` y `cancelled_at`, de forma que una empresa puede cancelar la renovacion y conservar acceso hasta la fecha contratada.
 
-## 8. Recorrido recomendado de demo
+## 8. Stripe, cobros y checkout
+
+Para los pagos de Membora se plantea Stripe como proveedor principal. Stripe cubrira cobros con tarjeta, suscripciones recurrentes y pagos automaticos. En el MVP no se integra una pasarela real completa: se conserva la logica de suscripcion, renovacion y pagos SaaS en modo interno/simulado para que el flujo pueda probarse sin claves bancarias.
+
+Cuando Jose cree la cuenta de Stripe, debera configurar:
+
+- Cuenta de Stripe y datos bancarios.
+- Claves de prueba y de produccion.
+- Productos y precios equivalentes a los planes activos de Membora.
+- Webhooks para confirmar pagos, fallos de cobro, cancelaciones y renovaciones.
+- URL de exito y cancelacion para el checkout.
+
+El flujo objetivo de contratacion sera:
+
+1. El usuario solicita demo con pocos datos, idealmente nombre y correo.
+2. Al contratar, el sistema pide datos completos: datos fiscales, direccion, telefono, plan y forma de pago.
+3. Se crea una sesion de checkout de Stripe.
+4. Stripe confirma el pago mediante webhook.
+5. Membora activa o renueva la empresa, actualiza `next_payment_at` y `access_until`, y registra el pago.
+6. El usuario recibe una confirmacion clara: "Enhorabuena, ya tienes acceso y puedes usar la aplicacion".
+
+La renovacion podra revisarse automaticamente con una tarea programada diaria, por ejemplo a medianoche. En fase inicial esta tarea puede simular cobros vencidos o preparar pagos internos; en fase real debera apoyarse en Stripe y en los webhooks para evitar marcar pagos como cobrados sin confirmacion externa.
+
+## 9. Facturacion de Membora y Verifactu
+
+Membora necesita una zona de facturas para las facturas emitidas por Jose a los gimnasios que pagan el SaaS. Esta facturacion es distinta de la facturacion interna que cada gimnasio pueda llevar con sus propios socios.
+
+La tabla de facturas SaaS debera mostrar como minimo:
+
+- Fecha de emision.
+- Fecha de vencimiento.
+- Serie y numero de factura.
+- Cliente o empresa.
+- Suscripcion asociada.
+- Concepto.
+- Base imponible.
+- IVA.
+- Total.
+- Forma de pago.
+- Estado de cobro.
+
+El sistema debera sugerir el siguiente numero disponible al crear una factura manual. En Espana se debe respetar una logica de serie y numero, por ejemplo `M-2026/0001`, `M-2026/0002`, manteniendo continuidad dentro de cada serie.
+
+Tipos de factura previstos:
+
+- Facturas automaticas por suscripcion SaaS.
+- Facturas manuales por servicios puntuales: integracion a medida, web, desarrollo especial, migracion, soporte extraordinario u otros trabajos facturables.
+
+Verifactu no se implementara desde cero dentro del MVP porque requiere cumplimiento legal, trazabilidad, firma/huella, codigos QR, registros inalterables y adaptacion a normativa fiscal. Segun la informacion de la Agencia Tributaria consultada el 10/07/2026, los plazos son:
+
+- 1 de enero de 2027 para contribuyentes sujetos al Impuesto sobre Sociedades.
+- 1 de julio de 2027 para el resto de contribuyentes.
+
+La estrategia recomendada es documentar e integrar un proveedor especializado cuando se acerque la obligacion. Se deja como opcion futura revisar KubiFactu u otro proveedor equivalente, comparando coste por volumen, API, soporte de Verifactu, emision de facturas, rectificativas, estado de envio y exportacion contable.
+
+Hasta entonces, el MVP puede guardar facturas internas y estados de cobro, pero no debe presentarse como sistema Verifactu certificado.
+
+## 10. Recorrido recomendado de demo
 
 1. Entrar como administrador de gimnasio.
 2. Revisar dashboard.
@@ -176,7 +236,7 @@ La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba
 15. Revisar contactos, empresas, pagos, planes y web comercial.
 16. Entrar en modo soporte sobre una empresa y volver a Admin CRM.
 
-## 9. Criterios de aceptacion del MVP
+## 11. Criterios de aceptacion del MVP
 
 - La aplicacion carga desde Plesk sin Node.js.
 - El login funciona con credenciales demo.
