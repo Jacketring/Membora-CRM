@@ -30,6 +30,15 @@ $clientStatusOptions = [
     'CUSTOMER' => 'Cliente',
     'LOST' => 'Perdido',
 ];
+$planOptions = $planOptions ?? PlatformPlanRepository::options();
+$planPrices = $planPrices ?? PlatformPlanRepository::priceMap();
+$paymentOptions = [
+    '' => 'Todos',
+    'PAID' => 'Al dia',
+    'PENDING' => 'Pendiente',
+    'OVERDUE' => 'Vencido',
+    'TRIAL' => 'Prueba',
+];
 ?>
 
 <div class="page-heading leads-heading platform-heading">
@@ -136,10 +145,10 @@ $clientStatusOptions = [
                   </form>
                 <?php endif; ?>
                 <?php if ($contact['type'] === 'client'): ?>
-                  <a class="support-renew-action" href="index.php?route=platform-companies&q=<?= urlencode($contact['email'] ?: $contact['company_name']) ?>">
+                  <button class="support-renew-action" type="button" data-open-modal="client-subscription-<?= e($contact['id']) ?>">
                     <svg viewBox="0 0 24 24"><path d="M7 7h10v2H7V7Zm0 4h10v2H7v-2Zm0 4h6v2H7v-2ZM5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/></svg>
                     <span>Suscripcion</span>
-                  </a>
+                  </button>
                   <a class="support-enter-action" href="index.php?route=platform-companies&client_id=<?= urlencode($contact['id']) ?>&modal=empresa-create-modal">
                     <svg viewBox="0 0 24 24"><path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <span>Empresa</span>
@@ -259,6 +268,17 @@ $clientStatusOptions = [
         <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
       </header>
       <?php require __DIR__ . '/partials/platform-client-form.php'; ?>
+    </dialog>
+    <?php $subscriptionEmpresa = $contact['empresa'] ?? null; ?>
+    <dialog class="modal-card empresa-modal" id="client-subscription-<?= e($client['id']) ?>">
+      <header>
+        <div>
+          <h2>Suscripcion</h2>
+          <p><?= e($client['company_name']) ?> - <?= e($client['email'] ?: 'Sin email') ?></p>
+        </div>
+        <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
+      </header>
+      <?php require __DIR__ . '/partials/empresa-subscription-form.php'; ?>
     </dialog>
   <?php endif; ?>
 <?php endforeach; ?>

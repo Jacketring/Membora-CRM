@@ -233,6 +233,8 @@ switch ($route) {
         render_layout('Contactos CRM', 'platform-contacts', [
             'filters' => $filters,
             'metrics' => PlatformContactRepository::metrics(),
+            'planOptions' => PlatformPlanRepository::options(),
+            'planPrices' => PlatformPlanRepository::priceMap(),
             'contacts' => PlatformContactRepository::all($filters['q'], $filters['status'], $filters['type']),
             'clients' => PlatformClientRepository::all($filters['q'], $filters['status']),
             'leads' => PlatformLeadRepository::all($filters['q'], $filters['status']),

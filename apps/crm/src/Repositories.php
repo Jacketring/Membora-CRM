@@ -412,7 +412,7 @@ final class AuditLogRepository
         ],
         'companies' => [
             'label' => 'Empresas',
-            'actions' => ['create_empresa', 'update_empresa', 'renew_empresa_subscription', 'enter_empresa_crm', 'exit_empresa_crm'],
+            'actions' => ['create_empresa', 'update_empresa', 'update_empresa_subscription', 'renew_empresa_subscription', 'enter_empresa_crm', 'exit_empresa_crm'],
         ],
         'members' => [
             'label' => 'Socios',
@@ -2518,6 +2518,7 @@ final class PlatformContactRepository
                     continue;
                 }
 
+                $empresa = EmpresaRepository::findByClient((string) $client['id']);
                 $contacts[] = [
                     'type' => 'client',
                     'id' => $client['id'],
@@ -2532,6 +2533,7 @@ final class PlatformContactRepository
                     'source_label' => 'Cliente CRM',
                     'created_at' => $client['created_at'],
                     'updated_at' => $client['updated_at'],
+                    'empresa' => $empresa,
                     'raw' => $client,
                 ];
             }
@@ -3001,6 +3003,20 @@ final class EmpresaRepository
         return $empresa ?: null;
     }
 
+    public static function findByClient(string $clientId): ?array
+    {
+        self::ensureTables();
+        if (trim($clientId) === '') {
+            return null;
+        }
+
+        $stmt = Database::connection()->prepare('SELECT * FROM empresas WHERE client_id = :client_id ORDER BY created_at DESC LIMIT 1');
+        $stmt->execute(['client_id' => $clientId]);
+        $empresa = $stmt->fetch();
+
+        return $empresa ?: null;
+    }
+
     public static function create(array $data): void
     {
         self::ensureTables();
@@ -3057,6 +3073,63 @@ final class EmpresaRepository
              WHERE id = :id'
         );
         $stmt->execute(self::empresaParams($data) + ['id' => $id]);
+    }
+
+    public static function updateSubscription(string $id, array $data): void
+    {
+        self::ensureTables();
+        $empresa = self::find($id);
+        if (!$empresa) {
+            throw new RuntimeException('No se encontro la empresa.');
+        }
+
+        $params = self::empresaParams(array_merge($empresa, [
+            'plan' => $data['plan'] ?? $empresa['plan'],
+            'status' => $data['status'] ?? $empresa['status'],
+            'payment_status' => $data['payment_status'] ?? $empresa['payment_status'],
+            'monthly_price' => $data['monthly_price'] ?? $empresa['monthly_price'],
+            'next_payment_at' => $data['next_payment_at'] ?? $empresa['next_payment_at'],
+            'trial_days' => $data['trial_days'] ?? $empresa['trial_days'],
+            'subscription_started_at' => $data['subscription_started_at'] ?? $empresa['subscription_started_at'],
+            'paid_since' => $data['paid_since'] ?? $empresa['paid_since'],
+            'access_until' => $data['access_until'] ?? $empresa['access_until'],
+            'renewal_period' => $data['renewal_period'] ?? $empresa['renewal_period'],
+            'renewal_status' => $data['renewal_status'] ?? $empresa['renewal_status'],
+            'cancelled_at' => $data['cancelled_at'] ?? $empresa['cancelled_at'],
+        ]));
+
+        $stmt = Database::connection()->prepare(
+            'UPDATE empresas
+             SET plan = :plan,
+                 status = :status,
+                 payment_status = :payment_status,
+                 monthly_price = :monthly_price,
+                 next_payment_at = :next_payment_at,
+                 trial_days = :trial_days,
+                 subscription_started_at = :subscription_started_at,
+                 paid_since = :paid_since,
+                 access_until = :access_until,
+                 renewal_period = :renewal_period,
+                 renewal_status = :renewal_status,
+                 cancelled_at = :cancelled_at,
+                 updated_at = NOW()
+             WHERE id = :id'
+        );
+        $stmt->execute([
+            'plan' => $params['plan'],
+            'status' => $params['status'],
+            'payment_status' => $params['payment_status'],
+            'monthly_price' => $params['monthly_price'],
+            'next_payment_at' => $params['next_payment_at'],
+            'trial_days' => $params['trial_days'],
+            'subscription_started_at' => $params['subscription_started_at'],
+            'paid_since' => $params['paid_since'],
+            'access_until' => $params['access_until'],
+            'renewal_period' => $params['renewal_period'],
+            'renewal_status' => $params['renewal_status'],
+            'cancelled_at' => $params['cancelled_at'],
+            'id' => $id,
+        ]);
     }
 
     public static function renewSubscription(string $id): void

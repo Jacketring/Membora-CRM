@@ -2040,6 +2040,15 @@ td.empty-state,
 .platform-row-actions form {
   margin: 0;
 }
+.platform-subscription-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(15, 23, 42, 0.12);
+}
 .support-enter-action,
 .support-edit-action,
 .support-renew-action,

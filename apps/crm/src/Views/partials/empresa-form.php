@@ -128,42 +128,12 @@ foreach (($clients ?? []) as $clientOption) {
     <span>Dias de prueba</span>
     <input name="trial_days" type="number" min="1" max="365" step="1" value="<?= e((string) ($empresaValues['trial_days'] ?? 30)) ?>" placeholder="30">
   </label>
-  <div class="form-full platform-form-divider">
-    <strong>Suscripcion</strong>
-    <span>Controla inicio, primer pago, acceso contratado, renovacion y cancelacion al final del periodo.</span>
-  </div>
-  <label class="field">
-    <span>Suscrito desde</span>
-    <input name="subscription_started_at" type="date" value="<?= e(!empty($empresaValues['subscription_started_at']) ? date('Y-m-d', strtotime($empresaValues['subscription_started_at'])) : date('Y-m-d')) ?>">
-  </label>
-  <label class="field">
-    <span>Paga desde</span>
-    <input name="paid_since" type="date" value="<?= e(!empty($empresaValues['paid_since']) ? date('Y-m-d', strtotime($empresaValues['paid_since'])) : '') ?>">
-  </label>
-  <label class="field">
-    <span>Acceso hasta</span>
-    <input name="access_until" type="date" value="<?= e(!empty($empresaValues['access_until']) ? date('Y-m-d', strtotime($empresaValues['access_until'])) : '') ?>">
-  </label>
-  <label class="field">
-    <span>Renovacion</span>
-    <select name="renewal_period">
-      <?php foreach (['MONTHLY' => 'Mensual', 'ANNUAL' => 'Anual'] as $value => $label): ?>
-        <option value="<?= e($value) ?>" <?= ($empresaValues['renewal_period'] ?? 'MONTHLY') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </label>
-  <label class="field">
-    <span>Estado de renovacion</span>
-    <select name="renewal_status">
-      <?php foreach (['ACTIVE' => 'Renovacion activa', 'CANCEL_AT_PERIOD_END' => 'Cancelar al final del periodo', 'CANCELLED' => 'Cancelada'] as $value => $label): ?>
-        <option value="<?= e($value) ?>" <?= ($empresaValues['renewal_status'] ?? 'ACTIVE') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </label>
-  <label class="field">
-    <span>Cancelada el</span>
-    <input name="cancelled_at" type="date" value="<?= e(!empty($empresaValues['cancelled_at']) ? date('Y-m-d', strtotime($empresaValues['cancelled_at'])) : '') ?>">
-  </label>
+  <input type="hidden" name="subscription_started_at" value="<?= e(!empty($empresaValues['subscription_started_at']) ? date('Y-m-d', strtotime($empresaValues['subscription_started_at'])) : date('Y-m-d')) ?>">
+  <input type="hidden" name="paid_since" value="<?= e(!empty($empresaValues['paid_since']) ? date('Y-m-d', strtotime($empresaValues['paid_since'])) : '') ?>">
+  <input type="hidden" name="access_until" value="<?= e(!empty($empresaValues['access_until']) ? date('Y-m-d', strtotime($empresaValues['access_until'])) : '') ?>">
+  <input type="hidden" name="renewal_period" value="<?= e($empresaValues['renewal_period'] ?? 'MONTHLY') ?>">
+  <input type="hidden" name="renewal_status" value="<?= e($empresaValues['renewal_status'] ?? 'ACTIVE') ?>">
+  <input type="hidden" name="cancelled_at" value="<?= e(!empty($empresaValues['cancelled_at']) ? date('Y-m-d', strtotime($empresaValues['cancelled_at'])) : '') ?>">
   <label class="field form-full">
     <span>Notas internas</span>
     <textarea name="notes" rows="4" placeholder="Contrato, incidencias de pago, contacto decisor..."><?= e($empresaValues['notes']) ?></textarea>

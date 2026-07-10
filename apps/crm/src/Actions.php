@@ -32,6 +32,7 @@ final class Actions
             'delete_platform_client' => self::deletePlatformClient(),
             'create_empresa' => self::createEmpresa(),
             'update_empresa' => self::updateEmpresa(),
+            'update_empresa_subscription' => self::updateEmpresaSubscription(),
             'renew_empresa_subscription' => self::renewEmpresaSubscription(),
             'cancel_empresa_subscription' => self::cancelEmpresaSubscription(),
             'resume_empresa_subscription' => self::resumeEmpresaSubscription(),
@@ -241,67 +242,91 @@ final class Actions
         redirect('platform-companies');
     }
 
-    private static function renewEmpresaSubscription(): never
+    private static function updateEmpresaSubscription(): never
     {
         self::requirePlatformAdmin();
         $id = post_value('id', '');
 
         if ($id === '') {
+            flash('No se encontro la suscripcion que quieres actualizar.', 'error');
+            redirect('platform-contacts');
+        }
+
+        try {
+            EmpresaRepository::updateSubscription($id, $_POST);
+        } catch (Throwable $exception) {
+            flash($exception->getMessage() ?: 'No se pudo actualizar la suscripcion.', 'error');
+            redirect('platform-contacts');
+        }
+
+        flash('Suscripcion actualizada correctamente.');
+        redirect('platform-contacts');
+    }
+
+    private static function renewEmpresaSubscription(): never
+    {
+        self::requirePlatformAdmin();
+        $id = post_value('id', '');
+        $returnRoute = post_value('return', 'platform-companies');
+
+        if ($id === '') {
             flash('No se encontro la empresa que quieres renovar.', 'error');
-            redirect('platform-companies');
+            redirect($returnRoute);
         }
 
         try {
             EmpresaRepository::renewSubscription($id);
         } catch (Throwable $exception) {
             flash($exception->getMessage() ?: 'No se pudo renovar la suscripcion.', 'error');
-            redirect('platform-companies');
+            redirect($returnRoute);
         }
 
         flash('Renovacion registrada y proximo pago actualizado.');
-        redirect('platform-companies');
+        redirect($returnRoute);
     }
 
     private static function cancelEmpresaSubscription(): never
     {
         self::requirePlatformAdmin();
         $id = post_value('id', '');
+        $returnRoute = post_value('return', 'platform-companies');
 
         if ($id === '') {
             flash('No se encontro la empresa que quieres cancelar.', 'error');
-            redirect('platform-companies');
+            redirect($returnRoute);
         }
 
         try {
             EmpresaRepository::cancelSubscription($id);
         } catch (Throwable $exception) {
             flash($exception->getMessage() ?: 'No se pudo cancelar la suscripcion.', 'error');
-            redirect('platform-companies');
+            redirect($returnRoute);
         }
 
         flash('Suscripcion marcada para cancelar al final del periodo.');
-        redirect('platform-companies');
+        redirect($returnRoute);
     }
 
     private static function resumeEmpresaSubscription(): never
     {
         self::requirePlatformAdmin();
         $id = post_value('id', '');
+        $returnRoute = post_value('return', 'platform-companies');
 
         if ($id === '') {
             flash('No se encontro la empresa que quieres reactivar.', 'error');
-            redirect('platform-companies');
+            redirect($returnRoute);
         }
 
         try {
             EmpresaRepository::resumeSubscription($id);
         } catch (Throwable $exception) {
             flash($exception->getMessage() ?: 'No se pudo reactivar la suscripcion.', 'error');
-            redirect('platform-companies');
+            redirect($returnRoute);
         }
 
         flash('Suscripcion reactivada correctamente.');
-        redirect('platform-companies');
+        redirect($returnRoute);
     }
 
     private static function updatePlatformLead(): never

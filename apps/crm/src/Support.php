@@ -643,6 +643,7 @@ function audit_action_label(?string $action): string
         'delete_platform_client' => 'Eliminacion de cliente CRM',
         'create_empresa' => 'Creacion de empresa',
         'update_empresa' => 'Actualizacion de empresa',
+        'update_empresa_subscription' => 'Actualizacion de suscripcion',
         'renew_empresa_subscription' => 'Renovacion de suscripcion',
         'cancel_empresa_subscription' => 'Cancelacion de suscripcion',
         'resume_empresa_subscription' => 'Reactivacion de suscripcion',
