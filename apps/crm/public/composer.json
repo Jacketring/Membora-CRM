@@ -1,0 +1,12 @@
+{
+  "name": "membora/crm-public-composer-bridge",
+  "description": "Composer bridge for Plesk detection from the public document root",
+  "type": "project",
+  "license": "proprietary",
+  "config": {
+    "vendor-dir": "../vendor"
+  },
+  "require": {
+    "stripe/stripe-php": "^16.0"
+  }
+}
