@@ -123,6 +123,18 @@ if (!can_access_route((string) $route, $currentUser)) {
     redirect(is_platform_admin($currentUser) ? 'platform-dashboard' : 'dashboard');
 }
 
+if (!is_platform_admin($currentUser) && !is_platform_support_context()) {
+    $subscriptionAccessState = EmpresaRepository::accessStateForTenant((string) ($currentUser['tenant_id'] ?? ''));
+    if (!empty($subscriptionAccessState['blocked'])) {
+        http_response_code(403);
+        render('subscription-required', [
+            'title' => 'Suscripcion requerida',
+            'accessState' => $subscriptionAccessState,
+        ]);
+        exit;
+    }
+}
+
 if ($route === 'global-search') {
     $query = trim((string) ($_GET['q'] ?? ''));
     $items = [];

@@ -16,6 +16,19 @@ final class Actions
             redirect($_GET['return'] ?? ($_GET['route'] ?? 'dashboard'));
         }
 
+        $user = Auth::user();
+        if ($action !== 'logout'
+            && $user
+            && !is_platform_admin($user)
+            && !is_platform_support_context()
+        ) {
+            $accessState = EmpresaRepository::accessStateForTenant((string) ($user['tenant_id'] ?? ''));
+            if (!empty($accessState['blocked'])) {
+                flash('Tu demo o suscripcion no permite realizar esta accion.', 'error');
+                redirect('dashboard');
+            }
+        }
+
         self::auditPostAction($action);
 
         match ($action) {

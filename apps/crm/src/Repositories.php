@@ -3444,10 +3444,20 @@ final class EmpresaRepository
         }
 
         $today = new DateTimeImmutable('today');
+        $status = (string) ($empresa['status'] ?? '');
+        if ($status === 'SUSPENDED') {
+            return [
+                'blocked' => true,
+                'kind' => 'subscription_suspended',
+                'title' => 'Tu suscripcion esta suspendida',
+                'message' => 'Contacta con Membora o elige un plan para recuperar el acceso al CRM.',
+            ];
+        }
+
         $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
         if ($isTrial) {
-            $createdAt = new DateTimeImmutable((string) ($empresa['created_at'] ?? 'now'));
-            $expiresAt = $createdAt->modify('+' . max(1, (int) ($empresa['trial_days'] ?? 30)) . ' days');
+            $trialStartedAt = (string) ($empresa['subscription_started_at'] ?: $empresa['created_at'] ?: 'now');
+            $expiresAt = (new DateTimeImmutable($trialStartedAt))->modify('+' . max(1, (int) ($empresa['trial_days'] ?? 30)) . ' days');
             if ($expiresAt < $today) {
                 return [
                     'blocked' => true,
@@ -3460,7 +3470,7 @@ final class EmpresaRepository
         }
 
         $accessUntil = trim((string) ($empresa['access_until'] ?? ''));
-        if (in_array((string) ($empresa['renewal_status'] ?? ''), ['CANCEL_AT_PERIOD_END', 'CANCELLED'], true) && $accessUntil !== '') {
+        if (!$isTrial && $accessUntil !== '') {
             $accessDate = new DateTimeImmutable($accessUntil);
             if ($accessDate < $today) {
                 return [
@@ -3471,6 +3481,15 @@ final class EmpresaRepository
                     'expires_at' => $accessUntil,
                 ];
             }
+        }
+
+        if (!$isTrial && $status === 'CANCELLED' && $accessUntil === '') {
+            return [
+                'blocked' => true,
+                'kind' => 'subscription_cancelled',
+                'title' => 'Tu suscripcion esta cancelada',
+                'message' => 'Elige un plan para reactivar el acceso a Membora.',
+            ];
         }
 
         return ['blocked' => false, 'empresa' => $empresa];
