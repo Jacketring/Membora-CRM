@@ -1,0 +1,12 @@
+{
+  "name": "membora/web-composer-bridge",
+  "description": "Composer bridge for Plesk detection from the public web root",
+  "type": "project",
+  "license": "proprietary",
+  "config": {
+    "vendor-dir": "../apps/crm/vendor"
+  },
+  "require": {
+    "stripe/stripe-php": "^16.0"
+  }
+}
