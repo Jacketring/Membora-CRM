@@ -65,7 +65,7 @@ $sessionCapacity = $editingSession['capacity'] ?? ($activeClassTypes[0]['capacit
     <input name="class_start_time" type="time" required value="<?= e($sessionStartTime) ?>">
   </label>
   <label class="field">
-    <span>Hora finalizacion</span>
+    <span>Hora finalización</span>
     <input name="class_end_time" type="time" required value="<?= e($sessionEndTime) ?>">
   </label>
   <label class="field">

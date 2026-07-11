@@ -1,0 +1,45 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/crm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: pcov
+          extensions: pdo_mysql, mbstring, curl
+      - uses: ramsey/composer-install@v3
+        with:
+          working-directory: apps/crm
+      - name: PHP syntax
+        working-directory: .
+        run: find apps/crm php-app httpdocs/api -name '*.php' -print0 | xargs -0 -n1 php -l
+      - run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage/clover.xml --coverage-filter=src/Support.php
+      - run: php bin/check-coverage.php coverage/clover.xml 80
+      - run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+  e2e:
+    if: ${{ vars.E2E_BASE_URL != '' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22, cache: npm, cache-dependency-path: e2e/package-lock.json}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}

@@ -1,7 +1,7 @@
 <div class="page-heading">
   <div>
     <h2>Usuarios</h2>
-    <p>Gestiona el personal interno que puede acceder al CRM. Los socios/clientes no aparecen en esta seccion.</p>
+    <p>Gestiona el personal interno que puede acceder al CRM. Los socios/clientes no aparecen en esta sección.</p>
   </div>
   <button class="primary-action primary-action--compact" data-open-modal="user-modal" type="button">Nuevo usuario</button>
 </div>
@@ -99,7 +99,7 @@ foreach ($roles as $role) {
           <th scope="col">Rol</th>
           <th scope="col">Estado</th>
           <th scope="col">Ultimo acceso</th>
-          <th scope="col">Creacion</th>
+          <th scope="col">Creación</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -137,7 +137,7 @@ foreach ($roles as $role) {
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="7">No hay usuarios internos que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="7">No hay usuarios internos que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
@@ -200,7 +200,7 @@ foreach ($roles as $role) {
           </div>
         </div>
         <label class="field field--wide">
-          <span>Nueva contrasena</span>
+          <span>Nueva contraseña</span>
           <input name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Dejalo vacio para mantener la actual">
         </label>
       </div>
@@ -260,8 +260,8 @@ foreach ($roles as $role) {
         </div>
       </div>
       <label class="field field--wide">
-        <span>Contrasena inicial</span>
-        <input name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="Minimo 8 caracteres">
+        <span>Contraseña inicial</span>
+        <input name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
       </label>
     </div>
 

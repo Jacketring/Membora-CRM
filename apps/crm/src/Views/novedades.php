@@ -5,15 +5,15 @@ $releaseNotes = [
         'version' => '0.5',
         'date' => '08/07/2026',
         'status' => 'Version de trabajo',
-        'summary' => 'Consolidacion del MVP PHP para TFM, con administracion SaaS, CRM de gimnasio y mejoras de operacion.',
+        'summary' => 'Consolidacion del MVP PHP para TFM, con administración SaaS, CRM de gimnasio y mejoras de operación.',
         'changes' => [
             'Contactos unificados en Admin CRM para leads web y clientes comerciales.',
             'Cambio de tipo entre Lead y Cliente CRM sin duplicar filas.',
             'Pagos, renovaciones, facturas PDF y control de cobros SaaS.',
-            'Pagos de socios, renovacion de membresias y factura PDF desde el CRM de cliente.',
-            'Check-ins, alertas de riesgo, auditoria interna y logs de actividad de empresas.',
+            'Pagos de socios, renovación de membresías y factura PDF desde el CRM de cliente.',
+            'Check-ins, alertas de riesgo, auditoría interna y logs de actividad de empresas.',
             'Permisos por rol y acceso de soporte desde Admin CRM.',
-            'Login demo cliente y demo administrador con sesion temporal.',
+            'Login demo cliente y demo administrador con sesión temporal.',
             'Navegacion reorganizada y acceso a Logs CRM desde el menu del usuario.',
             'Modo claro como apariencia predeterminada; el modo oscuro queda como opcion manual del usuario.',
         ],
@@ -24,7 +24,7 @@ $releaseNotes = [
         'status' => 'Iteracion interna',
         'summary' => 'Endurecimiento operativo del CRM y preparacion de entrega academica.',
         'changes' => [
-            'Modulo de auditoria con datos sanitizados.',
+            'Módulo de auditoría con datos sanitizados.',
             'Alertas reguladas para evitar generacion repetida.',
             'Tareas internas asignadas a usuarios del equipo.',
             'Documentacion de alcance, modelo de datos, pruebas y errores resueltos.',
@@ -36,10 +36,10 @@ $releaseNotes = [
         'status' => 'Base funcional',
         'summary' => 'Migracion del planteamiento inicial a una aplicacion PHP monolitica desplegable en Plesk.',
         'changes' => [
-            'CRM de gimnasio con leads, socios, membresias, clases, reservas y usuarios.',
+            'CRM de gimnasio con leads, socios, membresías, clases, reservas y usuarios.',
             'Admin CRM con empresas cliente, planes SaaS y pagos de plataforma.',
             'Web comercial estatica con formulario conectado al webhook del CRM.',
-            'Eliminacion de dependencia de Node.js, Next.js, NestJS, Prisma y build en produccion.',
+            'Eliminación de dependencia de Node.js, Next.js, NestJS, Prisma y build en producción.',
         ],
     ],
 ];
@@ -57,7 +57,7 @@ $releaseNotes = [
   <article>
     <span>Version actual</span>
     <strong>Membora CRM <?= e($currentVersion) ?></strong>
-    <p>El producto sigue en fase de desarrollo del MVP. La version 0.5 recoge las funciones principales, pero todavia no se considera una version final de produccion.</p>
+    <p>El producto sigue en fase de desarrollo del MVP. La version 0.5 recoge las funciones principales, pero todavía no se considera una version final de producción.</p>
   </article>
   <article>
     <span>Actualizaciones</span>

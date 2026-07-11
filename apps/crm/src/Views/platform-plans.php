@@ -86,10 +86,10 @@ $statusOptions = [
       <?php endif; ?>
       <dl>
         <div><dt>Alta</dt><dd><?= e(money_amount($plan['setup_price'])) ?></dd></div>
-        <div><dt>Usuarios</dt><dd><?= $plan['max_users'] !== null ? (int) $plan['max_users'] : 'Sin limite' ?></dd></div>
-        <div><dt>Socios</dt><dd><?= $plan['max_members'] !== null ? (int) $plan['max_members'] : 'Sin limite' ?></dd></div>
+        <div><dt>Usuarios</dt><dd><?= $plan['max_users'] !== null ? (int) $plan['max_users'] : 'Sin límite' ?></dd></div>
+        <div><dt>Socios</dt><dd><?= $plan['max_members'] !== null ? (int) $plan['max_members'] : 'Sin límite' ?></dd></div>
       </dl>
-      <p><?= e($plan['features'] ?: 'Sin descripcion de funciones.') ?></p>
+      <p><?= e($plan['features'] ?: 'Sin descripción de funciones.') ?></p>
       <button class="support-edit-action" type="button" data-open-modal="plan-edit-<?= e($plan['id']) ?>">
         <svg viewBox="0 0 24 24"><path d="M4 17.3V20h2.7L17.9 8.8l-2.7-2.7L4 17.3Zm15.8-10.6a1 1 0 0 0 0-1.4l-1.1-1.1a1 1 0 0 0-1.4 0l-.9.9 2.7 2.7.7-.8Z"/></svg>
         <span>Editar plan</span>

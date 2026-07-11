@@ -34,7 +34,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
 $planPrices = $planPrices ?? PlatformPlanRepository::priceMap();
 $paymentOptions = [
     '' => 'Todos',
-    'PAID' => 'Al dia',
+    'PAID' => 'Al día',
     'PENDING' => 'Pendiente',
     'OVERDUE' => 'Vencido',
     'TRIAL' => 'Prueba',
@@ -76,7 +76,7 @@ $paymentOptions = [
   <input type="hidden" name="route" value="platform-contacts">
   <label class="field platform-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, email, telefono o notas" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, email, teléfono o notas" data-auto-filter-input>
   </label>
   <label class="field platform-filter-field">
     <span>Tipo</span>
@@ -111,7 +111,7 @@ $paymentOptions = [
           <th>Empresa</th>
           <th>Contacto</th>
           <th>Email</th>
-          <th>Telefono</th>
+          <th>Teléfono</th>
           <th>Tipo</th>
           <th>Estado</th>
           <th>Notas</th>
@@ -128,7 +128,7 @@ $paymentOptions = [
             <td><strong><?= e($contact['company_name'] ?: 'Sin empresa') ?></strong></td>
             <td><?= e($contact['contact_name'] ?: 'Sin contacto') ?></td>
             <td><?= e($contact['email'] ?: 'Sin email') ?></td>
-            <td><?= e($contact['phone'] ?: 'Sin telefono') ?></td>
+            <td><?= e($contact['phone'] ?: 'Sin teléfono') ?></td>
             <td><span class="source-badge"><?= e($contact['source_label']) ?></span></td>
             <td><span class="status-badge status-badge--<?= e($contact['status_class']) ?>"><?= e($contact['status_label']) ?></span></td>
             <td><?= e($notes !== '' ? substr($notes, 0, 70) . (strlen($notes) > 70 ? '...' : '') : 'Sin notas') ?></td>
@@ -147,7 +147,7 @@ $paymentOptions = [
                 <?php if ($contact['type'] === 'client'): ?>
                   <button class="support-renew-action" type="button" data-open-modal="client-subscription-<?= e($contact['id']) ?>">
                     <svg viewBox="0 0 24 24"><path d="M7 7h10v2H7V7Zm0 4h10v2H7v-2Zm0 4h6v2H7v-2ZM5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/></svg>
-                    <span>Suscripcion</span>
+                    <span>Suscripción</span>
                   </button>
                   <a class="support-enter-action" href="index.php?route=platform-companies&client_id=<?= urlencode($contact['id']) ?>&modal=empresa-create-modal">
                     <svg viewBox="0 0 24 24"><path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -159,7 +159,7 @@ $paymentOptions = [
                   <span>Editar</span>
                 </button>
                 <?php if ($contact['type'] === 'lead'): ?>
-                  <form method="post" data-confirm-message="Eliminar este lead comercial? Esta accion no se puede deshacer.">
+                  <form method="post" data-confirm-message="Eliminar este lead comercial? Esta acción no se puede deshacer.">
                     <input type="hidden" name="action" value="delete_platform_lead">
                     <input type="hidden" name="id" value="<?= e($contact['id']) ?>">
                     <button class="note-delete-button" type="submit" aria-label="Eliminar lead <?= e($contact['contact_name']) ?>">
@@ -230,7 +230,7 @@ $paymentOptions = [
           <input name="email" type="email" value="<?= e($lead['email']) ?>">
         </label>
         <label class="field">
-          <span>Telefono</span>
+          <span>Teléfono</span>
           <input name="phone" value="<?= e($lead['phone']) ?>">
         </label>
         <label class="field">
@@ -273,7 +273,7 @@ $paymentOptions = [
     <dialog class="modal-card empresa-modal" id="client-subscription-<?= e($client['id']) ?>">
       <header>
         <div>
-          <h2>Suscripcion</h2>
+          <h2>Suscripción</h2>
           <p><?= e($client['company_name']) ?> - <?= e($client['email'] ?: 'Sin email') ?></p>
         </div>
         <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>

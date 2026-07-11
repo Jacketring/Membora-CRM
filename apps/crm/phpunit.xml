@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd" bootstrap="tests/bootstrap.php" colors="true" cacheDirectory=".phpunit.cache">
+  <testsuites><testsuite name="Membora CRM"><directory>tests</directory></testsuite></testsuites>
+  <source><include><file>src/Support.php</file></include></source>
+  <coverage includeUncoveredFiles="true"><report><html outputDirectory="coverage/html"/><text outputFile="coverage/coverage.txt" showUncoveredFiles="true"/></report></coverage>
+</phpunit>

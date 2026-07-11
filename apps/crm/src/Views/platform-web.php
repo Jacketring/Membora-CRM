@@ -8,7 +8,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
 <div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Web comercial</h2>
-    <p>Estado de conexion entre la web publica de Membora CRM y los leads comerciales del administrador.</p>
+    <p>Estado de conexion entre la web pública de Membora CRM y los leads comerciales del administrador.</p>
   </div>
   <div class="platform-heading-actions">
     <a class="secondary-action" href="index.php?route=platform-contacts&type=lead">Ver contactos</a>
@@ -55,7 +55,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
       </div>
       <div>
         <span>Protecciones</span>
-        <strong>Origen permitido, honeypot y limite de envios</strong>
+        <strong>Origen permitido, honeypot y límite de envíos</strong>
       </div>
     </div>
   </article>
@@ -81,7 +81,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
   <article class="platform-panel">
     <header>
       <div>
-        <h3>Configuracion detectada</h3>
+        <h3>Configuración detectada</h3>
         <p>Valores actuales leidos desde `apps/crm/.env`.</p>
       </div>
       <span><?= e($mailDiagnostics['transport'] ?? 'Sin dato') ?></span>
@@ -100,7 +100,7 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
 <section class="leads-table-card">
   <header>
     <div>
-      <h3>Ultimos envios tecnicos</h3>
+      <h3>Ultimos envíos tecnicos</h3>
       <span><?= count($logs) ?> registros</span>
     </div>
   </header>
@@ -121,12 +121,12 @@ $webUrl = $webUrl ?? 'https://app.web.josehurtado.dev';
           <tr>
             <td><?= e(format_date($log['created_at'])) ?></td>
             <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(webhook_status_label($status)) ?></span></td>
-            <td><?= e($log['source_url'] ?: 'Web publica') ?></td>
+            <td><?= e($log['source_url'] ?: 'Web pública') ?></td>
             <td><?= e($log['error_message'] ?: 'Solicitud procesada') ?></td>
           </tr>
         <?php endforeach; ?>
         <?php if (!$logs): ?>
-          <tr><td colspan="4" class="empty-state">Todavia no se han recibido formularios desde la web.</td></tr>
+          <tr><td colspan="4" class="empty-state">Todavía no se han recibido formularios desde la web.</td></tr>
         <?php endif; ?>
       </tbody>
     </table>

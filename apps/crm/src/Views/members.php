@@ -37,7 +37,7 @@ $memberStatusOptions = [
   <input type="hidden" name="route" value="members">
   <label class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Nombre, telefono o email" aria-label="Buscar socios por nombre, telefono o email" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Nombre, teléfono o email" aria-label="Buscar socios por nombre, teléfono o email" data-auto-filter-input>
   </label>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
@@ -80,10 +80,10 @@ $memberStatusOptions = [
       <thead>
         <tr>
           <th scope="col">Nombre</th>
-          <th scope="col">Telefono</th>
+          <th scope="col">Teléfono</th>
           <th scope="col">Email</th>
           <th scope="col">Estado</th>
-          <th scope="col">Membresia</th>
+          <th scope="col">Membresía</th>
           <th scope="col">Caduca</th>
           <th scope="col">Alta</th>
           <th scope="col">Actualizacion</th>
@@ -111,7 +111,7 @@ $memberStatusOptions = [
                 <strong><?= e($memberName) ?></strong>
               </div>
             </td>
-            <td><?= e($member['phone'] ?: 'Sin telefono') ?></td>
+            <td><?= e($member['phone'] ?: 'Sin teléfono') ?></td>
             <td><?= e($member['email'] ?: 'Sin email') ?></td>
             <td>
               <span class="status-badge status-badge--<?= e(strtolower($member['status'])) ?>">
@@ -123,7 +123,7 @@ $memberStatusOptions = [
                 <strong><?= e($member['membership_name']) ?></strong>
                 <small class="table-subtext"><?= e(money_amount($member['membership_price'])) ?> · <?= e(membership_period_label($member['membership_period'])) ?></small>
               <?php else: ?>
-                <span class="muted-cell">Sin membresia</span>
+                <span class="muted-cell">Sin membresía</span>
               <?php endif; ?>
             </td>
             <td>
@@ -143,15 +143,15 @@ $memberStatusOptions = [
                   <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-2v-1.95l7.25-7.25 1.95 1.95L7.95 18H6Zm10.6-8.65L14.65 7.4 16 6.05 17.95 8l-1.35 1.35Z"/></svg>
                 </button>
                 <?php if ($canRenewMembership): ?>
-                  <form method="post" data-confirm-message="Se renovara la membresia y se registrara el pago asociado." data-confirm-action-label="Confirmar">
+                  <form method="post" data-confirm-message="Se renovara la membresía y se registrara el pago asociado." data-confirm-action-label="Confirmar">
                     <input type="hidden" name="action" value="renew_member_subscription">
                     <input type="hidden" name="id" value="<?= e($member['id']) ?>">
-                    <button class="icon-action success-action" type="submit" title="Renovar membresia" aria-label="Renovar membresia de <?= e($memberName) ?>">
+                    <button class="icon-action success-action" type="submit" title="Renovar membresía" aria-label="Renovar membresía de <?= e($memberName) ?>">
                       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.2L13 11h8V3l-3.3 3.3ZM11 7h2v5.6l4 2.4-1 1.7-5-3V7Z"/></svg>
                     </button>
                   </form>
                 <?php endif; ?>
-                <form method="post" data-confirm-message="Eliminar este socio? Esta accion no se puede deshacer.">
+                <form method="post" data-confirm-message="Eliminar este socio? Esta acción no se puede deshacer.">
                   <input type="hidden" name="action" value="delete_member">
                   <input type="hidden" name="id" value="<?= e($member['id']) ?>">
                   <button class="icon-action danger-action" type="submit" title="Eliminar socio" aria-label="Eliminar socio <?= e($memberName) ?>">
@@ -169,7 +169,7 @@ $memberStatusOptions = [
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="9">No hay socios que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="9">No hay socios que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
@@ -194,7 +194,7 @@ $memberStatusOptions = [
             <?php endif; ?>
             <div>
               <h2 id="member-detail-title-<?= e($member['id']) ?>"><?= e($memberName) ?></h2>
-              <p><?= e($member['phone'] ?: 'Sin telefono') ?> &middot; <?= e($member['email'] ?: 'Sin email') ?></p>
+              <p><?= e($member['phone'] ?: 'Sin teléfono') ?> &middot; <?= e($member['email'] ?: 'Sin email') ?></p>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ $memberStatusOptions = [
           <input name="last_name" value="<?= e($member['last_name']) ?>">
         </label>
         <label class="field">
-          <span>Telefono</span>
+          <span>Teléfono</span>
           <div class="phone-combo">
             <div class="phone-prefix-picker" data-phone-picker>
               <input type="hidden" name="phone_country" value="<?= e($phoneCountry['code']) ?>" data-phone-country-value>
@@ -232,7 +232,7 @@ $memberStatusOptions = [
                 </div>
               </div>
             </div>
-            <input class="phone-number-input" name="phone_number" value="<?= e(phone_local_value($member['phone'])) ?>" inputmode="tel" placeholder="Numero" aria-label="Numero de telefono">
+            <input class="phone-number-input" name="phone_number" value="<?= e(phone_local_value($member['phone'])) ?>" inputmode="tel" placeholder="Número" aria-label="Número de teléfono">
           </div>
         </label>
         <label class="field">
@@ -258,14 +258,14 @@ $memberStatusOptions = [
           <input name="joined_at" type="date" value="<?= $member['joined_at'] ? e(date('Y-m-d', strtotime($member['joined_at']))) : '' ?>">
         </label>
         <div class="field">
-          <span>Membresia</span>
+          <span>Membresía</span>
           <div class="custom-select custom-select--field" data-custom-select>
             <input type="hidden" name="membership_plan_id" value="<?= e($member['membership_plan_id'] ?? '') ?>" data-custom-select-value>
             <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
-              <span data-custom-select-label><?= e($member['membership_name'] ?? 'Sin membresia') ?></span>
+              <span data-custom-select-label><?= e($member['membership_name'] ?? 'Sin membresía') ?></span>
             </button>
             <div class="custom-select-menu" data-custom-select-menu hidden>
-              <button class="custom-select-option <?= empty($member['membership_plan_id']) ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="" data-duration-days="">Sin membresia</button>
+              <button class="custom-select-option <?= empty($member['membership_plan_id']) ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="" data-duration-days="">Sin membresía</button>
               <?php foreach ($membershipPlans as $planOption): ?>
                 <button class="custom-select-option <?= ($member['membership_plan_id'] ?? '') === $planOption['id'] ? 'selected' : '' ?>" type="button" data-custom-select-option data-value="<?= e($planOption['id']) ?>" data-duration-days="<?= (int) $planOption['duration_days'] ?>">
                   <?= e($planOption['name']) ?> · <?= e(money_amount($planOption['price'])) ?> · <?= e(membership_period_label($planOption['billing_period'])) ?>
@@ -275,7 +275,7 @@ $memberStatusOptions = [
           </div>
         </div>
         <label class="field">
-          <span>Inicio membresia</span>
+          <span>Inicio membresía</span>
           <input name="membership_starts_at" type="date" value="<?= !empty($member['membership_starts_at']) ? e(date('Y-m-d', strtotime($member['membership_starts_at']))) : e(date('Y-m-d')) ?>" data-membership-start-date>
         </label>
         <label class="field">
@@ -322,7 +322,7 @@ $memberStatusOptions = [
             </article>
           <?php endforeach; ?>
           <?php if (!$memberReservations): ?>
-            <p class="empty-note">Este socio todavia no tiene reservas.</p>
+            <p class="empty-note">Este socio todavía no tiene reservas.</p>
           <?php endif; ?>
         </div>
       </section>
@@ -350,7 +350,7 @@ $memberStatusOptions = [
         <input name="last_name">
       </label>
       <label class="field">
-        <span>Telefono</span>
+        <span>Teléfono</span>
         <div class="phone-combo">
           <div class="phone-prefix-picker" data-phone-picker>
             <input type="hidden" name="phone_country" value="<?= e($defaultPhoneCountry['code']) ?>" data-phone-country-value>
@@ -371,7 +371,7 @@ $memberStatusOptions = [
               </div>
             </div>
           </div>
-          <input class="phone-number-input" name="phone_number" inputmode="tel" placeholder="Numero" aria-label="Numero de telefono">
+          <input class="phone-number-input" name="phone_number" inputmode="tel" placeholder="Número" aria-label="Número de teléfono">
         </div>
       </label>
       <label class="field">
@@ -396,14 +396,14 @@ $memberStatusOptions = [
         <input name="joined_at" type="date" value="<?= e(date('Y-m-d')) ?>">
       </label>
       <div class="field">
-        <span>Membresia</span>
+        <span>Membresía</span>
         <div class="custom-select custom-select--field" data-custom-select>
           <input type="hidden" name="membership_plan_id" value="" data-custom-select-value>
           <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
-            <span data-custom-select-label>Sin membresia</span>
+            <span data-custom-select-label>Sin membresía</span>
           </button>
           <div class="custom-select-menu" data-custom-select-menu hidden>
-            <button class="custom-select-option selected" type="button" data-custom-select-option data-value="" data-duration-days="">Sin membresia</button>
+            <button class="custom-select-option selected" type="button" data-custom-select-option data-value="" data-duration-days="">Sin membresía</button>
             <?php foreach ($membershipPlans as $planOption): ?>
               <button class="custom-select-option" type="button" data-custom-select-option data-value="<?= e($planOption['id']) ?>" data-duration-days="<?= (int) $planOption['duration_days'] ?>">
                 <?= e($planOption['name']) ?> · <?= e(money_amount($planOption['price'])) ?> · <?= e(membership_period_label($planOption['billing_period'])) ?>
@@ -413,7 +413,7 @@ $memberStatusOptions = [
         </div>
       </div>
       <label class="field">
-        <span>Inicio membresia</span>
+        <span>Inicio membresía</span>
         <input name="membership_starts_at" type="date" value="<?= e(date('Y-m-d')) ?>" data-membership-start-date>
       </label>
       <label class="field">

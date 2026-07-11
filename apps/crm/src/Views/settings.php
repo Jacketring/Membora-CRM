@@ -23,7 +23,7 @@ $initial = strtoupper(substr((string) ($user['name'] ?? 'U'), 0, 1));
     <div class="page-heading settings-heading">
       <div>
         <span class="settings-kicker">Preferencias</span>
-        <h2>Configuracion</h2>
+        <h2>Configuración</h2>
         <p>Apariencia, color y densidad de trabajo.</p>
       </div>
     </div>
@@ -68,7 +68,7 @@ $initial = strtoupper(substr((string) ($user['name'] ?? 'U'), 0, 1));
 
       <div class="settings-save-bar">
         <button class="secondary-action" type="button" data-settings-reset>Restablecer</button>
-        <button class="primary-action primary-action--compact" type="submit">Guardar configuracion</button>
+        <button class="primary-action primary-action--compact" type="submit">Guardar configuración</button>
       </div>
     </form>
   </section>

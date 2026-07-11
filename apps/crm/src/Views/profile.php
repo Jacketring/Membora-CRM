@@ -24,7 +24,7 @@ $initial = strtoupper(substr((string) ($user['name'] ?? 'U'), 0, 1));
       <div>
         <span class="settings-kicker">Cuenta</span>
         <h2>Perfil</h2>
-        <p>Datos personales, foto e inicio de sesion.</p>
+        <p>Datos personales, foto e inicio de sesión.</p>
       </div>
     </div>
 
@@ -35,7 +35,7 @@ $initial = strtoupper(substr((string) ($user['name'] ?? 'U'), 0, 1));
         <header class="settings-card-header">
           <div>
             <span>Identidad</span>
-            <h3>Informacion principal</h3>
+            <h3>Información principal</h3>
           </div>
         </header>
 
@@ -49,12 +49,12 @@ $initial = strtoupper(substr((string) ($user['name'] ?? 'U'), 0, 1));
             <input name="email" required type="email" value="<?= e($user['email']) ?>" autocomplete="email">
           </label>
           <label class="field field--wide">
-            <span>Contrasena actual</span>
+            <span>Contraseña actual</span>
             <input name="current_password" type="password" autocomplete="current-password" placeholder="Obligatoria para cambiarla">
           </label>
           <label class="field field--wide">
-            <span>Nueva contrasena</span>
-            <input name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Mantener contrasena actual">
+            <span>Nueva contraseña</span>
+            <input name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Mantener contraseña actual">
           </label>
         </div>
       </section>

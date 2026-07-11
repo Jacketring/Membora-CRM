@@ -45,7 +45,7 @@ $clientType = $clientValues['status'] === 'LEAD' ? 'lead' : 'client';
     <input name="email" type="email" value="<?= e($clientValues['email']) ?>" placeholder="admin@empresa.com">
   </label>
   <label class="field">
-    <span>Telefono</span>
+    <span>Teléfono</span>
     <input name="phone" value="<?= e($clientValues['phone']) ?>" placeholder="+34 600 000 000">
   </label>
   <label class="field">

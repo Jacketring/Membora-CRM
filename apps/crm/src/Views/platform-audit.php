@@ -11,7 +11,7 @@
     <strong><?= (int) $metrics['today'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--green">
-    <span>Ultimos 7 dias</span>
+    <span>Ultimos 7 días</span>
     <strong><?= (int) $metrics['week'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--orange">
@@ -28,7 +28,7 @@
   <input type="hidden" name="route" value="platform-audit">
   <label class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, usuario, accion, entidad o dato" aria-label="Buscar logs" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, usuario, acción, entidad o dato" aria-label="Buscar logs" data-auto-filter-input>
   </label>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
@@ -48,7 +48,7 @@
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
       <input type="hidden" name="action_filter" value="<?= e($filters['action']) ?>" data-custom-select-value>
       <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
-        <small>Accion</small>
+        <small>Acción</small>
         <span data-custom-select-label><?= e($actionOptions[$filters['action']] ?? 'Todas') ?></span>
       </button>
       <div class="custom-select-menu" data-custom-select-menu hidden>
@@ -86,8 +86,8 @@
           <th scope="col">Fecha</th>
           <th scope="col">Empresa</th>
           <th scope="col">Usuario</th>
-          <th scope="col">Accion</th>
-          <th scope="col">Modulo</th>
+          <th scope="col">Acción</th>
+          <th scope="col">Módulo</th>
           <th scope="col">Area</th>
           <th scope="col">Detalle</th>
         </tr>
@@ -122,7 +122,7 @@
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="7">No hay logs que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="7">No hay logs que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>

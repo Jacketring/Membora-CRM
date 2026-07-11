@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Metodo no permitido'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => false, 'message' => 'Método no permitido'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -94,7 +94,7 @@ if ($status < 200 || $status >= 300 || !is_array($responsePayload) || empty($res
         'success' => false,
         'message' => is_array($responsePayload) && isset($responsePayload['message'])
             ? (string) $responsePayload['message']
-            : 'No se pudo enviar la solicitud. Intentalo mas tarde.',
+            : 'No se pudo enviar la solicitud. Inténtalo mas tarde.',
         'status' => $status,
         'error' => $error ?: null,
     ], JSON_UNESCAPED_UNICODE);

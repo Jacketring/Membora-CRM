@@ -22,7 +22,7 @@ $statusOptions = [
     <input name="price" type="number" min="0" step="0.01" required value="<?= e((string) ($plan['price'] ?? '0.00')) ?>" placeholder="49.90">
   </label>
   <div class="field">
-    <span>Duracion</span>
+    <span>Duración</span>
     <div class="custom-select custom-select--field" data-custom-select>
       <input type="hidden" name="billing_period" value="<?= e($plan['billing_period'] ?? 'MONTHLY') ?>" data-custom-select-value>
       <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
@@ -54,7 +54,7 @@ $statusOptions = [
     </div>
   </div>
   <label class="field field--wide">
-    <span>Descripcion</span>
-    <textarea name="description" rows="3" placeholder="Incluye lo que cubre esta membresia"><?= e($plan['description'] ?? '') ?></textarea>
+    <span>Descripción</span>
+    <textarea name="description" rows="3" placeholder="Incluye lo que cubre esta membresía"><?= e($plan['description'] ?? '') ?></textarea>
   </label>
 </div>

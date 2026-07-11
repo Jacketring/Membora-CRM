@@ -209,7 +209,7 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
         <span>Emisor</span>
         <h2>Membora CRM</h2>
         <p>Proyecto SaaS Membora CRM</p>
-        <p>Madrid, Espana</p>
+        <p>Madrid, España</p>
         <p>NIF/CIF: pendiente de alta comercial</p>
       </div>
       <div class="party">
@@ -263,7 +263,7 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
     <section class="notes">
       <span>Observaciones</span>
       <p>Documento generado desde Admin CRM para control interno y entrega al cliente. Los datos fiscales del emisor deben completarse antes de un uso comercial real.</p>
-      <p>Forma de pago: transferencia bancaria o metodo acordado con la empresa cliente.</p>
+      <p>Forma de pago: transferencia bancaria o método acordado con la empresa cliente.</p>
     </section>
 
     <p class="footer">Factura generada por Membora CRM. Conserva este documento junto con el justificante de pago correspondiente.</p>

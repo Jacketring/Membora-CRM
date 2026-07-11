@@ -58,7 +58,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
 
 <div class="page-heading leads-heading platform-heading">
   <div>
-    <h2>Administracion Membora CRM</h2>
+    <h2>Administración Membora CRM</h2>
     <p>Panel ejecutivo para controlar cartera, cobros y empresas que necesitan seguimiento.</p>
   </div>
   <div class="platform-heading-actions">
@@ -102,7 +102,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
       <div>
         <span>Cartera</span>
         <h3><?= count($allEmpresas) ?> empresas</h3>
-        <p><?= $paidRate ?>% al dia en pagos.</p>
+        <p><?= $paidRate ?>% al día en pagos.</p>
       </div>
     </header>
     <div class="admin-dashboard-status">
@@ -118,7 +118,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
   </article>
 </section>
 
-<section class="admin-dashboard-actions" aria-label="Accesos de administracion">
+<section class="admin-dashboard-actions" aria-label="Accesos de administración">
   <a href="index.php?route=platform-contacts">
     <span>Contactos</span>
     <strong>Leads y clientes</strong>
@@ -146,7 +146,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
     <header class="admin-dashboard-panel-header">
       <div>
         <span>Prioridad</span>
-        <h3>Empresas que requieren accion</h3>
+        <h3>Empresas que requieren acción</h3>
         <p>Pagos pendientes, vencidos, estados bloqueados o renovaciones cercanas.</p>
       </div>
       <strong class="admin-dashboard-count"><?= count($riskCompanies) ?></strong>
@@ -158,7 +158,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
             <th>Empresa</th>
             <th>Estado</th>
             <th>Pago</th>
-            <th>Proximo pago</th>
+            <th>Próximo pago</th>
             <th>Importe</th>
           </tr>
         </thead>
@@ -184,7 +184,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
     <header class="admin-dashboard-panel-header">
       <div>
         <span>Cobros</span>
-        <h3>Proximos movimientos</h3>
+        <h3>Próximos movimientos</h3>
         <p>Pagos pendientes o ultimos pagos registrados para seguimiento rapido.</p>
       </div>
       <strong class="admin-dashboard-count"><?= (int) ($paymentMetrics['due_week'] ?? 0) ?></strong>
@@ -211,7 +211,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
             </tr>
           <?php endforeach; ?>
           <?php if (!$upcomingPayments): ?>
-            <tr><td colspan="5">Todavia no hay pagos registrados.</td></tr>
+            <tr><td colspan="5">Todavía no hay pagos registrados.</td></tr>
           <?php endif; ?>
         </tbody>
       </table>
@@ -258,7 +258,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
         </a>
       <?php endforeach; ?>
       <?php if (!$empresas): ?>
-        <p class="platform-empty">Todavia no hay empresas registradas.</p>
+        <p class="platform-empty">Todavía no hay empresas registradas.</p>
       <?php endif; ?>
     </div>
   </article>

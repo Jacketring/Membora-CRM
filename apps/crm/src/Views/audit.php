@@ -1,17 +1,17 @@
 <div class="page-heading">
   <div>
-    <h2>Auditoria</h2>
-    <p>Consulta las acciones registradas por usuario, fecha, modulo y entidad afectada.</p>
+    <h2>Auditoría</h2>
+    <p>Consulta las acciones registradas por usuario, fecha, módulo y entidad afectada.</p>
   </div>
 </div>
 
-<section class="lead-metrics" aria-label="Resumen de auditoria">
+<section class="lead-metrics" aria-label="Resumen de auditoría">
   <article class="lead-metric lead-metric--blue">
     <span>Hoy</span>
     <strong><?= (int) $metrics['today'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--green">
-    <span>Ultimos 7 dias</span>
+    <span>Ultimos 7 días</span>
     <strong><?= (int) $metrics['week'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--orange">
@@ -24,17 +24,17 @@
   </article>
 </section>
 
-<form class="lead-toolbar member-toolbar" method="get" aria-label="Filtros de auditoria" data-auto-filter-form data-live-search-form data-live-search-target="audit-table">
+<form class="lead-toolbar member-toolbar" method="get" aria-label="Filtros de auditoría" data-auto-filter-form data-live-search-form data-live-search-target="audit-table">
   <input type="hidden" name="route" value="audit">
   <label class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Accion, entidad, usuario o dato" aria-label="Buscar auditoria" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Acción, entidad, usuario o dato" aria-label="Buscar auditoría" data-auto-filter-input>
   </label>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
       <input type="hidden" name="action_filter" value="<?= e($filters['action']) ?>" data-custom-select-value>
       <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">
-        <small>Accion</small>
+        <small>Acción</small>
         <span data-custom-select-label><?= e($actionOptions[$filters['action']] ?? 'Todas') ?></span>
       </button>
       <div class="custom-select-menu" data-custom-select-menu hidden>
@@ -92,13 +92,13 @@
   </header>
   <div class="leads-table-wrap">
     <table class="leads-table" id="audit-table">
-      <caption class="sr-only">Registro de auditoria</caption>
+      <caption class="sr-only">Registro de auditoría</caption>
       <thead>
         <tr>
           <th scope="col">Fecha</th>
           <th scope="col">Usuario</th>
-          <th scope="col">Accion</th>
-          <th scope="col">Modulo</th>
+          <th scope="col">Acción</th>
+          <th scope="col">Módulo</th>
           <th scope="col">Area</th>
           <th scope="col">Detalle</th>
         </tr>
@@ -126,11 +126,11 @@
         <?php endforeach; ?>
         <?php if (!$logs): ?>
           <tr data-live-search-empty>
-            <td class="leads-empty-cell" colspan="6">No hay registros de auditoria que coincidan con los filtros actuales.</td>
+            <td class="leads-empty-cell" colspan="6">No hay registros de auditoría que coincidan con los filtros actuales.</td>
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="6">No hay registros de auditoria que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="6">No hay registros de auditoría que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>

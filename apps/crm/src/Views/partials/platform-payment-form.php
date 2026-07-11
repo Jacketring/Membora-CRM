@@ -60,7 +60,7 @@ $paymentStatusOptions = [
   </label>
   <label class="field form-full">
     <span>Notas internas</span>
-    <textarea name="notes" rows="4" placeholder="Factura, incidencia, metodo de pago..."><?= e($paymentValues['notes']) ?></textarea>
+    <textarea name="notes" rows="4" placeholder="Factura, incidencia, método de pago..."><?= e($paymentValues['notes']) ?></textarea>
   </label>
 
   <div class="form-actions form-full">

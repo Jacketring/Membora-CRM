@@ -1,5 +1,11 @@
 # Dependencies
 node_modules/
+/apps/crm/vendor/
+/vendor/
+/apps/crm/coverage/
+/apps/crm/.phpunit.cache/
+/e2e/test-results/
+/e2e/playwright-report/
 
 # Environment files (secretos fuera del repo, en cualquier nivel)
 .env

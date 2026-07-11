@@ -24,7 +24,7 @@ $invoiceValues = $isEditingInvoice ? $invoice : [
     'issuer_postal_code' => getenv('INVOICE_ISSUER_POSTAL_CODE') ?: '',
     'issuer_city' => getenv('INVOICE_ISSUER_CITY') ?: '',
     'issuer_province' => getenv('INVOICE_ISSUER_PROVINCE') ?: '',
-    'issuer_country' => getenv('INVOICE_ISSUER_COUNTRY') ?: 'Espana',
+    'issuer_country' => getenv('INVOICE_ISSUER_COUNTRY') ?: 'España',
     'issuer_email' => getenv('INVOICE_ISSUER_EMAIL') ?: getenv('MAIL_FROM_EMAIL') ?: '',
     'issuer_phone' => getenv('INVOICE_ISSUER_PHONE') ?: '',
     'customer_name' => '',
@@ -33,7 +33,7 @@ $invoiceValues = $isEditingInvoice ? $invoice : [
     'customer_postal_code' => '',
     'customer_city' => '',
     'customer_province' => '',
-    'customer_country' => 'Espana',
+    'customer_country' => 'España',
     'customer_email' => '',
     'customer_phone' => '',
     'concept' => '',
@@ -54,7 +54,7 @@ $invoiceValues = $isEditingInvoice ? $invoice : [
 ];
 if (!$invoiceItems) {
     $invoiceItems = [[
-        'description' => $invoiceValues['concept'] ?: 'Suscripcion Membora CRM',
+        'description' => $invoiceValues['concept'] ?: 'Suscripción Membora CRM',
         'quantity' => '1.000',
         'unit' => 'ud',
         'unit_price' => $invoiceValues['taxable_base'] ?: '0.00',
@@ -116,7 +116,7 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
     <input name="issuer_email" type="email" <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['issuer_email']) ?>">
   </label>
   <label class="field">
-    <span>Telefono emisor</span>
+    <span>Teléfono emisor</span>
     <input name="issuer_phone" <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['issuer_phone']) ?>">
   </label>
 
@@ -164,13 +164,13 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
     <input name="customer_email" type="email" <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['customer_email'] ?: $invoiceValues['contact_email'] ?? '') ?>">
   </label>
   <label class="field">
-    <span>Telefono cliente</span>
+    <span>Teléfono cliente</span>
     <input name="customer_phone" <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['customer_phone']) ?>">
   </label>
 
   <div class="form-full platform-form-divider">
     <strong>Datos de factura</strong>
-    <span>El numero es solo una sugerencia hasta emitir.</span>
+    <span>El número es solo una sugerencia hasta emitir.</span>
   </div>
   <label class="field">
     <span>Tipo</span>
@@ -186,7 +186,7 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
     <input name="invoice_series" required <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['invoice_series']) ?>">
   </label>
   <label class="field">
-    <span>Numero</span>
+    <span>Número</span>
     <input name="invoice_number" readonly value="<?= e($invoiceValues['invoice_number'] ? (string) $invoiceValues['invoice_number'] : (string) ($nextInvoiceNumber ?? PlatformInvoiceRepository::nextInvoiceNumber())) ?>">
   </label>
   <label class="field">
@@ -202,7 +202,7 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
     <input name="issued_at" type="date" <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['issued_at'] ? date('Y-m-d', strtotime($invoiceValues['issued_at'])) : date('Y-m-d')) ?>">
   </label>
   <label class="field">
-    <span>Fecha operacion</span>
+    <span>Fecha operación</span>
     <input name="operation_at" type="date" <?= $isIssued ? 'readonly' : '' ?> value="<?= e($invoiceValues['operation_at'] ? date('Y-m-d', strtotime($invoiceValues['operation_at'])) : '') ?>">
   </label>
   <label class="field">
@@ -236,14 +236,14 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
 
   <div class="form-full platform-form-divider">
     <strong>Lineas</strong>
-    <span>Los importes se recalculan tambien en servidor.</span>
+    <span>Los importes se recalculan también en servidor.</span>
   </div>
   <div class="form-full invoice-lines" data-invoice-lines>
     <?php foreach (array_values($invoiceItems) as $index => $item): ?>
       <div class="invoice-line" data-invoice-line>
         <input type="hidden" name="items[<?= $index ?>][sort_order]" value="<?= $index + 1 ?>" data-line-order>
         <label class="field invoice-line-description">
-          <span>Descripcion</span>
+          <span>Descripción</span>
           <input name="items[<?= $index ?>][description]" required <?= $isIssued ? 'readonly' : '' ?> value="<?= e($item['description']) ?>">
         </label>
         <label class="field">
@@ -283,7 +283,7 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
     <?php endforeach; ?>
   </div>
   <?php if (!$isIssued): ?>
-    <button class="secondary-action form-full" type="button" data-add-invoice-line>Anadir linea</button>
+    <button class="secondary-action form-full" type="button" data-add-invoice-line>Añadir linea</button>
   <?php endif; ?>
 
   <div class="form-full platform-form-divider">
@@ -344,7 +344,7 @@ $fiscalOptions = ['VAT_SUBJECT' => 'Sujeto a IVA', 'EXEMPT' => 'Exento', 'NOT_SU
 </form>
 
 <?php if ($isEditingInvoice && !$isIssued): ?>
-  <form class="platform-subscription-actions" method="post" data-confirm-message="Se asignara el siguiente numero correlativo y la factura quedara bloqueada." data-confirm-action-label="Emitir factura">
+  <form class="platform-subscription-actions" method="post" data-confirm-message="Se asignara el siguiente número correlativo y la factura quedara bloqueada." data-confirm-action-label="Emitir factura">
     <input type="hidden" name="action" value="<?= $clientInvoiceMode ? 'issue_client_invoice' : 'issue_platform_invoice' ?>">
     <input type="hidden" name="id" value="<?= e($invoiceValues['id']) ?>">
     <button class="primary-action" type="submit">Emitir factura</button>

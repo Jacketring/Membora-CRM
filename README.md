@@ -4,6 +4,22 @@
 
 El proyecto se ha migrado a una app PHP monolitica para simplificar el despliegue en Plesk y evitar procesos Node.js en produccion.
 
+El flujo de cambios funcionales es **spec → tests → implementación**: primero se valida la decisión de producto en `docs/specs/`, después se escribe la prueba automatizada y finalmente el código.
+
+## Calidad y pruebas
+
+```bash
+cd apps/crm
+composer install
+vendor/bin/phpunit
+vendor/bin/phpstan analyse
+vendor/bin/captainhook install
+```
+
+La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La medición local del 11 de julio de 2026 alcanza **93,50 % de líneas (604/646)**, con 34 tests y 164 aserciones. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
+
+Playwright está en `e2e/` y es solo para desarrollo/CI. Requiere una app y BD de prueba, además de `E2E_BASE_URL`, `E2E_EMAIL` y `E2E_PASSWORD`. Node.js no forma parte del despliegue.
+
 ## Estado actual
 
 ```text

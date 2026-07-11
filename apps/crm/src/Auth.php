@@ -17,10 +17,6 @@ final class Auth
     {
         $tenantId = self::user()['tenant_id'] ?? null;
         if (!$tenantId) {
-            $tenantId = self::fallbackTenantId();
-        }
-
-        if (!$tenantId) {
             self::logout();
             flash('No hay ningun centro configurado para este usuario.', 'error');
             redirect('login');
@@ -169,7 +165,7 @@ final class Auth
                 'domain' => $params['domain'],
                 'secure' => $params['secure'],
                 'httponly' => $params['httponly'],
-                'samesite' => $params['samesite'] ?? 'Lax',
+                'samesite' => $params['samesite'],
             ]);
         }
     }
@@ -208,20 +204,6 @@ final class Auth
             $_SESSION['user'] = $_SESSION['platform_admin_user'];
             unset($_SESSION['platform_admin_user']);
         }
-    }
-
-    private static function fallbackTenantId(): ?string
-    {
-        return null;
-    }
-
-    private static function fallbackTenant(): ?array
-    {
-        TenantRepository::ensureSettingsColumns();
-        $stmt = Database::connection()->query('SELECT id, name, primary_color FROM tenants ORDER BY created_at ASC LIMIT 1');
-        $tenant = $stmt->fetch();
-
-        return $tenant ?: null;
     }
 
     private static function ensureLoginAttemptsTable(PDO $pdo): void

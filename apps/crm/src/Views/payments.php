@@ -35,7 +35,7 @@
     <strong><?= (int) $metrics['overdue_count'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--green">
-    <span>Proximos 7 dias</span>
+    <span>Próximos 7 días</span>
     <strong><?= (int) $metrics['next_due_count'] ?></strong>
   </article>
 </section>
@@ -55,7 +55,7 @@ $paymentStatusOptions = [
   <input type="hidden" name="route" value="payments">
   <label class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Socio, email, membresia o nota" aria-label="Buscar pagos" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Socio, email, membresía o nota" aria-label="Buscar pagos" data-auto-filter-input>
   </label>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
@@ -97,9 +97,9 @@ $paymentStatusOptions = [
       <thead>
         <tr>
           <th scope="col">Socio</th>
-          <th scope="col">Membresia</th>
+          <th scope="col">Membresía</th>
           <th scope="col">Importe</th>
-          <th scope="col">Metodo</th>
+          <th scope="col">Método</th>
           <th scope="col">Estado</th>
           <th scope="col">Periodo</th>
           <th scope="col">Vence</th>
@@ -120,7 +120,7 @@ $paymentStatusOptions = [
               <strong><?= e($memberName) ?></strong>
               <small class="table-subtext"><?= e($payment['email'] ?: ($payment['phone'] ?: 'Sin contacto')) ?></small>
             </td>
-            <td><?= e($payment['plan_name'] ?: 'Sin membresia') ?></td>
+            <td><?= e($payment['plan_name'] ?: 'Sin membresía') ?></td>
             <td><?= e(money_amount($payment['amount'])) ?></td>
             <td><?= e(payment_method_label($payment['payment_method'])) ?></td>
             <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(platform_payment_status_label($payment['status'])) ?></span></td>
@@ -153,7 +153,7 @@ $paymentStatusOptions = [
                 <a class="icon-action success-action" href="index.php?route=payment-invoice&id=<?= urlencode($payment['id']) ?>" target="_blank" rel="noopener" title="Crear factura PDF" aria-label="Crear factura PDF del pago de <?= e($memberName) ?>">
                   <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2Zm8 1.5V8h4.5L14 3.5ZM8 11h8v2H8v-2Zm0 4h8v2H8v-2Zm0-8h4v2H8V7Z"/></svg>
                 </a>
-                <form method="post" data-confirm-message="Eliminar este pago? Esta accion no se puede deshacer.">
+                <form method="post" data-confirm-message="Eliminar este pago? Esta acción no se puede deshacer.">
                   <input type="hidden" name="action" value="delete_payment">
                   <input type="hidden" name="id" value="<?= e($payment['id']) ?>">
                   <button class="icon-action danger-action" type="submit" title="Eliminar pago" aria-label="Eliminar pago de <?= e($memberName) ?>">
@@ -170,7 +170,7 @@ $paymentStatusOptions = [
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="11">No hay pagos que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="11">No hay pagos que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>

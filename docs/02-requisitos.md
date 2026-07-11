@@ -16,7 +16,7 @@ Criterios:
 
 - Login con email y contrasena.
 - Contrasenas almacenadas con hash.
-- Sesion protegida mediante JWT o mecanismo equivalente.
+- Sesión protegida mediante sesiones PHP endurecidas: cookie `HttpOnly`, `SameSite=Lax`, `Secure` bajo HTTPS, modo estricto y token CSRF.
 - Rutas privadas protegidas.
 
 ### RF-02 Roles
@@ -190,7 +190,7 @@ La interfaz debe ser usable en escritorio, tablet y telefono.
 El sistema debe incluir:
 
 - Hash de contrasenas.
-- JWT o mecanismo equivalente para sesion.
+- Sesiones PHP endurecidas y protección CSRF como mecanismo de autenticación web.
 - Control de acceso por roles.
 - Validacion de entradas.
 - Variables de entorno para secretos.

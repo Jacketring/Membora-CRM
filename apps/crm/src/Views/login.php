@@ -20,7 +20,7 @@ $platformAdminEmail = EmpresaRepository::PLATFORM_ADMIN_EMAIL;
         <img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora CRM">
         <div>
           <h1>Membora CRM</h1>
-          <p>Portal de gestion fitness</p>
+          <p>Portal de gestión fitness</p>
         </div>
       </div>
       <form class="login-card" method="post">
@@ -37,10 +37,10 @@ $platformAdminEmail = EmpresaRepository::PLATFORM_ADMIN_EMAIL;
           <div class="input-shell"><input name="email" type="email" required value="" data-login-email autocomplete="username"></div>
         </label>
         <label class="field">
-          <span>Contrasena</span>
+          <span>Contraseña</span>
           <div class="input-shell"><input name="password" type="password" required value="" data-login-password autocomplete="current-password"></div>
         </label>
-        <button class="primary-action" type="submit">Iniciar sesion</button>
+        <button class="primary-action" type="submit">Iniciar sesión</button>
         <div class="demo-login-actions" aria-label="Accesos demo">
           <button class="demo-login-action demo-login-action--client" type="submit" form="demo-client-login">
             Demo cliente
@@ -52,8 +52,8 @@ $platformAdminEmail = EmpresaRepository::PLATFORM_ADMIN_EMAIL;
         <div class="demo-note demo-note--platform">
           <div>
             <strong>Acceso de evaluacion</strong>
-            <span>Las demos abren una sesion temporal de 20 minutos.</span>
-            <span>Al finalizar, el sistema cierra la sesion y vuelve a la web publica.</span>
+            <span>Las demos abren una sesión temporal de 20 minutos.</span>
+            <span>Al finalizar, el sistema cierra la sesión y vuelve a la web pública.</span>
           </div>
         </div>
       </form>

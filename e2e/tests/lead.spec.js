@@ -1,0 +1,18 @@
+const { test, expect } = require('@playwright/test');
+test('crea un lead y lo convierte en socio', async ({ page }) => {
+  test.skip(!process.env.E2E_EMAIL || !process.env.E2E_PASSWORD, 'Requiere usuario y BD de prueba');
+  await page.goto('/?route=login');
+  await page.getByRole('button', { name: 'Demo cliente', exact: true }).click();
+  await page.goto('/?route=leads');
+  await page.getByRole('button', { name: /nuevo lead/i }).click();
+  const leadName = `Lead E2E ${Date.now()}`;
+  await page.locator('input[name=first_name]').last().fill(leadName);
+  await page.locator('input[name=email]').last().fill(`e2e-${Date.now()}@example.test`);
+  await page.locator('form').filter({ has: page.locator('input[name=first_name]') }).last().getByRole('button', { name: /guardar|crear/i }).click();
+  await expect(page.locator('#leads-table').getByText(leadName, { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: `Convertir en cliente a ${leadName}`, exact: true }).click();
+  await expect(page.getByText('Lead convertido a cliente.', { exact: true })).toBeVisible();
+  await page.goto('/?route=members');
+  await expect(page.locator('#members-table tbody tr').filter({ hasText: leadName })).toBeVisible();
+  await page.screenshot({ path: 'evidence/lead-convertido-socio.png', fullPage: true });
+});

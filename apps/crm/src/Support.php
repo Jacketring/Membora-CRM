@@ -49,7 +49,7 @@ function enforce_internal_post_security(): void
         return;
     }
 
-    flash('Solicitud bloqueada por seguridad. Recarga la pagina e intentalo de nuevo.', 'error');
+    flash('Solicitud bloqueada por seguridad. Recarga la página e intentalo de nuevo.', 'error');
     redirect('dashboard');
 }
 
@@ -161,15 +161,15 @@ function hex_color_or_default(?string $value, string $default = '#004bf2'): stri
 function country_dial_codes(): array
 {
     return [
-        ['country' => 'Espana', 'iso' => 'es', 'code' => '+34'],
+        ['country' => 'España', 'iso' => 'es', 'code' => '+34'],
         ['country' => 'Portugal', 'iso' => 'pt', 'code' => '+351'],
         ['country' => 'Francia', 'iso' => 'fr', 'code' => '+33'],
         ['country' => 'Italia', 'iso' => 'it', 'code' => '+39'],
         ['country' => 'Alemania', 'iso' => 'de', 'code' => '+49'],
         ['country' => 'Reino Unido', 'iso' => 'gb', 'code' => '+44'],
         ['country' => 'Irlanda', 'iso' => 'ie', 'code' => '+353'],
-        ['country' => 'Paises Bajos', 'iso' => 'nl', 'code' => '+31'],
-        ['country' => 'Belgica', 'iso' => 'be', 'code' => '+32'],
+        ['country' => 'Países Bajos', 'iso' => 'nl', 'code' => '+31'],
+        ['country' => 'Bélgica', 'iso' => 'be', 'code' => '+32'],
         ['country' => 'Suiza', 'iso' => 'ch', 'code' => '+41'],
         ['country' => 'Austria', 'iso' => 'at', 'code' => '+43'],
         ['country' => 'Dinamarca', 'iso' => 'dk', 'code' => '+45'],
@@ -289,9 +289,9 @@ function initials(?string $firstName, ?string $lastName = null): string
     return strtoupper($letters !== '' ? $letters : 'S');
 }
 
-function enum_label(string $value, array $labels): string
+function enum_label(string $value, array $labels, ?string $default = null): string
 {
-    return $labels[$value] ?? $value;
+    return $labels[$value] ?? $default ?? $value;
 }
 
 function status_label(?string $status): string
@@ -308,7 +308,7 @@ function status_label(?string $status): string
         'SCHEDULED' => 'Programada',
         'reserved' => 'Reservada',
         'cancelled' => 'Cancelada',
-        'attended' => 'Asistio',
+        'attended' => 'Asisti?',
         'no_show' => 'No-show',
         'ACTIVE' => 'Activo',
         'INACTIVE' => 'Inactivo',
@@ -326,9 +326,9 @@ function role_label(?string $role): string
         'SUPERADMIN' => 'Superadmin',
         'GYM_ADMIN' => 'Administrador',
         'ADMIN' => 'Administrador',
-        'RECEPTION' => 'Recepcion',
+        'RECEPTION' => 'Recepción',
         'SALES' => 'Comercial',
-        'SALES_RECEPTION' => 'Recepcion / Comercial',
+        'SALES_RECEPTION' => 'Recepción / Comercial',
         'TRAINER' => 'Entrenador',
         'STAFF' => 'Equipo',
     ]);
@@ -470,7 +470,7 @@ function empresa_status_label(?string $status): string
 function empresa_payment_status_label(?string $status): string
 {
     return enum_label((string) $status, [
-        'PAID' => 'Al dia',
+        'PAID' => 'Al día',
         'PENDING' => 'Pendiente',
         'OVERDUE' => 'Vencido',
         'TRIAL' => 'Prueba',
@@ -488,7 +488,7 @@ function empresa_renewal_period_label(?string $period): string
 function empresa_renewal_status_label(?string $status): string
 {
     return enum_label((string) $status, [
-        'ACTIVE' => 'Renovacion activa',
+        'ACTIVE' => 'Renovación activa',
         'CANCEL_AT_PERIOD_END' => 'Cancelada al final del periodo',
         'CANCELLED' => 'Cancelada',
     ]);
@@ -624,7 +624,7 @@ function risk_alert_type_label(?string $type): string
     return enum_label((string) $type, [
         'PAYMENT_OVERDUE' => 'Pago vencido',
         'TASK_OVERDUE' => 'Tarea vencida',
-        'MEMBERSHIP_EXPIRED' => 'Membresia por renovar',
+        'MEMBERSHIP_EXPIRED' => 'Membresía por renovar',
         'MEMBER_INACTIVE' => 'Socio sin actividad',
         'LEAD_STALE' => 'Lead sin seguimiento',
         'CLASS_FULL' => 'Clase llena',
@@ -650,72 +650,72 @@ function audit_action_label(?string $action): string
     $value = (string) $action;
     $labels = [
         'SEED_DEMO_TENANT' => 'Carga de datos demo',
-        'login' => 'Inicio de sesion',
+        'login' => 'Inicio de sesión',
         'demo_login' => 'Inicio de demo',
-        'logout' => 'Cierre de sesion',
+        'logout' => 'Cierre de sesión',
         'update_profile' => 'Actualizacion de perfil',
         'create_user' => 'Crear usuario',
         'update_user' => 'Modificar usuario',
         'delete_user' => 'Eliminar usuario',
-        'create_lead' => 'Creacion de lead',
+        'create_lead' => 'Creación de lead',
         'update_lead' => 'Actualizacion de lead',
         'add_lead_note' => 'Nota de lead',
         'update_lead_note' => 'Actualizacion de nota',
-        'delete_lead_note' => 'Eliminacion de nota',
+        'delete_lead_note' => 'Eliminación de nota',
         'update_lead_stage' => 'Cambio de etapa',
-        'convert_lead' => 'Conversion de lead',
+        'convert_lead' => 'Conversión de lead',
         'mark_lead_lost' => 'Lead perdido',
-        'delete_lead' => 'Eliminacion de lead',
+        'delete_lead' => 'Eliminación de lead',
         'create_member' => 'Crear socio',
         'update_member' => 'Modificar socio',
         'delete_member' => 'Eliminar socio',
-        'renew_member_subscription' => 'Renovar membresia',
-        'create_membership_plan' => 'Crear membresia',
-        'update_membership_plan' => 'Modificar membresia',
-        'delete_membership_plan' => 'Eliminar membresia',
-        'create_payment' => 'Creacion de pago',
+        'renew_member_subscription' => 'Renovar membresía',
+        'create_membership_plan' => 'Crear membresía',
+        'update_membership_plan' => 'Modificar membresía',
+        'delete_membership_plan' => 'Eliminar membresía',
+        'create_payment' => 'Creación de pago',
         'update_payment' => 'Actualizacion de pago',
         'mark_payment_paid' => 'Pago marcado como cobrado',
         'generate_recurring_payments' => 'Generacion de borradores recurrentes',
-        'delete_payment' => 'Eliminacion de pago',
+        'delete_payment' => 'Eliminación de pago',
         'create_checkin' => 'Crear check-in',
         'delete_checkin' => 'Eliminar check-in',
         'update_risk_alert_status' => 'Cambiar alerta',
-        'save_billing_integration' => 'Configuracion de facturacion',
-        'sync_billing_integration' => 'Sincronizacion de facturacion',
+        'save_billing_integration' => 'Configuración de facturación',
+        'sync_billing_integration' => 'Sincronizacion de facturación',
         'create_class_type' => 'Crear tipo de clase',
         'create_class_session' => 'Crear clase',
         'update_class_session' => 'Modificar clase',
         'delete_class_session' => 'Eliminar clase',
-        'create_reservation' => 'Creacion de reserva',
+        'create_reservation' => 'Creación de reserva',
         'update_reservation_status' => 'Cambio de reserva',
         'create_task' => 'Crear tarea',
         'update_task' => 'Modificar tarea',
         'update_task_status' => 'Cambiar tarea',
         'delete_task' => 'Eliminar tarea',
-        'view_audit' => 'Ver auditoria',
+        'view_audit' => 'Ver auditoría',
         'update_platform_lead' => 'Actualizacion de lead web',
-        'convert_platform_lead' => 'Conversion de lead web',
-        'delete_platform_lead' => 'Eliminacion de lead web',
+        'convert_platform_lead' => 'Conversión de lead web',
+        'delete_platform_lead' => 'Eliminación de lead web',
         'send_platform_test_email' => 'Prueba de email',
-        'create_platform_client' => 'Creacion de cliente CRM',
+        'create_platform_client' => 'Creación de cliente CRM',
         'update_platform_client' => 'Actualizacion de cliente CRM',
-        'delete_platform_client' => 'Eliminacion de cliente CRM',
-        'create_empresa' => 'Creacion de empresa',
+        'delete_platform_client' => 'Eliminación de cliente CRM',
+        'create_empresa' => 'Creación de empresa',
         'update_empresa' => 'Actualizacion de empresa',
-        'update_empresa_subscription' => 'Actualizacion de suscripcion',
-        'renew_empresa_subscription' => 'Renovacion de suscripcion',
-        'cancel_empresa_subscription' => 'Cancelacion de suscripcion',
-        'resume_empresa_subscription' => 'Reactivacion de suscripcion',
+        'update_empresa_subscription' => 'Actualizacion de suscripción',
+        'renew_empresa_subscription' => 'Renovación de suscripción',
+        'cancel_empresa_subscription' => 'Cancelacion de suscripción',
+        'resume_empresa_subscription' => 'Reactivacion de suscripción',
         'create_empresa_stripe_checkout' => 'Inicio de Stripe Checkout',
         'cancel_empresa_stripe_subscription' => 'Cancelacion de Stripe al final del periodo',
-        'create_platform_payment' => 'Creacion de pago CRM',
+        'create_platform_payment' => 'Creación de pago CRM',
         'update_platform_payment' => 'Actualizacion de pago CRM',
-        'create_platform_invoice' => 'Creacion de factura CRM',
+        'create_platform_invoice' => 'Creación de factura CRM',
         'update_platform_invoice' => 'Actualizacion de factura CRM',
         'issue_platform_invoice' => 'Emision de factura CRM',
         'add_platform_invoice_payment' => 'Pago parcial de factura CRM',
-        'create_platform_plan' => 'Creacion de plan CRM',
+        'create_platform_plan' => 'Creación de plan CRM',
         'update_platform_plan' => 'Actualizacion de plan CRM',
         'enter_empresa_crm' => 'Entrada en soporte',
         'exit_empresa_crm' => 'Salida de soporte',
@@ -738,8 +738,8 @@ function audit_entity_label(?string $entity): string
         'users' => 'Usuario',
         'member' => 'Socio',
         'members' => 'Socio',
-        'membership_plan' => 'Membresia',
-        'membership_plans' => 'Membresia',
+        'membership_plan' => 'Membresía',
+        'membership_plans' => 'Membresía',
         'checkin' => 'Check-in',
         'checkins' => 'Check-in',
         'class_type' => 'Tipo de clase',
@@ -757,12 +757,12 @@ function audit_entity_label(?string $entity): string
         'platform_payment' => 'Pago CRM',
         'platform_invoice' => 'Factura CRM',
         'platform_plan' => 'Plan CRM',
-        'audit' => 'Auditoria',
-        'view_audit' => 'Auditoria',
+        'audit' => 'Auditoría',
+        'view_audit' => 'Auditoría',
         'lead_note' => 'Nota',
         'lead_stage' => 'Lead',
         'lead_lost' => 'Lead',
-        'billing_integration' => 'Facturacion',
+        'billing_integration' => 'Facturación',
         'reservation' => 'Reserva',
         'reservation_status' => 'Reserva',
         'task_status' => 'Tarea',
@@ -776,12 +776,12 @@ function audit_area_label(?string $route): string
     $label = enum_label((string) $route, [
         'users' => 'Usuarios',
         'members' => 'Socios',
-        'memberships' => 'Membresias',
+        'memberships' => 'Membresías',
         'checkins' => 'Check-ins',
         'classes' => 'Clases',
         'tasks' => 'Tareas',
         'alerts' => 'Alertas',
-        'audit' => 'Auditoria',
+        'audit' => 'Auditoría',
         'platform-audit' => 'Logs CRM',
         'platform-companies' => 'Empresas',
         'platform-contacts' => 'Contactos CRM',
@@ -794,7 +794,7 @@ function audit_area_label(?string $route): string
         'platform-web' => 'Web comercial',
         'dashboard' => 'Panel',
         'profile' => 'Perfil',
-        'settings' => 'Configuracion',
+        'settings' => 'Configuración',
         'novedades' => 'Novedades',
     ], 'CRM');
 
@@ -818,14 +818,14 @@ function audit_metadata_summary(?string $metadata): string
         'first_name' => 'Nombre',
         'last_name' => 'Apellidos',
         'email' => 'Email',
-        'phone' => 'Telefono',
+        'phone' => 'Teléfono',
         'status' => 'Estado',
-        'title' => 'Titulo',
+        'title' => 'Título',
         'type' => 'Tipo',
-        'method' => 'Metodo',
+        'method' => 'Método',
         'notes' => 'Notas',
-        'description' => 'Descripcion',
-        'due_at' => 'Fecha limite',
+        'description' => 'Descripción',
+        'due_at' => 'Fecha límite',
         'checked_in_at' => 'Fecha de check-in',
         'starts_at' => 'Inicio',
         'ends_at' => 'Fin',
@@ -837,7 +837,7 @@ function audit_metadata_summary(?string $metadata): string
         'admin_name' => 'Administrador',
         'amount' => 'Importe',
         'monthly_price' => 'Precio mensual',
-        'next_payment_at' => 'Proximo pago',
+        'next_payment_at' => 'Próximo pago',
         'contact_name' => 'Contacto',
         'company_name' => 'Empresa',
     ];
@@ -944,7 +944,7 @@ function source_label(?string $source): string
     return enum_label((string) $source, [
         'WALK_IN' => 'Visita',
         'WEBSITE' => 'Web',
-        'PHONE' => 'Telefono',
+        'PHONE' => 'Teléfono',
         'SOCIAL_MEDIA' => 'Redes',
         'REFERRAL' => 'Recomendacion',
         'WEB' => 'Web',
@@ -959,8 +959,8 @@ function task_type_label(?string $type): string
     return enum_label((string) $type, [
         'SALES' => 'Bienvenida / alta',
         'RETENTION' => 'Seguimiento de socio',
-        'PAYMENT' => 'Cobro o renovacion',
-        'OPERATIONAL' => 'Operacion interna',
+        'PAYMENT' => 'Cobro o renovación',
+        'OPERATIONAL' => 'Operación interna',
         'OTHER' => 'Otra',
     ]);
 }

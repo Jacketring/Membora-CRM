@@ -15,7 +15,7 @@ $statusOptions = [
 <div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Pagos CRM</h2>
-    <p>Controla cobros de empresas cliente, pagos vencidos y facturacion mensual del SaaS.</p>
+    <p>Controla cobros de empresas cliente, pagos vencidos y facturación mensual del SaaS.</p>
   </div>
   <button class="primary-action" type="button" data-open-modal="payment-create-modal">Nuevo pago</button>
 </div>
@@ -37,7 +37,7 @@ $statusOptions = [
     <small>Requieren seguimiento</small>
   </article>
   <article class="dashboard-metric dashboard-metric--primary">
-    <span>Proximos 7 dias</span>
+    <span>Próximos 7 días</span>
     <strong><?= (int) $metrics['due_week'] ?></strong>
     <small>Cobros programados</small>
   </article>

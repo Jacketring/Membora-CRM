@@ -55,7 +55,7 @@ $checkinMethodOptions = [
   </div>
 
   <div class="field">
-    <span>Metodo</span>
+    <span>Método</span>
     <div class="custom-select custom-select--field" data-custom-select>
       <input type="hidden" name="method" value="<?= e($checkinValues['method']) ?>" data-custom-select-value>
       <button class="custom-select-trigger" type="button" data-custom-select-trigger aria-expanded="false">

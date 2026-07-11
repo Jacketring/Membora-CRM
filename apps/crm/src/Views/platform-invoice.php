@@ -207,7 +207,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
         <p><?= e($invoice['issuer_tax_id'] ?: 'NIF/CIF pendiente') ?></p>
         <p><?= e($invoice['issuer_address'] ?: 'Direccion fiscal pendiente') ?></p>
         <p><?= e(trim(($invoice['issuer_postal_code'] ?? '') . ' ' . ($invoice['issuer_city'] ?? '') . ' ' . ($invoice['issuer_province'] ?? ''))) ?></p>
-        <p><?= e($invoice['issuer_country'] ?: 'Espana') ?></p>
+        <p><?= e($invoice['issuer_country'] ?: 'España') ?></p>
       </div>
       <div class="party">
         <span>Cliente</span>
@@ -215,7 +215,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
         <p><?= e($invoice['customer_tax_id'] ?: 'NIF/CIF pendiente') ?></p>
         <p><?= e($invoice['customer_address'] ?: 'Direccion fiscal pendiente') ?></p>
         <p><?= e(trim(($invoice['customer_postal_code'] ?? '') . ' ' . ($invoice['customer_city'] ?? '') . ' ' . ($invoice['customer_province'] ?? ''))) ?></p>
-        <p><?= e($invoice['customer_country'] ?: 'Espana') ?></p>
+        <p><?= e($invoice['customer_country'] ?: 'España') ?></p>
         <p><?= e($invoice['customer_email'] ?: $invoice['contact_email'] ?: 'Sin email de contacto') ?></p>
         <p>Plan: <?= e($planLabel) ?></p>
         <p>Cobro: <?= e(platform_invoice_status_label($invoice['collection_status'] ?? 'PENDING')) ?></p>

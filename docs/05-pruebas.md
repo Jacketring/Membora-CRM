@@ -1,5 +1,11 @@
 # Plan de pruebas - Membora CRM
 
+## Automatización
+
+La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, métricas del dashboard, estados históricos de reservas e inicialización de Sentry. El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %.
+
+Playwright valida contra la demo funcional los flujos de login correcto e incorrecto, creación y conversión de un lead a socio, y programación de una clase con reserva de plaza. Node.js se usa únicamente en desarrollo y CI.
+
 ## 1. Objetivo
 
 Este documento define las pruebas manuales recomendadas para validar la version PHP de Membora CRM antes de la entrega del TFM.

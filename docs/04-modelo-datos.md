@@ -1,5 +1,25 @@
 # Modelo de datos actual - Membora CRM
 
+## Diagrama entidad-relación
+
+```mermaid
+erDiagram
+    TENANTS ||--o{ USERS : contiene
+    TENANTS ||--o{ LEADS : capta
+    TENANTS ||--o{ MEMBERS : gestiona
+    TENANTS ||--o{ MEMBERSHIP_PLANS : ofrece
+    MEMBERS ||--o{ MEMBERSHIPS : contrata
+    MEMBERSHIP_PLANS ||--o{ MEMBERSHIPS : define
+    MEMBERS ||--o{ PAYMENTS : realiza
+    MEMBERS ||--o{ CHECKINS : registra
+    CLASS_SESSIONS ||--o{ RESERVATIONS : recibe
+    MEMBERS ||--o{ RESERVATIONS : reserva
+    TENANTS ||--o{ TASKS : organiza
+    TENANTS ||--o{ AUDIT_LOGS : audita
+    MEMBERS { string id PK string tenant_id FK string email string status }
+    PAYMENTS { string id PK string tenant_id FK string member_id FK decimal amount string status }
+```
+
 Fecha de actualizacion: 30/06/2026.
 
 ## 1. Estado del documento

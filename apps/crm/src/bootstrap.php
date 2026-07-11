@@ -9,6 +9,15 @@ if (is_file($composerAutoload)) {
     require $composerAutoload;
 }
 
+$sentryDsn = trim((string) getenv('SENTRY_DSN'));
+if ($sentryDsn !== '' && function_exists('Sentry\\init')) {
+    \Sentry\init([
+        'dsn' => $sentryDsn,
+        'environment' => getenv('SENTRY_ENVIRONMENT') ?: 'production',
+        'send_default_pii' => false,
+    ]);
+}
+
 $isSecureRequest = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 

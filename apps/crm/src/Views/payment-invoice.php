@@ -8,7 +8,7 @@ $baseAmount = (float) ($payment['amount'] ?? 0);
 $taxRate = 0.21;
 $taxAmount = round($baseAmount * $taxRate, 2);
 $totalAmount = round($baseAmount + $taxAmount, 2);
-$planName = $payment['plan_name'] ?: 'Membresia';
+$planName = $payment['plan_name'] ?: 'Membresía';
 ?>
 <!doctype html>
 <html lang="es">
@@ -193,7 +193,7 @@ $planName = $payment['plan_name'] ?: 'Membresia';
     <header class="invoice-header">
       <div class="brand">
         <h1><?= e($tenantName) ?></h1>
-        <p>Centro deportivo y gestion de membresias.</p>
+        <p>Centro deportivo y gestión de membresías.</p>
         <p>Factura emitida desde Membora CRM.</p>
       </div>
       <div class="invoice-meta">
@@ -208,14 +208,14 @@ $planName = $payment['plan_name'] ?: 'Membresia';
       <div class="party">
         <span>Emisor</span>
         <h2><?= e($tenantName) ?></h2>
-        <p>Actividad: servicios deportivos, clases y membresias.</p>
+        <p>Actividad: servicios deportivos, clases y membresías.</p>
         <p>Datos fiscales pendientes de completar por el centro.</p>
       </div>
       <div class="party">
         <span>Cliente</span>
         <h2><?= e($memberName ?: 'Socio') ?></h2>
         <p><?= e($payment['email'] ?: 'Sin email de contacto') ?></p>
-        <p><?= e($payment['phone'] ?: 'Sin telefono') ?></p>
+        <p><?= e($payment['phone'] ?: 'Sin teléfono') ?></p>
         <p>Estado del pago: <?= e(platform_payment_status_label($payment['status'])) ?></p>
       </div>
     </section>
@@ -232,7 +232,7 @@ $planName = $payment['plan_name'] ?: 'Membresia';
         <tr>
           <td><strong><?= e($planName) ?></strong></td>
           <td>
-            Cuota o renovacion de membresia.
+            Cuota o renovación de membresía.
             <?php if (!empty($payment['subscription_starts_at']) || !empty($payment['subscription_ends_at'])): ?>
               <br>Periodo: <?= e(format_date_short($payment['subscription_starts_at'])) ?> - <?= e(format_date_short($payment['subscription_ends_at'])) ?>
             <?php endif; ?>
@@ -268,7 +268,7 @@ $planName = $payment['plan_name'] ?: 'Membresia';
     </section>
 
     <p class="footer">
-      Factura generada automaticamente por Membora CRM. Revisa los datos fiscales antes de usarla como documento definitivo de facturacion.
+      Factura generada automaticamente por Membora CRM. Revisa los datos fiscales antes de usarla como documento definitivo de facturación.
     </p>
   </article>
 </body>

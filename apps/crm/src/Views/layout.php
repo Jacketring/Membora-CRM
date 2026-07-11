@@ -42,7 +42,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
           <a class="<?= in_array($route, ['platform-contacts', 'platform-leads', 'platform-clients'], true) ? 'active' : '' ?>" href="index.php?route=platform-contacts">Contactos</a>
           <a class="<?= $route === 'platform-companies' ? 'active' : '' ?>" href="index.php?route=platform-companies">Empresas</a>
           <details class="sidebar-nav-group" <?= in_array($route, ['platform-payments', 'platform-invoices', 'platform-invoice'], true) ? 'open' : '' ?>>
-            <summary class="<?= in_array($route, ['platform-payments', 'platform-invoices', 'platform-invoice'], true) ? 'active' : '' ?>">Facturacion</summary>
+            <summary class="<?= in_array($route, ['platform-payments', 'platform-invoices', 'platform-invoice'], true) ? 'active' : '' ?>">Facturación</summary>
             <div class="sidebar-nav-submenu">
               <a class="<?= $route === 'platform-payments' ? 'active' : '' ?>" href="index.php?route=platform-payments">Pagos</a>
               <a class="<?= in_array($route, ['platform-invoices', 'platform-invoice'], true) ? 'active' : '' ?>" href="index.php?route=platform-invoices">Facturas</a>
@@ -55,17 +55,17 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
             'leads' => 'Leads',
             'users' => 'Usuarios',
             'members' => 'Socios',
-            'memberships' => 'Membresias',
+            'memberships' => 'Membresías',
             'checkins' => 'Check-ins',
             'classes' => 'Clases',
             'tasks' => 'Tareas',
             'alerts' => 'Alertas',
-            'audit' => 'Auditoria',
+            'audit' => 'Auditoría',
           ] as $navRoute => $navLabel): ?>
             <?php if ($navRoute === 'checkins' && (can_access_route('payments', $user) || can_access_route('billing', $user))): ?>
               <?php $clientBillingRoutes = ['payments', 'payment-invoice', 'billing', 'client-invoice']; ?>
               <details class="sidebar-nav-group" <?= in_array($route, $clientBillingRoutes, true) ? 'open' : '' ?>>
-                <summary class="<?= in_array($route, $clientBillingRoutes, true) ? 'active' : '' ?>">Facturacion</summary>
+                <summary class="<?= in_array($route, $clientBillingRoutes, true) ? 'active' : '' ?>">Facturación</summary>
                 <div class="sidebar-nav-submenu">
                   <?php if (can_access_route('payments', $user)): ?>
                     <a class="<?= in_array($route, ['payments', 'payment-invoice'], true) ? 'active' : '' ?>" href="index.php?route=payments">Pagos</a>
@@ -85,14 +85,14 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
 
       <form method="post">
         <input type="hidden" name="action" value="logout">
-        <button class="logout-button" type="submit">Cerrar sesion</button>
+        <button class="logout-button" type="submit">Cerrar sesión</button>
       </form>
     </aside>
 
     <section class="workspace">
       <header class="topbar">
         <form class="search-box global-search-box" method="get" action="index.php" data-global-search-form>
-          <input name="q" value="" placeholder="<?= $isPlatformAdmin ? 'Buscar empresas, pagos o planes...' : 'Buscar tareas, socios, leads, clases o membresias...' ?>" autocomplete="off" data-global-search-input>
+          <input name="q" value="" placeholder="<?= $isPlatformAdmin ? 'Buscar empresas, pagos o planes...' : 'Buscar tareas, socios, leads, clases o membresías...' ?>" autocomplete="off" data-global-search-input>
           <button class="global-search-submit" type="submit" aria-label="Buscar">Buscar</button>
           <div class="global-search-dropdown" data-global-search-results hidden></div>
         </form>
@@ -111,10 +111,10 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
           <div class="user-menu-dropdown" data-user-menu-dropdown hidden role="menu">
             <a href="index.php?route=profile" role="menuitem">
               <strong>Ver perfil</strong>
-              <small>Foto, datos y contrasena</small>
+              <small>Foto, datos y contraseña</small>
             </a>
             <a href="index.php?route=settings" role="menuitem">
-              <strong>Configuracion</strong>
+              <strong>Configuración</strong>
               <small>Apariencia y comodidad</small>
             </a>
             <a href="index.php?route=novedades" role="menuitem">
@@ -134,7 +134,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
             <form method="post" role="none">
               <input type="hidden" name="action" value="logout">
               <button class="danger-menu-action" type="submit" role="menuitem">
-                <strong>Cerrar sesion</strong>
+                <strong>Cerrar sesión</strong>
                 <small>Salir de Membora CRM</small>
               </button>
             </form>
@@ -150,7 +150,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
           <div class="demo-session-banner" role="status">
             <div>
               <strong>Demo temporal</strong>
-              <span>Esta sesion de prueba se cerrara automaticamente.</span>
+              <span>Esta sesión de prueba se cerrará automaticamente.</span>
             </div>
             <time data-demo-countdown datetime="PT<?= (int) $demoRemainingSeconds ?>S">20:00</time>
           </div>
@@ -179,7 +179,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
             <svg viewBox="0 0 24 24"><path d="M12 2 1.8 20h20.4L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V8h2v5Z"/></svg>
           </span>
           <div>
-            <h2 id="subscription-blocker-title"><?= e($subscriptionAccessState['title'] ?? 'Suscripcion requerida') ?></h2>
+            <h2 id="subscription-blocker-title"><?= e($subscriptionAccessState['title'] ?? 'Suscripción requerida') ?></h2>
             <p><?= e($subscriptionAccessState['message'] ?? 'Elige un plan para continuar usando Membora.') ?></p>
           </div>
         </header>
@@ -195,7 +195,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
             </article>
           <?php endforeach; ?>
         </div>
-        <p class="subscription-blocker-note">Para contratar se solicitaran los datos fiscales, direccion, telefono, plan y forma de pago.</p>
+        <p class="subscription-blocker-note">Para contratar se solicitaran los datos fiscales, direccion, teléfono, plan y forma de pago.</p>
       </section>
     </div>
   <?php endif; ?>
@@ -206,8 +206,8 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
           <svg viewBox="0 0 24 24"><path d="M12 2 1.8 20h20.4L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V8h2v5Z"/></svg>
         </span>
         <div>
-          <h2>Confirmar accion</h2>
-          <p data-confirm-text>Esta accion no se puede deshacer.</p>
+          <h2>Confirmar acción</h2>
+          <p data-confirm-text>Esta acción no se puede deshacer.</p>
         </div>
       </header>
       <div class="confirm-actions">

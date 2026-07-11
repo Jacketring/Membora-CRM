@@ -5,7 +5,7 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
 
 <?php if (!$subscriptionEmpresa): ?>
   <div class="empty-state form-full">
-    Este cliente todavia no tiene una empresa CRM vinculada.
+    Este cliente todavía no tiene una empresa CRM vinculada.
   </div>
   <div class="form-actions form-full">
     <button class="secondary-action" type="button" data-close-modal>Cerrar</button>
@@ -81,11 +81,11 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       </select>
     </label>
     <label class="field" data-next-payment-field>
-      <span>Proximo pago</span>
+      <span>Próximo pago</span>
       <input name="next_payment_at" type="date" value="<?= e(!empty($empresaValues['next_payment_at']) ? date('Y-m-d', strtotime($empresaValues['next_payment_at'])) : '') ?>" data-next-payment-input>
     </label>
     <label class="field" data-trial-plan-field hidden>
-      <span>Dias de prueba</span>
+      <span>Días de prueba</span>
       <input name="trial_days" type="number" min="1" max="365" step="1" value="<?= e((string) ($empresaValues['trial_days'] ?? 30)) ?>" placeholder="30">
     </label>
     <label class="field">
@@ -97,7 +97,7 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       <input name="access_until" type="date" readonly value="<?= e(!empty($empresaValues['access_until']) ? date('Y-m-d', strtotime($empresaValues['access_until'])) : (!empty($empresaValues['next_payment_at']) ? date('Y-m-d', strtotime($empresaValues['next_payment_at'])) : '')) ?>" data-access-until-input>
     </label>
     <label class="field">
-      <span>Renovacion</span>
+      <span>Renovación</span>
       <select name="renewal_period">
         <?php foreach (['MONTHLY' => 'Mensual', 'ANNUAL' => 'Anual'] as $value => $label): ?>
           <option value="<?= e($value) ?>" <?= ($empresaValues['renewal_period'] ?? 'MONTHLY') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
@@ -105,9 +105,9 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       </select>
     </label>
     <label class="field">
-      <span>Estado de renovacion</span>
+      <span>Estado de renovación</span>
       <select name="renewal_status">
-        <?php foreach (['ACTIVE' => 'Renovacion activa', 'CANCEL_AT_PERIOD_END' => 'Cancelar al final del periodo', 'CANCELLED' => 'Cancelada'] as $value => $label): ?>
+        <?php foreach (['ACTIVE' => 'Renovación activa', 'CANCEL_AT_PERIOD_END' => 'Cancelar al final del periodo', 'CANCELLED' => 'Cancelada'] as $value => $label): ?>
           <option value="<?= e($value) ?>" <?= ($empresaValues['renewal_status'] ?? 'ACTIVE') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
         <?php endforeach; ?>
       </select>
@@ -119,13 +119,13 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
 
     <div class="form-actions form-full">
       <button class="secondary-action" type="button" data-close-modal>Cancelar</button>
-      <button class="primary-action" type="submit">Guardar suscripcion</button>
+      <button class="primary-action" type="submit">Guardar suscripción</button>
     </div>
   </form>
 
   <div class="platform-subscription-actions">
     <?php if ($stripeEnabled && !$isTrialPlan): ?>
-      <form method="post" data-confirm-message="Se abrira Stripe Checkout en modo test. El acceso solo se activara cuando llegue el webhook valido de Stripe." data-confirm-action-label="Abrir Stripe">
+      <form method="post" data-confirm-message="Se abrira Stripe Checkout en modo test. El acceso solo se activara cuando llegue el webhook válido de Stripe." data-confirm-action-label="Abrir Stripe">
         <input type="hidden" name="action" value="create_empresa_stripe_checkout">
         <input type="hidden" name="id" value="<?= e($empresaValues['id']) ?>">
         <input type="hidden" name="return" value="platform-contacts">
@@ -133,7 +133,7 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       </form>
     <?php endif; ?>
     <?php if ($stripeEnabled && $stripeSubscriptionId !== '' && $canCancel): ?>
-      <form method="post" data-confirm-message="Stripe marcara la suscripcion para cancelar al final del periodo. El acceso se conserva hasta current_period_end." data-confirm-action-label="Cancelar en Stripe">
+      <form method="post" data-confirm-message="Stripe marcara la suscripción para cancelar al final del periodo. El acceso se conserva hasta current_period_end." data-confirm-action-label="Cancelar en Stripe">
         <input type="hidden" name="action" value="cancel_empresa_stripe_subscription">
         <input type="hidden" name="id" value="<?= e($empresaValues['id']) ?>">
         <input type="hidden" name="return" value="platform-contacts">
@@ -141,7 +141,7 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       </form>
     <?php endif; ?>
     <?php if ($canRenew): ?>
-      <form method="post" data-confirm-message="Se creara un pago pagado y se movera el proximo pago al siguiente periodo." data-confirm-action-label="Confirmar">
+      <form method="post" data-confirm-message="Se creara un pago pagado y se movera el próximo pago al siguiente periodo." data-confirm-action-label="Confirmar">
         <input type="hidden" name="action" value="renew_empresa_subscription">
         <input type="hidden" name="id" value="<?= e($empresaValues['id']) ?>">
         <input type="hidden" name="return" value="platform-contacts">
@@ -149,11 +149,11 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       </form>
     <?php endif; ?>
     <?php if ($canCancel): ?>
-      <form method="post" data-confirm-message="La empresa mantendra acceso hasta la fecha de fin del periodo, pero no renovara automaticamente." data-confirm-action-label="Cancelar renovacion">
+      <form method="post" data-confirm-message="La empresa mantendra acceso hasta la fecha de fin del periodo, pero no renovara automaticamente." data-confirm-action-label="Cancelar renovación">
         <input type="hidden" name="action" value="cancel_empresa_subscription">
         <input type="hidden" name="id" value="<?= e($empresaValues['id']) ?>">
         <input type="hidden" name="return" value="platform-contacts">
-        <button class="note-delete-button" type="submit">Cancelar renovacion</button>
+        <button class="note-delete-button" type="submit">Cancelar renovación</button>
       </form>
     <?php endif; ?>
     <?php if ($canResume): ?>

@@ -4,6 +4,24 @@
   "type": "project",
   "license": "proprietary",
   "require": {
+    "php": "^8.2",
+    "sentry/sentry": "^4.0",
     "stripe/stripe-php": "^16.0"
+  },
+  "require-dev": {
+    "captainhook/captainhook": "^5.24",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.5"
+  },
+  "autoload": {
+    "psr-4": {"Membora\\": "src/"}
+  },
+  "scripts": {
+    "test": "phpunit",
+    "analyse": "phpstan analyse --memory-limit=1G"
+  },
+  "config": {
+    "allow-plugins": {"captainhook/plugin-composer": true},
+    "sort-packages": true
   }
 }

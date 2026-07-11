@@ -19,9 +19,9 @@
     <span>Perdidos</span>
     <strong><?= (int) $metrics['lost'] ?></strong>
   </article>
-  <article class="lead-metric lead-metric--dark" aria-label="Conversion: <?= (int) $metrics['conversion'] ?>%">
-    <span>Conversion</span>
-    <strong><?= (int) $metrics['conversion'] ?>%</strong>
+  <article class="lead-metric lead-metric--dark" aria-label="Conversión: <?= (int) $metrics['conversión'] ?>%">
+    <span>Conversión</span>
+    <strong><?= (int) $metrics['conversión'] ?>%</strong>
   </article>
 </section>
 
@@ -29,7 +29,7 @@
   <input type="hidden" name="route" value="leads">
   <label class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Nombre, telefono, email o interes" aria-label="Buscar leads por nombre, telefono, email o interes" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Nombre, teléfono, email o interés" aria-label="Buscar leads por nombre, teléfono, email o interés" data-auto-filter-input>
   </label>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
@@ -87,7 +87,7 @@
           'WEB' => 'Web externa',
           'LANDING' => 'Landing',
           'FORMULARIO_WEB' => 'Formulario web',
-          'PHONE' => 'Telefono',
+          'PHONE' => 'Teléfono',
           'SOCIAL_MEDIA' => 'Redes',
           'REFERRAL' => 'Recomendacion',
           'OTHER' => 'Otro',
@@ -128,18 +128,18 @@
 
   <div class="leads-table-wrap">
     <table class="leads-table" id="leads-table">
-      <caption class="sr-only">Listado de leads con contacto, etapa, estado, responsable, fecha de creacion y acciones disponibles</caption>
+      <caption class="sr-only">Listado de leads con contacto, etapa, estado, responsable, fecha de creación y acciones disponibles</caption>
       <thead>
         <tr>
           <th scope="col">Nombre</th>
-          <th scope="col">Telefono</th>
+          <th scope="col">Teléfono</th>
           <th scope="col">Email</th>
           <th scope="col">Origen</th>
-          <th scope="col">Interes</th>
+          <th scope="col">Interés</th>
           <th scope="col">Etapa</th>
           <th scope="col">Estado</th>
           <th scope="col">Responsable</th>
-          <th scope="col">Creacion</th>
+          <th scope="col">Creación</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -149,10 +149,10 @@
             <td>
               <strong><?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?></strong>
             </td>
-            <td><?= e($lead['phone'] ?: 'Sin telefono') ?></td>
+            <td><?= e($lead['phone'] ?: 'Sin teléfono') ?></td>
             <td><?= e($lead['email'] ?: 'Sin email') ?></td>
             <td><span class="source-badge"><?= e(source_label($lead['source'])) ?></span></td>
-            <td><?= e($lead['interest'] ?: 'Sin interes') ?></td>
+            <td><?= e($lead['interest'] ?: 'Sin interés') ?></td>
             <td>
               <button class="stage-badge-button stage-badge--<?= e(stage_color_class($lead['stage_key'] ?: $lead['stage_name'])) ?>" data-open-modal="lead-detail-<?= e($lead['id']) ?>" type="button" title="Cambiar etapa" aria-label="Cambiar etapa de <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>. Etapa actual: <?= e($lead['stage_name']) ?>">
                 <span class="stage-dot" aria-hidden="true"></span>
@@ -179,7 +179,7 @@
                     </button>
                   </form>
                 <?php endif; ?>
-                <form method="post" data-confirm-message="Eliminar este lead? Esta accion no se puede deshacer.">
+                <form method="post" data-confirm-message="Eliminar este lead? Esta acción no se puede deshacer.">
                   <input type="hidden" name="action" value="delete_lead">
                   <input type="hidden" name="id" value="<?= e($lead['id']) ?>">
                   <button class="icon-action danger-action" type="submit" title="Eliminar lead" aria-label="Eliminar lead <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">
@@ -197,7 +197,7 @@
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="10">No hay leads que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="10">No hay leads que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
@@ -211,7 +211,7 @@
     <header>
       <div>
         <h2 id="lead-detail-title-<?= e($lead['id']) ?>"><?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?></h2>
-        <p><?= e($lead['phone'] ?: 'Sin telefono') ?> &middot; <?= e($lead['email'] ?: 'Sin email') ?></p>
+        <p><?= e($lead['phone'] ?: 'Sin teléfono') ?> &middot; <?= e($lead['email'] ?: 'Sin email') ?></p>
       </div>
       <button data-close-modal type="button" aria-label="Cerrar detalles de <?= e(trim($lead['first_name'] . ' ' . ($lead['last_name'] ?? ''))) ?>">Cerrar</button>
     </header>
@@ -230,7 +230,7 @@
         </label>
         <?php $phoneCountry = phone_country_entry($lead['phone']); ?>
         <label class="field">
-          <span>Telefono</span>
+          <span>Teléfono</span>
           <div class="phone-combo">
             <div class="phone-prefix-picker" data-phone-picker>
               <input type="hidden" name="phone_country" value="<?= e($phoneCountry['code']) ?>" data-phone-country-value>
@@ -251,7 +251,7 @@
                 </div>
               </div>
             </div>
-          <input class="phone-number-input" name="phone_number" value="<?= e(phone_local_value($lead['phone'])) ?>" inputmode="tel" placeholder="Numero" aria-label="Numero de telefono">
+          <input class="phone-number-input" name="phone_number" value="<?= e(phone_local_value($lead['phone'])) ?>" inputmode="tel" placeholder="Número" aria-label="Número de teléfono">
           </div>
         </label>
         <label class="field">
@@ -281,11 +281,11 @@
           </div>
         </div>
         <label class="field">
-          <span>Proxima accion</span>
+          <span>Próxima acción</span>
           <input name="next_action_at" type="datetime-local" value="<?= $lead['next_action_at'] ? e(date('Y-m-d\TH:i', strtotime($lead['next_action_at']))) : '' ?>">
         </label>
         <label class="field field--wide">
-          <span>Interes principal</span>
+          <span>Interés principal</span>
           <input name="interest" value="<?= e($lead['interest']) ?>">
         </label>
       </div>
@@ -294,14 +294,14 @@
 
     <section class="notes-panel">
       <h3>Notas internas</h3>
-      <form method="post" class="note-form" aria-label="Anadir nota interna">
+      <form method="post" class="note-form" aria-label="Añadir nota interna">
         <input type="hidden" name="action" value="add_lead_note">
         <input type="hidden" name="id" value="<?= e($lead['id']) ?>">
         <label class="field">
           <span>Nueva nota</span>
           <textarea name="note" rows="3" placeholder="Escribe una nota sobre la llamada, visita o seguimiento..." required aria-label="Texto de la nueva nota"></textarea>
         </label>
-        <button class="primary-action primary-action--compact" type="submit">Anadir nota</button>
+        <button class="primary-action primary-action--compact" type="submit">Añadir nota</button>
       </form>
 
       <div class="notes-list">
@@ -320,7 +320,7 @@
                 </button>
               </div>
             </form>
-            <form method="post" class="note-delete-form" data-confirm-message="Eliminar esta nota? Esta accion no se puede deshacer.">
+            <form method="post" class="note-delete-form" data-confirm-message="Eliminar esta nota? Esta acción no se puede deshacer.">
               <input type="hidden" name="action" value="delete_lead_note">
               <input type="hidden" name="id" value="<?= e($lead['id']) ?>">
               <input type="hidden" name="note_id" value="<?= e($note['id']) ?>">
@@ -331,7 +331,7 @@
           </article>
         <?php endforeach; ?>
         <?php if (!$notes): ?>
-          <p class="empty-note">Todavia no hay notas para este lead.</p>
+          <p class="empty-note">Todavía no hay notas para este lead.</p>
         <?php endif; ?>
       </div>
     </section>
@@ -356,7 +356,7 @@
       </label>
       <?php $defaultPhoneCountry = phone_country_entry(null); ?>
       <label class="field">
-        <span>Telefono</span>
+        <span>Teléfono</span>
         <div class="phone-combo">
           <div class="phone-prefix-picker" data-phone-picker>
             <input type="hidden" name="phone_country" value="<?= e($defaultPhoneCountry['code']) ?>" data-phone-country-value>
@@ -377,7 +377,7 @@
               </div>
             </div>
           </div>
-          <input class="phone-number-input" name="phone_number" inputmode="tel" placeholder="Numero" aria-label="Numero de telefono">
+          <input class="phone-number-input" name="phone_number" inputmode="tel" placeholder="Número" aria-label="Número de teléfono">
         </div>
       </label>
       <label class="field">
@@ -392,7 +392,7 @@
           <option value="WEB">Web externa</option>
           <option value="LANDING">Landing</option>
           <option value="FORMULARIO_WEB">Formulario web</option>
-          <option value="PHONE">Telefono</option>
+          <option value="PHONE">Teléfono</option>
           <option value="SOCIAL_MEDIA">Redes sociales</option>
           <option value="REFERRAL">Recomendacion</option>
           <option value="OTHER">Otro</option>
@@ -413,7 +413,7 @@
         </div>
       </div>
       <label class="field field--wide">
-        <span>Interes principal</span>
+        <span>Interés principal</span>
         <input name="interest" placeholder="Ej. Prueba de HIIT, plan premium, bono mensual">
       </label>
     </div>

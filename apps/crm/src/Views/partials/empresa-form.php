@@ -78,7 +78,7 @@ foreach (($clients ?? []) as $clientOption) {
             data-search="<?= e($clientSearch) ?>"
           ><?= e($clientLabel) ?></button>
         <?php endforeach; ?>
-          <p class="custom-select-empty" data-custom-select-empty hidden>No hay clientes que coincidan con la busqueda.</p>
+          <p class="custom-select-empty" data-custom-select-empty hidden>No hay clientes que coincidan con la búsqueda.</p>
         </div>
       </div>
     </label>
@@ -121,11 +121,11 @@ foreach (($clients ?? []) as $clientOption) {
     <input name="monthly_price" inputmode="decimal" value="<?= e((string) $empresaValues['monthly_price']) ?>" placeholder="49.00" data-plan-price-input>
   </label>
   <label class="field" data-next-payment-field>
-    <span>Proximo pago</span>
+    <span>Próximo pago</span>
     <input name="next_payment_at" type="date" value="<?= e($empresaValues['next_payment_at'] ? date('Y-m-d', strtotime($empresaValues['next_payment_at'])) : '') ?>" data-next-payment-input>
   </label>
   <label class="field" data-trial-plan-field hidden>
-    <span>Dias de prueba</span>
+    <span>Días de prueba</span>
     <input name="trial_days" type="number" min="1" max="365" step="1" value="<?= e((string) ($empresaValues['trial_days'] ?? 30)) ?>" placeholder="30">
   </label>
   <input type="hidden" name="subscription_started_at" value="<?= e(!empty($empresaValues['subscription_started_at']) ? date('Y-m-d', strtotime($empresaValues['subscription_started_at'])) : date('Y-m-d')) ?>">
@@ -157,8 +157,8 @@ foreach (($clients ?? []) as $clientOption) {
       <input name="admin_email" type="email" value="<?= e($selectedClient['email'] ?? '') ?>" placeholder="admin@empresa.com">
     </label>
     <label class="field">
-      <span>Contrasena inicial</span>
-      <input name="admin_password" type="password" value="" minlength="8" required placeholder="Minimo 8 caracteres" autocomplete="new-password">
+      <span>Contraseña inicial</span>
+      <input name="admin_password" type="password" value="" minlength="8" required placeholder="Mínimo 8 caracteres" autocomplete="new-password">
     </label>
   <?php endif; ?>
 

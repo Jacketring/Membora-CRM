@@ -1,0 +1,7 @@
+{
+  "name": "membora-e2e-dev-only",
+  "private": true,
+  "description": "Playwright is only for local development and CI; it is not deployed to Plesk.",
+  "scripts": {"test": "playwright test"},
+  "devDependencies": {"@playwright/test": "^1.55.0"}
+}

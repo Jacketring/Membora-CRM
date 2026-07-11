@@ -25,8 +25,8 @@ $stripeEvents = $stripeEvents ?? [];
 
 <div class="page-heading leads-heading platform-heading">
   <div>
-    <h2><?= $clientInvoiceMode ? 'Facturacion' : 'Facturas CRM' ?></h2>
-    <p><?= $clientInvoiceMode ? 'Facturas del gimnasio a sus clientes, con serie, impuestos y estado de cobro.' : 'Facturas emitidas por Membora a gimnasios cliente, con serie, numero, IVA y estado de cobro.' ?></p>
+    <h2><?= $clientInvoiceMode ? 'Facturación' : 'Facturas CRM' ?></h2>
+    <p><?= $clientInvoiceMode ? 'Facturas del gimnasio a sus clientes, con serie, impuestos y estado de cobro.' : 'Facturas emitidas por Membora a gimnasios cliente, con serie, número, IVA y estado de cobro.' ?></p>
   </div>
   <button class="primary-action" type="button" data-open-modal="invoice-create-modal">Nueva factura</button>
 </div>
@@ -100,7 +100,7 @@ $stripeEvents = $stripeEvents ?? [];
   <input type="hidden" name="route" value="<?= e($invoiceListRoute) ?>">
   <label class="field platform-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Numero, empresa, concepto o notas" data-auto-submit-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Número, empresa, concepto o notas" data-auto-submit-input>
   </label>
   <label class="field platform-filter-field">
     <span>Estado</span>
@@ -184,7 +184,7 @@ $stripeEvents = $stripeEvents ?? [];
   <header>
     <div>
       <h2>Nueva factura</h2>
-      <p>Emite una factura manual con serie y numero sugerido.</p>
+      <p>Emite una factura manual con serie y número sugerido.</p>
     </div>
     <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
   </header>

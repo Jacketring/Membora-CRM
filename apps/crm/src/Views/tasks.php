@@ -46,7 +46,7 @@ $taskStatusOptions = [
   <input type="hidden" name="route" value="tasks">
   <div class="lead-search">
     <span>Buscar</span>
-    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Titulo, descripcion o responsable" data-auto-filter-input>
+    <input name="q" value="<?= e($filters['q']) ?>" placeholder="Título, descripción o responsable" data-auto-filter-input>
   </div>
   <div class="lead-filter-group">
     <div class="filter-control filter-control--select custom-select custom-select--filter" data-custom-select>
@@ -130,7 +130,7 @@ $taskStatusOptions = [
           <th>Usuario responsable</th>
           <th>Vencimiento</th>
           <th>Estado</th>
-          <th>Creacion</th>
+          <th>Creación</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -139,7 +139,7 @@ $taskStatusOptions = [
           <tr class="lead-data-row clickable-row" data-open-modal="task-detail-<?= e($task['id']) ?>" tabindex="0" role="button" aria-label="Editar tarea <?= e($task['title']) ?>" data-live-search-row>
             <td>
               <strong><?= e($task['title']) ?></strong>
-              <small class="task-description"><?= e($task['description'] ?: 'Sin descripcion') ?></small>
+              <small class="task-description"><?= e($task['description'] ?: 'Sin descripción') ?></small>
             </td>
             <td><span class="source-badge"><?= e(task_type_label($task['type'])) ?></span></td>
             <td><?= e($task['assigned_name'] ?: 'Sin asignar') ?></td>
@@ -173,7 +173,7 @@ $taskStatusOptions = [
                     </button>
                   </form>
                 <?php endif; ?>
-                <form method="post" data-confirm-message="Eliminar esta tarea? Esta accion no se puede deshacer.">
+                <form method="post" data-confirm-message="Eliminar esta tarea? Esta acción no se puede deshacer.">
                   <input type="hidden" name="action" value="delete_task">
                   <input type="hidden" name="id" value="<?= e($task['id']) ?>">
                   <button class="icon-action danger-action" type="submit" title="Eliminar tarea" aria-label="Eliminar tarea">
@@ -191,7 +191,7 @@ $taskStatusOptions = [
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="7">No hay tareas que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="7">No hay tareas que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
@@ -214,7 +214,7 @@ $taskStatusOptions = [
 
       <div class="form-grid">
         <label class="field field--wide">
-          <span>Titulo</span>
+          <span>Título</span>
           <input name="title" required value="<?= e($task['title']) ?>">
         </label>
         <div class="field">
@@ -265,7 +265,7 @@ $taskStatusOptions = [
           </div>
         </div>
         <label class="field field--wide">
-          <span>Descripcion</span>
+          <span>Descripción</span>
           <input name="description" value="<?= e($task['description']) ?>" placeholder="Notas internas de la tarea">
         </label>
       </div>
@@ -285,8 +285,8 @@ $taskStatusOptions = [
     </header>
     <div class="form-grid">
       <label class="field field--wide">
-        <span>Titulo</span>
-        <input name="title" required placeholder="Ej. Acompanhar a socio nuevo en su primer dia">
+        <span>Título</span>
+        <input name="title" required placeholder="Ej. Acompañar a socio nuevo en su primer día">
       </label>
       <div class="field">
         <span>Tipo</span>
@@ -323,7 +323,7 @@ $taskStatusOptions = [
         </div>
       </div>
       <label class="field field--wide">
-        <span>Descripcion</span>
+        <span>Descripción</span>
         <input name="description" placeholder="Notas internas de la tarea">
       </label>
     </div>

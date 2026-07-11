@@ -12,7 +12,7 @@
     <strong><?= (int) $metrics['today'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--blue">
-    <span>Ultimos 7 dias</span>
+    <span>Ultimos 7 días</span>
     <strong><?= (int) $metrics['week'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--orange">
@@ -59,7 +59,7 @@
           <th scope="col">Socio</th>
           <th scope="col">Fecha y hora</th>
           <th scope="col">Clase</th>
-          <th scope="col">Metodo</th>
+          <th scope="col">Método</th>
           <th scope="col">Registrado por</th>
           <th scope="col">Notas</th>
           <th scope="col">Acciones</th>
@@ -102,7 +102,7 @@
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="7">No hay check-ins que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="7">No hay check-ins que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>

@@ -1,17 +1,16 @@
 <?php
-$totalLeads = max(1, (int) $summary['totalLeads']);
-$conversionRate = (int) round(((int) $summary['convertedLeads'] / $totalLeads) * 100);
-$openLeadRate = (int) round(((int) $summary['openLeads'] / $totalLeads) * 100);
-$lostLeadRate = (int) round(((int) $summary['lostLeads'] / $totalLeads) * 100);
-$taskTotal = max(1, (int) $summary['pendingTasks'] + (int) $summary['completedTasks']);
-$taskCompletionRate = (int) round(((int) $summary['completedTasks'] / $taskTotal) * 100);
+$dashboardMetrics = \Membora\DashboardMetrics::calculate($summary);
+$conversionRate = $dashboardMetrics['conversionRate'];
+$openLeadRate = $dashboardMetrics['openLeadRate'];
+$lostLeadRate = $dashboardMetrics['lostLeadRate'];
+$taskCompletionRate = $dashboardMetrics['taskCompletionRate'];
 ?>
 
 <section class="dashboard-hero">
   <div>
     <span class="eyebrow">Panel operativo</span>
     <h2><?= e($user['tenant_name'] ?? 'Membora CRM') ?></h2>
-    <p>Vista rapida de ventas, tareas y riesgos para decidir que atender primero.</p>
+    <p>Vista rápida de ventas, tareas y riesgos para decidir que atender primero.</p>
   </div>
   <div class="dashboard-hero-actions">
     <a class="primary-action primary-action--compact" href="index.php?route=leads">Nuevo seguimiento</a>
@@ -26,7 +25,7 @@ $taskCompletionRate = (int) round(((int) $summary['completedTasks'] / $taskTotal
     <small><?= (int) $summary['totalMembers'] ?> socios registrados</small>
   </article>
   <article class="dashboard-metric dashboard-metric--green">
-    <span>Conversion de leads</span>
+    <span>Conversión de leads</span>
     <strong><?= $conversionRate ?>%</strong>
     <small><?= (int) $summary['convertedLeads'] ?> convertidos de <?= (int) $summary['totalLeads'] ?></small>
   </article>
@@ -36,8 +35,8 @@ $taskCompletionRate = (int) round(((int) $summary['completedTasks'] / $taskTotal
     <small><?= (int) $summary['todayTasks'] ?> para hoy</small>
   </article>
   <article class="dashboard-metric dashboard-metric--danger">
-    <span>Atencion requerida</span>
-    <strong><?= (int) $summary['overdueTasks'] + (int) $summary['openAlerts'] + (int) $summary['pendingPayments'] ?></strong>
+    <span>Atención requerida</span>
+    <strong><?= $dashboardMetrics['attentionRequired'] ?></strong>
     <small>Vencidas, alertas o pagos pendientes</small>
   </article>
 </section>
@@ -88,7 +87,7 @@ $taskCompletionRate = (int) round(((int) $summary['completedTasks'] / $taskTotal
   <article class="dashboard-card">
     <header class="dashboard-card-header">
       <div>
-        <h3>Trabajo del dia</h3>
+        <h3>Trabajo del día</h3>
         <p>Seguimientos y tareas activas.</p>
       </div>
     </header>
@@ -109,7 +108,7 @@ $taskCompletionRate = (int) round(((int) $summary['completedTasks'] / $taskTotal
     <header class="dashboard-card-header">
       <div>
         <h3>Riesgos</h3>
-        <p>Elementos que pueden bloquear gestion.</p>
+        <p>Elementos que pueden bloquear gestión.</p>
       </div>
     </header>
     <div class="risk-list">

@@ -15,7 +15,7 @@
     <strong><?= (int) $metrics['today'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--green">
-    <span>Proximos 7 dias</span>
+    <span>Próximos 7 días</span>
     <strong><?= (int) $metrics['week'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--orange">
@@ -106,7 +106,7 @@ foreach ($classTypes as $type) {
           <tr class="lead-data-row clickable-row" data-open-modal="class-detail-<?= e($session['id']) ?>" data-live-search-row>
             <td>
               <strong><?= e($session['class_name']) ?></strong>
-              <small class="table-subtext"><?= e($session['class_description'] ?: 'Sin descripcion') ?></small>
+              <small class="table-subtext"><?= e($session['class_description'] ?: 'Sin descripción') ?></small>
             </td>
             <td><?= e(format_date_short($session['starts_at'])) ?></td>
             <td><?= e(format_time($session['starts_at'])) ?> - <?= e(format_time($session['ends_at'])) ?></td>
@@ -142,7 +142,7 @@ foreach ($classTypes as $type) {
           </tr>
         <?php else: ?>
           <tr data-live-search-empty hidden>
-            <td class="leads-empty-cell" colspan="7">No hay clases que coincidan con la busqueda actual.</td>
+            <td class="leads-empty-cell" colspan="7">No hay clases que coincidan con la búsqueda actual.</td>
           </tr>
         <?php endif; ?>
       </tbody>
@@ -188,9 +188,9 @@ foreach ($classTypes as $type) {
         <input type="hidden" name="action" value="create_reservation">
         <input type="hidden" name="class_session_id" value="<?= e($session['id']) ?>">
         <div class="field field--wide">
-          <span>Anadir socio</span>
+          <span>Añadir socio</span>
           <div class="member-picker-shell" data-member-picker>
-            <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o telefono" data-member-search <?= $availableSeats <= 0 ? 'disabled' : '' ?>>
+            <input class="member-picker-search" type="search" placeholder="Buscar socio por nombre, email o teléfono" data-member-search <?= $availableSeats <= 0 ? 'disabled' : '' ?>>
             <div class="member-picker member-picker--radio">
               <?php foreach ($members as $member): ?>
                 <?php
@@ -208,7 +208,7 @@ foreach ($classTypes as $type) {
               <?php if (!$members): ?>
                 <p>No hay socios activos disponibles.</p>
               <?php endif; ?>
-              <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la busqueda.</p>
+              <p class="member-picker-empty" data-member-empty hidden>No hay socios que coincidan con la búsqueda.</p>
             </div>
           </div>
         </div>
@@ -262,7 +262,7 @@ foreach ($classTypes as $type) {
           </article>
         <?php endforeach; ?>
         <?php if (!$sessionReservations): ?>
-          <p class="empty-note">Todavia no hay socios reservados en esta clase.</p>
+          <p class="empty-note">Todavía no hay socios reservados en esta clase.</p>
         <?php endif; ?>
       </div>
     </section>
@@ -300,11 +300,11 @@ foreach ($classTypes as $type) {
         <input name="capacity" type="number" min="1" value="12">
       </label>
       <label class="field">
-        <span>Duracion</span>
+        <span>Duración</span>
         <input name="duration_minutes" type="number" min="15" step="5" value="60">
       </label>
       <label class="field field--wide">
-        <span>Descripcion</span>
+        <span>Descripción</span>
         <textarea name="description" rows="3" placeholder="Resumen breve de la clase"></textarea>
       </label>
     </div>
@@ -352,7 +352,7 @@ foreach ($classTypes as $type) {
       <div class="calendar-day <?= $dateKey === date('Y-m-d') ? 'calendar-day--today' : '' ?>" role="cell" tabindex="0" data-class-create-date="<?= e($dateKey) ?>" aria-label="Crear clase el <?= e(format_date_short($dateKey)) ?>">
         <div class="calendar-day-head">
           <strong><?= $day ?></strong>
-          <button class="calendar-add-button" type="button" data-class-create-date="<?= e($dateKey) ?>" aria-label="Anadir clase el <?= e(format_date_short($dateKey)) ?>">+</button>
+          <button class="calendar-add-button" type="button" data-class-create-date="<?= e($dateKey) ?>" aria-label="Añadir clase el <?= e(format_date_short($dateKey)) ?>">+</button>
         </div>
         <div class="calendar-events">
           <?php foreach ($daySessions as $daySession): ?>

@@ -12,11 +12,11 @@ final class Actions
 
         $action = post_value('action', '');
         if ($action !== 'demo_login' && !verify_csrf()) {
-            flash('Solicitud bloqueada por seguridad. Recarga la pagina e intentalo de nuevo.', 'error');
+            flash('Solicitud bloqueada por seguridad. Recarga la página e intentalo de nuevo.', 'error');
             redirect($_GET['return'] ?? ($_GET['route'] ?? 'dashboard'));
         }
         if (!can_perform_action($action)) {
-            flash('No tienes permisos para realizar esta accion.', 'error');
+            flash('No tienes permisos para realizar esta acción.', 'error');
             redirect($_GET['return'] ?? ($_GET['route'] ?? 'dashboard'));
         }
 
@@ -28,7 +28,7 @@ final class Actions
         ) {
             $accessState = EmpresaRepository::accessStateForTenant((string) ($user['tenant_id'] ?? ''));
             if (!empty($accessState['blocked'])) {
-                flash('Tu demo o suscripcion no permite realizar esta accion.', 'error');
+                flash('Tu demo o suscripción no permite realizar esta acción.', 'error');
                 redirect('dashboard');
             }
         }
@@ -121,7 +121,7 @@ final class Actions
             AuditLogRepository::record($action, $_POST);
         } catch (Throwable $exception) {
             $_SESSION['audit_log_error'] = $exception->getMessage();
-            // La auditoria no debe bloquear la operacion principal del usuario.
+            // La auditoría no debe bloquear la operación principal del usuario.
         }
     }
 
@@ -187,12 +187,12 @@ final class Actions
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            flash('El email del perfil no es valido.', 'error');
+            flash('El email del perfil no es válido.', 'error');
             redirect($_GET['return'] ?? 'dashboard');
         }
 
         if ($password !== '' && strlen($password) < 8) {
-            flash('La nueva contrasena debe tener al menos 8 caracteres.', 'error');
+            flash('La nueva contraseña debe tener al menos 8 caracteres.', 'error');
             redirect($_GET['return'] ?? 'dashboard');
         }
 
@@ -201,7 +201,7 @@ final class Actions
             $passwordStmt->execute(['id' => $userId]);
             $currentHash = $passwordStmt->fetchColumn();
             if (!is_string($currentHash) || $currentPassword === '' || !password_verify($currentPassword, $currentHash)) {
-                flash('La contrasena actual no es correcta.', 'error');
+                flash('La contraseña actual no es correcta.', 'error');
                 redirect($_GET['return'] ?? 'dashboard');
             }
         }
@@ -261,7 +261,7 @@ final class Actions
         }
 
         if (strlen((string) post_value('admin_password', '')) < 8) {
-            flash('Indica una contrasena de al menos 8 caracteres para el administrador.', 'error');
+            flash('Indica una contraseña de al menos 8 caracteres para el administrador.', 'error');
             redirect('platform-companies');
         }
 
@@ -298,7 +298,7 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro la suscripcion que quieres actualizar.', 'error');
+            flash('No se encontró la suscripción que quieres actualizar.', 'error');
             redirect('platform-contacts');
         }
 
@@ -306,11 +306,11 @@ final class Actions
             EmpresaRepository::updateSubscription($id, $_POST);
         } catch (Throwable $exception) {
             log_server_error($exception, 'subscription');
-            flash('No se pudo actualizar la suscripcion.', 'error');
+            flash('No se pudo actualizar la suscripción.', 'error');
             redirect('platform-contacts');
         }
 
-        flash('Suscripcion actualizada correctamente.');
+        flash('Suscripción actualizada correctamente.');
         redirect('platform-contacts');
     }
 
@@ -321,7 +321,7 @@ final class Actions
         $returnRoute = post_value('return', 'platform-companies');
 
         if ($id === '') {
-            flash('No se encontro la empresa que quieres renovar.', 'error');
+            flash('No se encontró la empresa que quieres renovar.', 'error');
             redirect($returnRoute);
         }
 
@@ -329,11 +329,11 @@ final class Actions
             EmpresaRepository::renewSubscription($id);
         } catch (Throwable $exception) {
             log_server_error($exception, 'subscription');
-            flash('No se pudo renovar la suscripcion.', 'error');
+            flash('No se pudo renovar la suscripción.', 'error');
             redirect($returnRoute);
         }
 
-        flash('Renovacion registrada y proximo pago actualizado.');
+        flash('Renovación registrada y próximo pago actualizado.');
         redirect($returnRoute);
     }
 
@@ -344,7 +344,7 @@ final class Actions
         $returnRoute = post_value('return', 'platform-companies');
 
         if ($id === '') {
-            flash('No se encontro la empresa que quieres cancelar.', 'error');
+            flash('No se encontró la empresa que quieres cancelar.', 'error');
             redirect($returnRoute);
         }
 
@@ -352,11 +352,11 @@ final class Actions
             EmpresaRepository::cancelSubscription($id);
         } catch (Throwable $exception) {
             log_server_error($exception, 'subscription');
-            flash('No se pudo cancelar la suscripcion.', 'error');
+            flash('No se pudo cancelar la suscripción.', 'error');
             redirect($returnRoute);
         }
 
-        flash('Suscripcion marcada para cancelar al final del periodo.');
+        flash('Suscripción marcada para cancelar al final del periodo.');
         redirect($returnRoute);
     }
 
@@ -367,7 +367,7 @@ final class Actions
         $returnRoute = post_value('return', 'platform-companies');
 
         if ($id === '') {
-            flash('No se encontro la empresa que quieres reactivar.', 'error');
+            flash('No se encontró la empresa que quieres reactivar.', 'error');
             redirect($returnRoute);
         }
 
@@ -375,11 +375,11 @@ final class Actions
             EmpresaRepository::resumeSubscription($id);
         } catch (Throwable $exception) {
             log_server_error($exception, 'subscription');
-            flash('No se pudo reactivar la suscripcion.', 'error');
+            flash('No se pudo reactivar la suscripción.', 'error');
             redirect($returnRoute);
         }
 
-        flash('Suscripcion reactivada correctamente.');
+        flash('Suscripción reactivada correctamente.');
         redirect($returnRoute);
     }
 
@@ -390,7 +390,7 @@ final class Actions
         $returnRoute = post_value('return', 'platform-contacts');
 
         if ($id === '') {
-            flash('No se encontro la empresa para iniciar Stripe Checkout.', 'error');
+            flash('No se encontró la empresa para iniciar Stripe Checkout.', 'error');
             redirect($returnRoute);
         }
 
@@ -399,7 +399,7 @@ final class Actions
         } catch (Throwable $exception) {
             StripeBillingRepository::recordEmpresaError($id, $exception->getMessage());
             log_server_error($exception, 'stripe');
-            flash('No se pudo crear la sesion de Stripe Checkout.', 'error');
+            flash('No se pudo crear la sesión de Stripe Checkout.', 'error');
             redirect($returnRoute);
         }
 
@@ -414,7 +414,7 @@ final class Actions
         $returnRoute = post_value('return', 'platform-contacts');
 
         if ($id === '') {
-            flash('No se encontro la empresa para cancelar Stripe.', 'error');
+            flash('No se encontró la empresa para cancelar Stripe.', 'error');
             redirect($returnRoute);
         }
 
@@ -423,7 +423,7 @@ final class Actions
         } catch (Throwable $exception) {
             StripeBillingRepository::recordEmpresaError($id, $exception->getMessage());
             log_server_error($exception, 'stripe');
-            flash('No se pudo cancelar la suscripcion en Stripe.', 'error');
+            flash('No se pudo cancelar la suscripción en Stripe.', 'error');
             redirect($returnRoute);
         }
 
@@ -437,7 +437,7 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el contacto seleccionado.', 'error');
+            flash('No se encontró el contacto seleccionado.', 'error');
             redirect('platform-contacts');
         }
 
@@ -465,7 +465,7 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el contacto seleccionado.', 'error');
+            flash('No se encontró el contacto seleccionado.', 'error');
             redirect('platform-contacts');
         }
 
@@ -487,7 +487,7 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el contacto seleccionado.', 'error');
+            flash('No se encontró el contacto seleccionado.', 'error');
             redirect('platform-contacts');
         }
 
@@ -502,13 +502,13 @@ final class Actions
         $email = strtolower(post_value('email', ''));
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            flash('Indica un email valido para la prueba.', 'error');
+            flash('Indica un email válido para la prueba.', 'error');
             redirect('platform-web');
         }
 
         if (Mailer::sendDebugEmail($email)) {
             WebhookIntegrationRepository::logPlatformEmailDiagnostic('email_test', 'Correo de prueba aceptado por el transporte de envio.', $email);
-            flash('Correo de prueba enviado a ' . $email . '. Revisa tambien spam/promociones.');
+            flash('Correo de prueba enviado a ' . $email . '. Revisa también spam/promociones.');
             redirect('platform-web');
         }
 
@@ -556,7 +556,7 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro el contacto que quieres eliminar.', 'error');
+            flash('No se encontró el contacto que quieres eliminar.', 'error');
             redirect('platform-contacts');
         }
 
@@ -643,7 +643,7 @@ final class Actions
         $id = post_value('id', '');
 
         if ($id === '') {
-            flash('No se encontro la factura que quieres emitir.', 'error');
+            flash('No se encontró la factura que quieres emitir.', 'error');
             redirect('platform-invoices');
         }
 
@@ -665,7 +665,7 @@ final class Actions
         $id = post_value('invoice_id', '');
 
         if ($id === '') {
-            flash('No se encontro la factura para registrar el pago.', 'error');
+            flash('No se encontró la factura para registrar el pago.', 'error');
             redirect('platform-invoices');
         }
 
@@ -685,7 +685,7 @@ final class Actions
     {
         $empresa = EmpresaRepository::findByTenant(Auth::tenantId());
         if (!$empresa) {
-            flash('No se encontro la empresa emisora.', 'error');
+            flash('No se encontró la empresa emisora.', 'error');
             redirect('billing');
         }
         try {
@@ -742,7 +742,7 @@ final class Actions
         $empresa = EmpresaRepository::findByTenant(Auth::tenantId());
         $invoice = $empresa ? PlatformInvoiceRepository::findWithEmpresa(post_value($field, ''), 'CLIENT', (string) $empresa['id']) : null;
         if (!$invoice) {
-            flash('No se encontro la factura.', 'error');
+            flash('No se encontró la factura.', 'error');
             redirect('billing');
         }
         return $invoice;
@@ -782,7 +782,7 @@ final class Actions
         self::requirePlatformAdmin();
         $empresa = EmpresaRepository::find(post_value('id', ''));
         if (!$empresa) {
-            flash('No se encontro la empresa.', 'error');
+            flash('No se encontró la empresa.', 'error');
             redirect('platform-dashboard');
         }
 
@@ -800,7 +800,7 @@ final class Actions
     private static function requirePlatformAdmin(): void
     {
         if (!is_platform_admin(Auth::requireUser())) {
-            flash('Solo un superadmin de Membora puede acceder a esta seccion.', 'error');
+            flash('Solo un superadmin de Membora puede acceder a esta sección.', 'error');
             redirect('dashboard');
         }
     }
@@ -814,22 +814,22 @@ final class Actions
         $roleId = post_value('role_id', '');
 
         if ($name === '' || $email === '' || $password === '' || $roleId === '') {
-            flash('Indica nombre, email, contrasena y rol.', 'error');
+            flash('Indica nombre, email, contraseña y rol.', 'error');
             redirect('users');
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            flash('El email del usuario no es valido.', 'error');
+            flash('El email del usuario no es válido.', 'error');
             redirect('users');
         }
 
         if (strlen($password) < 8) {
-            flash('La contrasena debe tener al menos 8 caracteres.', 'error');
+            flash('La contraseña debe tener al menos 8 caracteres.', 'error');
             redirect('users');
         }
 
         if (!UserRepository::assignableRoleExists($roleId) || (!is_platform_admin(Auth::user()) && UserRepository::isPlatformRole($roleId))) {
-            flash('Selecciona un rol valido.', 'error');
+            flash('Selecciona un rol válido.', 'error');
             redirect('users');
         }
 
@@ -872,17 +872,17 @@ final class Actions
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            flash('El email del usuario no es valido.', 'error');
+            flash('El email del usuario no es válido.', 'error');
             redirect('users');
         }
 
         if ($password !== '' && strlen($password) < 8) {
-            flash('La nueva contrasena debe tener al menos 8 caracteres.', 'error');
+            flash('La nueva contraseña debe tener al menos 8 caracteres.', 'error');
             redirect('users');
         }
 
         if (!UserRepository::assignableRoleExists($roleId) || (!is_platform_admin(Auth::user()) && UserRepository::isPlatformRole($roleId))) {
-            flash('Selecciona un rol valido.', 'error');
+            flash('Selecciona un rol válido.', 'error');
             redirect('users');
         }
 
@@ -1403,7 +1403,7 @@ final class Actions
     {
         $memberId = post_value('id', '');
         if ($memberId === '') {
-            flash('No se encontro el socio seleccionado.', 'error');
+            flash('No se encontró el socio seleccionado.', 'error');
             redirect('members');
         }
 
@@ -1411,11 +1411,11 @@ final class Actions
             MembershipRepository::renewMemberSubscription(Auth::tenantId(), $memberId);
         } catch (Throwable $exception) {
             log_server_error($exception, 'membership');
-            flash('No se pudo renovar la membresia.', 'error');
+            flash('No se pudo renovar la membresía.', 'error');
             redirect('members');
         }
 
-        flash('Membresia renovada y pago registrado correctamente.');
+        flash('Membresía renovada y pago registrado correctamente.');
         redirect('members');
     }
 
@@ -1448,7 +1448,7 @@ final class Actions
             'image/png' => 'png',
             'image/webp' => 'webp',
         ];
-        $mimeType = is_array($imageInfo) ? (string) ($imageInfo['mime'] ?? '') : '';
+        $mimeType = is_array($imageInfo) ? (string) $imageInfo['mime'] : '';
         if (!isset($allowedMimeTypes[$mimeType])) {
             flash('La imagen debe ser JPG, PNG o WEBP.', 'error');
             redirect($redirectRoute ?: ($_GET['return'] ?? 'dashboard'));
@@ -1468,11 +1468,6 @@ final class Actions
         }
 
         return 'uploads/' . $folder . '/' . $filename;
-    }
-
-    private static function memberUploadDirectory(): string
-    {
-        return self::uploadDirectory('members');
     }
 
     private static function uploadDirectory(string $folder): string
@@ -1498,7 +1493,7 @@ final class Actions
         $name = post_value('name', '');
 
         if ($name === '') {
-            flash('Indica el nombre de la membresia.', 'error');
+            flash('Indica el nombre de la membresía.', 'error');
             redirect('memberships');
         }
 
@@ -1518,7 +1513,7 @@ final class Actions
             'status' => post_value('status') === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
         ]);
 
-        flash('Membresia creada correctamente.');
+        flash('Membresía creada correctamente.');
         redirect('memberships');
     }
 
@@ -1528,7 +1523,7 @@ final class Actions
         $name = post_value('name', '');
 
         if ($name === '') {
-            flash('Indica el nombre de la membresia.', 'error');
+            flash('Indica el nombre de la membresía.', 'error');
             redirect('memberships');
         }
 
@@ -1555,7 +1550,7 @@ final class Actions
             'tenant_id' => Auth::tenantId(),
         ]);
 
-        flash('Membresia actualizada correctamente.');
+        flash('Membresía actualizada correctamente.');
         redirect('memberships');
     }
 
@@ -1570,14 +1565,14 @@ final class Actions
         $activeStmt->execute(['tenant_id' => $tenantId, 'id' => $planId]);
 
         if ((int) $activeStmt->fetchColumn() > 0) {
-            flash('No se puede eliminar una membresia asignada a socios. Desactivala si ya no se vende.', 'error');
+            flash('No se puede eliminar una membresía asignada a socios. Desactivala si ya no se vende.', 'error');
             redirect('memberships');
         }
 
         $stmt = $pdo->prepare('DELETE FROM membership_plans WHERE id = :id AND tenant_id = :tenant_id');
         $stmt->execute(['id' => $planId, 'tenant_id' => $tenantId]);
 
-        flash('Membresia eliminada correctamente.');
+        flash('Membresía eliminada correctamente.');
         redirect('memberships');
     }
 
@@ -1611,7 +1606,7 @@ final class Actions
     {
         $id = post_value('id', '');
         if ($id === '') {
-            flash('No se encontro el pago seleccionado.', 'error');
+            flash('No se encontró el pago seleccionado.', 'error');
             redirect('payments');
         }
 
@@ -1631,7 +1626,7 @@ final class Actions
     {
         $id = post_value('id', '');
         if ($id === '') {
-            flash('No se encontro el pago seleccionado.', 'error');
+            flash('No se encontró el pago seleccionado.', 'error');
             redirect('payments');
         }
 
@@ -1666,7 +1661,7 @@ final class Actions
     {
         $id = post_value('id', '');
         if ($id === '') {
-            flash('No se encontro el pago seleccionado.', 'error');
+            flash('No se encontró el pago seleccionado.', 'error');
             redirect('payments');
         }
 
@@ -1693,7 +1688,7 @@ final class Actions
     {
         $id = post_value('id', '');
         if ($id === '') {
-            flash('No se encontro el check-in seleccionado.', 'error');
+            flash('No se encontró el check-in seleccionado.', 'error');
             redirect('checkins');
         }
 
@@ -1707,7 +1702,7 @@ final class Actions
         $id = post_value('id', '');
         $status = post_value('status', 'OPEN');
         if ($id === '') {
-            flash('No se encontro la alerta seleccionada.', 'error');
+            flash('No se encontró la alerta seleccionada.', 'error');
             redirect('alerts');
         }
 
@@ -1723,7 +1718,7 @@ final class Actions
     private static function saveBillingIntegration(): never
     {
         BillingIntegrationRepository::saveSettings(Auth::tenantId(), $_POST);
-        flash('Integracion de facturacion guardada.');
+        flash('Integración de facturación guardada.');
         redirect('billing');
     }
 
@@ -1734,7 +1729,7 @@ final class Actions
             flash('Sincronizacion completada: ' . (int) $result['count'] . ' pagos enviados por ' . money_amount($result['total']) . '.');
         } catch (Throwable $exception) {
             log_server_error($exception, 'class_session');
-            flash('No se pudo completar la operacion.', 'error');
+            flash('No se pudo completar la operación.', 'error');
         }
 
         redirect('billing');
@@ -1775,7 +1770,7 @@ final class Actions
         [$startsAt, $endsAt] = self::classDateTimesFromPost();
 
         if ($classTypeId === '' || !$startsAt || !$endsAt) {
-            flash('Indica clase, fecha, hora de inicio y hora de finalizacion.', 'error');
+            flash('Indica clase, fecha, hora de inicio y hora de finalización.', 'error');
             self::redirectAfterClassAction();
         }
 
@@ -1805,7 +1800,7 @@ final class Actions
         [$startsAt, $endsAt] = self::classDateTimesFromPost();
 
         if ($classTypeId === '' || !$startsAt || !$endsAt) {
-            flash('Indica clase, fecha, hora de inicio y hora de finalizacion.', 'error');
+            flash('Indica clase, fecha, hora de inicio y hora de finalización.', 'error');
             self::redirectAfterClassAction();
         }
 
@@ -1896,7 +1891,7 @@ final class Actions
         $status = post_value('status', '');
 
         if ($reservationId === '' || $sessionId === '') {
-            flash('No se encontro la reserva seleccionada.', 'error');
+            flash('No se encontró la reserva seleccionada.', 'error');
             self::redirectAfterReservationAction($sessionId);
         }
 
@@ -1930,7 +1925,7 @@ final class Actions
         $endsAt = $date . ' ' . $endTime . ':00';
 
         if (strtotime($endsAt) <= strtotime($startsAt)) {
-            flash('La hora de finalizacion debe ser posterior a la hora de inicio.', 'error');
+            flash('La hora de finalización debe ser posterior a la hora de inicio.', 'error');
             self::redirectAfterClassAction();
         }
 
@@ -1977,7 +1972,7 @@ final class Actions
 
         $title = post_value('title', '');
         if ($title === '') {
-            flash('Indica un titulo para la tarea.', 'error');
+            flash('Indica un título para la tarea.', 'error');
             redirect('tasks');
         }
 
@@ -2023,7 +2018,7 @@ final class Actions
     {
         $title = post_value('title', '');
         if ($title === '') {
-            flash('Indica un titulo para la tarea.', 'error');
+            flash('Indica un título para la tarea.', 'error');
             redirect('tasks');
         }
 
