@@ -17,8 +17,9 @@
     "psr-4": {"Membora\\": "src/"}
   },
   "scripts": {
-    "test": "phpunit",
-    "analyse": "phpstan analyse --memory-limit=1G"
+    "test": "phpunit --no-coverage",
+    "analyse": "phpstan analyse --memory-limit=1G",
+    "lint": "php -l src/Actions.php && php -l src/Auth.php && php -l src/Repositories.php && php -l public/index.php"
   },
   "config": {
     "allow-plugins": {"captainhook/plugin-composer": true},

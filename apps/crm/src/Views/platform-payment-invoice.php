@@ -185,7 +185,7 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
 </head>
 <body>
   <div class="invoice-actions">
-    <button type="button" onclick="window.print()">Imprimir / guardar PDF</button>
+    <button type="button" class="js-print-invoice">Imprimir / guardar PDF</button>
     <a href="index.php?route=platform-payments">Volver a pagos</a>
   </div>
 
@@ -268,5 +268,6 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
 
     <p class="footer">Factura generada por Membora CRM. Conserva este documento junto con el justificante de pago correspondiente.</p>
   </article>
+  <script src="assets/app.js"></script>
 </body>
 </html>

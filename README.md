@@ -18,7 +18,16 @@ vendor/bin/captainhook install
 
 La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La medición local del 11 de julio de 2026 alcanza **93,50 % de líneas (604/646)**, con 34 tests y 164 aserciones. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
 
-Playwright está en `e2e/` y es solo para desarrollo/CI. Requiere una app y BD de prueba, además de `E2E_BASE_URL`, `E2E_EMAIL` y `E2E_PASSWORD`. Node.js no forma parte del despliegue.
+Playwright está en `e2e/` y es solo para desarrollo/CI; Node.js no forma parte del despliegue. Debe apuntar exclusivamente a una app y BD local o de staging preparadas para pruebas, nunca a producción:
+
+```bash
+cd e2e
+npm ci
+npx playwright install chromium
+E2E_BASE_URL="https://staging.example.test" E2E_EMAIL="gym-admin@example.test" E2E_PASSWORD="..." npm test
+```
+
+`E2E_INVOICE_URL` es opcional y debe contener la ruta o URL de una factura existente en esa BD para activar la prueba de impresión. El usuario debe ser un `GYM_ADMIN` de pruebas con acceso a socios, leads, clases y pagos. En GitHub Actions se configura `E2E_BASE_URL` y, opcionalmente, `E2E_INVOICE_URL` como variables del repositorio; `E2E_EMAIL` y `E2E_PASSWORD` como secretos. Si no existe `E2E_BASE_URL`, el job se omite. No se incluye ni se inventa una URL de staging.
 
 ## Estado actual
 
@@ -222,21 +231,21 @@ Administrador de gimnasio:
 
 ```text
 Email: admin@nexofit.demo
-Password: MemboraDemo2026!
+Password: definida de forma segura en el entorno de pruebas (no se versiona).
 ```
 
 Recepcion / comercial:
 
 ```text
 Email: recepcion@nexofit.demo
-Password: MemboraDemo2026!
+Password: definida de forma segura en el entorno de pruebas (no se versiona).
 ```
 
 Entrenador:
 
 ```text
 Email: entrenador@nexofit.demo
-Password: MemboraDemo2026!
+Password: definida de forma segura en el entorno de pruebas (no se versiona).
 ```
 
 Administrador de la plataforma Membora:

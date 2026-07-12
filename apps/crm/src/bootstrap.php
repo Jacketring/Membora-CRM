@@ -41,6 +41,9 @@ session_start();
 ob_start('inject_csrf_fields');
 
 require __DIR__ . '/Database.php';
+require __DIR__ . '/Security/DemoAccessPolicy.php';
+require __DIR__ . '/Security/LoginRateLimitPolicy.php';
+require __DIR__ . '/Security/UserMutationPolicy.php';
 require __DIR__ . '/Auth.php';
 require __DIR__ . '/Mailer.php';
 require __DIR__ . '/Repositories.php';

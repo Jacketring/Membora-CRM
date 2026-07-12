@@ -85,6 +85,23 @@ final class UserRepository
         return (int) $stmt->fetchColumn() > 0;
     }
 
+    public static function roleKey(string $roleId): ?string
+    {
+        $stmt = Database::connection()->prepare('SELECT `key` FROM roles WHERE id = :id LIMIT 1');
+        $stmt->execute(['id' => $roleId]);
+        $key = $stmt->fetchColumn();
+
+        return $key === false ? null : (string) $key;
+    }
+
+    public static function belongsToTenant(string $userId, string $tenantId): bool
+    {
+        $stmt = Database::connection()->prepare('SELECT COUNT(*) FROM users WHERE id = :id AND tenant_id = :tenant_id');
+        $stmt->execute(['id' => $userId, 'tenant_id' => $tenantId]);
+
+        return (int) $stmt->fetchColumn() === 1;
+    }
+
     public static function assignableRoleExists(string $roleId): bool
     {
         $stmt = Database::connection()->prepare('SELECT COUNT(*) FROM roles WHERE id = :id AND `key` NOT IN ("SUPER_ADMIN", "SUPERADMIN")');

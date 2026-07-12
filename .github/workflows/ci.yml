@@ -21,7 +21,7 @@ jobs:
           working-directory: apps/crm
       - name: PHP syntax
         working-directory: .
-        run: find apps/crm php-app httpdocs/api -name '*.php' -print0 | xargs -0 -n1 php -l
+        run: find apps/crm httpdocs/api -name '*.php' -print0 | xargs -0 -n1 php -l
       - run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage/clover.xml --coverage-filter=src/Support.php
       - run: php bin/check-coverage.php coverage/clover.xml 80
       - run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
@@ -43,3 +43,4 @@ jobs:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
           E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_INVOICE_URL: ${{ vars.E2E_INVOICE_URL }}

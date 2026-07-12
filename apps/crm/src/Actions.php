@@ -135,7 +135,7 @@ final class Actions
                 redirect(is_platform_admin(Auth::user()) ? 'platform-dashboard' : 'dashboard');
             }
         } catch (Throwable $exception) {
-            flash('No se pudo conectar con la base de datos. Revisa apps/crm/.env o php-app/.env.', 'error');
+            flash('No se pudo conectar con la base de datos. Revisa apps/crm/.env.', 'error');
             redirect('login');
         }
 
@@ -145,6 +145,11 @@ final class Actions
 
     private static function demoLogin(): never
     {
+        if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+            flash('La demo no está disponible en este entorno.', 'error');
+            redirect('login');
+        }
+
         $type = post_value('demo_type', 'client') === 'admin' ? 'admin' : 'client';
 
         try {
@@ -828,7 +833,8 @@ final class Actions
             redirect('users');
         }
 
-        if (!UserRepository::assignableRoleExists($roleId) || (!is_platform_admin(Auth::user()) && UserRepository::isPlatformRole($roleId))) {
+        $roleKey = UserRepository::roleKey($roleId);
+        if ($roleKey === null || !UserMutationPolicy::mayAssignRole(Auth::user() ?? [], $roleKey)) {
             flash('Selecciona un rol válido.', 'error');
             redirect('users');
         }
@@ -881,8 +887,14 @@ final class Actions
             redirect('users');
         }
 
-        if (!UserRepository::assignableRoleExists($roleId) || (!is_platform_admin(Auth::user()) && UserRepository::isPlatformRole($roleId))) {
+        $roleKey = UserRepository::roleKey($roleId);
+        if ($roleKey === null || !UserMutationPolicy::mayAssignRole(Auth::user() ?? [], $roleKey)) {
             flash('Selecciona un rol válido.', 'error');
+            redirect('users');
+        }
+
+        if (!UserRepository::belongsToTenant($userId, $tenantId)) {
+            flash('No se encontró el usuario en este centro.', 'error');
             redirect('users');
         }
 

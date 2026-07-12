@@ -185,7 +185,7 @@ $planName = $payment['plan_name'] ?: 'Membresía';
 </head>
 <body>
   <div class="invoice-actions">
-    <button type="button" onclick="window.print()">Imprimir / guardar PDF</button>
+    <button type="button" class="js-print-invoice">Imprimir / guardar PDF</button>
     <a href="index.php?route=payments">Volver a pagos</a>
   </div>
 
@@ -271,5 +271,6 @@ $planName = $payment['plan_name'] ?: 'Membresía';
       Factura generada automaticamente por Membora CRM. Revisa los datos fiscales antes de usarla como documento definitivo de facturación.
     </p>
   </article>
+  <script src="assets/app.js"></script>
 </body>
 </html>

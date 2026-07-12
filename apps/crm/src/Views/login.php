@@ -1,6 +1,7 @@
 <?php
 $flash = flash();
 $platformAdminEmail = EmpresaRepository::PLATFORM_ADMIN_EMAIL;
+$demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
 ?>
 <!doctype html>
 <html lang="es">
@@ -41,6 +42,7 @@ $platformAdminEmail = EmpresaRepository::PLATFORM_ADMIN_EMAIL;
           <div class="input-shell"><input name="password" type="password" required value="" data-login-password autocomplete="current-password"></div>
         </label>
         <button class="primary-action" type="submit">Iniciar sesión</button>
+        <?php if ($demoEnabled): ?>
         <div class="demo-login-actions" aria-label="Accesos demo">
           <button class="demo-login-action demo-login-action--client" type="submit" form="demo-client-login">
             Demo cliente
@@ -56,11 +58,14 @@ $platformAdminEmail = EmpresaRepository::PLATFORM_ADMIN_EMAIL;
             <span>Al finalizar, el sistema cierra la sesión y vuelve a la web pública.</span>
           </div>
         </div>
+        <?php endif; ?>
       </form>
+      <?php if ($demoEnabled): ?>
       <form id="demo-client-login" method="post" hidden>
         <input type="hidden" name="action" value="demo_login">
         <input type="hidden" name="demo_type" value="client">
       </form>
+      <?php endif; ?>
       <form id="demo-admin-login" method="post" hidden>
         <input type="hidden" name="action" value="demo_login">
         <input type="hidden" name="demo_type" value="admin">

@@ -110,7 +110,8 @@ final class Auth
         }
 
         DemoRepository::prepareClientDemo();
-        $success = self::attempt(DemoRepository::CLIENT_EMAIL, DemoRepository::CLIENT_PASSWORD);
+        $password = DemoRepository::clientPassword();
+        $success = $password !== '' && self::attempt(DemoRepository::CLIENT_EMAIL, $password);
         if ($success) {
             self::markDemoSession('client');
         }
@@ -220,9 +221,11 @@ final class Auth
 
     private static function tooManyLoginAttempts(PDO $pdo, string $ip, string $emailHash): bool
     {
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM login_attempts WHERE attempted_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE) AND (ip_address = :ip OR email_hash = :email_hash)');
+        $stmt = $pdo->prepare('SELECT UNIX_TIMESTAMP(attempted_at) FROM login_attempts WHERE ip_address = :ip AND email_hash = :email_hash');
         $stmt->execute(['ip' => $ip, 'email_hash' => $emailHash]);
-        return (int) $stmt->fetchColumn() >= 5;
+        $timestamps = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+
+        return (new LoginRateLimitPolicy())->isBlocked($timestamps, time());
     }
 
     private static function recordFailedLogin(PDO $pdo, string $ip, string $emailHash): void
@@ -233,7 +236,7 @@ final class Auth
 
     private static function clearLoginAttempts(PDO $pdo, string $ip, string $emailHash): void
     {
-        $pdo->prepare('DELETE FROM login_attempts WHERE ip_address = :ip OR email_hash = :email_hash')
+        $pdo->prepare('DELETE FROM login_attempts WHERE ip_address = :ip AND email_hash = :email_hash')
             ->execute(['ip' => $ip, 'email_hash' => $emailHash]);
     }
 

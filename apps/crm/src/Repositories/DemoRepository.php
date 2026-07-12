@@ -5,12 +5,27 @@ declare(strict_types=1);
 final class DemoRepository
 {
     public const CLIENT_EMAIL = 'demo.cliente@membora.crm';
-    public const CLIENT_PASSWORD = 'MemboraDemo2026!';
     private const TENANT_ID = 'demo_tenant_cliente';
     private const RESET_KEY = 'client_demo';
 
+    public static function clientPassword(): string
+    {
+        return trim((string) getenv('DEMO_CLIENT_PASSWORD'));
+    }
+
+    private static function assertDemoEnvironment(): void
+    {
+        if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+            throw new LogicException('Demo data cannot be created outside the demo environment.');
+        }
+        if (self::clientPassword() === '') {
+            throw new LogicException('DEMO_CLIENT_PASSWORD is required in the demo environment.');
+        }
+    }
+
     public static function prepareClientDemo(): void
     {
+        self::assertDemoEnvironment();
         self::ensureResetTable();
         self::ensureTenantAndUser();
 
@@ -25,6 +40,7 @@ final class DemoRepository
 
     public static function prepareAdminDemo(): void
     {
+        self::assertDemoEnvironment();
         EmpresaRepository::ensureTables();
         EmpresaRepository::ensurePlatformAdmin();
         PlatformPlanRepository::ensureTable();
@@ -95,7 +111,7 @@ final class DemoRepository
         $user = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
         $user->execute(['email' => self::CLIENT_EMAIL]);
         $userId = (string) ($user->fetchColumn() ?: cuid());
-        $passwordHash = password_hash(self::CLIENT_PASSWORD, PASSWORD_BCRYPT);
+        $passwordHash = password_hash(self::clientPassword(), PASSWORD_BCRYPT);
 
         if ($userId && self::userExists($userId)) {
             $updateUser = $pdo->prepare(

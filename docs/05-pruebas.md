@@ -40,7 +40,7 @@ Credenciales de gimnasio:
 
 ```text
 Email: admin@nexofit.demo
-Password: MemboraDemo2026!
+Password: definida de forma segura en el entorno de pruebas (no se versiona).
 ```
 
 Credenciales de plataforma:

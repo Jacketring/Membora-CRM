@@ -2,7 +2,6 @@
 
 $envPaths = [
     dirname(__DIR__) . '/.env',
-    dirname(__DIR__, 3) . '/php-app/.env',
     dirname(__DIR__, 3) . '/.env',
 ];
 

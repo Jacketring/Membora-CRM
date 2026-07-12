@@ -2,7 +2,9 @@ const { test, expect } = require('@playwright/test');
 test('crea un lead y lo convierte en socio', async ({ page }) => {
   test.skip(!process.env.E2E_EMAIL || !process.env.E2E_PASSWORD, 'Requiere usuario y BD de prueba');
   await page.goto('/?route=login');
-  await page.getByRole('button', { name: 'Demo cliente', exact: true }).click();
+  await page.locator('input[name=email]').fill(process.env.E2E_EMAIL);
+  await page.locator('input[name=password]').fill(process.env.E2E_PASSWORD);
+  await page.getByRole('button', { name: /iniciar sesi[oó]n/i }).click();
   await page.goto('/?route=leads');
   await page.getByRole('button', { name: /nuevo lead/i }).click();
   const leadName = `Lead E2E ${Date.now()}`;

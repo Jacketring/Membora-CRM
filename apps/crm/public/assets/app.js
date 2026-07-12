@@ -1129,6 +1129,11 @@ document.querySelectorAll('[data-copy-target]').forEach((button) => {
 });
 
 const confirmDialog = document.getElementById('confirm-dialog');
+
+document.querySelectorAll('.js-print-invoice').forEach((button) => {
+  button.addEventListener('click', () => window.print());
+});
+
 let pendingConfirmForm = null;
 
 if (confirmDialog) {

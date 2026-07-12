@@ -41,7 +41,9 @@ function request_origin_allowed(): bool
 
 function enforce_internal_post_security(): void
 {
-    if (post_value('action', '') === 'demo_login' && demo_origin_allowed()) {
+    if (post_value('action', '') === 'demo_login'
+        && DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))
+        && demo_origin_allowed()) {
         return;
     }
 
@@ -55,6 +57,9 @@ function enforce_internal_post_security(): void
 
 function demo_origin_allowed(): bool
 {
+    if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+        return false;
+    }
     $origin = rtrim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''), '/');
     $referer = rtrim((string) ($_SERVER['HTTP_REFERER'] ?? ''), '/');
     $allowedWeb = rtrim((string) (getenv('WEB_APP_URL') ?: 'https://app.web.josehurtado.dev'), '/');

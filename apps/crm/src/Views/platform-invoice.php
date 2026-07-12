@@ -180,7 +180,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
 </head>
 <body>
   <div class="invoice-actions">
-    <button type="button" onclick="window.print()">Imprimir / guardar PDF</button>
+    <button type="button" class="js-print-invoice">Imprimir / guardar PDF</button>
     <a href="index.php?route=platform-invoices">Volver a facturas</a>
   </div>
 
@@ -296,5 +296,6 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
 
     <p class="footer">Factura generada por Membora CRM. Conserva este documento junto con el justificante de pago correspondiente.</p>
   </article>
+  <script src="assets/app.js"></script>
 </body>
 </html>
