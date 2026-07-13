@@ -86,13 +86,19 @@
             <td><?= e($checkin['created_by_name'] ?: 'Sistema') ?></td>
             <td><?= e($checkin['notes'] ? substr($checkin['notes'], 0, 70) . (strlen($checkin['notes']) > 70 ? '...' : '') : 'Sin notas') ?></td>
             <td>
-              <form method="post" data-confirm-message="Eliminar este check-in?">
-                <input type="hidden" name="action" value="delete_checkin">
-                <input type="hidden" name="id" value="<?= e($checkin['id']) ?>">
-                <button class="icon-action danger-action" type="submit" title="Eliminar check-in" aria-label="Eliminar check-in de <?= e($memberName) ?>">
-                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 21a2 2 0 0 1-2-2V8h14v11a2 2 0 0 1-2 2H7ZM9 6V4h6v2h5v2h5v2H4V6h5Zm0 5v7h2v-7H9Zm4 0v7h2v-7h-2Z"/></svg>
-                </button>
-              </form>
+              <?php if (can_perform_action('delete_checkin')): ?>
+                <div class="row-actions">
+                  <form method="post" data-confirm-message="¿Eliminar este check-in? Esta acción no se puede deshacer." data-confirm-action-label="Eliminar">
+                    <input type="hidden" name="action" value="delete_checkin">
+                    <input type="hidden" name="id" value="<?= e($checkin['id']) ?>">
+                    <button class="icon-action danger-action" type="submit" title="Eliminar check-in" aria-label="Eliminar check-in de <?= e($memberName) ?>">
+                      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 21a2 2 0 0 1-2-2V8h14v11a2 2 0 0 1-2 2H7ZM9 6V4h6v2h5v2H4V6h5Zm0 5v7h2v-7H9Zm4 0v7h2v-7h-2Z"/></svg>
+                    </button>
+                  </form>
+                </div>
+              <?php else: ?>
+                <span class="muted-cell">Sin acciones</span>
+              <?php endif; ?>
             </td>
           </tr>
         <?php endforeach; ?>
