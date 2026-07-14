@@ -12,7 +12,7 @@ final class Actions
 
         $action = post_value('action', '');
         if ($action !== 'demo_login' && !verify_csrf()) {
-            flash('Solicitud bloqueada por seguridad. Recarga la página e intentalo de nuevo.', 'error');
+            flash('Solicitud bloqueada por seguridad. Recarga la página e inténtalo de nuevo.', 'error');
             redirect($_GET['return'] ?? ($_GET['route'] ?? 'dashboard'));
         }
         if (!can_perform_action($action)) {

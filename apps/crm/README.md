@@ -67,6 +67,7 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Login.
 - Login demo automatico con usuario temporal unico y caducidad de 20 minutos.
 - Alta publica de prueba durante 14 dias con verificacion de email y creacion automatica de tenant y administrador.
+- Cookie de sesion exclusiva mediante `SESSION_COOKIE_NAME`, evitando colisiones con otras aplicaciones PHP del dominio.
 - Dashboard del gimnasio.
 - Leads.
 - Socios.

@@ -26,6 +26,14 @@ ini_set('session.use_only_cookies', '1');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Lax');
 
+// A dedicated cookie name avoids stale PHPSESSID cookies from the public site or old domains.
+$configuredSessionName = trim((string) (getenv('SESSION_COOKIE_NAME') ?: 'MEMBORA_CRM_SESSION'));
+$sessionName = preg_replace('/[^A-Za-z0-9_]/', '', $configuredSessionName) ?: 'MEMBORA_CRM_SESSION';
+if (!preg_match('/^[A-Za-z]/', $sessionName)) {
+    $sessionName = 'M_' . $sessionName;
+}
+session_name($sessionName);
+
 session_set_cookie_params([
     'lifetime' => 0,
     'path' => '/',

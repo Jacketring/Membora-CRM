@@ -23,7 +23,7 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
           <p>Portal de gestión fitness</p>
         </div>
       </div>
-      <form class="login-card" method="post">
+      <form class="login-card" method="post" action="index.php?route=login">
         <input type="hidden" name="action" value="login">
         <header>
           <h2>Accede a tu CRM</h2>

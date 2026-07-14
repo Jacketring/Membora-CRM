@@ -56,7 +56,7 @@ function enforce_internal_post_security(): void
         return;
     }
 
-    flash('Solicitud bloqueada por seguridad. Recarga la página e intentalo de nuevo.', 'error');
+    flash('Solicitud bloqueada por seguridad. Recarga la página e inténtalo de nuevo.', 'error');
     redirect('dashboard');
 }
 
