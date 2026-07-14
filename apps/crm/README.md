@@ -128,7 +128,7 @@ Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones N
 
 La captacion web se revisa desde el panel de administradores de Membora CRM, no desde cada gimnasio cliente.
 
-Los enlaces de demo de la web publica envian un `POST` al login demo del CRM. La demo cliente publica funciona con `APP_ENV=production`, mientras que la demo de administrador solo se habilita con `APP_ENV=demo`. Cada acceso crea un usuario temporal con credenciales aleatorias, dura 20 minutos, muestra un contador y elimina ese usuario al cerrar sesion, caducar o cerrar la pestana. Al terminar devuelve al usuario a `WEB_APP_URL`.
+Los enlaces de demo de la web publica envian un `POST` al login demo del CRM. La demo cliente publica no depende del nombre exacto de `APP_ENV`, mientras que la demo de administrador solo se habilita con `APP_ENV=demo`. Cada acceso crea un usuario temporal con credenciales aleatorias, dura 20 minutos, muestra un contador y elimina ese usuario al cerrar sesion, caducar o cerrar la pestana. Al terminar devuelve al usuario a `WEB_APP_URL`.
 
 El formulario de `httpdocs` envia al webhook:
 

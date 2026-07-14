@@ -11,7 +11,7 @@ final class DemoAccessPolicy
 
     public static function isClientEnabled(string $environment): bool
     {
-        return in_array(strtolower(trim($environment)), ['demo', 'production'], true);
+        return !in_array(strtolower(trim($environment)), ['test', 'testing'], true);
     }
 
     public static function isTypeEnabled(string $environment, string $type): bool
