@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/Repositories/DashboardRepository.php';
+require_once __DIR__ . '/Repositories/AuthTokenRepository.php';
 require_once __DIR__ . '/Repositories/DemoRepository.php';
 require_once __DIR__ . '/Repositories/AuditLogRepository.php';
 require_once __DIR__ . '/Repositories/RiskAlertRepository.php';

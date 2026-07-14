@@ -122,6 +122,14 @@ summary:focus-visible {
 }
 .login-card header h2 { font-size: 24px; margin: 0 0 8px; }
 .login-card header p { color: var(--muted); line-height: 1.5; margin: 0 0 24px; }
+.login-options { align-items: center; display: flex; gap: 12px; justify-content: space-between; margin: 4px 0 18px; }
+.login-remember { align-items: center; color: var(--muted); display: inline-flex; font-size: 13px; gap: 7px; }
+.login-remember input { accent-color: var(--primary); height: 16px; width: 16px; }
+.login-help-link, .login-back-link { color: var(--primary); font-size: 13px; font-weight: 800; }
+.login-help-link:hover, .login-back-link:hover { text-decoration: underline; }
+.login-back-link { display: block; margin-top: 18px; text-align: center; }
+.login-primary-link { display: block; text-align: center; }
+.login-card > .notice, .login-card form > .notice { margin-bottom: 18px; }
 .demo-note {
   background: #eef4ff;
   border-radius: 10px;
@@ -169,6 +177,7 @@ summary:focus-visible {
   filter: brightness(0.98);
 }
 @media (max-width: 520px) {
+  .login-options { align-items: flex-start; flex-direction: column; }
   .demo-login-actions {
     grid-template-columns: 1fr;
   }

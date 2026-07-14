@@ -40,6 +40,13 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
           <span>Contraseña</span>
           <div class="input-shell"><input name="password" type="password" required value="" data-login-password autocomplete="current-password"></div>
         </label>
+        <div class="login-options">
+          <label class="login-remember">
+            <input name="remember" type="checkbox" value="1">
+            <span>Recordarme durante 30 días</span>
+          </label>
+          <a class="login-help-link" href="index.php?route=forgot-password">¿Olvidaste tu contraseña?</a>
+        </div>
         <button class="primary-action" type="submit">Iniciar sesión</button>
         <?php if ($demoEnabled): ?>
         <div class="demo-login-actions" aria-label="Accesos demo">

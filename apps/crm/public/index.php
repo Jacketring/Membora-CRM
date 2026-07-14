@@ -123,6 +123,7 @@ if ($requestPath === '/stripe/checkout/cancel') {
 }
 
 $postAction = $_SERVER['REQUEST_METHOD'] === 'POST' ? (string) ($_POST['action'] ?? '') : '';
+Auth::restoreRememberedLogin();
 if (!in_array($postAction, ['login', 'demo_login'], true)) {
     Auth::enforceDemoExpiry();
 }
@@ -147,6 +148,30 @@ if ($route === 'login') {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
     render('login');
+    exit;
+}
+
+if ($route === 'forgot-password') {
+    if (Auth::user()) {
+        redirect(is_platform_admin(Auth::user()) ? 'platform-dashboard' : 'dashboard');
+    }
+
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    render('forgot-password');
+    exit;
+}
+
+if ($route === 'reset-password') {
+    if (Auth::user()) {
+        redirect(is_platform_admin(Auth::user()) ? 'platform-dashboard' : 'dashboard');
+    }
+
+    $token = trim((string) ($_GET['token'] ?? ''));
+    $tokenValid = $token !== '' && AuthTokenRepository::validUserId($token, AuthTokenRepository::PASSWORD_RESET_PURPOSE) !== null;
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    render('reset-password', ['token' => $token, 'tokenValid' => $tokenValid]);
     exit;
 }
 

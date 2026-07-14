@@ -2,6 +2,8 @@
 
 final class Auth
 {
+    private const REMEMBER_COOKIE = 'membora_remember';
+    private const REMEMBER_TTL = 2592000;
     private static bool $lastAttemptRateLimited = false;
 
     public static function lastAttemptWasRateLimited(): bool
@@ -35,7 +37,7 @@ final class Auth
         return $user;
     }
 
-    public static function attempt(string $email, string $password): bool
+    public static function attempt(string $email, string $password, bool $remember = false): bool
     {
         $pdo = Database::connection();
         self::$lastAttemptRateLimited = false;
@@ -68,32 +70,63 @@ final class Auth
 
         self::clearLoginAttempts($pdo, $ip, $emailKey);
 
-        session_regenerate_id(true);
-
-        $isPlatformAdmin = in_array(strtoupper((string) $user['role_key']), ['SUPER_ADMIN', 'SUPERADMIN'], true);
-
-        if ($isPlatformAdmin) {
-            $user['tenant_name'] = 'Membora CRM';
-            $user['tenant_primary_color'] = '#004bf2';
-        } elseif (!$user['tenant_id']) {
+        if (!self::startUserSession($user)) {
             return false;
         }
 
-        $_SESSION['user'] = [
-            'id' => $user['id'],
-            'tenant_id' => $user['tenant_id'],
-            'tenant_name' => $user['tenant_name'],
-            'tenant_primary_color' => $user['tenant_primary_color'] ?: '#004bf2',
-            'name' => $user['name'],
-            'email' => $user['email'],
-            'avatar_path' => $user['avatar_path'] ?? null,
-            'role' => $user['role_key'],
-        ];
+        self::forgetRememberedLogin();
+        if ($remember) {
+            try {
+                self::issueRememberedLogin((string) $user['id']);
+            } catch (Throwable $exception) {
+                self::clearRememberCookie();
+                log_server_error($exception, 'remember_login_issue');
+            }
+        }
 
         $update = $pdo->prepare('UPDATE users SET last_login_at = NOW() WHERE id = :id');
         $update->execute(['id' => $user['id']]);
 
         return true;
+    }
+
+    public static function restoreRememberedLogin(): bool
+    {
+        if (self::user()) {
+            return true;
+        }
+
+        $token = trim((string) ($_COOKIE[self::REMEMBER_COOKIE] ?? ''));
+        if ($token === '') {
+            return false;
+        }
+
+        try {
+            $userId = AuthTokenRepository::validUserId($token, AuthTokenRepository::REMEMBER_PURPOSE);
+            AuthTokenRepository::deleteSelector(AuthTokenRepository::selector($token));
+            if ($userId === null) {
+                self::clearRememberCookie();
+                return false;
+            }
+
+            $user = self::activeUserById($userId);
+            if (!$user || !self::startUserSession($user)) {
+                self::clearRememberCookie();
+                return false;
+            }
+
+            try {
+                self::issueRememberedLogin($userId);
+            } catch (Throwable $exception) {
+                self::clearRememberCookie();
+                log_server_error($exception, 'remember_login_rotate');
+            }
+            return true;
+        } catch (Throwable $exception) {
+            self::clearRememberCookie();
+            log_server_error($exception, 'remember_login');
+            return false;
+        }
     }
 
     public static function attemptDemo(string $type): bool
@@ -156,6 +189,7 @@ final class Auth
 
     public static function logout(): void
     {
+        self::forgetRememberedLogin();
         unset($_SESSION['user'], $_SESSION['platform_admin_user']);
         $_SESSION = [];
 
@@ -245,5 +279,88 @@ final class Auth
     {
         $_SESSION['demo_type'] = $type;
         $_SESSION['demo_expires_at'] = time() + 20 * 60;
+    }
+
+    private static function activeUserById(string $userId): ?array
+    {
+        UserRepository::ensureAvatarColumn();
+        TenantRepository::ensureSettingsColumns();
+        $stmt = Database::connection()->prepare(
+            'SELECT users.*, tenants.name AS tenant_name, tenants.primary_color AS tenant_primary_color, roles.key AS role_key
+             FROM users
+             LEFT JOIN tenants ON tenants.id = users.tenant_id
+             INNER JOIN roles ON roles.id = users.role_id
+             WHERE users.id = :id AND users.status = "ACTIVE"
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $userId]);
+        $user = $stmt->fetch();
+
+        return $user ?: null;
+    }
+
+    private static function startUserSession(array $user): bool
+    {
+        $isPlatformAdmin = in_array(strtoupper((string) $user['role_key']), ['SUPER_ADMIN', 'SUPERADMIN'], true);
+        if ($isPlatformAdmin) {
+            $user['tenant_name'] = 'Membora CRM';
+            $user['tenant_primary_color'] = '#004bf2';
+        } elseif (empty($user['tenant_id'])) {
+            return false;
+        }
+
+        session_regenerate_id(true);
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'tenant_id' => $user['tenant_id'],
+            'tenant_name' => $user['tenant_name'],
+            'tenant_primary_color' => $user['tenant_primary_color'] ?: '#004bf2',
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'avatar_path' => $user['avatar_path'] ?? null,
+            'role' => $user['role_key'],
+        ];
+
+        return true;
+    }
+
+    private static function issueRememberedLogin(string $userId): void
+    {
+        $token = AuthTokenRepository::issue($userId, AuthTokenRepository::REMEMBER_PURPOSE, self::REMEMBER_TTL);
+        setcookie(self::REMEMBER_COOKIE, $token, self::rememberCookieOptions(time() + self::REMEMBER_TTL));
+        $_COOKIE[self::REMEMBER_COOKIE] = $token;
+    }
+
+    private static function forgetRememberedLogin(): void
+    {
+        $token = trim((string) ($_COOKIE[self::REMEMBER_COOKIE] ?? ''));
+        if ($token !== '') {
+            try {
+                AuthTokenRepository::deleteSelector(AuthTokenRepository::selector($token));
+            } catch (Throwable) {
+            }
+        }
+        self::clearRememberCookie();
+    }
+
+    private static function clearRememberCookie(): void
+    {
+        setcookie(self::REMEMBER_COOKIE, '', self::rememberCookieOptions(time() - 3600));
+        unset($_COOKIE[self::REMEMBER_COOKIE]);
+    }
+
+    private static function rememberCookieOptions(int $expires): array
+    {
+        $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
+        return [
+            'expires' => $expires,
+            'path' => '/',
+            'domain' => '',
+            'secure' => $secure,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ];
     }
 }

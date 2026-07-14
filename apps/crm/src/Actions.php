@@ -38,6 +38,8 @@ final class Actions
         match ($action) {
             'login' => self::login(),
             'demo_login' => self::demoLogin(),
+            'request_password_reset' => self::requestPasswordReset(),
+            'reset_password' => self::resetPassword(),
             'logout' => self::logout(),
             'update_profile' => self::updateProfile(),
             'update_platform_lead' => self::updatePlatformLead(),
@@ -132,9 +134,10 @@ final class Actions
     {
         $email = post_value('email', '');
         $password = post_value('password', '');
+        $remember = post_value('remember') === '1';
 
         try {
-            if (Auth::attempt($email, $password)) {
+            if (Auth::attempt($email, $password, $remember)) {
                 redirect(is_platform_admin(Auth::user()) ? 'platform-dashboard' : 'dashboard');
             }
         } catch (Throwable $exception) {
@@ -144,6 +147,77 @@ final class Actions
 
         flash(Auth::lastAttemptWasRateLimited() ? 'Demasiados intentos, prueba mas tarde.' : 'Credenciales incorrectas.', 'error');
         redirect('login');
+    }
+
+    private static function requestPasswordReset(): never
+    {
+        $email = strtolower(trim((string) post_value('email', '')));
+        $genericMessage = 'Si existe una cuenta activa con ese email, recibirás un enlace para cambiar la contraseña.';
+
+        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            try {
+                $stmt = Database::connection()->prepare('SELECT id, name, email FROM users WHERE LOWER(email) = :email AND status = "ACTIVE" LIMIT 1');
+                $stmt->execute(['email' => $email]);
+                $user = $stmt->fetch();
+
+                if ($user) {
+                    $token = AuthTokenRepository::issuePasswordReset((string) $user['id']);
+                    if ($token !== null) {
+                        $resetUrl = app_base_url() . '/index.php?route=reset-password&token=' . urlencode($token);
+                        if (!Mailer::sendPasswordReset((string) $user['email'], (string) $user['name'], $resetUrl)) {
+                            AuthTokenRepository::deleteSelector(AuthTokenRepository::selector($token));
+                            error_log('Password reset email failed: ' . Mailer::lastError());
+                        }
+                    }
+                }
+            } catch (Throwable $exception) {
+                log_server_error($exception, 'password_reset_request');
+            }
+        }
+
+        flash($genericMessage);
+        redirect('forgot-password');
+    }
+
+    private static function resetPassword(): never
+    {
+        $token = trim((string) post_value('token', ''));
+        $password = (string) post_value('password', '');
+        $confirmation = (string) post_value('password_confirmation', '');
+        if ($token === '' || AuthTokenRepository::validUserId($token, AuthTokenRepository::PASSWORD_RESET_PURPOSE) === null) {
+            flash('El enlace de recuperación no es válido o ha caducado.', 'error');
+            redirect('forgot-password');
+        }
+
+        if (strlen($password) < 8) {
+            flash('La nueva contraseña debe tener al menos 8 caracteres.', 'error');
+            self::redirectToPasswordReset($token);
+        }
+
+        if (!hash_equals($password, $confirmation)) {
+            flash('Las contraseñas no coinciden.', 'error');
+            self::redirectToPasswordReset($token);
+        }
+
+        try {
+            if (!AuthTokenRepository::resetPassword($token, password_hash($password, PASSWORD_BCRYPT))) {
+                flash('El enlace de recuperación no es válido o ha caducado.', 'error');
+                redirect('forgot-password');
+            }
+        } catch (Throwable $exception) {
+            log_server_error($exception, 'password_reset');
+            flash('No se pudo cambiar la contraseña. Inténtalo de nuevo.', 'error');
+            self::redirectToPasswordReset($token);
+        }
+
+        flash('Contraseña actualizada. Ya puedes iniciar sesión.');
+        redirect('login');
+    }
+
+    private static function redirectToPasswordReset(string $token): never
+    {
+        header('Location: index.php?route=reset-password&token=' . urlencode($token));
+        exit;
     }
 
     private static function demoLogin(): never

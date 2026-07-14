@@ -73,6 +73,28 @@ final class Mailer
         return self::sendNativeMail($email, 'Prueba de correo - Membora CRM', $html);
     }
 
+    public static function sendPasswordReset(string $email, string $name, string $resetUrl): bool
+    {
+        self::$lastError = '';
+
+        if (strtolower((string) (getenv('MAIL_ENABLED') ?: 'true')) === 'false') {
+            return true;
+        }
+
+        $email = strtolower(trim($email));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            self::$lastError = 'Email de recuperación no válido.';
+            return false;
+        }
+
+        $html = self::passwordResetTemplate($name, $resetUrl);
+        if (self::usesSmtp()) {
+            return self::sendSmtp($email, 'Restablece tu contraseña - Membora CRM', $html);
+        }
+
+        return self::sendNativeMail($email, 'Restablece tu contraseña - Membora CRM', $html);
+    }
+
     private static function sendNativeMail(string $to, string $subject, string $html): bool
     {
         $fromEmail = self::fromEmail();
@@ -301,6 +323,36 @@ HTML;
           </table>
         </td>
       </tr>
+    </table>
+  </body>
+</html>
+HTML;
+    }
+
+    private static function passwordResetTemplate(string $name, string $resetUrl): string
+    {
+        $safeName = e(trim($name) !== '' ? trim($name) : 'Hola');
+        $safeUrl = e($resetUrl);
+        $emailLogo = self::emailLogoHtml(48);
+
+        return <<<HTML
+<!doctype html>
+<html lang="es">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Restablecer contraseña</title></head>
+  <body style="margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0b172a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:32px 14px;">
+      <tr><td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#fff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;">
+          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span></td></tr>
+          <tr><td style="padding:34px 32px;">
+            <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Recuperación de acceso</p>
+            <h1 style="margin:0 0 16px;font-size:28px;color:#071327;">{$safeName}, crea una nueva contraseña</h1>
+            <p style="margin:0 0 24px;color:#334155;font-size:16px;line-height:1.65;">Este enlace es de un solo uso y caduca en 60 minutos.</p>
+            <a href="{$safeUrl}" style="display:inline-block;background:#004bf2;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Cambiar contraseña</a>
+            <p style="margin:24px 0 0;color:#64748b;font-size:13px;line-height:1.6;">Si no solicitaste este cambio, ignora el correo. Tu contraseña actual seguirá funcionando.</p>
+          </td></tr>
+        </table>
+      </td></tr>
     </table>
   </body>
 </html>

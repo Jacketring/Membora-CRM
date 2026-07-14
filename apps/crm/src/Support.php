@@ -406,7 +406,7 @@ function can_perform_action(string $action, ?array $user = null): bool
     $user = $user ?? Auth::user();
     $role = user_role_key($user);
 
-    if (in_array($action, ['login', 'demo_login', 'logout', 'update_profile'], true)) {
+    if (in_array($action, ['login', 'demo_login', 'request_password_reset', 'reset_password', 'logout', 'update_profile'], true)) {
         return true;
     }
 
