@@ -98,15 +98,40 @@ final class CheckinRepository
         return $stmt->fetchAll();
     }
 
-    public static function create(string $tenantId, array $data): void
+    public static function create(string $tenantId, array $data, bool $ensureTable = true): void
     {
-        self::ensureTable();
+        if ($ensureTable) {
+            self::ensureTable();
+        }
         $params = self::params($tenantId, $data);
 
         $pdo = Database::connection();
-        $pdo->beginTransaction();
+        $ownsTransaction = !$pdo->inTransaction();
+        if ($ownsTransaction) {
+            $pdo->beginTransaction();
+        }
 
         try {
+            if (!empty($params['reservation_id'])) {
+                $existing = $pdo->prepare(
+                    'SELECT id FROM checkins
+                     WHERE tenant_id = :tenant_id AND reservation_id = :reservation_id
+                     LIMIT 1'
+                );
+                $existing->execute([
+                    'tenant_id' => $tenantId,
+                    'reservation_id' => $params['reservation_id'],
+                ]);
+
+                if ($existing->fetchColumn()) {
+                    self::markReservationAttended($tenantId, (string) $params['reservation_id'], (string) $params['member_id']);
+                    if ($ownsTransaction) {
+                        $pdo->commit();
+                    }
+                    return;
+                }
+            }
+
             $stmt = $pdo->prepare(
                 'INSERT INTO checkins (id, tenant_id, member_id, class_session_id, reservation_id, method, checked_in_at, notes, created_by_user_id, created_at)
                  VALUES (:id, :tenant_id, :member_id, :class_session_id, :reservation_id, :method, :checked_in_at, :notes, :created_by_user_id, NOW())'
@@ -114,21 +139,14 @@ final class CheckinRepository
             $stmt->execute($params + ['id' => cuid()]);
 
             if (!empty($params['reservation_id'])) {
-                $updateReservation = $pdo->prepare(
-                    'UPDATE reservations
-                     SET status = "attended"
-                     WHERE id = :id AND tenant_id = :tenant_id AND member_id = :member_id'
-                );
-                $updateReservation->execute([
-                    'id' => $params['reservation_id'],
-                    'tenant_id' => $tenantId,
-                    'member_id' => $params['member_id'],
-                ]);
+                self::markReservationAttended($tenantId, (string) $params['reservation_id'], (string) $params['member_id']);
             }
 
-            $pdo->commit();
+            if ($ownsTransaction) {
+                $pdo->commit();
+            }
         } catch (Throwable $exception) {
-            if ($pdo->inTransaction()) {
+            if ($ownsTransaction && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
 
@@ -226,7 +244,7 @@ final class CheckinRepository
         }
 
         $method = strtoupper(trim((string) ($data['method'] ?? 'MANUAL')));
-        if (!in_array($method, ['MANUAL', 'QR'], true)) {
+        if (!in_array($method, ['MANUAL', 'QR', 'AUTOMATIC'], true)) {
             $method = 'MANUAL';
         }
 
@@ -270,6 +288,20 @@ final class CheckinRepository
         $stmt->execute(['id' => $classSessionId, 'tenant_id' => $tenantId]);
 
         return (int) $stmt->fetchColumn() > 0;
+    }
+
+    private static function markReservationAttended(string $tenantId, string $reservationId, string $memberId): void
+    {
+        $stmt = Database::connection()->prepare(
+            'UPDATE reservations
+             SET status = "attended"
+             WHERE id = :id AND tenant_id = :tenant_id AND member_id = :member_id'
+        );
+        $stmt->execute([
+            'id' => $reservationId,
+            'tenant_id' => $tenantId,
+            'member_id' => $memberId,
+        ]);
     }
 
     private static function count(PDO $pdo, string $tenantId, string $where): int

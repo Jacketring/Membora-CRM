@@ -2029,12 +2029,40 @@ final class Actions
             self::redirectAfterReservationAction($sessionId);
         }
 
+        ReservationRepository::ensureTable();
+        CheckinRepository::ensureTable();
+        $pdo = Database::connection();
+
         try {
-            ReservationRepository::create($tenantId, $memberId, $sessionId);
-            flash('Reserva creada correctamente.');
+            $pdo->beginTransaction();
+            $reservationId = ReservationRepository::create($tenantId, $memberId, $sessionId, false);
+            CheckinRepository::create($tenantId, [
+                'member_id' => $memberId,
+                'class_session_id' => $sessionId,
+                'reservation_id' => $reservationId,
+                'method' => 'AUTOMATIC',
+                'notes' => 'Creado automáticamente al reservar la clase.',
+            ], false);
+            $pdo->commit();
+
+            try {
+                AuditLogRepository::record('create_checkin', [
+                    'member_id' => $memberId,
+                    'class_session_id' => $sessionId,
+                    'reservation_id' => $reservationId,
+                    'method' => 'AUTOMATIC',
+                ]);
+            } catch (Throwable $auditException) {
+                $_SESSION['audit_log_error'] = $auditException->getMessage();
+            }
+
+            flash('Reserva y check-in creados correctamente.');
         } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             log_server_error($exception, 'reservation');
-            flash('No se pudo crear la reserva.', 'error');
+            flash('No se pudo crear la reserva y su check-in.', 'error');
         }
 
         self::redirectAfterReservationAction($sessionId);

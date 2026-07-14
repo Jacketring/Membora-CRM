@@ -15,7 +15,7 @@ function send_security_headers(bool $isSecureRequest = false): void
     header('X-Frame-Options: DENY');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
-    header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'");
+    header("Content-Security-Policy: default-src 'self'; img-src 'self' data: https://flagcdn.com; style-src 'self' 'unsafe-inline'; script-src 'self'");
 
     if ($isSecureRequest) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
@@ -628,6 +628,7 @@ function checkin_method_label(?string $method): string
     return enum_label((string) $method, [
         'MANUAL' => 'Manual',
         'QR' => 'QR',
+        'AUTOMATIC' => 'Automático',
     ]);
 }
 

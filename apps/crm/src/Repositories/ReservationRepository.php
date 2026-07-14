@@ -123,9 +123,11 @@ final class ReservationRepository
         return $capacity === false ? null : (int) $capacity;
     }
 
-    public static function create(string $tenantId, string $memberId, string $sessionId): void
+    public static function create(string $tenantId, string $memberId, string $sessionId, bool $ensureTable = true): string
     {
-        self::ensureTable();
+        if ($ensureTable) {
+            self::ensureTable();
+        }
         $pdo = Database::connection();
 
         $memberStmt = $pdo->prepare('SELECT id FROM members WHERE id = :id AND tenant_id = :tenant_id AND status <> "INACTIVE" LIMIT 1');
@@ -168,19 +170,22 @@ final class ReservationRepository
                  WHERE id = :id AND tenant_id = :tenant_id'
             );
             $stmt->execute(['id' => $existing['id'], 'tenant_id' => $tenantId]);
-            return;
+            return (string) $existing['id'];
         }
 
+        $reservationId = cuid();
         $stmt = $pdo->prepare(
             'INSERT INTO reservations (id, tenant_id, member_id, class_session_id, status, created_at, cancelled_at)
              VALUES (:id, :tenant_id, :member_id, :class_session_id, "reserved", NOW(), NULL)'
         );
         $stmt->execute([
-            'id' => cuid(),
+            'id' => $reservationId,
             'tenant_id' => $tenantId,
             'member_id' => $memberId,
             'class_session_id' => $sessionId,
         ]);
+
+        return $reservationId;
     }
 
     public static function updateStatus(string $tenantId, string $reservationId, string $status): void

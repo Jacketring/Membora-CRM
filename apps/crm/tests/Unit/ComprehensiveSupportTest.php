@@ -98,7 +98,7 @@ final class ComprehensiveSupportTest extends TestCase
             [platform_lead_status_label(...), 'CONVERTED'], [platform_payment_status_label(...), 'PAID'],
             [platform_invoice_status_label(...), 'ISSUED'], [payment_method_label(...), 'CARD'],
             [billing_sync_status_label(...), 'SUCCESS'], [billing_operation_label(...), 'CREATE'],
-            [checkin_method_label(...), 'QR'], [risk_alert_type_label(...), 'INACTIVITY'],
+            [checkin_method_label(...), 'QR'], [checkin_method_label(...), 'AUTOMATIC'], [risk_alert_type_label(...), 'INACTIVITY'],
             [risk_alert_severity_label(...), 'HIGH'], [audit_action_label(...), 'create_lead'],
             [audit_entity_label(...), 'member'], [audit_area_label(...), 'settings'],
             [platform_plan_status_label(...), 'ACTIVE'], [webhook_status_label(...), 'success'],
