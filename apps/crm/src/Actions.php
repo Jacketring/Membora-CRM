@@ -224,11 +224,10 @@ final class Actions
 
     private static function demoLogin(): never
     {
-        if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+        $type = post_value('demo_type', 'client') === 'admin' ? 'admin' : 'client';
+        if (!DemoAccessPolicy::isTypeEnabled((string) getenv('APP_ENV'), $type)) {
             redirect('login');
         }
-
-        $type = post_value('demo_type', 'client') === 'admin' ? 'admin' : 'client';
 
         try {
             if (Auth::attemptDemo($type)) {

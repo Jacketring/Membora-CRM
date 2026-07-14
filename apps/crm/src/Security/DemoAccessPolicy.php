@@ -8,4 +8,16 @@ final class DemoAccessPolicy
     {
         return strtolower(trim($environment)) === 'demo';
     }
+
+    public static function isClientEnabled(string $environment): bool
+    {
+        return in_array(strtolower(trim($environment)), ['demo', 'production'], true);
+    }
+
+    public static function isTypeEnabled(string $environment, string $type): bool
+    {
+        return $type === 'admin'
+            ? self::isEnabled($environment)
+            : self::isClientEnabled($environment);
+    }
 }

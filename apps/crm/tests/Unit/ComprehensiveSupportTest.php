@@ -151,4 +151,29 @@ final class ComprehensiveSupportTest extends TestCase
         $_SERVER['HTTP_ORIGIN'] = 'https://evil.example';
         self::assertFalse(request_origin_allowed());
     }
+
+    public function testProductionClientDemoAcceptsEveryConfiguredPublicOrigin(): void
+    {
+        $previousEnvironment = getenv('APP_ENV');
+        $previousWebUrl = getenv('WEB_APP_URL');
+
+        try {
+            putenv('APP_ENV=production');
+            putenv('WEB_APP_URL=https://membora.es,https://www.membora.es');
+            $_POST = ['action' => 'demo_login', 'demo_type' => 'client'];
+            $_SERVER['HTTP_ORIGIN'] = 'https://www.membora.es';
+
+            self::assertTrue(demo_origin_allowed());
+
+            $_POST['demo_type'] = 'admin';
+            self::assertFalse(demo_origin_allowed());
+
+            $_POST['demo_type'] = 'client';
+            $_SERVER['HTTP_ORIGIN'] = 'https://evil.example';
+            self::assertFalse(demo_origin_allowed());
+        } finally {
+            $previousEnvironment === false ? putenv('APP_ENV') : putenv('APP_ENV=' . $previousEnvironment);
+            $previousWebUrl === false ? putenv('WEB_APP_URL') : putenv('WEB_APP_URL=' . $previousWebUrl);
+        }
+    }
 }

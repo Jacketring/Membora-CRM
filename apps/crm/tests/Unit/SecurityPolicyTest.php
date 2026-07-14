@@ -54,6 +54,14 @@ final class SecurityPolicyTest extends TestCase
         self::assertFalse(DemoAccessPolicy::isEnabled(''));
     }
 
+    public function testPublicClientDemoIsEnabledInProductionWithoutEnablingAdminDemo(): void
+    {
+        self::assertTrue(DemoAccessPolicy::isClientEnabled('production'));
+        self::assertTrue(DemoAccessPolicy::isTypeEnabled('production', 'client'));
+        self::assertFalse(DemoAccessPolicy::isTypeEnabled('production', 'admin'));
+        self::assertFalse(DemoAccessPolicy::isClientEnabled('testing'));
+    }
+
     public function testProductionLoginDoesNotRenderHiddenDemoForms(): void
     {
         $previousEnvironment = getenv('APP_ENV');

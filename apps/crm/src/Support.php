@@ -45,8 +45,9 @@ function request_origin_allowed(): bool
 
 function enforce_internal_post_security(): void
 {
+    $demoType = post_value('demo_type', 'client') === 'admin' ? 'admin' : 'client';
     if (post_value('action', '') === 'demo_login'
-        && DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))
+        && DemoAccessPolicy::isTypeEnabled((string) getenv('APP_ENV'), $demoType)
         && demo_origin_allowed()) {
         return;
     }
@@ -61,19 +62,29 @@ function enforce_internal_post_security(): void
 
 function demo_origin_allowed(): bool
 {
-    if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+    $demoType = post_value('demo_type', 'client') === 'admin' ? 'admin' : 'client';
+    if (!DemoAccessPolicy::isTypeEnabled((string) getenv('APP_ENV'), $demoType)) {
         return false;
     }
     $origin = rtrim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''), '/');
     $referer = rtrim((string) ($_SERVER['HTTP_REFERER'] ?? ''), '/');
-    $allowedWeb = rtrim(trim(explode(',', (string) (getenv('WEB_APP_URL') ?: 'https://membora.es'))[0]), '/');
+    $allowedWebOrigins = array_values(array_filter(array_map(
+        static fn (string $value): string => rtrim(trim($value), '/'),
+        explode(',', (string) (getenv('WEB_APP_URL') ?: 'https://membora.es'))
+    )));
 
     if ($origin !== '') {
-        return hash_equals($allowedWeb, $origin);
+        return in_array($origin, $allowedWebOrigins, true);
     }
 
     if ($referer !== '') {
-        return str_starts_with($referer, $allowedWeb . '/') || hash_equals($allowedWeb, $referer);
+        foreach ($allowedWebOrigins as $allowedWeb) {
+            if (str_starts_with($referer, $allowedWeb . '/') || hash_equals($allowedWeb, $referer)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     return true;

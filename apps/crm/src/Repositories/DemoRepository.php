@@ -13,9 +13,9 @@ final class DemoRepository
         return trim((string) getenv('DEMO_CLIENT_PASSWORD'));
     }
 
-    private static function assertDemoEnvironment(): void
+    private static function assertDemoEnvironment(string $type = 'client'): void
     {
-        if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+        if (!DemoAccessPolicy::isTypeEnabled((string) getenv('APP_ENV'), $type)) {
             throw new LogicException('Demo data cannot be created outside the demo environment.');
         }
     }
@@ -37,7 +37,7 @@ final class DemoRepository
 
     public static function prepareAdminDemo(): void
     {
-        self::assertDemoEnvironment();
+        self::assertDemoEnvironment('admin');
         EmpresaRepository::ensureTables();
         EmpresaRepository::ensurePlatformAdmin();
         PlatformPlanRepository::ensureTable();
@@ -91,7 +91,7 @@ final class DemoRepository
 
     public static function maintainTemporaryUsers(): void
     {
-        if (!DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'))) {
+        if (!DemoAccessPolicy::isClientEnabled((string) getenv('APP_ENV'))) {
             return;
         }
 
