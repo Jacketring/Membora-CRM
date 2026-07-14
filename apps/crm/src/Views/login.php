@@ -43,7 +43,7 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
         <div class="login-options">
           <label class="login-remember">
             <input name="remember" type="checkbox" value="1">
-            <span>Recordarme durante 30 días</span>
+            <span>Recordar</span>
           </label>
           <a class="login-help-link" href="index.php?route=forgot-password">¿Olvidaste tu contraseña?</a>
         </div>

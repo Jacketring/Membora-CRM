@@ -74,9 +74,13 @@ final class AuthTokenRepository
 
         self::ensureTable();
         [$selector, $verifier] = $parts;
+        $maximumAgeSql = $purpose === self::REMEMBER_PURPOSE
+            ? ' AND created_at > DATE_SUB(NOW(), INTERVAL 1 DAY)'
+            : '';
         $stmt = Database::connection()->prepare(
             'SELECT user_id, token_hash FROM auth_tokens
              WHERE selector = :selector AND purpose = :purpose AND expires_at > NOW()
+             ' . $maximumAgeSql . '
              LIMIT 1'
         );
         $stmt->execute(['selector' => $selector, 'purpose' => $purpose]);

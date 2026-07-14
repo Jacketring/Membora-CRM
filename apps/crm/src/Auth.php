@@ -3,7 +3,7 @@
 final class Auth
 {
     private const REMEMBER_COOKIE = 'membora_remember';
-    private const REMEMBER_TTL = 2592000;
+    private const REMEMBER_TTL = 86400;
     private static bool $lastAttemptRateLimited = false;
 
     public static function lastAttemptWasRateLimited(): bool
