@@ -5,41 +5,41 @@ declare(strict_types=1);
 final class AuditLogRepository
 {
     private const ACTION_GROUPS = [
+        'leads' => [
+            'label' => 'Leads',
+            'actions' => ['create_lead', 'update_lead'],
+        ],
         'users' => [
             'label' => 'Usuarios',
-            'actions' => ['create_user', 'update_user', 'delete_user'],
-        ],
-        'companies' => [
-            'label' => 'Empresas',
-            'actions' => ['create_empresa', 'update_empresa', 'update_empresa_subscription', 'renew_empresa_subscription', 'enter_empresa_crm', 'exit_empresa_crm'],
+            'actions' => ['create_user', 'update_user'],
         ],
         'members' => [
             'label' => 'Socios',
-            'actions' => ['create_member', 'update_member', 'delete_member'],
+            'actions' => ['create_member', 'update_member'],
         ],
         'memberships' => [
             'label' => 'Membresias',
-            'actions' => ['create_membership_plan', 'update_membership_plan', 'delete_membership_plan'],
+            'actions' => ['create_membership_plan', 'update_membership_plan', 'renew_member_subscription'],
+        ],
+        'billing' => [
+            'label' => 'Facturacion',
+            'actions' => ['create_payment', 'update_payment', 'mark_payment_paid', 'create_client_invoice', 'update_client_invoice', 'issue_client_invoice', 'add_client_invoice_payment'],
         ],
         'checkins' => [
             'label' => 'Check-ins',
-            'actions' => ['create_checkin', 'delete_checkin'],
+            'actions' => ['create_checkin'],
         ],
         'classes' => [
             'label' => 'Clases',
-            'actions' => ['create_class_type', 'create_class_session', 'update_class_session', 'delete_class_session'],
+            'actions' => ['create_class_type', 'create_class_session', 'update_class_session'],
         ],
         'tasks' => [
             'label' => 'Tareas',
-            'actions' => ['create_task', 'update_task', 'update_task_status', 'delete_task'],
+            'actions' => ['create_task', 'update_task', 'update_task_status'],
         ],
         'alerts' => [
             'label' => 'Alertas',
             'actions' => ['update_risk_alert_status'],
-        ],
-        'audit' => [
-            'label' => 'Auditoria',
-            'actions' => ['view_audit'],
         ],
     ];
 
@@ -89,6 +89,10 @@ final class AuditLogRepository
 
     public static function record(string $action, array $payload = []): void
     {
+        if (!self::isBusinessAction($action)) {
+            return;
+        }
+
         self::ensureTable();
 
         $user = Auth::user();
@@ -123,8 +127,8 @@ final class AuditLogRepository
         return [
             'today' => self::count($baseWhere . ' AND DATE(created_at) = CURDATE()', $params),
             'week' => self::count($baseWhere . ' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)', $params),
-            'writes' => self::count($baseWhere . ' AND (action LIKE "create_%" OR action LIKE "update_%" OR action LIKE "delete_%" OR action = "view_audit")', $params),
-            'deletes' => self::count($baseWhere . ' AND action LIKE "delete_%"', $params),
+            'writes' => self::count($baseWhere, $params),
+            'creates' => self::count($baseWhere . ' AND action LIKE "create_%"', $params),
         ];
     }
 
@@ -192,7 +196,7 @@ final class AuditLogRepository
         return [
             'today' => self::count($baseWhere . ' AND DATE(created_at) = CURDATE()', $params),
             'week' => self::count($baseWhere . ' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)', $params),
-            'writes' => self::count($baseWhere . ' AND (action LIKE "create_%" OR action LIKE "update_%" OR action LIKE "delete_%" OR action = "view_audit")', $params),
+            'writes' => self::count($baseWhere, $params),
             'tenants' => self::countDistinctTenants($baseWhere, $params),
         ];
     }
@@ -367,6 +371,11 @@ final class AuditLogRepository
         }
 
         return array_values(array_unique($actions));
+    }
+
+    private static function isBusinessAction(string $action): bool
+    {
+        return in_array($action, self::businessActions(), true);
     }
 
     private static function ensureColumn(string $table, string $column, string $definition): void

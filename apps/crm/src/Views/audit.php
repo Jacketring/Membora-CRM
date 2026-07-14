@@ -19,8 +19,8 @@
     <strong><?= (int) $metrics['writes'] ?></strong>
   </article>
   <article class="lead-metric lead-metric--dark">
-    <span>Eliminaciones</span>
-    <strong><?= (int) $metrics['deletes'] ?></strong>
+    <span>Creaciones</span>
+    <strong><?= (int) $metrics['creates'] ?></strong>
   </article>
 </section>
 

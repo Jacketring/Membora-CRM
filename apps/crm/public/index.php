@@ -437,11 +437,6 @@ switch ($route) {
             'date_from' => trim((string) ($_GET['date_from'] ?? '')),
             'date_to' => trim((string) ($_GET['date_to'] ?? '')),
         ];
-        try {
-            AuditLogRepository::record('view_audit', ['scope' => 'platform', 'filters' => $filters]);
-        } catch (Throwable $exception) {
-            $_SESSION['audit_log_error'] = $exception->getMessage();
-        }
         if (!empty($_SESSION['audit_log_error'])) {
             flash('La auditoria no se esta guardando: ' . $_SESSION['audit_log_error'], 'error');
             unset($_SESSION['audit_log_error']);
@@ -677,11 +672,6 @@ switch ($route) {
             'date_from' => trim((string) ($_GET['date_from'] ?? '')),
             'date_to' => trim((string) ($_GET['date_to'] ?? '')),
         ];
-        try {
-            AuditLogRepository::record('view_audit', ['scope' => 'tenant', 'filters' => $filters]);
-        } catch (Throwable $exception) {
-            $_SESSION['audit_log_error'] = $exception->getMessage();
-        }
         if (!empty($_SESSION['audit_log_error'])) {
             flash('La auditoria no se esta guardando: ' . $_SESSION['audit_log_error'], 'error');
             unset($_SESSION['audit_log_error']);
