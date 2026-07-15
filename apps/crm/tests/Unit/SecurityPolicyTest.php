@@ -83,5 +83,7 @@ final class SecurityPolicyTest extends TestCase
         self::assertStringNotContainsString('action" value="demo_login', $html);
         self::assertStringNotContainsString('id="demo-admin-login"', $html);
         self::assertStringNotContainsString('id="demo-client-login"', $html);
+        self::assertStringContainsString('class="login-site-back-action" href="/"', $html);
+        self::assertStringContainsString('Volver a la web', $html);
     }
 }

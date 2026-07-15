@@ -129,6 +129,22 @@ summary:focus-visible {
 .login-help-link:hover, .login-back-link:hover { text-decoration: underline; }
 .login-back-link { display: block; margin-top: 18px; text-align: center; }
 .login-primary-link { display: block; text-align: center; }
+.login-main-actions { display: grid; gap: 10px; }
+.login-main-actions > * { width: 100%; }
+.login-site-back-action {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #bfd3f8;
+  border-radius: 10px;
+  color: var(--primary);
+  display: inline-flex;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.login-site-back-action:hover { background: #f8fbff; border-color: #8db1ee; }
 .login-card > .notice, .login-card form > .notice { margin-bottom: 18px; }
 .demo-note {
   background: #eef4ff;

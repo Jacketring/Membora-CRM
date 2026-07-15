@@ -47,7 +47,13 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
           </label>
           <a class="login-help-link" href="index.php?route=forgot-password">¿Olvidaste tu contraseña?</a>
         </div>
-        <button class="primary-action" type="submit">Iniciar sesión</button>
+        <div class="login-main-actions">
+          <button class="primary-action" type="submit">Iniciar sesión</button>
+          <a class="login-site-back-action" href="/">
+            <span aria-hidden="true">←</span>
+            Volver a la web
+          </a>
+        </div>
         <?php if ($demoEnabled): ?>
         <div class="demo-login-actions" aria-label="Accesos demo">
           <button class="demo-login-action demo-login-action--client" type="submit" form="demo-client-login">
