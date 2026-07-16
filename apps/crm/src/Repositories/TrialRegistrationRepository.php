@@ -170,12 +170,17 @@ final class TrialRegistrationRepository
             $empresaCreated = true;
             $empresaCleaned = false;
 
-            $userStmt = Database::connection()->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
-            $userStmt->execute(['email' => $registration['email']]);
-            $userId = (string) $userStmt->fetchColumn();
-            if ($userId === '') {
-                throw new RuntimeException('No se pudo localizar el usuario de la prueba.');
+            $empresa = EmpresaRepository::findByClient($clientId);
+            $tenantId = trim((string) ($empresa['tenant_id'] ?? ''));
+            if (!$empresa || $tenantId === '') {
+                throw new RuntimeException('No se pudo vincular el usuario a la empresa de la prueba.');
             }
+            $userId = EmpresaRepository::ensureTenantAdminUser(
+                $tenantId,
+                (string) $registration['name'],
+                (string) $registration['email'],
+                $initialPassword
+            );
 
             $credentialToken = TrialCredentialRepository::issue(
                 $userId,

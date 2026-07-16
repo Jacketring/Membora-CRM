@@ -27,12 +27,6 @@ trait EmpresaTenantProvisioningTrait
         }
 
         $pdo = Database::connection();
-        $exists = $pdo->prepare('SELECT COUNT(*) FROM users WHERE email = :email');
-        $exists->execute(['email' => $adminEmail]);
-        if ((int) $exists->fetchColumn() > 0) {
-            throw new RuntimeException('Ya existe un usuario con ese email. Usa otro email para el administrador.');
-        }
-
         $tenantId = cuid();
         $tenantColumns = self::tableColumns('tenants');
         $tenantValues = [
@@ -52,27 +46,7 @@ trait EmpresaTenantProvisioningTrait
         );
         $tenantInsert->execute($tenantParams);
 
-        $roleId = self::ensureGymAdminRole();
-        $userColumns = self::tableColumns('users');
-        $userValues = [
-            'id' => cuid(),
-            'tenant_id' => $tenantId,
-            'role_id' => $roleId,
-            'name' => $adminName,
-            'email' => $adminEmail,
-            'password_hash' => password_hash($adminPassword, PASSWORD_BCRYPT),
-            'status' => 'ACTIVE',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ];
-        $insertUserColumns = array_values(array_intersect(array_keys($userValues), $userColumns));
-        $userPlaceholders = array_map(static fn (string $column): string => ':' . $column, $insertUserColumns);
-        $userParams = array_intersect_key($userValues, array_flip($insertUserColumns));
-        $userInsert = $pdo->prepare(
-            'INSERT INTO users (' . implode(', ', $insertUserColumns) . ')
-             VALUES (' . implode(', ', $userPlaceholders) . ')'
-        );
-        $userInsert->execute($userParams);
+        self::ensureTenantAdminUser($tenantId, $adminName, $adminEmail, $adminPassword);
 
         self::seedTenantPipeline($tenantId);
 

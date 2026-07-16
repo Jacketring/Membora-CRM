@@ -173,6 +173,70 @@ final class EmpresaRepository
         return $empresa ?: null;
     }
 
+    public static function ensureTenantAdminUser(string $tenantId, string $name, string $email, string $password): string
+    {
+        $tenantId = trim($tenantId);
+        $name = trim($name) ?: 'Administrador';
+        $email = strtolower(trim($email));
+        if ($tenantId === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
+            throw new RuntimeException('No se pudo preparar el usuario administrador de la empresa.');
+        }
+
+        $pdo = Database::connection();
+        $tenant = $pdo->prepare('SELECT COUNT(*) FROM tenants WHERE id = :id');
+        $tenant->execute(['id' => $tenantId]);
+        if ((int) $tenant->fetchColumn() !== 1) {
+            throw new RuntimeException('La empresa no tiene un tenant válido para vincular al usuario.');
+        }
+
+        $existing = $pdo->prepare('SELECT id, tenant_id FROM users WHERE email = :email LIMIT 1');
+        $existing->execute(['email' => $email]);
+        $user = $existing->fetch();
+        if ($user) {
+            if (!hash_equals($tenantId, (string) ($user['tenant_id'] ?? ''))) {
+                throw new RuntimeException('Ya existe un usuario con ese email vinculado a otra empresa.');
+            }
+
+            $pdo->prepare(
+                'UPDATE users
+                 SET name = :name,
+                     role_id = :role_id,
+                     password_hash = :password_hash,
+                     status = "ACTIVE",
+                     updated_at = NOW()
+                 WHERE id = :id'
+            )->execute([
+                'id' => $user['id'],
+                'name' => $name,
+                'role_id' => self::ensureGymAdminRole(),
+                'password_hash' => password_hash($password, PASSWORD_BCRYPT),
+            ]);
+            return (string) $user['id'];
+        }
+
+        $userId = cuid();
+        $values = [
+            'id' => $userId,
+            'tenant_id' => $tenantId,
+            'role_id' => self::ensureGymAdminRole(),
+            'name' => $name,
+            'email' => $email,
+            'password_hash' => password_hash($password, PASSWORD_BCRYPT),
+            'status' => 'ACTIVE',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        $columns = array_values(array_intersect(array_keys($values), self::tableColumns('users')));
+        $placeholders = array_map(static fn (string $column): string => ':' . $column, $columns);
+        $stmt = $pdo->prepare(
+            'INSERT INTO users (' . implode(', ', $columns) . ')
+             VALUES (' . implode(', ', $placeholders) . ')'
+        );
+        $stmt->execute(array_intersect_key($values, array_flip($columns)));
+
+        return $userId;
+    }
+
     public static function create(array $data): void
     {
         self::ensureTables();
