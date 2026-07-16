@@ -532,7 +532,14 @@ switch ($route) {
             redirect('dashboard');
         }
 
-        redirect('platform-dashboard');
+        $webUrls = explode(',', (string) (getenv('WEB_APP_URL') ?: 'https://membora.es'));
+        render_layout('Web y correo', 'platform-web', [
+            'logs' => WebhookIntegrationRepository::recentPlatformLogs(),
+            'mailDiagnostics' => Mailer::diagnostics(),
+            'webhookUrl' => app_base_url() . '/webhook/lead',
+            'webUrl' => rtrim(trim($webUrls[0]), '/'),
+        ]);
+        break;
 
     case 'platform-audit':
         if (!is_platform_admin($currentUser)) {

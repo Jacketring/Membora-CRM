@@ -82,8 +82,20 @@ final class TrialRegistrationRepository
             $loginUrl = app_base_url() . '/index.php?route=login';
             $forgotPasswordUrl = app_base_url() . '/index.php?route=forgot-password';
             if (!Mailer::sendExistingTrialAccount($email, (string) ($user['name'] ?? $name), $loginUrl, $forgotPasswordUrl)) {
-                log_server_error(new RuntimeException(Mailer::lastError()), 'trial_existing_account_email');
+                $error = Mailer::lastError();
+                log_server_error(new RuntimeException($error), 'trial_existing_account_email');
+                self::logEmailDiagnostic(
+                    'email_error',
+                    'Alta de prueba para cuenta existente: ' . $error,
+                    $email
+                );
+                return ['success' => false, 'message' => 'No se pudo enviar el correo de acceso. Inténtalo más tarde.'];
             }
+            self::logEmailDiagnostic(
+                'trial_email',
+                'Correo de cuenta existente aceptado por el transporte de envío.',
+                $email
+            );
             // Keep the public response indistinguishable to prevent account enumeration.
             return ['success' => true, 'message' => 'Revisa tu correo para activar la prueba.'];
         }
@@ -108,9 +120,21 @@ final class TrialRegistrationRepository
         $activationUrl = app_base_url() . '/index.php?route=activate-trial&token=' . urlencode($token);
         if (!Mailer::sendTrialActivation($email, $name, $company, $activationUrl)) {
             Database::connection()->prepare('DELETE FROM trial_registrations WHERE id = :id')->execute(['id' => $id]);
-            log_server_error(new RuntimeException(Mailer::lastError()), 'trial_activation_email');
+            $error = Mailer::lastError();
+            log_server_error(new RuntimeException($error), 'trial_activation_email');
+            self::logEmailDiagnostic(
+                'email_error',
+                'Correo de activación de prueba: ' . $error,
+                $email
+            );
             return ['success' => false, 'message' => 'No se pudo enviar el correo de activación. Inténtalo más tarde.'];
         }
+
+        self::logEmailDiagnostic(
+            'trial_email',
+            'Correo de activación de prueba aceptado por el transporte de envío.',
+            $email
+        );
 
         return ['success' => true, 'message' => 'Revisa tu correo para activar la prueba.'];
     }
@@ -212,6 +236,15 @@ final class TrialRegistrationRepository
                 INDEX trial_registration_status_idx (status, expires_at)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
         );
+    }
+
+    private static function logEmailDiagnostic(string $status, string $message, string $email): void
+    {
+        try {
+            WebhookIntegrationRepository::logPlatformEmailDiagnostic($status, $message, $email);
+        } catch (Throwable $exception) {
+            log_server_error($exception, 'trial_email_diagnostic');
+        }
     }
 
     private static function isRateLimited(string $ipHash, string $email): bool

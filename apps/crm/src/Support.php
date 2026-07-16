@@ -935,6 +935,7 @@ function webhook_status_label(?string $status): string
         'duplicate' => 'Duplicado',
         'blocked' => 'Bloqueado',
         'email_test' => 'Prueba enviada',
+        'trial_email' => 'Email de activación',
         'email_error' => 'Email no enviado',
         'error' => 'Error',
     ]);

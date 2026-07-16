@@ -50,6 +50,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
             </div>
           </details>
           <a class="<?= $route === 'platform-plans' ? 'active' : '' ?>" href="index.php?route=platform-plans">Planes</a>
+          <a class="<?= $route === 'platform-web' ? 'active' : '' ?>" href="index.php?route=platform-web">Web y correo</a>
         <?php else: ?>
           <?php foreach ([
             'dashboard' => 'Panel',

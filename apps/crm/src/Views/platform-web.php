@@ -117,7 +117,7 @@ $webUrl = $webUrl ?? 'https://membora.es';
       <tbody>
         <?php foreach ($logs as $log): ?>
           <?php $status = (string) ($log['status'] ?? ''); ?>
-          <?php $statusClass = in_array($status, ['success', 'duplicate', 'email_test'], true) ? 'active' : ($status === 'email_error' ? 'pending' : 'cancelled'); ?>
+          <?php $statusClass = in_array($status, ['success', 'duplicate', 'email_test', 'trial_email'], true) ? 'active' : ($status === 'email_error' ? 'pending' : 'cancelled'); ?>
           <tr>
             <td><?= e(format_date($log['created_at'])) ?></td>
             <td><span class="status-badge status-badge--<?= e($statusClass) ?>"><?= e(webhook_status_label($status)) ?></span></td>

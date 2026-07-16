@@ -418,7 +418,7 @@ trialForm?.addEventListener('submit', async (event) => {
     }
 
     trialForm.reset();
-    showTrialMessage('Revisa tu correo para activar la prueba y configurar tu contraseña.', 'success');
+    showTrialMessage(result.message || 'Revisa tu correo para activar la prueba y configurar tu contraseña.', 'success');
   } catch (error) {
     showTrialMessage(error.message || 'No se pudo crear la prueba. Inténtalo más tarde.', 'error');
   } finally {
