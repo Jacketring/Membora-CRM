@@ -6,27 +6,6 @@ final class TrialRegistrationRepository
 {
     private const TRIAL_DAYS = 14;
     private const TOKEN_TTL_SECONDS = 3600;
-    private const ALLOWED_TRIAL_EMAIL = 'josehur2003@gmail.com';
-
-    public static function isAllowedRecipient(string $email): bool
-    {
-        $email = strtolower(trim($email));
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return false;
-        }
-
-        [$local, $domain] = array_pad(explode('@', $email, 2), 2, '');
-        if (!in_array($domain, ['gmail.com', 'googlemail.com'], true)) {
-            return false;
-        }
-
-        $local = explode('+', $local, 2)[0];
-        $canonical = str_replace('.', '', $local) . '@gmail.com';
-
-        $allowedEmail = strtolower(trim((string) (getenv('TRIAL_ALLOWED_EMAIL') ?: self::ALLOWED_TRIAL_EMAIL)));
-
-        return hash_equals($allowedEmail, $canonical);
-    }
 
     public static function validationErrors(array $payload): array
     {
@@ -43,8 +22,6 @@ final class TrialRegistrationRepository
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 191) {
             $errors[] = 'Indica un email válido.';
-        } elseif (!self::isAllowedRecipient($email)) {
-            $errors[] = 'La prueba privada solo está habilitada para el correo autorizado.';
         }
         if ((string) ($payload['acepta_rgpd'] ?? '') !== '1') {
             $errors[] = 'Debes aceptar la política de privacidad.';
@@ -254,8 +231,12 @@ final class TrialRegistrationRepository
             return $deliveryEmail;
         }
 
+        [$local, $domain] = array_pad(explode('@', $deliveryEmail, 2), 2, '');
+        $baseLocal = explode('+', $local, 2)[0];
         do {
-            $candidate = 'josehur2003+trial-' . date('YmdHis') . '-' . bin2hex(random_bytes(3)) . '@gmail.com';
+            $suffix = '+trial-' . date('YmdHis') . '-' . bin2hex(random_bytes(3));
+            $maxBaseLength = max(1, 191 - strlen($domain) - strlen($suffix) - 1);
+            $candidate = substr($baseLocal, 0, $maxBaseLength) . $suffix . '@' . $domain;
             $exists->execute(['email' => $candidate]);
         } while ((int) $exists->fetchColumn() > 0);
 
