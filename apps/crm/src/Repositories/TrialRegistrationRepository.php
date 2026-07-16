@@ -118,10 +118,7 @@ final class TrialRegistrationRepository
     public static function activate(string $token): string
     {
         self::ensureTable();
-        $token = strtolower(trim($token));
-        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
-            throw new RuntimeException('El enlace de activación no es válido.');
-        }
+        $token = self::normalizeActivationToken($token);
 
         $stmt = Database::connection()->prepare(
             'SELECT * FROM trial_registrations
@@ -193,6 +190,20 @@ final class TrialRegistrationRepository
         }
     }
 
+    public static function validateActivationToken(string $token): void
+    {
+        self::ensureTable();
+        $token = self::normalizeActivationToken($token);
+        $stmt = Database::connection()->prepare(
+            'SELECT COUNT(*) FROM trial_registrations
+             WHERE token_hash = :token_hash AND status = "PENDING" AND expires_at > NOW()'
+        );
+        $stmt->execute(['token_hash' => hash('sha256', $token)]);
+        if ((int) $stmt->fetchColumn() !== 1) {
+            throw new RuntimeException('El enlace de activación ha caducado o ya se ha utilizado.');
+        }
+    }
+
     public static function resetAttempts(string $email): int
     {
         $email = strtolower(trim($email));
@@ -240,6 +251,16 @@ final class TrialRegistrationRepository
             Database::connection()->exec('ALTER TABLE trial_registrations ADD COLUMN delivery_email VARCHAR(191) NULL AFTER email');
         }
         Database::connection()->exec('UPDATE trial_registrations SET delivery_email = email WHERE delivery_email IS NULL');
+    }
+
+    private static function normalizeActivationToken(string $token): string
+    {
+        $token = strtolower(trim($token));
+        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+            throw new RuntimeException('El enlace de activación no es válido.');
+        }
+
+        return $token;
     }
 
     private static function availableAccountEmail(string $deliveryEmail): string

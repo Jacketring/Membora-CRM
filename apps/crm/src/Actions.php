@@ -42,6 +42,7 @@ final class Actions
             'schedule_demo_cleanup' => self::scheduleDemoCleanup(),
             'request_password_reset' => self::requestPasswordReset(),
             'reset_password' => self::resetPassword(),
+            'confirm_trial_activation' => self::confirmTrialActivation(),
             'logout' => self::logout(),
             'update_profile' => self::updateProfile(),
             'update_platform_lead' => self::updatePlatformLead(),
@@ -215,6 +216,29 @@ final class Actions
 
         flash('Contraseña actualizada. Ya puedes iniciar sesión.');
         redirect('login');
+    }
+
+    private static function confirmTrialActivation(): never
+    {
+        $token = trim((string) post_value('token', ''));
+
+        try {
+            $resetToken = TrialRegistrationRepository::activate($token);
+            header('Location: index.php?route=reset-password&token=' . urlencode($resetToken));
+            exit;
+        } catch (Throwable $exception) {
+            log_server_error($exception, 'trial_activation');
+            $safeMessages = [
+                'El enlace de activación no es válido.',
+                'El enlace de activación ha caducado o ya se ha utilizado.',
+                'Esta prueba ya se está activando.',
+            ];
+            $message = in_array($exception->getMessage(), $safeMessages, true)
+                ? $exception->getMessage()
+                : 'No se pudo activar la prueba. Contacta con el equipo de Membora.';
+            flash($message, 'error');
+            redirect('login');
+        }
     }
 
     private static function redirectToPasswordReset(string $token): never

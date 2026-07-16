@@ -183,8 +183,10 @@ $route = $_GET['route'] ?? 'dashboard';
 
 if ($route === 'activate-trial') {
     try {
-        $resetToken = TrialRegistrationRepository::activate(trim((string) ($_GET['token'] ?? '')));
-        header('Location: index.php?route=reset-password&token=' . urlencode($resetToken));
+        $token = trim((string) ($_GET['token'] ?? ''));
+        TrialRegistrationRepository::validateActivationToken($token);
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        render('trial-activation-confirm', ['token' => $token]);
     } catch (Throwable $exception) {
         log_server_error($exception, 'trial_activation');
         $safeMessages = [
@@ -196,7 +198,7 @@ if ($route === 'activate-trial') {
             ? $exception->getMessage()
             : 'No se pudo activar la prueba. Contacta con el equipo de Membora.';
         flash($message, 'error');
-        header('Location: index.php?route=login');
+        redirect('login');
     }
     exit;
 }

@@ -21,5 +21,6 @@ final class AuthTokenRepositoryTest extends TestCase
     {
         self::assertTrue(can_perform_action('request_password_reset', null));
         self::assertTrue(can_perform_action('reset_password', null));
+        self::assertTrue(can_perform_action('confirm_trial_activation', null));
     }
 }
