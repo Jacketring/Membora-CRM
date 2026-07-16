@@ -245,8 +245,21 @@ final class TrialRegistrationRepository
 
     public static function publicAppUrl(): string
     {
+        $configured = rtrim(trim((string) getenv('TRIAL_PUBLIC_URL')), '/');
+        if ($configured !== '' && filter_var($configured, FILTER_VALIDATE_URL)) {
+            return $configured;
+        }
+
         $webUrls = explode(',', (string) (getenv('WEB_APP_URL') ?: 'https://membora.es'));
-        $webOrigin = rtrim(trim($webUrls[0]), '/');
+        $webOrigin = 'https://membora.es';
+        foreach ($webUrls as $candidate) {
+            $candidate = rtrim(trim($candidate), '/');
+            $host = strtolower((string) parse_url($candidate, PHP_URL_HOST));
+            if (in_array($host, ['membora.es', 'www.membora.es'], true)) {
+                $webOrigin = 'https://membora.es';
+                break;
+            }
+        }
         $appPath = '/' . trim((string) (getenv('MEMBORA_APP_PATH') ?: '/app'), '/');
 
         return $webOrigin . $appPath;

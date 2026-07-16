@@ -65,4 +65,16 @@ final class TrialRegistrationRepositoryTest extends TestCase
     {
         self::assertSame('https://membora.es/app', TrialRegistrationRepository::publicAppUrl());
     }
+
+    public function testLegacyWebDomainCannotLeakIntoTrialLinks(): void
+    {
+        $previous = getenv('WEB_APP_URL');
+        putenv('WEB_APP_URL=https://app.web.josehurtado.dev');
+
+        try {
+            self::assertSame('https://membora.es/app', TrialRegistrationRepository::publicAppUrl());
+        } finally {
+            $previous === false ? putenv('WEB_APP_URL') : putenv('WEB_APP_URL=' . $previous);
+        }
+    }
 }
