@@ -5,7 +5,6 @@ declare(strict_types=1);
 final class TrialRegistrationRepository
 {
     private const TRIAL_DAYS = 14;
-    private const TOKEN_TTL_SECONDS = 3600;
 
     public static function validationErrors(array $payload): array
     {
@@ -82,7 +81,7 @@ final class TrialRegistrationRepository
         $stmt = Database::connection()->prepare(
             'INSERT INTO trial_registrations
              (id, name, company_name, email, delivery_email, token_hash, ip_hash, status, expires_at, created_at)
-             VALUES (:id, :name, :company_name, :email, :delivery_email, :token_hash, :ip_hash, "PENDING", :expires_at, NOW())'
+             VALUES (:id, :name, :company_name, :email, :delivery_email, :token_hash, :ip_hash, "PENDING", DATE_ADD(NOW(), INTERVAL 1 HOUR), NOW())'
         );
         $stmt->execute([
             'id' => $id,
@@ -92,7 +91,6 @@ final class TrialRegistrationRepository
             'delivery_email' => $deliveryEmail,
             'token_hash' => hash('sha256', $token),
             'ip_hash' => $ipHash,
-            'expires_at' => date('Y-m-d H:i:s', time() + self::TOKEN_TTL_SECONDS),
         ]);
 
         $activationUrl = self::publicAppUrl() . '/index.php?route=activate-trial&token=' . urlencode($token);
