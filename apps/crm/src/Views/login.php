@@ -11,7 +11,7 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
   <meta name="theme-color" content="#004bf2">
   <title>Membora CRM - Login</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="stylesheet" href="assets/app.css">
+  <link rel="stylesheet" href="assets/app.css?v=20260716-login-actions">
 </head>
 <body>
   <main class="login-screen">
@@ -50,8 +50,16 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
         <div class="login-main-actions">
           <button class="primary-action" type="submit">Iniciar sesión</button>
           <a class="login-site-back-action" href="/">
-            <span aria-hidden="true">←</span>
-            Volver a la web
+            <span class="login-site-back-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img">
+                <path d="M10 6 4 12l6 6M5 12h15" />
+              </svg>
+            </span>
+            <span class="login-site-back-action__copy">
+              <strong>Volver a la web</strong>
+              <small>Descubre Membora y sus planes</small>
+            </span>
+            <span class="login-site-back-action__chevron" aria-hidden="true">›</span>
           </a>
         </div>
         <?php if ($demoEnabled): ?>
