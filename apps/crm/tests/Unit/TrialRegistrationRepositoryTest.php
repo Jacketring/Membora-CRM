@@ -11,9 +11,17 @@ final class TrialRegistrationRepositoryTest extends TestCase
         self::assertSame([], TrialRegistrationRepository::validationErrors([
             'nombre' => 'Ana Martín',
             'empresa' => 'Centro Norte',
-            'email' => 'ana@example.com',
+            'email' => 'josehur2003+prueba@gmail.com',
             'acepta_rgpd' => '1',
         ]));
+    }
+
+    public function testTrialIsRestrictedToTheAuthorizedGmailInbox(): void
+    {
+        self::assertTrue(TrialRegistrationRepository::isAllowedRecipient('josehur2003@gmail.com'));
+        self::assertTrue(TrialRegistrationRepository::isAllowedRecipient('josehur2003+otra-prueba@gmail.com'));
+        self::assertFalse(TrialRegistrationRepository::isAllowedRecipient('otro@gmail.com'));
+        self::assertFalse(TrialRegistrationRepository::isAllowedRecipient('josehur2003@example.com'));
     }
 
     public function testTrialPayloadRequiresIdentityCompanyEmailAndConsent(): void

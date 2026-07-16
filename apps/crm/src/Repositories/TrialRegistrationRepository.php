@@ -6,6 +6,27 @@ final class TrialRegistrationRepository
 {
     private const TRIAL_DAYS = 14;
     private const TOKEN_TTL_SECONDS = 3600;
+    private const ALLOWED_TRIAL_EMAIL = 'josehur2003@gmail.com';
+
+    public static function isAllowedRecipient(string $email): bool
+    {
+        $email = strtolower(trim($email));
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+
+        [$local, $domain] = array_pad(explode('@', $email, 2), 2, '');
+        if (!in_array($domain, ['gmail.com', 'googlemail.com'], true)) {
+            return false;
+        }
+
+        $local = explode('+', $local, 2)[0];
+        $canonical = str_replace('.', '', $local) . '@gmail.com';
+
+        $allowedEmail = strtolower(trim((string) (getenv('TRIAL_ALLOWED_EMAIL') ?: self::ALLOWED_TRIAL_EMAIL)));
+
+        return hash_equals($allowedEmail, $canonical);
+    }
 
     public static function validationErrors(array $payload): array
     {
@@ -22,6 +43,8 @@ final class TrialRegistrationRepository
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 191) {
             $errors[] = 'Indica un email válido.';
+        } elseif (!self::isAllowedRecipient($email)) {
+            $errors[] = 'La prueba privada solo está habilitada para el correo autorizado.';
         }
         if ((string) ($payload['acepta_rgpd'] ?? '') !== '1') {
             $errors[] = 'Debes aceptar la política de privacidad.';
@@ -68,64 +91,42 @@ final class TrialRegistrationRepository
 
         $name = trim((string) $payload['nombre']);
         $company = trim((string) $payload['empresa']);
-        $email = strtolower(trim((string) $payload['email']));
+        $deliveryEmail = strtolower(trim((string) $payload['email']));
         $ipHash = hash('sha256', substr((string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 64));
 
-        if (self::isRateLimited($ipHash, $email)) {
+        if (self::isRateLimited($ipHash, $deliveryEmail)) {
             return ['success' => false, 'message' => 'Demasiadas solicitudes. Inténtalo de nuevo dentro de una hora.'];
         }
 
-        $existingUser = Database::connection()->prepare('SELECT id, name FROM users WHERE email = :email LIMIT 1');
-        $existingUser->execute(['email' => $email]);
-        $user = $existingUser->fetch();
-        if ($user) {
-            $loginUrl = app_base_url() . '/index.php?route=login';
-            $forgotPasswordUrl = app_base_url() . '/index.php?route=forgot-password';
-            if (!Mailer::sendExistingTrialAccount($email, (string) ($user['name'] ?? $name), $loginUrl, $forgotPasswordUrl)) {
-                $error = Mailer::lastError();
-                log_server_error(new RuntimeException($error), 'trial_existing_account_email');
-                self::logEmailDiagnostic(
-                    'email_error',
-                    'Alta de prueba para cuenta existente: ' . $error,
-                    $email
-                );
-                return ['success' => false, 'message' => 'No se pudo enviar el correo de acceso. Inténtalo más tarde.'];
-            }
-            self::logEmailDiagnostic(
-                'trial_email',
-                'Correo de cuenta existente aceptado por el transporte de envío.',
-                $email
-            );
-            // Keep the public response indistinguishable to prevent account enumeration.
-            return ['success' => true, 'message' => 'Revisa tu correo para activar la prueba.'];
-        }
+        $accountEmail = self::availableAccountEmail($deliveryEmail);
 
         $token = bin2hex(random_bytes(32));
         $id = cuid();
         $stmt = Database::connection()->prepare(
             'INSERT INTO trial_registrations
-             (id, name, company_name, email, token_hash, ip_hash, status, expires_at, created_at)
-             VALUES (:id, :name, :company_name, :email, :token_hash, :ip_hash, "PENDING", :expires_at, NOW())'
+             (id, name, company_name, email, delivery_email, token_hash, ip_hash, status, expires_at, created_at)
+             VALUES (:id, :name, :company_name, :email, :delivery_email, :token_hash, :ip_hash, "PENDING", :expires_at, NOW())'
         );
         $stmt->execute([
             'id' => $id,
             'name' => $name,
             'company_name' => $company,
-            'email' => $email,
+            'email' => $accountEmail,
+            'delivery_email' => $deliveryEmail,
             'token_hash' => hash('sha256', $token),
             'ip_hash' => $ipHash,
             'expires_at' => date('Y-m-d H:i:s', time() + self::TOKEN_TTL_SECONDS),
         ]);
 
         $activationUrl = app_base_url() . '/index.php?route=activate-trial&token=' . urlencode($token);
-        if (!Mailer::sendTrialActivation($email, $name, $company, $activationUrl)) {
+        if (!Mailer::sendTrialActivation($deliveryEmail, $name, $company, $activationUrl, $accountEmail)) {
             Database::connection()->prepare('DELETE FROM trial_registrations WHERE id = :id')->execute(['id' => $id]);
             $error = Mailer::lastError();
             log_server_error(new RuntimeException($error), 'trial_activation_email');
             self::logEmailDiagnostic(
                 'email_error',
                 'Correo de activación de prueba: ' . $error,
-                $email
+                $deliveryEmail
             );
             return ['success' => false, 'message' => 'No se pudo enviar el correo de activación. Inténtalo más tarde.'];
         }
@@ -133,7 +134,7 @@ final class TrialRegistrationRepository
         self::logEmailDiagnostic(
             'trial_email',
             'Correo de activación de prueba aceptado por el transporte de envío.',
-            $email
+            $deliveryEmail
         );
 
         return ['success' => true, 'message' => 'Revisa tu correo para activar la prueba.'];
@@ -225,6 +226,7 @@ final class TrialRegistrationRepository
                 name VARCHAR(160) NOT NULL,
                 company_name VARCHAR(191) NOT NULL,
                 email VARCHAR(191) NOT NULL,
+                delivery_email VARCHAR(191) NULL,
                 token_hash CHAR(64) NOT NULL UNIQUE,
                 ip_hash CHAR(64) NOT NULL,
                 status VARCHAR(16) NOT NULL DEFAULT "PENDING",
@@ -236,6 +238,28 @@ final class TrialRegistrationRepository
                 INDEX trial_registration_status_idx (status, expires_at)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
         );
+
+        $column = Database::connection()->query("SHOW COLUMNS FROM trial_registrations LIKE 'delivery_email'")->fetch();
+        if (!$column) {
+            Database::connection()->exec('ALTER TABLE trial_registrations ADD COLUMN delivery_email VARCHAR(191) NULL AFTER email');
+        }
+        Database::connection()->exec('UPDATE trial_registrations SET delivery_email = email WHERE delivery_email IS NULL');
+    }
+
+    private static function availableAccountEmail(string $deliveryEmail): string
+    {
+        $exists = Database::connection()->prepare('SELECT COUNT(*) FROM users WHERE email = :email');
+        $exists->execute(['email' => $deliveryEmail]);
+        if ((int) $exists->fetchColumn() === 0) {
+            return $deliveryEmail;
+        }
+
+        do {
+            $candidate = 'josehur2003+trial-' . date('YmdHis') . '-' . bin2hex(random_bytes(3)) . '@gmail.com';
+            $exists->execute(['email' => $candidate]);
+        } while ((int) $exists->fetchColumn() > 0);
+
+        return $candidate;
     }
 
     private static function logEmailDiagnostic(string $status, string $message, string $email): void
@@ -252,7 +276,7 @@ final class TrialRegistrationRepository
         $stmt = Database::connection()->prepare(
             'SELECT
                 SUM(ip_hash = :ip_hash) AS ip_attempts,
-                SUM(email = :email) AS email_attempts
+                SUM(COALESCE(delivery_email, email) = :email) AS email_attempts
              FROM trial_registrations
              WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)'
         );

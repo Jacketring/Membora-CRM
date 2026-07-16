@@ -95,7 +95,7 @@ final class Mailer
         return self::sendNativeMail($email, 'Restablece tu contraseña - Membora CRM', $html);
     }
 
-    public static function sendTrialActivation(string $email, string $name, string $company, string $activationUrl): bool
+    public static function sendTrialActivation(string $email, string $name, string $company, string $activationUrl, ?string $accountEmail = null): bool
     {
         self::$lastError = '';
 
@@ -110,7 +110,7 @@ final class Mailer
             return false;
         }
 
-        $html = self::trialActivationTemplate($name, $company, $activationUrl);
+        $html = self::trialActivationTemplate($name, $company, $activationUrl, $accountEmail ?: $email);
         if (self::usesSmtp()) {
             return self::sendSmtp($email, 'Activa tu prueba gratuita de Membora', $html);
         }
@@ -375,11 +375,12 @@ HTML;
 HTML;
     }
 
-    private static function trialActivationTemplate(string $name, string $company, string $activationUrl): string
+    private static function trialActivationTemplate(string $name, string $company, string $activationUrl, string $accountEmail): string
     {
         $safeName = e(trim($name) !== '' ? trim($name) : 'Hola');
         $safeCompany = e(trim($company));
         $safeUrl = e($activationUrl);
+        $safeAccountEmail = e($accountEmail);
         $emailLogo = self::emailLogoHtml(48);
 
         return <<<HTML
@@ -399,6 +400,7 @@ HTML;
             <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Prueba gratuita de 14 días</p>
             <h1 style="margin:0 0 16px;font-size:30px;line-height:1.18;color:#071327;">Hola, {$safeName}</h1>
             <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#334155;">Confirma tu email para crear el espacio de <strong>{$safeCompany}</strong>. Después podrás definir tu contraseña y entrar en Membora.</p>
+            <p style="margin:0 0 18px;padding:14px 16px;border-radius:12px;background:#eef4ff;color:#1f3657;font-size:14px;line-height:1.5;">Tu email de acceso al CRM será <strong>{$safeAccountEmail}</strong>.</p>
             <p style="margin:26px 0;"><a href="{$safeUrl}" style="display:inline-block;background:#004bf2;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Activar prueba gratuita</a></p>
             <p style="margin:0;color:#64748b;font-size:14px;line-height:1.6;">El enlace caduca en una hora y solo puede utilizarse una vez. Si no has solicitado esta prueba, ignora este correo.</p>
           </td></tr>
