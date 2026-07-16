@@ -95,7 +95,7 @@ final class TrialRegistrationRepository
             'expires_at' => date('Y-m-d H:i:s', time() + self::TOKEN_TTL_SECONDS),
         ]);
 
-        $activationUrl = app_base_url() . '/index.php?route=activate-trial&token=' . urlencode($token);
+        $activationUrl = self::publicAppUrl() . '/index.php?route=activate-trial&token=' . urlencode($token);
         if (!Mailer::sendTrialActivation($deliveryEmail, $name, $company, $activationUrl, $accountEmail)) {
             Database::connection()->prepare('DELETE FROM trial_registrations WHERE id = :id')->execute(['id' => $id]);
             $error = Mailer::lastError();
@@ -241,6 +241,15 @@ final class TrialRegistrationRepository
         } while ((int) $exists->fetchColumn() > 0);
 
         return $candidate;
+    }
+
+    public static function publicAppUrl(): string
+    {
+        $webUrls = explode(',', (string) (getenv('WEB_APP_URL') ?: 'https://membora.es'));
+        $webOrigin = rtrim(trim($webUrls[0]), '/');
+        $appPath = '/' . trim((string) (getenv('MEMBORA_APP_PATH') ?: '/app'), '/');
+
+        return $webOrigin . $appPath;
     }
 
     private static function logEmailDiagnostic(string $status, string $message, string $email): void

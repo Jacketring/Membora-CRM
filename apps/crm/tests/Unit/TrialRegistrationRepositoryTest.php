@@ -60,4 +60,9 @@ final class TrialRegistrationRepositoryTest extends TestCase
         self::assertSame('Ana Martín', $data['admin_name']);
         self::assertSame('temporary-secret', $data['admin_password']);
     }
+
+    public function testPublicTrialLinksAlwaysPointToTheCrmPath(): void
+    {
+        self::assertSame('https://membora.es/app', TrialRegistrationRepository::publicAppUrl());
+    }
 }
