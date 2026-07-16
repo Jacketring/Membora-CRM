@@ -27,11 +27,7 @@ final class Mailer
         $subject = 'Hemos recibido tu solicitud en Membora CRM';
         $html = self::webLeadTemplate($name, $company, $leadId);
 
-        if (self::usesSmtp()) {
-            return self::sendSmtp($email, $subject, $html);
-        }
-
-        return self::sendNativeMail($email, $subject, $html);
+        return self::sendHtml($email, $subject, $html);
     }
 
     public static function lastError(): string
@@ -45,7 +41,7 @@ final class Mailer
 
         return [
             'enabled' => strtolower((string) (getenv('MAIL_ENABLED') ?: 'true')) !== 'false' ? 'Si' : 'No',
-            'transport' => self::usesSmtp() ? 'SMTP' : 'PHP mail()',
+            'transport' => self::usesSmtp() ? 'SMTP con respaldo PHP mail()' : 'PHP mail()',
             'from_email' => self::fromEmail(),
             'reply_to' => trim((string) (getenv('MAIL_REPLY_TO') ?: self::fromEmail())),
             'smtp_host' => trim((string) (getenv('SMTP_HOST') ?: 'Sin configurar')),
@@ -66,11 +62,7 @@ final class Mailer
         }
 
         $html = self::debugTemplate();
-        if (self::usesSmtp()) {
-            return self::sendSmtp($email, 'Prueba de correo - Membora CRM', $html);
-        }
-
-        return self::sendNativeMail($email, 'Prueba de correo - Membora CRM', $html);
+        return self::sendHtml($email, 'Prueba de correo - Membora CRM', $html);
     }
 
     public static function sendPasswordReset(string $email, string $name, string $resetUrl): bool
@@ -88,11 +80,7 @@ final class Mailer
         }
 
         $html = self::passwordResetTemplate($name, $resetUrl);
-        if (self::usesSmtp()) {
-            return self::sendSmtp($email, 'Restablece tu contraseña - Membora CRM', $html);
-        }
-
-        return self::sendNativeMail($email, 'Restablece tu contraseña - Membora CRM', $html);
+        return self::sendHtml($email, 'Restablece tu contraseña - Membora CRM', $html);
     }
 
     public static function sendTrialActivation(string $email, string $name, string $company, string $activationUrl, ?string $accountEmail = null): bool
@@ -111,11 +99,7 @@ final class Mailer
         }
 
         $html = self::trialActivationTemplate($name, $company, $activationUrl, $accountEmail ?: $email);
-        if (self::usesSmtp()) {
-            return self::sendSmtp($email, 'Activa tu prueba gratuita de Membora', $html);
-        }
-
-        return self::sendNativeMail($email, 'Activa tu prueba gratuita de Membora', $html);
+        return self::sendHtml($email, 'Activa tu prueba gratuita de Membora', $html);
     }
 
     public static function sendExistingTrialAccount(string $email, string $name, string $loginUrl, string $forgotPasswordUrl): bool
@@ -134,11 +118,33 @@ final class Mailer
         }
 
         $html = self::existingTrialAccountTemplate($name, $loginUrl, $forgotPasswordUrl);
-        if (self::usesSmtp()) {
-            return self::sendSmtp($email, 'Ya tienes acceso a Membora CRM', $html);
+        return self::sendHtml($email, 'Ya tienes acceso a Membora CRM', $html);
+    }
+
+    private static function sendHtml(string $to, string $subject, string $html): bool
+    {
+        if (!self::usesSmtp()) {
+            return self::sendNativeMail($to, $subject, $html);
         }
 
-        return self::sendNativeMail($email, 'Ya tienes acceso a Membora CRM', $html);
+        if (self::sendSmtp($to, $subject, $html)) {
+            return true;
+        }
+
+        $smtpError = self::$lastError;
+        if (strtolower((string) (getenv('MAIL_NATIVE_FALLBACK') ?: 'true')) === 'false') {
+            return false;
+        }
+
+        if (self::sendNativeMail($to, $subject, $html)) {
+            self::$lastError = '';
+            return true;
+        }
+
+        $nativeError = self::$lastError;
+        self::$lastError = 'SMTP: ' . $smtpError . ' | PHP mail(): ' . $nativeError;
+
+        return false;
     }
 
     private static function sendNativeMail(string $to, string $subject, string $html): bool
