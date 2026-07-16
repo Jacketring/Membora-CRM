@@ -29,7 +29,7 @@ https://membora.es/demo.html
 
 ## Prueba gratuita de 14 dias
 
-El formulario `Empieza gratis` no comparte los datos de la demo. Envia la solicitud a `api/trial.php`, que actua como proxy hacia `/app/api/trial`. El CRM verifica el email con un enlace de un solo uso y solo despues crea el tenant y su administrador en estado `TRIAL`. La persona configura su propia contrasena antes de entrar.
+El formulario `Empieza gratis` no comparte los datos de la demo. Envia la solicitud a `api/trial.php`, que actua como proxy hacia `/app/api/trial`. El CRM verifica el email con un enlace de un solo uso y solo despues crea o actualiza el contacto como `Cliente CRM`, vincula su empresa, crea el tenant y su administrador en estado `TRIAL` durante 14 dias. La persona configura su propia contrasena antes de entrar.
 
 El flujo incluye honeypot, validacion de origen y limites por IP y email. Requiere SMTP activo porque no se provisionan cuentas sin verificar el correo.
 

@@ -140,6 +140,7 @@ Guion recomendado:
 - [x] `docs/08-auditoria-testing-2026-06-29.md`
 - [x] `docs/09-seguridad-y-captacion-web.md`
 - [x] `docs/10-incidencias-y-soluciones.md`
+- [x] `docs/19-metodologia-desarrollo.md`
 
 ## 8. Riesgos pendientes
 

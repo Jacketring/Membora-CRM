@@ -75,6 +75,77 @@ final class PlatformClientRepository
         return $client ?: null;
     }
 
+    public static function findByEmail(string $email): ?array
+    {
+        self::ensureTable();
+        $stmt = Database::connection()->prepare(
+            'SELECT * FROM platform_clients
+             WHERE LOWER(email) = :email
+             ORDER BY updated_at DESC
+             LIMIT 1'
+        );
+        $stmt->execute(['email' => strtolower(trim($email))]);
+        $client = $stmt->fetch();
+
+        return $client ?: null;
+    }
+
+    public static function upsertTrialCustomer(string $company, string $contactName, string $email): string
+    {
+        self::ensureTable();
+
+        $company = trim($company);
+        $contactName = trim($contactName);
+        $email = strtolower(trim($email));
+        $pdo = Database::connection();
+        $existing = self::findByEmail($email);
+        $clientId = (string) ($existing['id'] ?? '');
+
+        if ($clientId !== '') {
+            $stmt = $pdo->prepare(
+                'UPDATE platform_clients
+                 SET company_name = :company_name,
+                     contact_name = :contact_name,
+                     email = :email,
+                     status = "CUSTOMER",
+                     notes = CASE
+                         WHEN notes IS NULL OR notes = "" THEN :notes_empty
+                         WHEN notes LIKE "%Alta self-service de prueba%" THEN notes
+                         ELSE CONCAT(notes, "\n", :notes_append)
+                     END,
+                     updated_at = NOW()
+                 WHERE id = :id'
+            );
+            $stmt->execute([
+                'id' => $clientId,
+                'company_name' => $company,
+                'contact_name' => $contactName ?: null,
+                'email' => $email,
+                'notes_empty' => 'Alta self-service de prueba durante 14 dias.',
+                'notes_append' => 'Alta self-service de prueba durante 14 dias.',
+            ]);
+            self::markLinkedLeadConverted($clientId);
+
+            return $clientId;
+        }
+
+        $clientId = cuid();
+        $stmt = $pdo->prepare(
+            'INSERT INTO platform_clients
+             (id, company_name, contact_name, email, phone, status, notes, created_at, updated_at)
+             VALUES (:id, :company_name, :contact_name, :email, NULL, "CUSTOMER", :notes, NOW(), NOW())'
+        );
+        $stmt->execute([
+            'id' => $clientId,
+            'company_name' => $company,
+            'contact_name' => $contactName ?: null,
+            'email' => $email,
+            'notes' => 'Alta self-service de prueba durante 14 dias.',
+        ]);
+
+        return $clientId;
+    }
+
     public static function create(array $data): void
     {
         self::ensureTable();

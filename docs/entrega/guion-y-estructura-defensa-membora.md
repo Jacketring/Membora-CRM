@@ -116,7 +116,7 @@ Estilo recomendado:
 
 - **Objetivo:** diferenciar el proyecto de una simple maqueta académica.
 - **Texto en pantalla:**
-  - `49 tests · 230 aserciones`
+  - `50 tests · 243 aserciones`
   - `PHPUnit · PHPStan · GitHub Actions · Playwright`
   - Frase central: `No solo he desarrollado una aplicación funcional; he construido, probado y desplegado un producto siguiendo una metodología profesional.`
 - **Visual recomendado:** pipeline horizontal: especificación → tests → implementación → CI → Plesk. Incorporar una captura real de una ejecución correcta de GitHub Actions cuando esté disponible.
@@ -209,7 +209,7 @@ Estilo recomendado:
 
 ### Diapositiva 8
 
-> La calidad también forma parte del producto. Actualmente la suite automatizada ejecuta 49 tests con 230 aserciones. GitHub Actions valida la sintaxis PHP, PHPUnit, el umbral de cobertura configurado y el análisis estático con PHPStan. Los flujos principales también tienen pruebas Playwright cuando se configura un entorno E2E seguro. El trabajo sigue una secuencia de especificación, tests e implementación. Por eso no solo he desarrollado una aplicación funcional; he construido, probado y desplegado un producto siguiendo una metodología profesional.
+> La calidad también forma parte del producto. Actualmente la suite automatizada ejecuta 50 tests con 243 aserciones. He seguido una metodología incremental adaptada a un proyecto individual: alcance, requisitos, historias, especificación y criterios de aceptación, pruebas, implementación, integración continua y validación del despliegue. GitHub Actions valida la sintaxis PHP, PHPUnit, el umbral de cobertura configurado y el análisis estático con PHPStan. Los flujos principales también tienen pruebas Playwright cuando se configura un entorno E2E seguro. No lo presento como Scrum o TDD estricto, sino como un proceso trazable y apoyado por pruebas. Por eso no solo he desarrollado una aplicación funcional; he construido, probado y desplegado un producto siguiendo una metodología profesional.
 
 **[Cambiar a la diapositiva 9 y enseñar la captura de la web]**
 

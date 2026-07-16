@@ -1,222 +1,161 @@
 # Backend PHP, rutas y acciones - Membora CRM
 
-Fecha de actualizacion: 30/06/2026.
+Fecha de actualizacion: 16/07/2026.
 
-## 1. Estado actual
+## 1. Arquitectura activa
 
-La version actual no usa una API NestJS/JWT separada. El backend activo es una aplicacion PHP monolitica con entrada unica en:
+El backend es una aplicacion PHP monolitica con entrada unica en `apps/crm/public/index.php`. En produccion, `httpdocs/app/index.php` actua como puente seguro desde `/app/`, sirve solo recursos permitidos y mantiene el codigo fuera del document root.
 
-```text
-apps/crm/public/index.php
-```
+La navegacion usa el parametro `route`; las escrituras internas usan `POST` con un campo `action`. La sesion PHP identifica al usuario, fija el `tenant_id` y aplica la matriz de permisos antes de renderizar una ruta o ejecutar una accion.
 
-La navegacion se resuelve con el parametro `route` y las acciones de escritura se envian por `POST` con un campo `action`. La sesion PHP identifica al usuario autenticado y fija el contexto de gimnasio mediante `tenant_id`.
+## 2. Endpoints HTTP publicos y especiales
 
-## 2. Rutas de pantalla
+| Metodo | Ruta | Finalidad |
+|---|---|---|
+| `GET` | `/api/plans` | Devuelve en JSON los planes SaaS publicos. Alias: `?action=public_plans`. |
+| `POST` | `/api/trial` | Solicita una prueba de 14 dias con verificacion de email. Alias: `?action=trial_registration`. |
+| `POST` | `/webhook/lead` | Recibe captacion web por origen permitido o integraciones de tenant mediante token. Alias: `?action=webhook_lead`. |
+| `POST` | `/stripe/webhook` | Recibe eventos Stripe y valida obligatoriamente `Stripe-Signature`. Alias: `?action=stripe_webhook`. |
+| `GET` | `/stripe/checkout/success` | Retorno informativo de checkout; el webhook confirma el acceso y el cobro. |
+| `GET` | `/stripe/checkout/cancel` | Retorno de checkout cancelado sin activar acceso ni registrar cobro. |
 
-Rutas publicas o especiales:
+La web publica dispone de proxies en `httpdocs/api/plans.php`, `trial.php` y `lead.php`. Estos proxies conservan el mismo origen publico, aplican tiempos limite y trasladan una respuesta JSON generica al navegador.
 
-- `?route=login`: formulario de login.
-- `/webhook/lead`: endpoint publico para solicitudes desde la web comercial.
-- `/api/trial`: alta publica de prueba con verificacion por email.
-- `?action=webhook_lead`: alias compatible del webhook.
+## 3. Rutas de pantalla y datos
 
-Rutas de gimnasio:
+Rutas publicas o de autenticacion:
 
-- `?route=dashboard`: panel principal.
-- `?route=leads`: gestion de leads.
-- `?route=members`: socios.
-- `?route=memberships`: planes y suscripciones.
-- `?route=payments`: pagos manuales de socios.
-- `?route=billing`: configuracion y logs de facturacion externa generica.
-- `?route=billing-export`: descarga CSV de pagos preparados para facturacion.
-- `?route=checkins`: entradas y asistencias de socios.
-- `?route=alerts`: alertas de riesgo operativas.
-- `?route=audit`: auditoria de acciones internas.
-- `?route=classes`: tipos de clase, calendario, sesiones y reservas.
-- `?route=tasks`: tareas.
-- `?route=users`: usuarios internos.
-- `?route=profile`: perfil del usuario.
-- `?route=settings`: configuracion visual.
-- `?route=global-search&q=...`: buscador global en JSON.
+- `?route=login`
+- `?route=forgot-password`
+- `?route=reset-password&token=...`
+- `?route=activate-trial&token=...`
+- `?route=demo-expired`
+
+Rutas autenticadas de gimnasio:
+
+- `dashboard`, `leads`, `tasks`, `users`, `profile`, `settings` y `novedades`.
+- `members`, `memberships`, `payments`, `payment-invoice` y `client-invoice`.
+- `billing`, `checkins`, `alerts`, `audit` y `classes`.
+- `global-search`: buscador/autocompletado JSON limitado al tenant actual.
+- `billing-export`: alias historico que redirige al modulo de facturacion externa.
 
 Rutas de administracion SaaS:
 
-- `?route=platform-dashboard`: resumen de Admin CRM.
-- `?route=platform-contacts`: contactos unificados con leads web y clientes comerciales.
-- `?route=platform-leads` y `?route=platform-clients`: rutas antiguas redirigidas a `platform-contacts`.
-- `?route=platform-companies`: empresas cliente.
-- `?route=platform-payments`: cobros SaaS.
-- `?route=platform-plans`: catalogo de planes SaaS.
-- `?route=platform-web`: estado tecnico de la web, webhook y correo.
-- `?route=platform-audit`: logs de actividad de empresas cliente y plataforma.
+- `platform-dashboard`, `platform-contacts` y `platform-companies`.
+- `platform-users`, `platform-payments` y `platform-payment-invoice`.
+- `platform-invoices`, `platform-invoice`, `platform-plans` y `platform-web`.
+- `platform-audit`.
+- `platform-leads` y `platform-clients`: alias antiguos redirigidos a `platform-contacts`.
 
-## 3. Acciones POST principales
+La autorizacion efectiva se define en `route_permissions()` y `action_permissions()` de `apps/crm/src/Support.php`. Una ruta listada aqui no implica acceso para todos los roles.
 
-Autenticacion y perfil:
+## 4. Acciones POST
 
-- `login`
-- `logout`
-- `update_profile`
+Autenticacion, sesion y perfil:
 
-Administracion SaaS:
+- `login`, `demo_login`, `keep_demo_session`, `schedule_demo_cleanup` y `logout`.
+- `request_password_reset`, `reset_password` y `update_profile`.
 
-- `update_platform_lead`
-- `convert_platform_lead`
-- `delete_platform_lead`
-- `send_platform_test_email`
-- `create_platform_client`
-- `update_platform_client`
-- `create_empresa`
-- `update_empresa`
-- `create_platform_payment`
-- `update_platform_payment`
-- `create_platform_plan`
-- `update_platform_plan`
-- `enter_empresa_crm`
-- `exit_empresa_crm`
+Administracion SaaS, contactos y empresas:
 
-Gimnasio:
+- `update_platform_lead`, `convert_platform_lead`, `delete_platform_lead` y `send_platform_test_email`.
+- `create_platform_client`, `update_platform_client` y `delete_platform_client`.
+- `create_empresa`, `update_empresa` y `update_empresa_subscription`.
+- `renew_empresa_subscription`, `cancel_empresa_subscription` y `resume_empresa_subscription`.
+- `create_empresa_stripe_checkout` y `cancel_empresa_stripe_subscription`.
+- `enter_empresa_crm` y `exit_empresa_crm`.
 
-- `create_user`
-- `update_user`
-- `create_lead`
-- `update_lead`
-- `add_lead_note`
-- `update_lead_note`
-- `delete_lead_note`
-- `update_lead_stage`
-- `convert_lead`
-- `mark_lead_lost`
-- `delete_lead`
-- `create_member`
-- `update_member`
-- `delete_member`
-- `create_membership_plan`
-- `update_membership_plan`
-- `delete_membership_plan`
-- `create_payment`
-- `update_payment`
-- `delete_payment`
-- `create_checkin`
-- `delete_checkin`
-- `update_risk_alert_status`
-- `save_billing_integration`
-- `sync_billing_integration`
-- `create_class_type`
-- `create_class_session`
-- `update_class_session`
-- `delete_class_session`
-- `create_reservation`
-- `update_reservation_status`
-- `create_task`
-- `update_task`
-- `update_task_status`
-- `delete_task`
+Usuarios de plataforma y gimnasio:
 
-## 4. Webhook publico
+- `create_platform_user`, `update_platform_user` y `delete_platform_user`.
+- `create_user` y `update_user`.
 
-Endpoint:
+Cobros, facturas y planes SaaS:
 
-```text
-POST /webhook/lead
-```
+- `create_platform_payment` y `update_platform_payment`.
+- `create_platform_invoice`, `update_platform_invoice`, `issue_platform_invoice` y `add_platform_invoice_payment`.
+- `create_client_invoice`, `update_client_invoice`, `issue_client_invoice` y `add_client_invoice_payment`.
+- `create_platform_plan` y `update_platform_plan`.
 
-Formatos aceptados:
+Leads, socios y membresias:
 
-- `application/json`
-- `application/x-www-form-urlencoded`
-- `multipart/form-data`
+- `create_lead`, `update_lead`, `update_lead_stage`, `convert_lead`, `mark_lead_lost` y `delete_lead`.
+- `add_lead_note`, `update_lead_note` y `delete_lead_note`.
+- `create_member`, `update_member`, `delete_member` y `renew_member_subscription`.
+- `create_membership_plan`, `update_membership_plan` y `delete_membership_plan`.
 
-Comportamiento:
+Pagos y operacion del gimnasio:
 
-- Valida origen contra `WEB_APP_URL` cuando el navegador envia `Origin`.
-- Acepta `OPTIONS` para CORS.
-- Aplica validaciones anti-abuso en el repositorio de integracion.
-- Crea o actualiza una entrada en `platform_leads`.
-- Intenta enviar email HTML de confirmacion si hay email valido y SMTP configurado.
-- Registra resultados tecnicos en `webhook_logs`.
+- `create_payment`, `update_payment`, `mark_payment_paid`, `generate_recurring_payments` y `delete_payment`.
+- `create_checkin`, `delete_checkin` y `update_risk_alert_status`.
+- `save_billing_integration` y `sync_billing_integration`.
+- `create_class_type`, `create_class_session`, `update_class_session` y `delete_class_session`.
+- `create_reservation` y `update_reservation_status`.
+- `create_task`, `update_task`, `update_task_status` y `delete_task`.
 
-Respuesta JSON:
+Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion controlada de demo, permisos por rol, bloqueo de suscripcion y auditoria sanitizada.
 
-```json
-{
-  "success": true,
-  "message": "Solicitud recibida correctamente"
-}
-```
+## 5. Contratos publicos resumidos
 
-## 5. Seguridad de backend
+### Planes
 
-### Alta de prueba self-service
+`GET /api/plans` responde con `success`, moneda `EUR` y una lista de planes activos. La web publica consume este endpoint mediante `httpdocs/api/plans.php`.
 
-`POST /api/trial` acepta nombre, empresa, email, consentimiento y honeypot. Valida el origen contra `WEB_APP_URL`, limita solicitudes por IP y email y envia un enlace de activacion valido durante una hora. La activacion crea un tenant con plan `TRIAL` de 14 dias y redirige al formulario para definir contrasena. Nunca devuelve ni envia una contrasena en claro.
+### Prueba self-service
 
-- Sesiones PHP con cookies `HttpOnly`, `SameSite=Lax` y `Secure` si hay HTTPS.
-- Regeneracion de ID de sesion tras login.
-- Validacion de `Origin`/`Referer` en POST internos con `APP_URL`.
-- `APP_STRICT_POST_ORIGIN` permite endurecer el bloqueo de POST sin origen.
-- Consultas preparadas PDO.
-- Escape de salida con `e($value)` en vistas.
-- Validacion de uploads de imagen por tamano y MIME real.
-- Aislamiento de datos operativos por `tenant_id`.
-- Acceso a `Admin CRM` restringido a superadmin de plataforma.
+`POST /api/trial` acepta nombre, empresa, email, consentimiento y honeypot. Valida el origen contra `WEB_APP_URL`, limita solicitudes por IP y email y envia un enlace de activacion valido durante una hora. Solo tras verificarlo crea o actualiza el contacto como `Cliente CRM`, vincula una empresa `TRIAL`, crea tenant y administrador; la persona define su propia contrasena. Si el email ya pertenece a un usuario, no duplica datos y envia un aviso con acceso y recuperacion.
 
-## 6. Configuracion relacionada
+### Captacion web
 
-Variables principales:
+`POST /webhook/lead` acepta JSON, formulario URL-encoded y multipart. Sin token exige un origen publico permitido, honeypot vacio y rate limit; crea o actualiza `platform_leads` y envia confirmacion cuando SMTP esta disponible. Con token busca la configuracion del tenant y crea o actualiza el lead operativo correspondiente.
 
-```env
-APP_URL="https://membora.es/app"
-WEB_APP_URL="https://membora.es,https://www.membora.es"
-APP_STRICT_POST_ORIGIN="false"
-DB_HOST="localhost"
-DB_PORT="3306"
-DB_DATABASE="membora_crm"
-DB_USERNAME="usuario"
-DB_PASSWORD="password"
-MAIL_ENABLED="true"
-MAIL_MAILER="smtp"
-MAIL_FROM_EMAIL="no-reply@josehurtado.dev"
-MAIL_FROM_NAME="Membora CRM"
-MAIL_REPLY_TO="contacto@josehurtado.dev"
-SMTP_HOST="mail.josehurtado.dev"
-SMTP_PORT="587"
-SMTP_ENCRYPTION="tls"
-SMTP_USERNAME="no-reply@josehurtado.dev"
-SMTP_PASSWORD="password"
-```
+### Stripe
 
-Tambien se admite `DATABASE_URL` para la conexion MariaDB.
+`POST /stripe/webhook` funciona cuando `PAYMENTS_MODE=stripe_test`, verifica la firma, registra `stripe_events` para idempotencia y sincroniza suscripciones, cobros y facturas. El checkout no activa el acceso por la URL de retorno: espera la confirmacion firmada del webhook.
 
-## 7. Pruebas tecnicas recomendadas
+## 6. Seguridad de backend
 
-Antes de desplegar cambios:
+- Sesion estricta con cookie propia, `HttpOnly`, `SameSite=Lax` y `Secure` bajo HTTPS.
+- Tokens CSRF en formularios y validacion de `Origin`/`Referer` en POST internos.
+- Rate limit de login, captacion y alta de prueba.
+- Tokens de recuerdo y recuperacion con selector/verificador, caducidad y uso unico cuando corresponde.
+- Consultas preparadas PDO, escape de salida y validacion MIME/tamano de uploads.
+- Aislamiento por `tenant_id`, permisos por ruta/accion y modo soporte explicito.
+- Auditoria que elimina contrasenas, tokens y secretos de los metadatos.
+- Firma Stripe e idempotencia de eventos externos.
+
+## 7. Configuracion relacionada
+
+La referencia completa es `apps/crm/.env.example`. Grupos principales:
+
+- Aplicacion: `APP_NAME`, `APP_ENV`, `APP_URL`, `WEB_APP_URL`, `APP_STRICT_POST_ORIGIN`, `SESSION_COOKIE_NAME` y `APP_KEY`.
+- Base de datos: `DATABASE_URL` o `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD`.
+- Administracion/demo: `PLATFORM_ADMIN_PASSWORD` y `DEMO_CLIENT_PASSWORD`.
+- Correo: `MAIL_*` y `SMTP_*`.
+- Facturas: `INVOICE_ISSUER_*`.
+- Stripe: `PAYMENTS_MODE`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET`.
+- Observabilidad: `SENTRY_DSN` y `SENTRY_ENVIRONMENT`.
+
+Variables opcionales de infraestructura:
+
+- `MEMBORA_APP_PATH`: cambia el prefijo `/app` usado por el puente y los helpers.
+- `MEMBORA_PUBLIC_ORIGIN`: fija el origen que usan los proxies publicos si la deteccion por host no es suficiente.
+- `APP_WEB_URL`: alias compatible adicional para origenes de la web; la configuracion principal es `WEB_APP_URL`.
+
+## 8. Verificacion tecnica
 
 ```bash
-php -l apps/crm/public/index.php
-php -l apps/crm/src/Actions.php
-php -l apps/crm/src/Repositories.php
-php -l apps/crm/src/Auth.php
-php -l apps/crm/src/Support.php
-node --check apps/crm/public/assets/app.js
-node --check httpdocs/assets/site.js
+cd apps/crm
+composer test
+composer analyse
+php -l public/index.php
+php -l src/Actions.php
+php -l src/Auth.php
+php -l src/Repositories.php
+php -l src/StripeBilling.php
+node --check public/assets/app.js
+node --check ../../httpdocs/assets/site.js
 git diff --check
 ```
 
-Pruebas manuales clave:
-
-- Login de administrador de gimnasio.
-- Login de superadmin.
-- Demo temporal desde la web publica con contador de 20 minutos.
-- Creacion y conversion de lead.
-- Creacion/edicion de socio con foto.
-- Asignacion de membresia.
-- Registro y edicion de pagos de socios.
-- Registro y eliminacion de check-ins.
-- Generacion, resolucion y descarte de alertas de riesgo.
-- Creacion de clase desde calendario.
-- Reserva, asistencia, no-show y cancelacion.
-- Creacion de tarea interna asignada a un usuario responsable.
-- Formulario de la web publica hacia `/webhook/lead`.
-- Prueba de correo desde `Admin CRM > Web`.
+El CI amplía la sintaxis PHP a `apps/crm` y `httpdocs/api`, genera cobertura de la capa configurada, exige el umbral del 80 % y ejecuta Playwright solo cuando existe `E2E_BASE_URL`.

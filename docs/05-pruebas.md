@@ -1,10 +1,29 @@
 # Plan de pruebas - Membora CRM
 
+Fecha de actualización: 16/07/2026.
+
+Este plan corresponde a la fase de verificación de la metodología incremental descrita en `docs/19-metodologia-desarrollo.md`.
+
 ## Automatización
 
-La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, métricas del dashboard, estados históricos de reservas e inicialización de Sentry. El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %.
+La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 16 de julio de 2026 completa **50 tests y 243 aserciones** sin errores.
 
-Playwright valida contra la demo funcional los flujos de login correcto e incorrecto, creación y conversión de un lead a socio, y programación de una clase con reserva de plaza. Node.js se usa únicamente en desarrollo y CI.
+El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %. Esta cobertura es la última medición guardada y debe tratarse como evidencia histórica de esa capa, no como cobertura actual de todo el producto.
+
+Playwright valida login correcto e incorrecto, bloqueo de rutas de plataforma para usuarios de gimnasio, creación y conversión de un lead, programación de una clase con reserva y, cuando existe `E2E_INVOICE_URL`, visualización e impresión de una factura. Node.js se usa únicamente en desarrollo y CI.
+
+## Matriz resumida de trazabilidad
+
+| Area | Requisitos | Historias | Evidencia principal |
+|---|---|---|---|
+| Autenticacion y permisos | RF-01 a RF-03, RF-21 | HU-01 a HU-03, HU-23 y HU-24 | PHPUnit de seguridad, PF-01, PF-08 y E2E login |
+| Leads, socios y membresias | RF-04 a RF-08 | HU-04 a HU-10 | PF-02 a PF-04 y E2E lead |
+| Pagos, clases y operacion | RF-09 a RF-15, RF-22 | HU-11 a HU-20, HU-32 | PF-04B a PF-06, PF-10, PF-11 y E2E clase |
+| Perfil y novedades | RF-23 | HU-25 | PF-09 |
+| Plataforma SaaS | RF-16, RF-17 y RF-19 | HU-26 a HU-28, HU-30 | PA-01 a PA-07 y PA-10 |
+| Trial y planes publicos | RF-18 y RF-24 | HU-22 y HU-31 | PD-05 y PA-08 |
+| Stripe Test | RF-20 | HU-29 | PA-09 y `docs/16-stripe-billing-saas.md` |
+| Demo y despliegue | RNF-05, RNF-06 | HU-21 | PD-01 a PD-04 |
 
 ## 1. Objetivo
 
@@ -12,7 +31,7 @@ Este documento define las pruebas manuales recomendadas para validar la version 
 
 El objetivo es comprobar que:
 
-- La aplicacion carga en Plesk desde `apps/crm/public`.
+- La aplicacion carga en Plesk desde el document root `httpdocs`; `httpdocs/app/index.php` puentea de forma segura hacia `apps/crm/public`.
 - El login funciona con usuarios demo.
 - Los datos se separan por `tenant_id`.
 - Los modulos principales funcionan sin errores 500.
@@ -126,7 +145,7 @@ Resultado esperado:
 - El formulario no revela si un correo ya estaba registrado.
 - Sin verificar el correo no se crea ninguna empresa ni usuario del CRM.
 - El enlace solo se puede usar una vez y caduca al cabo de una hora.
-- Tras verificarlo se crea un tenant aislado con 14 dias de prueba.
+- Tras verificarlo aparece un contacto `Cliente CRM` con empresa vinculada, tenant aislado y 14 dias de prueba.
 - La contrasena nunca se envia por correo y la establece el propio usuario.
 
 ## 4. Pruebas funcionales de gimnasio
@@ -294,6 +313,65 @@ Resultado esperado:
 - Los roles se muestran en espanol.
 - Los socios/clientes no aparecen como usuarios internos.
 
+### PF-08 Recuperacion y recuerdo de sesion
+
+Pasos:
+
+1. Solicitar recuperacion para un email existente y otro inexistente.
+2. Abrir el enlace recibido y establecer una contrasena valida.
+3. Intentar reutilizar el mismo enlace.
+4. Iniciar sesion marcando `Recordarme`, cerrar sesion y revisar la cookie.
+
+Resultado esperado:
+
+- Las respuestas de solicitud no revelan si el email existe.
+- El token valido permite un unico cambio y despues queda revocado.
+- La cookie de recuerdo restaura y rota la sesion mientras sea valida.
+- Cerrar sesion elimina cookie y token.
+
+### PF-09 Perfil, configuracion y novedades
+
+Pasos:
+
+1. Editar nombre, telefono e imagen del perfil.
+2. Cambiar color y tema visual.
+3. Abrir Novedades.
+
+Resultado esperado:
+
+- Los cambios se conservan para el usuario o tenant correcto.
+- Un archivo no permitido se rechaza.
+- Novedades muestra la version y el historial configurados.
+
+### PF-10 Facturacion externa
+
+Pasos:
+
+1. Guardar endpoint, proveedor, formato y una clave API de prueba.
+2. Crear pagos pagados pendientes de envio.
+3. Exportar CSV y ejecutar la sincronizacion simulada.
+4. Revisar los logs tecnicos.
+
+Resultado esperado:
+
+- La clave se muestra enmascarada y no aparece en auditoria.
+- El CSV contiene solo pagos elegibles del tenant actual.
+- Estado, numero de pagos, importe y resultado quedan registrados.
+
+### PF-11 Auditoria
+
+Pasos:
+
+1. Crear, editar y eliminar una entidad de prueba.
+2. Abrir Auditoria y filtrar por accion, usuario y fecha.
+3. Revisar los metadatos de una accion con campos sensibles.
+
+Resultado esperado:
+
+- La actividad pertenece al tenant actual.
+- Contrasenas, CSRF, tokens, cookies y claves se sustituyen por valores sanitizados.
+- Un superadministrador puede consultar la actividad de plataforma o del cliente solicitado sin mezclar contextos.
+
 ## 5. Pruebas de administracion SaaS
 
 ### PA-01 Login superadmin
@@ -355,13 +433,110 @@ Resultado esperado:
 - El superadmin puede ver datos del cliente para soporte.
 - Se puede volver al panel SaaS.
 
+### PA-05 Usuarios de plataforma
+
+Pasos:
+
+1. Abrir `Admin CRM > Usuarios`.
+2. Crear y editar un usuario de plataforma.
+3. Comprobar desde un administrador de gimnasio que la ruta y las acciones se bloquean.
+4. Eliminar el usuario de prueba.
+
+Resultado esperado:
+
+- Solo los roles de plataforma autorizados pueden gestionarlos.
+- Los roles globales no aparecen como asignables desde un gimnasio.
+
+### PA-06 Cobros SaaS
+
+Pasos:
+
+1. Crear un cobro para una empresa.
+2. Editar concepto, importe, vencimiento y estado.
+3. Abrir su justificante o factura asociada cuando exista.
+
+Resultado esperado:
+
+- El cobro queda vinculado a la empresa correcta.
+- Los indicadores mensuales y pendientes se actualizan.
+
+### PA-07 Facturas SaaS y de cliente
+
+Pasos:
+
+1. Crear una factura en borrador con varias lineas e impuestos.
+2. Emitirla y comprobar serie, numero y totales.
+3. Registrar un pago parcial y despues el saldo restante.
+4. Abrir la vista imprimible.
+5. Repetir el flujo para un cliente comercial sin empresa cuando proceda.
+
+Resultado esperado:
+
+- Los totales y el saldo se recalculan correctamente.
+- El estado cambia de pendiente a parcial y pagado.
+- Los cobros no duplican ni eliminan historial.
+- La impresion no produce errores JavaScript.
+
+### PA-08 Planes y API publica
+
+Pasos:
+
+1. Crear o editar un plan activo.
+2. Consultar `/app/api/plans` y el proxy `/api/plans.php`.
+3. Desactivar el plan y repetir la consulta.
+
+Resultado esperado:
+
+- Solo se publican planes activos y datos comerciales permitidos.
+- La moneda y los importes coinciden con el panel.
+
+### PA-09 Stripe Billing de prueba
+
+Precondicion: `PAYMENTS_MODE=stripe_test`, claves de prueba y Price IDs validos.
+
+Pasos:
+
+1. Iniciar checkout para una empresa y completar un pago con tarjeta de prueba.
+2. Confirmar que el retorno por si solo no activa el acceso.
+3. Enviar o esperar el webhook firmado.
+4. Repetir el mismo evento.
+5. Solicitar la cancelacion de Stripe al final del periodo y recibir su actualizacion por webhook.
+
+Resultado esperado:
+
+- El webhook sincroniza empresa, suscripcion, factura y cobro.
+- El mismo `stripe_event_id` no se procesa dos veces.
+- La cancelacion conserva el acceso hasta el final del periodo y queda sincronizada por webhook.
+- Ninguna prueba usa claves Live ni dinero real.
+
+### PA-10 Web, correo y captacion
+
+Pasos:
+
+1. Enviar una solicitud desde la web publica sin token manual.
+2. Comprobar su aparicion en Contactos y el log de confirmacion.
+3. Ejecutar la prueba de correo desde `Admin CRM > Web`.
+4. Enviar una integracion de tenant con token valido e invalido.
+
+Resultado esperado:
+
+- La captacion publica exige origen permitido, honeypot vacio y rate limit.
+- La integracion con token solo escribe en su tenant activo.
+- Los errores SMTP quedan registrados sin impedir la creacion del contacto.
+
 ## 6. Pruebas tecnicas locales
 
 Comandos usados antes de subir cambios:
 
 ```bash
-php -l archivo.php
-node --check apps/crm/public/assets/app.js
+cd apps/crm
+composer test
+composer analyse
+php -l public/index.php
+php -l src/Actions.php
+php -l src/StripeBilling.php
+node --check public/assets/app.js
+node --check ../../httpdocs/assets/site.js
 git diff --check
 ```
 
@@ -376,3 +551,5 @@ Resultado esperado:
 - Las reservas estan implementadas dentro del modulo de clases, pero conviene validarlas en produccion con datos reales.
 - La aplicacion crea tablas auxiliares automaticamente; conviene validar permisos de usuario MariaDB en Plesk.
 - Hay que validar el flujo completo en produccion justo antes de grabar el video final.
+- Stripe esta implementado solo en modo de prueba; activar Live exige cuenta, claves, webhook, precios, banco y validacion fiscal/comercial.
+- La cobertura del 93,50 % es historica y corresponde a la capa configurada, no a todas las rutas, repositorios ni vistas.

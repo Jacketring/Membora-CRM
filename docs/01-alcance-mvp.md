@@ -1,6 +1,8 @@
 # Alcance del MVP - Membora CRM
 
-Fecha de actualizacion: 10/07/2026.
+Fecha de actualizacion: 16/07/2026.
+
+Este alcance constituye la primera fase de la metodología incremental descrita en `docs/19-metodologia-desarrollo.md`. Permite distinguir el MVP demostrable de las mejoras futuras antes de definir requisitos, historias y especificaciones.
 
 ## 1. Objetivo
 
@@ -163,7 +165,7 @@ La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba
 
 ## 8. Stripe, cobros y checkout
 
-Para los pagos de Membora se plantea Stripe como proveedor principal. Stripe cubrira cobros con tarjeta, suscripciones recurrentes y pagos automaticos. En el MVP no se integra una pasarela real completa: se conserva la logica de suscripcion, renovacion y pagos SaaS en modo interno/simulado para que el flujo pueda probarse sin claves bancarias.
+Para los pagos de Membora se usa Stripe como proveedor principal. El MVP incluye una integracion funcional restringida a `stripe_test`: checkout alojado, webhooks firmados, suscripciones recurrentes, cancelacion al final del periodo, facturas, cobros e idempotencia. No se habilita Stripe Live ni se realizan cargos reales hasta completar la configuracion bancaria, fiscal y comercial.
 
 Cuando Jose cree la cuenta de Stripe, debera configurar:
 
@@ -182,7 +184,7 @@ El flujo objetivo de contratacion sera:
 5. Membora activa o renueva la empresa, actualiza `next_payment_at` y `access_until`, y registra el pago.
 6. El usuario recibe una confirmacion clara: "Enhorabuena, ya tienes acceso y puedes usar la aplicacion".
 
-La renovacion podra revisarse automaticamente con una tarea programada diaria, por ejemplo a medianoche. En fase inicial esta tarea puede simular cobros vencidos o preparar pagos internos; en fase real debera apoyarse en Stripe y en los webhooks para evitar marcar pagos como cobrados sin confirmacion externa.
+Las renovaciones Stripe se sincronizan mediante webhooks y nunca se marcan como cobradas por la URL de retorno. Los pagos manuales de socios pueden generarse de forma recurrente dentro del CRM, pero no constituyen un cargo bancario automatico.
 
 ## 9. Facturacion de Membora y Verifactu
 

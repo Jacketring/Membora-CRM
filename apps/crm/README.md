@@ -4,6 +4,12 @@ Aplicacion PHP monolitica para ejecutar Membora CRM en `/app/` dentro del mismo 
 
 La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/index.php`, manteniendo el codigo privado en `apps/crm`.
 
+## Metodología y validación
+
+El CRM se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
+
+Estado verificado el 16/07/2026: **50 tests y 243 aserciones** de PHPUnit, además de PHPStan sin errores.
+
 ## Requisitos
 
 - PHP 8.2 o superior.
@@ -15,6 +21,8 @@ La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/inde
 ## Configuracion
 
 Crear `apps/crm/.env` a partir de `.env.example`.
+
+`.env.example` es la referencia completa para sesion, correo, datos fiscales, Stripe y Sentry. `MEMBORA_APP_PATH`, `MEMBORA_PUBLIC_ORIGIN` y `APP_WEB_URL` son variables opcionales de infraestructura descritas en `../../docs/06-api-backend.md`.
 
 Configuracion recomendada:
 
@@ -72,12 +80,16 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Leads.
 - Socios.
 - Membresias.
+- Pagos de socios y facturas imprimibles.
+- Facturacion externa generica.
+- Check-ins, alertas y auditoria.
 - Clases y calendario.
 - Tareas.
 - Usuarios internos.
 - Perfil.
 - Configuracion visual.
-- Panel de administracion SaaS con resumen, contactos, empresas, pagos, planes y web comercial.
+- Novedades.
+- Panel de administracion SaaS con resumen, contactos, empresas, usuarios, pagos, facturas, planes, web comercial y auditoria.
 
 ## Administracion SaaS
 
@@ -95,6 +107,8 @@ La app crea y usa tablas de administracion SaaS para controlar clientes, empresa
 - Acceso de soporte al CRM de la empresa si tiene `tenant_id`.
 - Creacion de tenant y usuario administrador al pasar de cliente a empresa.
 - Pagos SaaS por empresa: concepto, importe, vencimiento, fecha de pago y estado.
+- Facturas SaaS y de clientes: lineas, impuestos, emision, pagos asociados y vista imprimible.
+- Usuarios de plataforma separados de los usuarios de gimnasio.
 - Planes SaaS: codigo, precio mensual, coste de alta, limites y prestaciones.
 - Contactos: tabla unificada de solicitudes web y clientes comerciales, con edicion, conversion a cliente, alta manual y eliminacion controlada de leads.
 - Web comercial: estado tecnico del formulario publico y logs de envios recibidos.
@@ -115,16 +129,33 @@ La aplicacion crea algunas tablas o columnas auxiliares si no existen, por ejemp
 - `platform_clients`.
 - `empresa_payments`.
 - `saas_plans`.
+- `platform_invoices`.
+- `platform_invoice_items`.
+- `platform_invoice_payments`.
 - `lead_notes`.
+- `webhook_settings`.
 - `webhook_logs`.
 - `task_members`.
 - `membership_plans`.
 - `subscriptions`.
 - `class_types`.
 - `class_sessions`.
+- `reservations`.
+- `payments`.
+- `billing_integrations`.
+- `billing_sync_logs`.
+- `checkins`.
+- `risk_alerts`.
+- `audit_logs`.
+- `demo_users` y `demo_resets`.
+- `login_attempts` y `auth_tokens`.
+- `trial_registrations`.
+- `stripe_events`.
 - columnas de imagen para usuarios/socios.
 
 Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones Node.
+
+La integracion Stripe esta habilitada exclusivamente con `PAYMENTS_MODE=stripe_test` y claves `sk_test_`. La activacion Live queda fuera del estado cerrado actual; consulta `../../docs/16-stripe-billing-saas.md`.
 
 ## Web comercial
 
@@ -132,7 +163,7 @@ La captacion web se revisa desde el panel de administradores de Membora CRM, no 
 
 Los enlaces de demo de la web publica envian un `POST` al login demo del CRM. La demo cliente publica no depende del nombre exacto de `APP_ENV`, mientras que la demo de administrador solo se habilita con `APP_ENV=demo`. Cada acceso crea un usuario temporal con credenciales aleatorias, dura 20 minutos, muestra un contador y elimina ese usuario al cerrar sesion, caducar o cerrar la pestana. Al terminar devuelve al usuario a `WEB_APP_URL`.
 
-El formulario `Empieza gratis` envia a `/app/api/trial`. El servidor verifica origen, honeypot y rate limit, envia un enlace de activacion de una hora y, tras confirmar el email, crea un tenant con plan `TRIAL` durante 14 dias. La persona define su contrasena mediante el flujo seguro de recuperacion; no se envian contrasenas por correo.
+El formulario `Empieza gratis` envia a `/app/api/trial`. El servidor verifica origen, honeypot y rate limit, envia un enlace de activacion de una hora y, tras confirmar el email, crea o actualiza un contacto `Cliente CRM`, lo vincula a su empresa y crea un tenant con plan `TRIAL` durante 14 dias. La persona define su contrasena mediante el flujo seguro de recuperacion; no se envian contrasenas por correo.
 
 El formulario de `httpdocs` envia al webhook:
 

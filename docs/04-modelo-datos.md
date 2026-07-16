@@ -8,19 +8,26 @@ erDiagram
     TENANTS ||--o{ LEADS : capta
     TENANTS ||--o{ MEMBERS : gestiona
     TENANTS ||--o{ MEMBERSHIP_PLANS : ofrece
-    MEMBERS ||--o{ MEMBERSHIPS : contrata
-    MEMBERSHIP_PLANS ||--o{ MEMBERSHIPS : define
+    MEMBERS ||--o{ SUBSCRIPTIONS : contrata
+    MEMBERSHIP_PLANS ||--o{ SUBSCRIPTIONS : define
     MEMBERS ||--o{ PAYMENTS : realiza
     MEMBERS ||--o{ CHECKINS : registra
     CLASS_SESSIONS ||--o{ RESERVATIONS : recibe
     MEMBERS ||--o{ RESERVATIONS : reserva
     TENANTS ||--o{ TASKS : organiza
     TENANTS ||--o{ AUDIT_LOGS : audita
+    PLATFORM_LEADS |o--o| PLATFORM_CLIENTS : convierte
+    PLATFORM_CLIENTS ||--o{ EMPRESAS : origina
+    EMPRESAS ||--o{ EMPRESA_PAYMENTS : recibe
+    EMPRESAS ||--o{ PLATFORM_INVOICES : factura
+    PLATFORM_INVOICES ||--|{ PLATFORM_INVOICE_ITEMS : contiene
+    PLATFORM_INVOICES ||--o{ PLATFORM_INVOICE_PAYMENTS : cobra
+    USERS ||--o{ AUTH_TOKENS : autentica
     MEMBERS { string id PK string tenant_id FK string email string status }
     PAYMENTS { string id PK string tenant_id FK string member_id FK decimal amount string status }
 ```
 
-Fecha de actualizacion: 30/06/2026.
+Fecha de actualizacion: 16/07/2026.
 
 ## 1. Estado del documento
 
@@ -63,7 +70,6 @@ Estas tablas pertenecen a un gimnasio concreto y deben consultarse siempre con `
 - `checkins`: entradas/asistencias manuales de socios.
 - `audit_logs`: registro de acciones internas con datos sanitizados.
 - `demo_users`: usuarios temporales de demo, token de limpieza y fecha de caducidad.
-- `trial_registrations`: solicitudes de prueba, token de verificacion, rate limit, estado y fecha de activacion.
 
 Columnas auxiliares que PHP puede anadir:
 
@@ -84,8 +90,19 @@ Estas tablas son globales de Membora CRM y no representan datos internos de un g
 - `empresas`: empresas cliente del SaaS, plan contratado, estado, pago y dias de prueba comercial.
 - `empresa_payments`: cobros SaaS por empresa.
 - `saas_plans`: catalogo comercial de planes SaaS.
+- `platform_invoices`: cabeceras de facturas SaaS y facturas manuales emitidas a clientes.
+- `platform_invoice_items`: lineas, cantidades, precios, impuestos y totales de cada factura.
+- `platform_invoice_payments`: cobros parciales o totales asociados a facturas.
+- `stripe_events`: eventos Stripe recibidos, resultado de proceso e idempotencia por `stripe_event_id`.
 - `webhook_settings`: configuracion historica/tecnica de integraciones.
 - `webhook_logs`: registros tecnicos de formularios, emails y diagnosticos.
+
+Tablas transversales de autenticacion, demo y provisionamiento:
+
+- `login_attempts`: intentos fallidos por IP y hash del email para limitar fuerza bruta.
+- `auth_tokens`: tokens de un solo uso o rotatorios para recordar sesion y recuperar contrasena.
+- `demo_resets`: control de reinicios periodicos de los datos demo.
+- `trial_registrations`: solicitudes de prueba, token de verificacion, rate limit, estado y fecha de activacion.
 
 ## 5. Relaciones principales
 
@@ -99,7 +116,7 @@ Estas tablas son globales de Membora CRM y no representan datos internos de un g
 - `Member` 1 -> N `CheckIn`.
 - `BillingIntegration` 1 -> N `BillingSyncLog`.
 - `MembershipPlan` 1 -> N `Subscription`.
-- `Subscription` 0..N -> N `Payment`.
+- `Subscription` 1 -> N `Payment`; la relacion es opcional desde cada pago.
 - `ClassType` 1 -> N `ClassSession`.
 - `ClassSession` 1 -> N `Reservation`.
 - `ClassSession` 0..N -> N `CheckIn`.
@@ -112,8 +129,12 @@ Estas tablas son globales de Membora CRM y no representan datos internos de un g
 - `PlatformClient` 0..N -> N `Empresa` como origen comercial.
 - `Empresa` 0..1 -> 1 `Tenant` cuando el CRM esta creado.
 - `Empresa` 1 -> N `EmpresaPayment`.
+- `Empresa` 1 -> N `PlatformInvoice`.
+- `PlatformInvoice` 1 -> N `PlatformInvoiceItem` y `PlatformInvoicePayment`.
 - `SaasPlan` 1 -> N `Empresa` cuando se asigna un plan comercial.
 - `Empresa.trial_days` define la duracion de la prueba cuando `plan` esta en `TRIAL`.
+- `User` 1 -> N `AuthToken`; los tokens se guardan mediante selector y verificador derivado, no en claro.
+- `StripeEvent` no pertenece a un tenant: registra eventos tecnicos globales y evita procesarlos dos veces.
 
 ## 6. Reglas de aislamiento
 
@@ -217,6 +238,7 @@ La aplicacion PHP puede crear o adaptar tablas auxiliares al cargar repositorios
 Automatismos principales:
 
 - Crea `platform_leads`, `platform_clients`, `empresas`, `empresa_payments` y `saas_plans`.
+- Crea `platform_invoices`, `platform_invoice_items` y `platform_invoice_payments` para facturacion SaaS y cobros asociados.
 - Crea `lead_notes`, `task_members`, `membership_plans`, `subscriptions`, `class_types`, `class_sessions` y `reservations`.
 - Crea `checkins` para entradas manuales y asistencias asociadas a reservas.
 - Crea `risk_alerts` para pagos vencidos, tareas vencidas, membresias caducadas o proximas a renovar, leads sin seguimiento, socios sin actividad y clases llenas.
@@ -226,6 +248,8 @@ Automatismos principales:
 - Anade `empresas.trial_days` para pruebas comerciales configurables.
 - Crea `webhook_settings` y `webhook_logs` para integraciones y diagnostico.
 - Crea `trial_registrations` para altas self-service verificadas por email antes de provisionar el tenant.
+- Crea `login_attempts`, `auth_tokens` y `demo_resets` para autenticacion, recuperacion y mantenimiento de la demo.
+- Crea `stripe_events` y columnas Stripe en empresas, planes, pagos y facturas cuando se inicializa la integracion de prueba.
 - Anade columnas auxiliares de imagen, color, planes, clases y suscripciones si faltan.
 
 Requisito operativo:
@@ -234,6 +258,8 @@ Requisito operativo:
 
 ## 9. Fuera del alcance actual
 
-No estan cerrados todavia como modulos completos de gimnasio:
+La integracion Stripe Billing funciona en modo `stripe_test`, con checkout alojado, webhooks firmados, suscripciones e idempotencia. Quedan fuera del alcance cerrado:
 
-- Pasarela de pagos real con cobro automatico.
+- Activacion de Stripe Live con claves de produccion y cuenta bancaria validada.
+- Validacion fiscal/comercial definitiva antes de cobrar a clientes reales.
+- Pasarela de pagos de socios dentro de cada gimnasio; los pagos de socios siguen siendo registros manuales.

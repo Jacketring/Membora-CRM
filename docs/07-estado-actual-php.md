@@ -1,12 +1,12 @@
 # Estado actual de la version PHP - Membora CRM
 
-Fecha de actualizacion: 08/07/2026.
+Fecha de actualizacion: 16/07/2026.
 
 ## 1. Resumen
 
 Membora CRM se encuentra actualmente como una aplicacion PHP monolitica desplegable en Plesk. La decision tecnica principal ha sido abandonar el despliegue productivo con Node.js para reducir problemas de build, consumo de recursos y mantenimiento en hosting compartido.
 
-La aplicacion funciona en un unico subdominio:
+La aplicacion funciona bajo un unico dominio y el prefijo `/app/`:
 
 ```text
 https://membora.es/app/
@@ -24,7 +24,17 @@ https://membora.es/app/
 
 No se usa Node.js en produccion.
 
-## 3. Modulos implementados
+## 3. Metodología y calidad
+
+El desarrollo sigue el proceso incremental documentado en `docs/19-metodologia-desarrollo.md`: alcance, requisitos, historias, especificación, pruebas, implementación, integración continua y validación del despliegue.
+
+Estado verificado el 16/07/2026:
+
+- PHPUnit: **50 tests y 243 aserciones**, sin errores.
+- PHPStan: sin errores.
+- GitHub Actions: sintaxis PHP, PHPUnit, umbral de cobertura y PHPStan; E2E condicionado a un staging configurado.
+
+## 4. Modulos implementados
 
 ### Autenticacion
 
@@ -35,6 +45,9 @@ No se usa Node.js en produccion.
 - Roles internos.
 - Sesion PHP.
 - Cierre de sesion.
+- Opcion `Recordarme` con token rotatorio y revocable.
+- Recuperacion de contrasena mediante enlace de un solo uso y respuesta publica neutra.
+- Limite de intentos de login por IP y hash del email.
 - Usuario superadmin de plataforma.
 
 ### Panel de gimnasio
@@ -161,7 +174,7 @@ No se usa Node.js en produccion.
 
 ### Administracion SaaS de Membora CRM
 
-- Panel `Admin CRM` separado en resumen, contactos, empresas, pagos, planes y web comercial.
+- Panel `Admin CRM` separado en resumen, contactos, empresas, usuarios, pagos, facturas, planes, web comercial y auditoria.
 - Resumen ejecutivo con MRR, ARR, ARPA, pagos pendientes, cobrado en el mes y prioridades.
 - Tabla unificada de `Contactos` en la interfaz de administracion, combinando `platform_leads` y `platform_clients`.
 - Gestion de solicitudes web con estados nuevo, contactado, cualificado, convertido o perdido.
@@ -177,22 +190,29 @@ No se usa Node.js en produccion.
 - MRR estimado.
 - Tabla `empresa_payments` para cobros SaaS por empresa.
 - Registro y edicion de pagos con concepto, importe, vencimiento, fecha de pago, estado y notas.
+- Facturas SaaS y facturas manuales para clientes, con lineas, impuestos, emision, vista imprimible y pagos parciales o totales.
+- Usuarios de plataforma gestionados en una ruta exclusiva para administradores globales.
 - Tabla `saas_plans` para catalogo comercial.
 - Gestion de planes con precio mensual, setup, limites de usuarios/socios, estado y prestaciones.
+- Endpoint publico de planes activos consumido por la web comercial.
 - Web comercial externa en `httpdocs`.
 - Web comercial con enlaces a aviso legal, privacidad y cookies.
+- El alta self-service verificada crea automaticamente un contacto `Cliente CRM` y lo vincula a su empresa `TRIAL` de 14 dias.
 - Enlaces de demo desde la web publica hacia una sesion funcional del CRM durante 20 minutos.
 - Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Contactos`.
 - Email HTML automatico de confirmacion para el visitante cuando envia el formulario web.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 - Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
+- Stripe Billing funcional en modo `stripe_test`: checkout alojado, webhook firmado, idempotencia, suscripciones, cancelacion al final del periodo y sincronizacion de cobros y facturas.
 
-## 4. Modulos pendientes
+## 5. Pendiente para operacion real
 
-- Pasarela de pagos real con cobro automatico.
+- Activacion de Stripe Live con cuenta, banco, claves, precios y webhook de produccion.
+- Validacion fiscal y comercial definitiva antes de cobrar a clientes reales.
+- Pasarela de pago automatico para cuotas de socios dentro de cada gimnasio; esos pagos siguen siendo registros manuales.
 
-## 5. Credenciales principales
+## 6. Credenciales principales
 
 Administrador de gimnasio:
 
@@ -222,7 +242,7 @@ Email: admin@membora.crm
 Password: definida mediante `PLATFORM_ADMIN_PASSWORD` en `.env` durante el despliegue.
 ```
 
-## 6. Tablas auxiliares creadas por PHP
+## 7. Tablas auxiliares creadas por PHP
 
 La aplicacion PHP puede crear de forma incremental:
 
@@ -248,15 +268,23 @@ La aplicacion PHP puede crear de forma incremental:
 - `class_sessions`.
 - `reservations`.
 - `demo_users`.
+- `demo_resets`.
+- `login_attempts`.
+- `auth_tokens`.
+- `trial_registrations`.
+- `platform_invoices`.
+- `platform_invoice_items`.
+- `platform_invoice_payments`.
+- `stripe_events`.
 
-Tambien puede anadir columnas auxiliares para imagenes y configuracion visual si faltan.
+Tambien puede anadir columnas auxiliares para imagenes, configuracion visual, facturacion y referencias Stripe si faltan.
 
-## 7. Flujo de despliegue recomendado
+## 8. Flujo de despliegue recomendado
 
 1. Pull desde GitHub en Plesk.
 2. Confirmar que el document root apunta a `httpdocs` y que `/app/` carga el CRM.
 3. Confirmar que `apps/crm/.env` tiene las credenciales reales.
-4. Abrir el subdominio.
+4. Abrir la URL del CRM.
 5. Iniciar sesion con un usuario demo o con el admin de plataforma.
 
 No se debe ejecutar `npm install`, `npm run build` ni comandos Prisma para la version PHP.

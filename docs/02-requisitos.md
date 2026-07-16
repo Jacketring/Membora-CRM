@@ -2,6 +2,8 @@
 
 > Nota de estado: este documento combina requisitos del MVP y requisitos previstos. El estado implementado actual esta resumido en `docs/07-estado-actual-php.md`; la arquitectura PHP activa esta documentada en `docs/06-api-backend.md`.
 
+Dentro de la metodología del proyecto, estos requisitos conectan el alcance con las historias de usuario, las especificaciones y las pruebas. La trazabilidad completa se explica en `docs/19-metodologia-desarrollo.md`.
+
 ## 1. Objetivo
 
 Membora CRM debe ser una aplicacion web SaaS responsive para gimnasios y centros fitness pequenos o medianos. El sistema debe centralizar la gestion comercial y operativa basica del centro: leads, socios, membresias, pagos manuales, clases, reservas, check-ins, tareas, alertas y dashboard.
@@ -178,6 +180,72 @@ KPIs previstos:
 - No-shows.
 - Socios en riesgo.
 - Tareas vencidas.
+
+### RF-16 Administracion SaaS
+
+El superadministrador debe disponer de un espacio separado para gestionar contactos, empresas cliente, usuarios de plataforma, planes, cobros, facturas, estado de la web y auditoria global.
+
+- Los usuarios de gimnasio no deben acceder a rutas ni acciones de plataforma.
+- El superadministrador puede entrar en modo soporte sobre una empresa conectada y volver al panel global.
+- Los indicadores SaaS deben incluir MRR, ARR, ARPA, cobros y prioridades.
+
+### RF-17 Captacion y contactos comerciales
+
+El sistema debe recibir solicitudes desde la web publica, validarlas y gestionarlas junto con los clientes comerciales.
+
+- La captacion publica debe aplicar origen permitido, honeypot y rate limit.
+- Debe admitir integraciones de tenant autenticadas mediante token.
+- Un lead web puede convertirse en cliente comercial sin perder su procedencia.
+- Los errores tecnicos y de correo deben quedar registrados sin exponer secretos al visitante.
+
+### RF-18 Alta self-service
+
+Una persona debe poder solicitar una prueba gratuita de 14 dias desde la web publica.
+
+- El email se verifica mediante un enlace de un solo uso y una hora de validez.
+- No se crea tenant, empresa ni usuario antes de verificar el email.
+- Tras la activacion se crea o actualiza un contacto `Cliente CRM`, se vincula una empresa `TRIAL`, un tenant aislado y su administrador.
+- La contrasena la establece la propia persona mediante un token seguro; nunca se envia en claro.
+
+### RF-19 Facturacion SaaS
+
+El superadministrador debe poder crear y emitir facturas a empresas y clientes comerciales.
+
+- La factura incluye serie, numero, emisor, receptor, lineas, impuestos y totales.
+- Debe admitir borradores, emision, pagos parciales o totales y visualizacion imprimible.
+- Los cobros asociados deben actualizar el estado pendiente, parcial o pagado sin perder historial.
+- El sistema no debe presentarse como software Verifactu certificado.
+
+### RF-20 Stripe Billing en modo de prueba
+
+El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el recorrido SaaS sin dinero real.
+
+- Debe crear checkout alojado y asociarlo a empresa, plan y periodicidad.
+- Debe verificar `Stripe-Signature` y procesar eventos de forma idempotente.
+- El acceso y el cobro solo cambian tras confirmacion por webhook, no por la URL de retorno.
+- Debe permitir cancelar al final del periodo y consultar el estado sincronizado de la suscripcion.
+- Stripe Live queda pendiente de configuracion bancaria, fiscal y comercial.
+
+### RF-21 Autenticacion recuperable
+
+El sistema debe permitir recordar una sesion y recuperar una contrasena sin guardar tokens reutilizables en claro.
+
+- El login debe limitar intentos fallidos por IP y hash del email.
+- El token de recuerdo debe rotarse y poder revocarse al cerrar sesion.
+- La recuperacion debe responder de forma neutra para no revelar si un email existe.
+- El token de restablecimiento debe caducar y usarse una sola vez.
+
+### RF-22 Facturacion externa del gimnasio
+
+Cada gimnasio debe poder configurar una integracion externa generica, exportar pagos cobrados y registrar una sincronizacion trazable sin depender de un proveedor concreto.
+
+### RF-23 Novedades, perfil y configuracion
+
+Los usuarios autenticados deben poder actualizar su perfil, imagen y preferencias visuales, y consultar la version actual y el historial de novedades del CRM.
+
+### RF-24 Planes publicos
+
+La web comercial debe poder consultar mediante un endpoint de solo lectura los planes SaaS activos, su precio y prestaciones sin acceder al panel administrativo.
 
 ## 3. Requisitos no funcionales
 

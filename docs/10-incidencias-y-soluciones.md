@@ -1,6 +1,6 @@
 # Incidencias tecnicas y soluciones aplicadas - Membora CRM
 
-Fecha de actualizacion: 02/07/2026.
+Fecha de actualizacion: 16/07/2026.
 
 ## 1. Objetivo del documento
 
@@ -312,7 +312,7 @@ Pagos queda cerrado como modulo manual del MVP.
 
 Limite consciente:
 
-La pasarela de cobro automatico queda fuera del MVP.
+La pasarela de cobro automatico de cuotas de socios queda fuera del MVP. Stripe Test cubre por separado los cobros SaaS de Membora a gimnasios, como se documenta en `docs/16-stripe-billing-saas.md`.
 
 ### I-12 Check-ins pendientes como modulo independiente
 

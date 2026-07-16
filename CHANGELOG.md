@@ -4,6 +4,11 @@ Todos los cambios notables se documentan aquí siguiendo [Keep a Changelog](http
 
 ## [Unreleased]
 
+### Changed
+- Sincronizada la documentacion canonica con las rutas, acciones, tablas, autenticacion, facturacion SaaS y Stripe Test implementados.
+- Ampliada la trazabilidad con requisitos, historias, flujos arquitectonicos y casos de prueba de las funciones actuales.
+- El alta de prueba verificada crea y vincula automaticamente `Cliente CRM`, empresa `TRIAL`, tenant y administrador durante 14 dias; los emails ya registrados reciben un aviso de acceso en lugar de una respuesta silenciosa.
+
 ### Added
 - PHPUnit, PHPStan, CaptainHook, CI y pruebas E2E de desarrollo.
 - Specs, ADRs y diagramas como código.

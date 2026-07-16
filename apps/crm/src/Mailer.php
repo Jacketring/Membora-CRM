@@ -118,6 +118,29 @@ final class Mailer
         return self::sendNativeMail($email, 'Activa tu prueba gratuita de Membora', $html);
     }
 
+    public static function sendExistingTrialAccount(string $email, string $name, string $loginUrl, string $forgotPasswordUrl): bool
+    {
+        self::$lastError = '';
+
+        if (strtolower((string) (getenv('MAIL_ENABLED') ?: 'true')) === 'false') {
+            self::$lastError = 'El correo debe estar habilitado para informar sobre cuentas existentes.';
+            return false;
+        }
+
+        $email = strtolower(trim($email));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            self::$lastError = 'Email de cuenta existente no valido.';
+            return false;
+        }
+
+        $html = self::existingTrialAccountTemplate($name, $loginUrl, $forgotPasswordUrl);
+        if (self::usesSmtp()) {
+            return self::sendSmtp($email, 'Ya tienes acceso a Membora CRM', $html);
+        }
+
+        return self::sendNativeMail($email, 'Ya tienes acceso a Membora CRM', $html);
+    }
+
     private static function sendNativeMail(string $to, string $subject, string $html): bool
     {
         $fromEmail = self::fromEmail();
@@ -380,6 +403,37 @@ HTML;
             <p style="margin:0;color:#64748b;font-size:14px;line-height:1.6;">El enlace caduca en una hora y solo puede utilizarse una vez. Si no has solicitado esta prueba, ignora este correo.</p>
           </td></tr>
           <tr><td style="padding:22px 32px;background:#f8fafc;color:#64748b;font-size:13px;line-height:1.5;">Membora nunca te pedirá una tarjeta para activar esta prueba.</td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>
+HTML;
+    }
+
+    private static function existingTrialAccountTemplate(string $name, string $loginUrl, string $forgotPasswordUrl): string
+    {
+        $safeName = e(trim($name) !== '' ? trim($name) : 'Hola');
+        $safeLoginUrl = e($loginUrl);
+        $safeForgotPasswordUrl = e($forgotPasswordUrl);
+        $emailLogo = self::emailLogoHtml(48);
+
+        return <<<HTML
+<!doctype html>
+<html lang="es">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ya tienes acceso a Membora CRM</title></head>
+  <body style="margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0b172a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:32px 14px;">
+      <tr><td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;">
+          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span></td></tr>
+          <tr><td style="padding:34px 32px;">
+            <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Cuenta existente</p>
+            <h1 style="margin:0 0 16px;font-size:28px;color:#071327;">Hola, {$safeName}</h1>
+            <p style="margin:0 0 18px;color:#334155;font-size:16px;line-height:1.65;">Hemos recibido una solicitud de prueba con este email, pero ya existe una cuenta asociada. No hemos creado otra empresa ni duplicado tus datos.</p>
+            <p style="margin:24px 0;"><a href="{$safeLoginUrl}" style="display:inline-block;background:#004bf2;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Entrar en Membora</a></p>
+            <p style="margin:0;color:#64748b;font-size:14px;line-height:1.6;">Si no recuerdas tu contraseña, <a href="{$safeForgotPasswordUrl}" style="color:#004bf2;">solicita un enlace de recuperación</a>. Si no has realizado esta solicitud, puedes ignorar el mensaje.</p>
+          </td></tr>
         </table>
       </td></tr>
     </table>

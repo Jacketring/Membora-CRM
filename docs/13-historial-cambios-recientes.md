@@ -1,6 +1,6 @@
 # Historial de cambios recientes - Membora CRM
 
-Fecha de actualizacion: 11/07/2026.
+Fecha de actualizacion: 16/07/2026.
 
 ## 1. Objetivo
 
@@ -84,11 +84,11 @@ El objetivo funcional es que el administrador de plataforma trabaje desde un uni
 - Estado de cobro.
 - Proximo acceso o renovacion.
 
-Los pagos siguen siendo internos/manuales en esta fase. No existe todavia cobro automatico real.
+Los pagos de socios siguen siendo internos/manuales. La integracion posterior de Stripe Test descrita en la seccion siguiente afecta a los cobros SaaS de Membora a gimnasios, no a las cuotas de socios.
 
 ## 5. Stripe y checkout
 
-Se ha documentado la estrategia de Stripe como proveedor recomendado para cobros SaaS:
+La estrategia inicial de Stripe como proveedor de cobros SaaS se completo despues con la implementacion en modo `stripe_test` documentada en `docs/16-stripe-billing-saas.md`:
 
 - Checkout alojado.
 - Suscripciones recurrentes.
@@ -97,7 +97,7 @@ Se ha documentado la estrategia de Stripe como proveedor recomendado para cobros
 - Fallos de pago.
 - Sincronizacion de acceso contratado.
 
-En el MVP no hay una integracion real con Stripe. La logica actual prepara el modelo de negocio y los estados necesarios para conectarlo despues sin rehacer la estructura principal.
+El estado actual incluye checkout, webhooks firmados, idempotencia, suscripciones, facturas y cobros de prueba. Stripe Live y los cargos reales siguen pendientes.
 
 ## 6. Verifactu
 
@@ -181,9 +181,9 @@ Referencias recientes en Git:
 
 Quedan pendientes para siguientes fases:
 
-- Integracion real con Stripe.
+- Activacion de Stripe Live con cuenta, claves, banco y precios de produccion.
 - Webhooks de pago en produccion.
-- Automatizacion real de renovaciones.
+- Validacion fiscal y comercial de los cobros reales.
 - Verifactu certificado o integracion con proveedor especializado.
 - Migraciones versionadas formales si el proyecto deja de depender de `ensureTable()` y `ensureColumn()`.
 - Pruebas finales en Plesk con datos reales, SMTP, uploads y dominios definitivos.

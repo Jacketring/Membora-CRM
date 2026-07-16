@@ -9,6 +9,10 @@ Este documento resume las medidas de seguridad aplicadas en Membora CRM y deja d
 
 La version actual mantiene el webhook como flujo operativo y deja preparada conceptualmente la alternativa por base de datos para un despliegue mas simple en Plesk si se decide migrar.
 
+## Relación con la metodología
+
+La seguridad se trata como criterio transversal en cada incremento, no como una revisión añadida al final. Las especificaciones definen validación, permisos, aislamiento y criterios de aceptación; PHPUnit comprueba las reglas aislables; Playwright valida recorridos completos en un entorno preparado; y GitHub Actions ejecuta las puertas de calidad antes del despliegue. El proceso completo está descrito en `docs/19-metodologia-desarrollo.md`.
+
 ## Principios de seguridad aplicados
 
 ### 1. Aislamiento por empresa
@@ -30,6 +34,7 @@ Esto aplica a:
 - Reservas.
 - Tareas.
 - Usuarios internos.
+- Pagos, check-ins, alertas y auditoria.
 
 La administracion SaaS de Membora CRM usa tablas de plataforma como:
 
@@ -38,6 +43,7 @@ La administracion SaaS de Membora CRM usa tablas de plataforma como:
 - `empresas`.
 - `empresa_payments`.
 - `saas_plans`.
+- `platform_invoices`, `platform_invoice_items` y `platform_invoice_payments`.
 
 ### 2. Consultas preparadas
 
@@ -78,7 +84,16 @@ Objetivo:
 - Reducir robo/uso de cookie por scripts.
 - Reducir CSRF basico en navegadores modernos.
 
-### 5. Validacion de origen en formularios internos
+### 5. Autenticacion, recuerdo y recuperacion
+
+- Los fallos de login se limitan por IP y hash SHA-256 del email; no se almacena el email en claro en `login_attempts`.
+- La opcion `Recordarme` usa `auth_tokens`, cookie segura, selector/verificador y rotacion al restaurar la sesion.
+- Cerrar sesion revoca el selector y elimina la cookie de recuerdo.
+- La recuperacion responde de forma neutra para no confirmar si existe una cuenta.
+- Los enlaces de restablecimiento caducan, son de un solo uso y nunca almacenan el token completo en claro.
+- Cambiar la contrasena revoca los tokens anteriores del usuario.
+
+### 6. Validacion de origen y CSRF en formularios internos
 
 Las acciones POST internas del CRM validan el origen usando:
 
@@ -87,6 +102,8 @@ Las acciones POST internas del CRM validan el origen usando:
 - `APP_URL`.
 
 Si una solicitud POST viene desde un origen externo al CRM, se bloquea.
+
+Ademas, los formularios incluyen un token CSRF de 256 bits asociado a la sesion. `demo_login` es la unica excepcion al CSRF interno porque se inicia desde la web publica y aplica su politica de origen especifica.
 
 Variable opcional:
 
@@ -102,7 +119,7 @@ APP_STRICT_POST_ORIGIN="true"
 
 Con `true`, una solicitud POST sin origen/referer tambien se bloquea.
 
-### 6. Cabeceras de seguridad
+### 7. Cabeceras de seguridad
 
 La app y la web publica aplican cabeceras:
 
@@ -119,7 +136,7 @@ Nota:
 - HSTS se envia desde PHP cuando la peticion es HTTPS.
 - En Apache/Plesk se refuerzan cabeceras desde `.htaccess` cuando `mod_headers` esta disponible.
 
-### 7. Subidas de imagenes
+### 8. Subidas de imagenes
 
 Las subidas de foto de socio y perfil validan:
 
@@ -134,7 +151,7 @@ Objetivo:
 - Evitar subir archivos arbitrarios.
 - Reducir riesgo de ejecucion de contenido no esperado.
 
-### 8. Captacion web anti-abuso
+### 9. Captacion web anti-abuso
 
 El formulario publico incluye:
 
@@ -144,6 +161,14 @@ El formulario publico incluye:
 - Validacion de email/telefono.
 - Registro de logs tecnicos.
 - Creacion del lead aunque falle el email de confirmacion.
+
+### 10. Stripe y eventos externos
+
+- La integracion solo se habilita con `PAYMENTS_MODE=stripe_test` y rechaza claves que no empiecen por `sk_test_`.
+- `/stripe/webhook` exige `Stripe-Signature` y el secreto configurado en `STRIPE_WEBHOOK_SECRET`.
+- `stripe_events` mantiene un identificador unico por evento para evitar efectos duplicados.
+- La URL de exito de checkout nunca activa acceso ni marca un pago; solo lo hace el webhook verificado.
+- Payloads, errores y diagnosticos no deben exponer claves secretas en vistas ni auditoria.
 
 ## Flujo actual: webhook HTTP
 

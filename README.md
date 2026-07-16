@@ -4,7 +4,7 @@
 
 El proyecto se ha migrado a una app PHP monolitica para simplificar el despliegue en Plesk y evitar procesos Node.js en produccion.
 
-El flujo de cambios funcionales es **spec → tests → implementación**: primero se valida la decisión de producto en `docs/specs/`, después se escribe la prueba automatizada y finalmente el código.
+El proyecto sigue una metodología incremental orientada a requisitos: **alcance → requisitos → historias → especificación → pruebas → implementación → CI → despliegue y validación**. El proceso completo, su trazabilidad y sus criterios de finalización están documentados en `docs/19-metodologia-desarrollo.md`.
 
 ## Calidad y pruebas
 
@@ -16,7 +16,7 @@ vendor/bin/phpstan analyse
 vendor/bin/captainhook install
 ```
 
-La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La medición local del 11 de julio de 2026 alcanza **93,50 % de líneas (604/646)**, con 34 tests y 164 aserciones. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
+La ejecución local del 16 de julio de 2026 completa **50 tests y 243 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
 
 Playwright está en `e2e/` y es solo para desarrollo/CI; Node.js no forma parte del despliegue. Debe apuntar exclusivamente a una app y BD local o de staging preparadas para pruebas, nunca a producción:
 
@@ -58,13 +58,14 @@ Pantallas disponibles:
 - Perfil de usuario.
 - Configuracion visual personal.
 - Canal de novedades con version actual del CRM e historial de cambios.
-- Panel de administracion de Membora CRM separado en resumen, contactos, empresas, facturacion, planes, web comercial y logs.
+- Panel de administracion de Membora CRM separado en resumen, contactos, empresas, usuarios, cobros, facturas, planes, web comercial y logs.
 - Demo funcional desde la web publica con usuario temporal unico, contador de 20 minutos, limpieza al cerrar o caducar y retorno automatico a la web.
 - Alta self-service con verificacion por email, tenant propio y prueba gratuita de 14 dias sin tarjeta.
 
 Pendiente o futuro:
 
-- Pasarela de pagos real con cobro automatico.
+- Activar Stripe Live y validar configuracion bancaria, fiscal y comercial. La integracion actual funciona solo con claves, precios y webhooks de Stripe Test.
+- Incorporar cobro automatico de cuotas de socios; los pagos operativos del gimnasio siguen siendo registros manuales.
 
 Repositorio:
 
@@ -91,7 +92,9 @@ La aplicacion PHP usa una estructura monolitica sencilla:
 - `public/index.php`: entrada unica, routing basico y carga de vistas.
 - `src/Actions.php`: acciones POST de formularios.
 - `src/Auth.php`: login, sesion y contexto de soporte.
-- `src/Repositories.php`: consultas y creacion automatica de tablas auxiliares.
+- `src/Repositories.php`: agregador de repositorios cargados por el bootstrap.
+- `src/Repositories/`: acceso a datos y evolucion incremental del esquema por dominio.
+- `src/StripeBilling.php`: checkout, webhooks e integracion Stripe Billing en modo de prueba.
 - `src/Views/`: pantallas HTML/PHP.
 - `public/assets/app.css`: estilos de la interfaz.
 - `public/assets/app.js`: interacciones de modales, buscadores y controles.
@@ -131,6 +134,8 @@ membora-crm/                     # raiz del repo = raiz de la suscripcion Plesk
 |   |   |   |-- Auth.php
 |   |   |   |-- Database.php
 |   |   |   |-- Repositories.php
+|   |   |   |-- Repositories/
+|   |   |   |-- StripeBilling.php
 |   |   |   |-- Support.php
 |   |   |   |-- View.php
 |   |   |   |-- bootstrap.php
@@ -156,6 +161,8 @@ Mapeo de despliegue en Plesk:
 ## Configuracion
 
 Crear `apps/crm/.env` en local o en Plesk.
+
+La referencia completa y actualizada de variables es `apps/crm/.env.example`; los bloques siguientes son ejemplos minimos de conexion y correo.
 
 Opcion recomendada en Plesk, especialmente si la contrasena tiene caracteres especiales:
 
@@ -219,7 +226,7 @@ La seccion `Admin CRM > Web` incluye una prueba de correo para enviar un email t
 La web publica incluye enlaces a textos legales basicos: aviso legal, privacidad y cookies.
 Los enlaces de demo de la web publica no abren una maqueta estatica: crean un usuario temporal unico e inician una sesion real del CRM durante 20 minutos sin depender del nombre exacto de `APP_ENV`. El acceso publico solo habilita la demo cliente; la demo de administrador queda limitada al entorno interno `demo`. El usuario se elimina al cerrar sesion, al caducar o tras la senal de cierre de pestana; la limpieza por caducidad actua tambien como respaldo. Al finalizar, el CRM devuelve al usuario a `WEB_APP_URL`.
 
-La web tambien ofrece una prueba gratuita self-service de 14 dias. El alta requiere verificar el email mediante un enlace de un solo uso; despues crea un tenant `TRIAL`, su administrador y redirige al formulario seguro para definir la contrasena. Las solicitudes aplican validacion de origen, honeypot y limites por IP y email.
+La web tambien ofrece una prueba gratuita self-service de 14 dias. El alta requiere verificar el email mediante un enlace de un solo uso; despues crea o actualiza el contacto como `Cliente CRM`, lo vincula a una empresa `TRIAL`, crea su tenant y administrador y redirige al formulario seguro para definir la contrasena. Las solicitudes aplican validacion de origen, honeypot y limites por IP y email.
 
 En el `.env` del CRM debe existir `APP_URL="https://membora.es/app"` y
 `WEB_APP_URL="https://membora.es,https://www.membora.es"`. Todo el flujo funciona
@@ -300,7 +307,9 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 - Plan de prueba con duracion configurable por dias; solo cuando el plan es `Prueba` se oculta el proximo pago y no aparece renovacion.
 - MRR estimado.
 - Seccion `Facturacion` para gestionar facturas SaaS, pagos asociados, vencimientos, cobros pagados, pendientes y cancelados.
+- Seccion `Usuarios` para gestionar cuentas de plataforma separadas de los usuarios de gimnasio.
 - Seccion `Planes` para definir catalogo comercial, precio mensual, setup, rebajas, limites y prestaciones sincronizadas con la web publica.
+- Stripe Billing en modo de prueba con checkout, webhooks firmados, idempotencia, renovaciones y cancelacion al final del periodo.
 - Seccion `Web` para revisar el estado tecnico del formulario publico y envios recientes.
 - Seccion `Logs` para filtrar actividad por empresa, accion, fecha y texto.
 - Acceso de soporte al CRM de una empresa conectada.
@@ -319,9 +328,18 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 - `docs/08-auditoria-testing-2026-06-29.md`: auditoria tecnica y checklist manual de testing.
 - `docs/09-seguridad-y-captacion-web.md`: medidas de seguridad y estrategia webhook/base de datos.
 - `docs/10-incidencias-y-soluciones.md`: incidencias tecnicas del TFM y soluciones aplicadas.
+- `docs/11-web-publica.md`: despliegue, proxies y formularios de la web comercial.
+- `docs/12-migracion-facturas-saas.sql`: migracion SQL de facturacion SaaS.
 - `docs/13-historial-cambios-recientes.md`: resumen de cambios recientes en suscripciones, facturacion, pagos, web publica y despliegue.
+- `docs/14-cuotas-socios-recurrentes.sql`: apoyo SQL para cuotas recurrentes de socios.
+- `docs/15-migracion-stripe-billing.sql`: migracion SQL de campos y eventos Stripe.
 - `docs/16-stripe-billing-saas.md`: integracion Stripe Billing para cobros SaaS de Membora a gimnasios.
+- `docs/17-endurecimiento-seguridad-2026-07-11.md`: correcciones verificadas de autenticacion, roles, secretos y endpoints.
+- `docs/18-arquitectura-y-flujos.md`: arquitectura y recorridos de captacion, trial, demo, Stripe y soporte.
 - `docs/18-auditoria-web-seo-accesibilidad-2026-07-14.md`: cierre verificable de la auditoria de contenido, SEO, accesibilidad y prueba publica.
+- `docs/19-metodologia-desarrollo.md`: metodología incremental, trazabilidad, validación y criterio de finalización.
+- `docs/adr/`: decisiones arquitectonicas vigentes.
+- `docs/specs/`: especificaciones y criterios de aceptacion por incremento.
 
 ## Presentacion TFM
 

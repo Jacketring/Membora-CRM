@@ -9,7 +9,7 @@ Permitir que una persona cree un espacio propio de Membora durante 14 dias desde
 1. La persona indica nombre, gimnasio, email y acepta privacidad.
 2. El backend valida origen, honeypot, formato y rate limit.
 3. Se envia un enlace de verificacion valido durante una hora.
-4. Al abrirlo se crea un tenant, una empresa `TRIAL` y un usuario `GYM_ADMIN`.
+4. Al abrirlo se crea o actualiza el contacto como `Cliente CRM`, se vincula una empresa `TRIAL`, se crea su tenant y un usuario `GYM_ADMIN`.
 5. Se emite un token de un solo uso para que la persona defina su contrasena.
 6. El acceso de prueba caduca a los 14 dias conforme a `EmpresaRepository::accessStateForTenant`.
 
@@ -29,5 +29,5 @@ Permitir que una persona cree un espacio propio de Membora durante 14 dias desde
 - Un payload incompleto o sin consentimiento se rechaza.
 - Un origen externo se rechaza.
 - Un email ya registrado no crea otro usuario.
-- La activacion crea tenant, empresa `TRIAL` de 14 dias y administrador.
+- La activacion crea un `Cliente CRM`, empresa vinculada `TRIAL` de 14 dias, tenant y administrador.
 - La persona debe definir su contrasena antes de iniciar sesion.

@@ -39,4 +39,25 @@ final class TrialRegistrationRepositoryTest extends TestCase
             TrialRegistrationRepository::request(['website' => 'https://spam.example'])
         );
     }
+
+    public function testProvisioningCreatesLinkedCustomerCompanyAndFourteenDayTrial(): void
+    {
+        $data = TrialRegistrationRepository::provisioningData([
+            'name' => 'Ana Martín',
+            'company_name' => 'Centro Norte',
+            'email' => 'ana@example.com',
+        ], 'client_trial_1', 'temporary-secret');
+
+        self::assertSame('client_trial_1', $data['client_id']);
+        self::assertSame('Centro Norte', $data['name']);
+        self::assertSame('ana@example.com', $data['contact_email']);
+        self::assertSame('TRIAL', $data['plan']);
+        self::assertSame('TRIAL', $data['status']);
+        self::assertSame('TRIAL', $data['payment_status']);
+        self::assertSame('0', $data['monthly_price']);
+        self::assertSame('14', $data['trial_days']);
+        self::assertSame('1', $data['create_tenant']);
+        self::assertSame('Ana Martín', $data['admin_name']);
+        self::assertSame('temporary-secret', $data['admin_password']);
+    }
 }

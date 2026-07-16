@@ -2,6 +2,8 @@
 
 > Nota de estado: estas historias recogen el alcance funcional del producto. La version PHP actual cubre el flujo principal e incluye permisos por rol, auditoria, pagos, check-ins, alertas e integracion generica de facturacion.
 
+Las historias y sus criterios de aceptación forman parte de la metodología incremental documentada en `docs/19-metodologia-desarrollo.md`. Sirven como enlace entre los requisitos, las especificaciones de cada incremento y su validación.
+
 ## 1. Autenticacion y roles
 
 ### HU-01 Login
@@ -207,3 +209,117 @@ Criterios de aceptacion:
 - El README contiene URL de despliegue.
 - El README contiene usuario y contrasena de prueba.
 - Los datos demo permiten recorrer las funcionalidades principales.
+
+## 8. Alta, autenticacion y configuracion personal
+
+### HU-22 Solicitar una prueba gratuita
+
+Como propietario de un gimnasio, quiero verificar mi email y crear una prueba de 14 dias para evaluar el CRM con un espacio aislado.
+
+Criterios de aceptacion:
+
+- La solicitud valida consentimiento, origen, honeypot y limites de frecuencia.
+- Antes de verificar el email no se crea ninguna empresa ni cuenta operativa.
+- El enlace caduca, solo se usa una vez y permite definir la contrasena de forma segura.
+- El contacto aparece como `Cliente CRM` con empresa vinculada y el nuevo usuario entra en un tenant propio con plan `TRIAL` durante 14 dias.
+
+### HU-23 Recuperar la contrasena
+
+Como usuario, quiero solicitar un enlace de recuperacion para volver a entrar sin que el sistema revele si mi email esta registrado.
+
+Criterios de aceptacion:
+
+- La respuesta publica es neutra.
+- El enlace tiene caducidad y no puede reutilizarse.
+- La nueva contrasena se almacena mediante hash y revoca tokens anteriores.
+
+### HU-24 Mantener la sesion
+
+Como usuario, quiero marcar `Recordarme` para recuperar mi sesion de forma limitada y revocable.
+
+Criterios de aceptacion:
+
+- El token se almacena en cookie segura y se rota al usarlo.
+- Cerrar sesion elimina la cookie y revoca su selector.
+
+### HU-25 Personalizar mi cuenta
+
+Como usuario interno, quiero editar mi perfil, imagen, color y tema, y consultar las novedades del CRM.
+
+Criterios de aceptacion:
+
+- Los cambios solo afectan al usuario o tenant autorizado.
+- Las imagenes se validan por tamano, extension y MIME real.
+- La pantalla de novedades muestra version e historial disponibles.
+
+## 9. Administracion SaaS
+
+### HU-26 Gestionar contactos y empresas
+
+Como superadministrador, quiero convertir solicitudes web en clientes y empresas para controlar el ciclo comercial completo.
+
+Criterios de aceptacion:
+
+- Leads web y clientes se consultan desde una vista unificada.
+- La conversion conserva los datos comerciales y evita duplicados accidentales.
+- Crear una empresa puede provisionar tenant y administrador de gimnasio.
+
+### HU-27 Gestionar usuarios de plataforma
+
+Como superadministrador, quiero crear, editar y eliminar usuarios de plataforma sin exponer esos roles a administradores de gimnasio.
+
+Criterios de aceptacion:
+
+- Solo un usuario de plataforma autorizado accede a estas acciones.
+- Un gimnasio no puede asignarse un rol global mediante un POST manipulado.
+
+### HU-28 Emitir y cobrar una factura SaaS
+
+Como superadministrador, quiero crear una factura con sus lineas, emitirla y registrar uno o varios cobros para mantener su estado financiero.
+
+Criterios de aceptacion:
+
+- La numeracion se sugiere de forma coherente por serie.
+- Los totales se recalculan a partir de base, impuestos y retenciones.
+- Los pagos parciales y totales actualizan saldo y estado sin eliminar historial.
+- La factura dispone de vista imprimible.
+
+### HU-29 Probar una suscripcion Stripe
+
+Como superadministrador, quiero iniciar un checkout Stripe de prueba para validar altas, renovaciones y cancelaciones antes de activar cobros reales.
+
+Criterios de aceptacion:
+
+- Solo se aceptan claves `sk_test_` y precios Stripe configurados.
+- El retorno del navegador no activa por si solo la suscripcion.
+- Los webhooks firmados se procesan una sola vez y sincronizan cobro, factura y acceso.
+
+### HU-30 Entrar en modo soporte
+
+Como superadministrador, quiero entrar temporalmente en el CRM de una empresa para resolver incidencias y volver de forma visible al panel SaaS.
+
+Criterios de aceptacion:
+
+- El contexto de soporte muestra un banner y fija el tenant objetivo.
+- Salir restaura el contexto de plataforma sin mezclar datos.
+
+## 10. Web comercial e integraciones
+
+### HU-31 Consultar planes publicos
+
+Como visitante, quiero ver planes y precios actualizados desde el catalogo del CRM.
+
+Criterios de aceptacion:
+
+- El endpoint solo devuelve planes activos y datos comerciales publicos.
+- Una indisponibilidad del CRM produce un error generico y no filtra detalles internos.
+
+### HU-32 Configurar facturacion externa
+
+Como administrador de gimnasio, quiero exportar pagos y registrar sincronizaciones con mi proveedor de facturacion para mantener trazabilidad sin acoplarme a una marca concreta.
+
+Criterios de aceptacion:
+
+- La clave configurada se muestra enmascarada.
+- Solo se exportan pagos que cumplen los estados previstos.
+- Cada intento registra fecha, resultado, importes y payload tecnico sanitizado.

@@ -30,6 +30,28 @@ final class TrialRegistrationRepository
         return $errors;
     }
 
+    public static function provisioningData(array $registration, string $clientId, string $adminPassword): array
+    {
+        return [
+            'client_id' => $clientId,
+            'name' => (string) ($registration['company_name'] ?? ''),
+            'contact_email' => (string) ($registration['email'] ?? ''),
+            'plan' => 'TRIAL',
+            'status' => 'TRIAL',
+            'payment_status' => 'TRIAL',
+            'monthly_price' => '0',
+            'trial_days' => (string) self::TRIAL_DAYS,
+            'subscription_started_at' => date('Y-m-d'),
+            'renewal_period' => 'MONTHLY',
+            'renewal_status' => 'ACTIVE',
+            'notes' => 'Alta self-service desde membora.es.',
+            'create_tenant' => '1',
+            'admin_name' => (string) ($registration['name'] ?? ''),
+            'admin_email' => (string) ($registration['email'] ?? ''),
+            'admin_password' => $adminPassword,
+        ];
+    }
+
     public static function request(array $payload): array
     {
         if (trim((string) ($payload['website'] ?? '')) !== '') {
@@ -53,9 +75,15 @@ final class TrialRegistrationRepository
             return ['success' => false, 'message' => 'Demasiadas solicitudes. Inténtalo de nuevo dentro de una hora.'];
         }
 
-        $existingUser = Database::connection()->prepare('SELECT COUNT(*) FROM users WHERE email = :email');
+        $existingUser = Database::connection()->prepare('SELECT id, name FROM users WHERE email = :email LIMIT 1');
         $existingUser->execute(['email' => $email]);
-        if ((int) $existingUser->fetchColumn() > 0) {
+        $user = $existingUser->fetch();
+        if ($user) {
+            $loginUrl = app_base_url() . '/index.php?route=login';
+            $forgotPasswordUrl = app_base_url() . '/index.php?route=forgot-password';
+            if (!Mailer::sendExistingTrialAccount($email, (string) ($user['name'] ?? $name), $loginUrl, $forgotPasswordUrl)) {
+                log_server_error(new RuntimeException(Mailer::lastError()), 'trial_existing_account_email');
+            }
             // Keep the public response indistinguishable to prevent account enumeration.
             return ['success' => true, 'message' => 'Revisa tu correo para activar la prueba.'];
         }
@@ -115,24 +143,23 @@ final class TrialRegistrationRepository
             throw new RuntimeException('Esta prueba ya se está activando.');
         }
 
+        $newClient = PlatformClientRepository::findByEmail((string) $registration['email']) === null;
+        $clientId = '';
+        $empresaCreated = false;
+
         try {
-            EmpresaRepository::create([
-                'name' => (string) $registration['company_name'],
-                'contact_email' => (string) $registration['email'],
-                'plan' => 'TRIAL',
-                'status' => 'TRIAL',
-                'payment_status' => 'TRIAL',
-                'monthly_price' => '0',
-                'trial_days' => (string) self::TRIAL_DAYS,
-                'subscription_started_at' => date('Y-m-d'),
-                'renewal_period' => 'MONTHLY',
-                'renewal_status' => 'ACTIVE',
-                'notes' => 'Alta self-service desde membora.es.',
-                'create_tenant' => '1',
-                'admin_name' => (string) $registration['name'],
-                'admin_email' => (string) $registration['email'],
-                'admin_password' => bin2hex(random_bytes(24)),
-            ]);
+            $clientId = PlatformClientRepository::upsertTrialCustomer(
+                (string) $registration['company_name'],
+                (string) $registration['name'],
+                (string) $registration['email']
+            );
+
+            EmpresaRepository::create(self::provisioningData(
+                $registration,
+                $clientId,
+                bin2hex(random_bytes(24))
+            ));
+            $empresaCreated = true;
 
             $userStmt = Database::connection()->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
             $userStmt->execute(['email' => $registration['email']]);
@@ -152,6 +179,13 @@ final class TrialRegistrationRepository
 
             return $resetToken;
         } catch (Throwable $exception) {
+            if ($newClient && !$empresaCreated && $clientId !== '') {
+                try {
+                    PlatformClientRepository::delete($clientId);
+                } catch (Throwable $cleanupException) {
+                    log_server_error($cleanupException, 'trial_client_cleanup');
+                }
+            }
             Database::connection()->prepare(
                 'UPDATE trial_registrations SET status = "FAILED" WHERE id = :id'
             )->execute(['id' => $registration['id']]);
