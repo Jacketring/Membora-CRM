@@ -6,6 +6,7 @@ final class PlatformContactRepository
 {
     public static function metrics(): array
     {
+        PlatformClientRepository::syncMissingFromEmpresas();
         PlatformClientRepository::syncLeadStatusClients();
         PlatformLeadRepository::ensureTable();
         PlatformClientRepository::ensureTable();
@@ -23,6 +24,7 @@ final class PlatformContactRepository
 
     public static function all(string $query = '', string $status = '', string $type = ''): array
     {
+        PlatformClientRepository::syncMissingFromEmpresas();
         PlatformClientRepository::syncLeadStatusClients();
 
         $contacts = [];

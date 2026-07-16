@@ -312,6 +312,54 @@ final class PlatformClientRepository
         }
     }
 
+    public static function syncMissingFromEmpresas(): int
+    {
+        self::ensureTable();
+        EmpresaRepository::ensureTables();
+
+        $pdo = Database::connection();
+        $stmt = $pdo->query(
+            'SELECT empresas.id, empresas.name, empresas.contact_email
+             FROM empresas
+             LEFT JOIN platform_clients ON platform_clients.id = empresas.client_id
+             WHERE platform_clients.id IS NULL
+               AND empresas.contact_email IS NOT NULL
+               AND empresas.contact_email <> ""'
+        );
+        $repaired = 0;
+
+        foreach ($stmt->fetchAll() as $empresa) {
+            $email = strtolower(trim((string) $empresa['contact_email']));
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+
+            $client = self::findByEmail($email);
+            if ($client) {
+                $clientId = (string) $client['id'];
+                self::markCustomer($clientId);
+            } else {
+                $clientId = self::upsertTrialCustomer(
+                    (string) $empresa['name'],
+                    (string) $empresa['name'],
+                    $email
+                );
+            }
+
+            $update = $pdo->prepare(
+                'UPDATE empresas SET client_id = :client_id, updated_at = NOW()
+                 WHERE id = :id AND (client_id IS NULL OR client_id = "" OR client_id NOT IN (SELECT id FROM platform_clients))'
+            );
+            $update->execute([
+                'client_id' => $clientId,
+                'id' => $empresa['id'],
+            ]);
+            $repaired += $update->rowCount();
+        }
+
+        return $repaired;
+    }
+
     private static function count(PDO $pdo, string $where): int
     {
         $stmt = $pdo->query("SELECT COUNT(*) FROM platform_clients WHERE {$where}");

@@ -179,9 +179,13 @@ final class TrialRegistrationRepository
             $empresaCleaned = false;
 
             $empresa = EmpresaRepository::findByClient($clientId);
+            $client = PlatformClientRepository::find($clientId);
             $tenantId = trim((string) ($empresa['tenant_id'] ?? ''));
-            if (!$empresa || $tenantId === '') {
-                throw new RuntimeException('No se pudo vincular el usuario a la empresa de la prueba.');
+            if (!$client || (string) ($client['status'] ?? '') !== 'CUSTOMER') {
+                throw new RuntimeException('No se pudo crear el Cliente CRM de la prueba.');
+            }
+            if (!$empresa || $tenantId === '' || !hash_equals($clientId, (string) ($empresa['client_id'] ?? ''))) {
+                throw new RuntimeException('No se pudo vincular el Cliente CRM y el usuario a la empresa de la prueba.');
             }
             $userId = EmpresaRepository::ensureTenantAdminUser(
                 $tenantId,
