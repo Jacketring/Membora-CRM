@@ -23,6 +23,7 @@ final class Actions
         $user = Auth::user();
         if ($action !== 'logout'
             && $action !== 'reveal_trial_credentials'
+            && $action !== 'create_tenant_stripe_checkout'
             && $user
             && !is_platform_admin($user)
             && !is_platform_support_context()
@@ -63,6 +64,7 @@ final class Actions
             'cancel_empresa_subscription' => self::cancelEmpresaSubscription(),
             'resume_empresa_subscription' => self::resumeEmpresaSubscription(),
             'create_empresa_stripe_checkout' => self::createEmpresaStripeCheckout(),
+            'create_tenant_stripe_checkout' => self::createTenantStripeCheckout(),
             'cancel_empresa_stripe_subscription' => self::cancelEmpresaStripeSubscription(),
             'create_platform_payment' => self::createPlatformPayment(),
             'update_platform_payment' => self::updatePlatformPayment(),
@@ -571,6 +573,40 @@ final class Actions
             log_server_error($exception, 'stripe');
             flash('No se pudo crear la sesión de Stripe Checkout.', 'error');
             redirect($returnRoute);
+        }
+
+        header('Location: ' . $url);
+        exit;
+    }
+
+    private static function createTenantStripeCheckout(): never
+    {
+        $user = Auth::requireUser();
+        if (!is_gym_admin($user) || is_platform_admin($user) || is_platform_support_context()) {
+            flash('Solo el administrador del gimnasio puede mejorar el plan.', 'error');
+            redirect('dashboard');
+        }
+
+        $empresa = EmpresaRepository::findByTenant((string) ($user['tenant_id'] ?? ''));
+        if (!$empresa) {
+            flash('No se encontro la empresa vinculada a tu cuenta.', 'error');
+            redirect('dashboard');
+        }
+        $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
+        if (!$isTrial) {
+            flash('La mejora directa esta disponible para empresas en prueba.', 'error');
+            redirect('dashboard');
+        }
+
+        $planCode = strtoupper(post_value('plan_code', ''));
+        $renewalPeriod = strtoupper(post_value('renewal_period', 'MONTHLY'));
+        try {
+            $url = StripeBillingService::createCheckoutSession((string) $empresa['id'], $planCode, $renewalPeriod, true);
+        } catch (Throwable $exception) {
+            StripeBillingRepository::recordEmpresaError((string) $empresa['id'], $exception->getMessage());
+            log_server_error($exception, 'tenant_stripe_checkout');
+            flash('No se pudo iniciar el pago: ' . $exception->getMessage(), 'error');
+            redirect('upgrade-plan');
         }
 
         header('Location: ' . $url);

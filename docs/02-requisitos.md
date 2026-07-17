@@ -227,6 +227,10 @@ El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el re
 - El acceso y el cobro solo cambian tras confirmacion por webhook, no por la URL de retorno.
 - Debe permitir cancelar al final del periodo y consultar el estado sincronizado de la suscripcion.
 - Stripe Live queda pendiente de configuracion bancaria, fiscal y comercial.
+- Una empresa `TRIAL` debe ver los dias restantes y poder elegir un plan de pago desde su propio CRM.
+- Solo el administrador del gimnasio puede iniciar Checkout; los demas roles pueden consultar los planes.
+- Los datos bancarios se recogen en la pagina alojada de Stripe y no se persisten en Membora.
+- El plan seleccionado debe permanecer pendiente hasta `invoice.paid`; al confirmarse se crean el pago y la factura administrativa y se activa el acceso contratado.
 
 ### RF-21 Autenticacion recuperable
 

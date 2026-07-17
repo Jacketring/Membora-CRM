@@ -17,11 +17,12 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
 <?php
 $tenantPrimaryColor = hex_color_or_default($user['tenant_primary_color'] ?? '#004bf2');
 $isPlatformAdmin = is_platform_admin($user);
+$route = $_GET['route'] ?? 'dashboard';
 $demoRemainingSeconds = Auth::demoRemainingSeconds();
 $subscriptionAccessState = (!$isPlatformAdmin && !is_platform_support_context())
     ? EmpresaRepository::accessStateForTenant((string) ($user['tenant_id'] ?? ''))
     : null;
-$subscriptionBlocked = !empty($subscriptionAccessState['blocked']);
+$subscriptionBlocked = !empty($subscriptionAccessState['blocked']) && $route !== 'upgrade-plan';
 $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : [];
 ?>
 <body data-tenant-accent="<?= e($tenantPrimaryColor) ?>" <?= $demoRemainingSeconds > 0 ? 'data-demo-expires-in="' . e((string) $demoRemainingSeconds) . '"' : '' ?> <?= $subscriptionBlocked ? 'data-subscription-blocked="true"' : '' ?>>
@@ -35,7 +36,6 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
         </div>
       </div>
 
-      <?php $route = $_GET['route'] ?? 'dashboard'; ?>
       <nav class="sidebar-nav">
         <?php if ($isPlatformAdmin): ?>
           <a class="<?= $route === 'platform-dashboard' ? 'active' : '' ?>" href="index.php?route=platform-dashboard">Resumen</a>
@@ -91,6 +91,16 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
     </aside>
 
     <section class="workspace">
+      <?php if (!empty($subscriptionAccessState['is_trial']) && !is_platform_support_context()): ?>
+        <div class="trial-upgrade-banner" role="region" aria-label="Estado de la prueba gratuita">
+          <div>
+            <?php $trialRemainingDays = (int) ($subscriptionAccessState['remaining_days'] ?? 0); ?>
+            <strong><?= $trialRemainingDays > 0 ? ($trialRemainingDays === 1 ? 'Te queda 1 día de prueba' : 'Te quedan ' . $trialRemainingDays . ' días de prueba') : 'Tu prueba gratuita ha finalizado' ?></strong>
+            <span><?= !empty($subscriptionAccessState['expires_at']) ? 'Acceso de prueba hasta el ' . e(format_date_short($subscriptionAccessState['expires_at'])) . '.' : 'Elige un plan para mantener el acceso.' ?></span>
+          </div>
+          <a class="trial-upgrade-action" href="index.php?route=upgrade-plan">Mejorar el plan</a>
+        </div>
+      <?php endif; ?>
       <header class="topbar">
         <form class="search-box global-search-box" method="get" action="index.php" data-global-search-form>
           <input name="q" value="" placeholder="<?= $isPlatformAdmin ? 'Buscar empresas, pagos o planes...' : 'Buscar tareas, socios, leads, clases o membresías...' ?>" autocomplete="off" data-global-search-input>

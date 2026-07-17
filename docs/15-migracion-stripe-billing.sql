@@ -10,7 +10,9 @@ ALTER TABLE empresas
   ADD COLUMN IF NOT EXISTS stripe_current_period_end DATETIME NULL AFTER stripe_current_period_start,
   ADD COLUMN IF NOT EXISTS stripe_cancel_at_period_end TINYINT(1) NOT NULL DEFAULT 0 AFTER stripe_current_period_end,
   ADD COLUMN IF NOT EXISTS stripe_checkout_session_id VARCHAR(191) NULL AFTER stripe_cancel_at_period_end,
-  ADD COLUMN IF NOT EXISTS stripe_last_error TEXT NULL AFTER stripe_checkout_session_id;
+  ADD COLUMN IF NOT EXISTS stripe_pending_plan_code VARCHAR(64) NULL AFTER stripe_checkout_session_id,
+  ADD COLUMN IF NOT EXISTS stripe_pending_renewal_period VARCHAR(16) NULL AFTER stripe_pending_plan_code,
+  ADD COLUMN IF NOT EXISTS stripe_last_error TEXT NULL AFTER stripe_pending_renewal_period;
 
 ALTER TABLE saas_plans
   ADD COLUMN IF NOT EXISTS stripe_monthly_price_id VARCHAR(191) NULL AFTER discount_label,

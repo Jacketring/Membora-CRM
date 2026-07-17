@@ -101,6 +101,8 @@ El estado actual incluye checkout, webhooks firmados, idempotencia, suscripcione
 
 Para la entrega se retiraron de la interfaz el bloque diagnostico de Stripe, el boton de Checkout y la cancelacion directa de Stripe. El webhook y las acciones de backend siguen implementados para pruebas tecnicas; el modal visible concentra ahora la gestion local de renovacion con mas espacio y una jerarquia mas clara.
 
+Posteriormente se incorporo un checkout visible con un alcance distinto: las empresas `TRIAL` ven los dias restantes y pueden abrir `Mejorar el plan`. El administrador del gimnasio elige un plan pagado y completa los datos bancarios en Stripe. La eleccion queda pendiente y solo `invoice.paid` cambia el plan y crea el pago y la factura administrativa. Los diagnosticos y controles Stripe del superadministrador continúan ocultos.
+
 ## 6. Alta self-service y limpieza de pruebas
 
 La activacion por correo se completo como un flujo de dos mensajes:

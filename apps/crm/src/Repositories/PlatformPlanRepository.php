@@ -218,6 +218,8 @@ final class PlatformPlanRepository
                 'max_users' => $plan['max_users'] !== null ? (int) $plan['max_users'] : null,
                 'max_members' => $plan['max_members'] !== null ? (int) $plan['max_members'] : null,
                 'features' => $features,
+                'stripe_monthly_available' => trim((string) ($plan['stripe_monthly_price_id'] ?? '')) !== '',
+                'stripe_annual_available' => trim((string) ($plan['stripe_annual_price_id'] ?? '')) !== '',
             ];
         }
 

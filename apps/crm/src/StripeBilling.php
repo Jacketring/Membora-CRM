@@ -89,7 +89,9 @@ final class StripeBillingRepository
             ['empresas', 'stripe_current_period_end', 'ALTER TABLE empresas ADD COLUMN stripe_current_period_end DATETIME NULL AFTER stripe_current_period_start'],
             ['empresas', 'stripe_cancel_at_period_end', 'ALTER TABLE empresas ADD COLUMN stripe_cancel_at_period_end TINYINT(1) NOT NULL DEFAULT 0 AFTER stripe_current_period_end'],
             ['empresas', 'stripe_checkout_session_id', 'ALTER TABLE empresas ADD COLUMN stripe_checkout_session_id VARCHAR(191) NULL AFTER stripe_cancel_at_period_end'],
-            ['empresas', 'stripe_last_error', 'ALTER TABLE empresas ADD COLUMN stripe_last_error TEXT NULL AFTER stripe_checkout_session_id'],
+            ['empresas', 'stripe_pending_plan_code', 'ALTER TABLE empresas ADD COLUMN stripe_pending_plan_code VARCHAR(64) NULL AFTER stripe_checkout_session_id'],
+            ['empresas', 'stripe_pending_renewal_period', 'ALTER TABLE empresas ADD COLUMN stripe_pending_renewal_period VARCHAR(16) NULL AFTER stripe_pending_plan_code'],
+            ['empresas', 'stripe_last_error', 'ALTER TABLE empresas ADD COLUMN stripe_last_error TEXT NULL AFTER stripe_pending_renewal_period'],
             ['saas_plans', 'stripe_monthly_price_id', 'ALTER TABLE saas_plans ADD COLUMN stripe_monthly_price_id VARCHAR(191) NULL AFTER discount_label'],
             ['saas_plans', 'stripe_annual_price_id', 'ALTER TABLE saas_plans ADD COLUMN stripe_annual_price_id VARCHAR(191) NULL AFTER stripe_monthly_price_id'],
             ['empresa_payments', 'stripe_invoice_id', 'ALTER TABLE empresa_payments ADD COLUMN stripe_invoice_id VARCHAR(191) NULL AFTER empresa_id'],
@@ -218,16 +220,23 @@ final class StripeBillingRepository
         )->execute(['id' => $empresaId, 'stripe_customer_id' => $customerId]);
     }
 
-    public static function markCheckoutSession(string $empresaId, string $sessionId): void
+    public static function markCheckoutSession(string $empresaId, string $sessionId, string $planCode, string $renewalPeriod): void
     {
         self::ensureSchema();
         Database::connection()->prepare(
             'UPDATE empresas
              SET stripe_checkout_session_id = :stripe_checkout_session_id,
+                 stripe_pending_plan_code = :stripe_pending_plan_code,
+                 stripe_pending_renewal_period = :stripe_pending_renewal_period,
                  stripe_last_error = NULL,
                  updated_at = NOW()
              WHERE id = :id'
-        )->execute(['id' => $empresaId, 'stripe_checkout_session_id' => $sessionId]);
+        )->execute([
+            'id' => $empresaId,
+            'stripe_checkout_session_id' => $sessionId,
+            'stripe_pending_plan_code' => $planCode,
+            'stripe_pending_renewal_period' => $renewalPeriod,
+        ]);
     }
 
     public static function recordEmpresaError(string $empresaId, string $message): void
@@ -251,11 +260,15 @@ final class StripeBillingRepository
 
         $subscriptionId = self::objectId($session['subscription'] ?? null);
         $customerId = self::objectId($session['customer'] ?? null);
+        $planCode = strtoupper(self::metadataValue($session, 'plan_code'));
+        $renewalPeriod = strtoupper(self::metadataValue($session, 'renewal_period'));
         $stmt = Database::connection()->prepare(
             'UPDATE empresas
              SET stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
                  stripe_subscription_id = COALESCE(:stripe_subscription_id, stripe_subscription_id),
                  stripe_checkout_session_id = :stripe_checkout_session_id,
+                 stripe_pending_plan_code = COALESCE(:stripe_pending_plan_code, stripe_pending_plan_code),
+                 stripe_pending_renewal_period = COALESCE(:stripe_pending_renewal_period, stripe_pending_renewal_period),
                  payment_status = "PENDING",
                  stripe_last_error = NULL,
                  updated_at = NOW()
@@ -266,6 +279,8 @@ final class StripeBillingRepository
             'stripe_customer_id' => $customerId ?: null,
             'stripe_subscription_id' => $subscriptionId ?: null,
             'stripe_checkout_session_id' => (string) ($session['id'] ?? ''),
+            'stripe_pending_plan_code' => $planCode !== '' && $planCode !== 'TRIAL' ? $planCode : null,
+            'stripe_pending_renewal_period' => in_array($renewalPeriod, ['MONTHLY', 'ANNUAL'], true) ? $renewalPeriod : null,
         ]);
     }
 
@@ -362,6 +377,22 @@ final class StripeBillingRepository
         $paidAt = self::timestampDate($invoice['status_transitions']['paid_at'] ?? null) ?: date('Y-m-d');
         $amount = self::centsToDecimal((int) ($invoice['amount_paid'] ?? $invoice['total'] ?? 0));
         $concept = self::invoiceDescription($invoice);
+        $subscriptionMetadata = $invoice['_membora_subscription_metadata'] ?? [];
+        if (!is_array($subscriptionMetadata)) {
+            $subscriptionMetadata = [];
+        }
+        $paidPlanCode = strtoupper(trim((string) ($subscriptionMetadata['plan_code'] ?? $empresa['stripe_pending_plan_code'] ?? '')));
+        $paidPlan = $paidPlanCode !== '' ? self::planByCode($paidPlanCode) : null;
+        if (!$paidPlan || $paidPlanCode === 'TRIAL') {
+            $paidPlanCode = strtoupper((string) ($empresa['plan'] ?? ''));
+            $paidPlan = self::planByCode($paidPlanCode);
+        }
+        $paidRenewalPeriod = strtoupper(trim((string) ($subscriptionMetadata['renewal_period'] ?? $empresa['stripe_pending_renewal_period'] ?? $empresa['renewal_period'] ?? 'MONTHLY')));
+        if (!in_array($paidRenewalPeriod, ['MONTHLY', 'ANNUAL'], true)) {
+            $paidRenewalPeriod = 'MONTHLY';
+        }
+        $planPrices = $paidPlan ? PlatformPlanRepository::priceMap() : [];
+        $paidMonthlyPrice = $planPrices[$paidPlanCode] ?? $empresa['monthly_price'];
 
         $pdo = Database::connection();
         $pdo->beginTransaction();
@@ -372,6 +403,9 @@ final class StripeBillingRepository
                 'UPDATE empresas
                  SET status = "ACTIVE",
                      payment_status = "PAID",
+                     plan = :plan,
+                     monthly_price = :monthly_price,
+                     renewal_period = :renewal_period,
                      stripe_customer_id = COALESCE(:stripe_customer_id, stripe_customer_id),
                      stripe_subscription_id = COALESCE(:stripe_subscription_id, stripe_subscription_id),
                      stripe_subscription_status = COALESCE(:stripe_subscription_status, stripe_subscription_status),
@@ -380,11 +414,16 @@ final class StripeBillingRepository
                      subscription_started_at = COALESCE(subscription_started_at, CURDATE()),
                      paid_since = COALESCE(paid_since, CURDATE()),
                      renewal_status = CASE WHEN stripe_cancel_at_period_end = 1 THEN "CANCEL_AT_PERIOD_END" ELSE "ACTIVE" END,
+                     stripe_pending_plan_code = NULL,
+                     stripe_pending_renewal_period = NULL,
                      stripe_last_error = NULL,
                      updated_at = NOW()
                  WHERE id = :id'
             )->execute([
                 'id' => $empresa['id'],
+                'plan' => $paidPlanCode,
+                'monthly_price' => $paidMonthlyPrice,
+                'renewal_period' => $paidRenewalPeriod,
                 'stripe_customer_id' => self::objectId($invoice['customer'] ?? null) ?: null,
                 'stripe_subscription_id' => self::objectId($invoice['subscription'] ?? null) ?: null,
                 'stripe_subscription_status' => null,
@@ -754,9 +793,12 @@ final class StripeBillingRepository
 
 final class StripeBillingService
 {
-    public static function createCheckoutSession(string $empresaId): string
+    public static function createCheckoutSession(string $empresaId, ?string $requestedPlanCode = null, ?string $requestedPeriod = null, bool $tenantCheckout = false): string
     {
         StripeBillingConfig::assertReady();
+        if ($tenantCheckout && StripeBillingConfig::webhookSecret() === '') {
+            throw new RuntimeException('Falta configurar el webhook firmado de Stripe antes de aceptar pagos.');
+        }
         StripeBillingRepository::ensureSchema();
         \Stripe\Stripe::setApiKey(StripeBillingConfig::secretKey());
 
@@ -765,12 +807,16 @@ final class StripeBillingService
             throw new RuntimeException('No se encontro la empresa.');
         }
 
-        $plan = StripeBillingRepository::planByCode((string) ($empresa['plan'] ?? ''));
-        if (!$plan || strtoupper((string) $plan['code']) === 'TRIAL') {
+        $planCode = strtoupper(trim((string) ($requestedPlanCode ?: ($empresa['plan'] ?? ''))));
+        $plan = StripeBillingRepository::planByCode($planCode);
+        if (!$plan || strtoupper((string) $plan['code']) === 'TRIAL' || (string) ($plan['status'] ?? '') !== 'ACTIVE') {
             throw new RuntimeException('Selecciona un plan de pago antes de crear el checkout.');
         }
 
-        $period = (string) ($empresa['renewal_period'] ?? 'MONTHLY');
+        $period = strtoupper(trim((string) ($requestedPeriod ?: ($empresa['renewal_period'] ?? 'MONTHLY'))));
+        if (!in_array($period, ['MONTHLY', 'ANNUAL'], true)) {
+            throw new RuntimeException('Selecciona una periodicidad de pago valida.');
+        }
         $priceId = $period === 'ANNUAL'
             ? trim((string) ($plan['stripe_annual_price_id'] ?? ''))
             : trim((string) ($plan['stripe_monthly_price_id'] ?? ''));
@@ -819,8 +865,8 @@ final class StripeBillingService
                 'price' => $priceId,
                 'quantity' => 1,
             ]],
-            'success_url' => app_base_url() . '/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => app_base_url() . '/stripe/checkout/cancel?empresa_id=' . rawurlencode((string) $empresa['id']),
+            'success_url' => app_base_url() . '/stripe/checkout/success?source=' . ($tenantCheckout ? 'tenant' : 'platform') . '&session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => app_base_url() . '/stripe/checkout/cancel?source=' . ($tenantCheckout ? 'tenant' : 'platform') . '&empresa_id=' . rawurlencode((string) $empresa['id']),
             'allow_promotion_codes' => true,
             'metadata' => $metadata,
             'subscription_data' => [
@@ -828,7 +874,7 @@ final class StripeBillingService
             ],
         ]);
 
-        StripeBillingRepository::markCheckoutSession($empresaId, (string) $session->id);
+        StripeBillingRepository::markCheckoutSession($empresaId, (string) $session->id, (string) $plan['code'], $period);
 
         return (string) $session->url;
     }
@@ -877,6 +923,9 @@ final class StripeBillingService
             if (!is_array($object)) {
                 $object = [];
             }
+            if (in_array($eventType, ['invoice.paid', 'invoice.payment_failed'], true)) {
+                $object = self::withSubscriptionMetadata($object);
+            }
 
             match ($eventType) {
                 'checkout.session.completed' => StripeBillingRepository::syncCheckoutSession($object),
@@ -894,5 +943,23 @@ final class StripeBillingService
             StripeBillingRepository::failEvent($eventId, $exception->getMessage());
             throw $exception;
         }
+    }
+
+    private static function withSubscriptionMetadata(array $invoice): array
+    {
+        $subscription = $invoice['subscription'] ?? null;
+        $subscriptionId = is_string($subscription)
+            ? $subscription
+            : (is_array($subscription) ? (string) ($subscription['id'] ?? '') : '');
+        if ($subscriptionId === '') {
+            return $invoice;
+        }
+
+        $subscriptionObject = \Stripe\Subscription::retrieve($subscriptionId);
+        $subscriptionData = $subscriptionObject->toArray();
+        $metadata = $subscriptionData['metadata'] ?? [];
+        $invoice['_membora_subscription_metadata'] = is_array($metadata) ? $metadata : [];
+
+        return $invoice;
     }
 }

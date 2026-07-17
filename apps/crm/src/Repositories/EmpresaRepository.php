@@ -569,20 +569,32 @@ final class EmpresaRepository
         $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
         if ($isTrial) {
             $trialStartedAt = (string) ($empresa['subscription_started_at'] ?: $empresa['created_at'] ?: 'now');
-            $expiresAt = (new DateTimeImmutable($trialStartedAt))->modify('+' . max(1, (int) ($empresa['trial_days'] ?? 30)) . ' days');
-            if ($expiresAt <= $today) {
+            $trialPeriod = trial_period_details($trialStartedAt, (int) ($empresa['trial_days'] ?? 30), $today);
+            if ($trialPeriod['expired']) {
                 return [
                     'blocked' => true,
                     'kind' => 'trial_expired',
                     'title' => 'Tu prueba ha caducado',
-                    'message' => 'El periodo de prueba finalizo el ' . format_date_short($expiresAt->format('Y-m-d')) . '. Elige un plan para continuar usando Membora.',
-                    'expires_at' => $expiresAt->format('Y-m-d'),
+                    'message' => 'El periodo de prueba finalizo el ' . format_date_short($trialPeriod['expires_at']) . '. Elige un plan para continuar usando Membora.',
+                    'expires_at' => $trialPeriod['expires_at'],
+                    'remaining_days' => 0,
+                    'is_trial' => true,
+                    'empresa' => $empresa,
                 ];
             }
+
+            return [
+                'blocked' => false,
+                'kind' => 'trial_active',
+                'is_trial' => true,
+                'expires_at' => $trialPeriod['expires_at'],
+                'remaining_days' => $trialPeriod['remaining_days'],
+                'empresa' => $empresa,
+            ];
         }
 
         $accessUntil = trim((string) ($empresa['access_until'] ?? ''));
-        if (!$isTrial && $accessUntil !== '') {
+        if ($accessUntil !== '') {
             $accessDate = new DateTimeImmutable($accessUntil);
             if ($accessDate < $today) {
                 return [
@@ -595,7 +607,7 @@ final class EmpresaRepository
             }
         }
 
-        if (!$isTrial && $status === 'CANCELLED' && $accessUntil === '') {
+        if ($status === 'CANCELLED' && $accessUntil === '') {
             return [
                 'blocked' => true,
                 'kind' => 'subscription_cancelled',
@@ -604,7 +616,7 @@ final class EmpresaRepository
             ];
         }
 
-        return ['blocked' => false, 'empresa' => $empresa];
+        return ['blocked' => false, 'is_trial' => false, 'empresa' => $empresa];
     }
 
     private static function syncFromTenants(): void

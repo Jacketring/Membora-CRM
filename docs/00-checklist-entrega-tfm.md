@@ -77,7 +77,7 @@ Recorrido recomendado:
 15. Login como administrador de plataforma.
 16. Panel `Admin CRM`: contactos, empresas, renovaciones, facturas, planes, auditoria y acceso de soporte. No abrir la herramienta oculta de correo salvo que sea necesario diagnosticar SMTP.
 17. Web publica: formulario, opiniones y enlaces legales.
-18. Diferenciar verbalmente Stripe Test preparado en backend de los controles visibles: no presentar Stripe Live ni un checkout comercial activo.
+18. Mostrar, si Stripe Test esta configurado, el banner de dias restantes y `Mejorar el plan`; explicar que Checkout es de prueba y que Stripe Live todavia no esta activo.
 
 ## 5. Slides
 

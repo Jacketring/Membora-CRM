@@ -35,6 +35,7 @@ Rutas publicas o de autenticacion:
 Rutas autenticadas de gimnasio:
 
 - `dashboard`, `leads`, `tasks`, `users`, `profile`, `settings` y `novedades`.
+- `upgrade-plan`: dias restantes, catalogo de planes de pago e inicio de Stripe Checkout. Todos los roles del tenant pueden consultar; solo `GYM_ADMIN` puede contratar.
 - `members`, `memberships`, `payments`, `payment-invoice` y `client-invoice`.
 - `billing`, `checkins`, `alerts`, `audit` y `classes`.
 - `global-search`: buscador/autocompletado JSON limitado al tenant actual.
@@ -64,6 +65,7 @@ Administracion SaaS, contactos y empresas:
 - `create_empresa`, `update_empresa`, `delete_empresa` y `update_empresa_subscription`.
 - `renew_empresa_subscription`, `cancel_empresa_subscription` y `resume_empresa_subscription`.
 - `create_empresa_stripe_checkout` y `cancel_empresa_stripe_subscription`.
+- `create_tenant_stripe_checkout`: inicia Checkout para el tenant autenticado sin aceptar un `empresa_id` del navegador.
 - `enter_empresa_crm` y `exit_empresa_crm`.
 
 Usuarios de plataforma y gimnasio:
@@ -113,6 +115,8 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 ### Stripe
 
 `POST /stripe/webhook` funciona cuando `PAYMENTS_MODE=stripe_test`, verifica la firma, registra `stripe_events` para idempotencia y sincroniza suscripciones, cobros y facturas. El checkout no activa el acceso por la URL de retorno: espera la confirmacion firmada del webhook.
+
+`POST action=create_tenant_stripe_checkout` acepta `plan_code` y `renewal_period`, pero obtiene la empresa exclusivamente desde el `tenant_id` de la sesion. Solo admite planes activos distintos de `TRIAL` y Price IDs configurados. Guarda la eleccion como pendiente, envia al administrador del gimnasio a Stripe Checkout y requiere `STRIPE_WEBHOOK_SECRET`. `invoice.paid` activa el plan, actualiza el acceso y crea pago y factura; Membora no recibe ni almacena los datos de tarjeta.
 
 ## 6. Seguridad de backend
 

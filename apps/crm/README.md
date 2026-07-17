@@ -8,7 +8,7 @@ La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/inde
 
 El CRM se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
 
-Estado verificado el 17/07/2026: **54 tests y 251 aserciones** de PHPUnit, además de PHPStan sin errores.
+Estado verificado el 17/07/2026: **54 tests y 260 aserciones** de PHPUnit, además de PHPStan sin errores.
 
 ## Requisitos
 
@@ -75,6 +75,8 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Login.
 - Login demo automatico con usuario temporal unico y caducidad de 20 minutos.
 - Alta publica de prueba durante 14 dias con verificacion de email y creacion automatica de tenant y administrador.
+- Banner permanente durante la prueba con dias restantes y acceso a la seleccion de planes de pago.
+- Stripe Checkout alojado desde `Mejorar el plan`; los datos bancarios se introducen en Stripe y no se almacenan en el CRM.
 - Cookie de sesion exclusiva mediante `SESSION_COOKIE_NAME`, evitando colisiones con otras aplicaciones PHP del dominio.
 - Dashboard del gimnasio.
 - Leads.
@@ -159,7 +161,7 @@ Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones N
 
 La integracion Stripe esta habilitada exclusivamente con `PAYMENTS_MODE=stripe_test` y claves `sk_test_`. La activacion Live queda fuera del estado cerrado actual; consulta `../../docs/16-stripe-billing-saas.md`.
 
-El estado tecnico de Stripe, sus identificadores y la URL del webhook no se muestran en Facturas CRM ni en el formulario de suscripcion. La integracion y el endpoint `/stripe/webhook` siguen activos internamente; se ocultan para no mezclar diagnostico tecnico con la gestion diaria.
+El estado tecnico de Stripe, sus identificadores y la URL del webhook no se muestran en Facturas CRM ni en el formulario administrativo de suscripcion. El administrador de una empresa `TRIAL` si dispone de un flujo funcional en `?route=upgrade-plan`: selecciona un plan de pago y entra en Stripe Checkout. El plan queda pendiente y solo se activa cuando `/stripe/webhook` recibe `invoice.paid`; en ese momento se crean el pago y la factura de plataforma.
 
 ## Web comercial
 

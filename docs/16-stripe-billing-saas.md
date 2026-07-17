@@ -85,15 +85,14 @@ El webhook verifica obligatoriamente la cabecera `Stripe-Signature`.
 ## 7. Flujo funcional
 
 1. El administrador configura planes locales con Price IDs.
-2. Para una prueba tecnica se invoca la accion interna de checkout de una empresa; el boton ya no se muestra en el modal de suscripcion.
-3. Membora crea/reutiliza `stripe_customer_id`.
-4. Se crea una Checkout Session con `mode=subscription`.
-5. Stripe redirige al checkout alojado.
-6. Al completar, Membora no activa el acceso por la redireccion de exito.
-7. El acceso se activa solo cuando llega un webhook valido.
-8. `invoice.paid` marca empresa al dia, actualiza `access_until`, registra pago y factura local.
-9. `invoice.payment_failed` marca el pago como vencido/error y no amplia acceso.
-10. `customer.subscription.updated/deleted` sincroniza estado, cancelacion al final del periodo y `current_period_end`.
+2. Una empresa `TRIAL` ve en la parte superior los dias restantes y pulsa `Mejorar el plan`.
+3. Todos los roles pueden consultar los planes pagados, pero solo `GYM_ADMIN` puede iniciar el cobro.
+4. El administrador elige plan y periodicidad; Membora obtiene la empresa desde el `tenant_id` de la sesion y guarda la eleccion como pendiente.
+5. Stripe crea/reutiliza `stripe_customer_id` y abre Checkout alojado para recoger la forma de pago.
+6. La redireccion de exito no activa el acceso.
+7. `invoice.paid` aplica el plan pendiente, marca la empresa al dia, actualiza `access_until` y crea pago y factura local.
+8. `invoice.payment_failed` registra el intento vencido/error y no amplia acceso.
+9. `customer.subscription.updated/deleted` sincroniza estado, cancelacion al final del periodo y `current_period_end`.
 
 ### Estado de la interfaz
 
@@ -104,6 +103,8 @@ La integracion de backend se conserva, pero la interfaz entregable no muestra ac
 - El enlace `Cancelar renovacion` conectado directamente a Stripe.
 
 La gestion visible usa el bloque `Gestion de renovacion` y los estados locales. Esta decision evita mezclar controles tecnicos de prueba con la administracion diaria y no elimina `StripeBilling.php`, las acciones internas ni `/stripe/webhook`.
+
+Esta ocultacion se refiere al panel del superadministrador. La pantalla `Mejorar el plan` del tenant muestra el checkout necesario para convertir una prueba en suscripcion pagada, sin mostrar IDs, secretos ni diagnosticos Stripe.
 
 ## 8. Migracion
 
@@ -155,8 +156,8 @@ Prueba:
 2. Pegar `sk_test_...`, `pk_test_...` y `whsec_...`.
 3. Crear Price mensual/anual en Stripe.
 4. Pegar Price IDs en el plan local.
-5. Asignar ese plan a una empresa.
-6. Invocar la accion interna `create_empresa_stripe_checkout` desde una prueba tecnica controlada; no hay un boton visible en la interfaz entregable.
+5. Entrar como administrador de una empresa `TRIAL` y abrir `Mejorar el plan`.
+6. Elegir el plan y pulsar `Pagar mensualmente` o `Pagar anualmente`.
 7. Completar pago con `4242 4242 4242 4242`.
 8. Revisar las tablas de facturas/cobros y el registro tecnico `stripe_events`; la pantalla de Facturas no muestra un bloque de diagnostico Stripe.
 9. Confirmar que el evento `invoice.paid` queda procesado en `stripe_events`.

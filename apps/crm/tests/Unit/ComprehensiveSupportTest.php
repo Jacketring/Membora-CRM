@@ -66,6 +66,9 @@ final class ComprehensiveSupportTest extends TestCase
         self::assertTrue(can_access_route('platform-plans', $platform));
         self::assertFalse(can_access_route('members', $platform));
         self::assertTrue(can_access_route('members', $gym));
+        self::assertTrue(can_access_route('upgrade-plan', $gym));
+        self::assertTrue(can_access_route('upgrade-plan', ['role' => 'STAFF']));
+        self::assertFalse(can_access_route('upgrade-plan', $platform));
         self::assertFalse(can_access_route('platform-plans', $gym));
 
         foreach (['SALES_RECEPTION', 'RECEPTION', 'SALES', 'TRAINER', 'STAFF', 'UNKNOWN'] as $role) {
@@ -78,6 +81,7 @@ final class ComprehensiveSupportTest extends TestCase
         self::assertTrue(can_perform_action('delete_platform_user', $platform));
         self::assertFalse(can_perform_action('create_member', $platform));
         self::assertTrue(can_perform_action('create_member', $gym));
+        self::assertTrue(can_perform_action('create_tenant_stripe_checkout', $gym));
         self::assertFalse(can_perform_action('platform_create_plan', $gym));
         self::assertFalse(can_perform_action('create_platform_user', $gym));
         self::assertFalse(can_perform_action('update_platform_user', $gym));
@@ -136,6 +140,15 @@ final class ComprehensiveSupportTest extends TestCase
         self::assertSame(365, membership_duration_days('YEARLY'));
         self::assertSame(30, membership_duration_days('MONTHLY'));
         self::assertSame('Julio 2026', month_title('2026-07'));
+
+        $activeTrial = trial_period_details('2026-07-17 12:00:00', 14, new DateTimeImmutable('2026-07-20'));
+        self::assertFalse($activeTrial['expired']);
+        self::assertSame(11, $activeTrial['remaining_days']);
+        self::assertSame('2026-07-31', $activeTrial['expires_at']);
+
+        $expiredTrial = trial_period_details('2026-07-01', 14, new DateTimeImmutable('2026-07-15'));
+        self::assertTrue($expiredTrial['expired']);
+        self::assertSame(0, $expiredTrial['remaining_days']);
     }
 
     public function testRequestOriginRules(): void

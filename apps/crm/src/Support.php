@@ -407,6 +407,10 @@ function can_access_route(string $route, ?array $user = null): bool
         return true;
     }
 
+    if ($route === 'upgrade-plan') {
+        return $user !== null && !is_platform_admin($user) && empty($user['tenant_context']);
+    }
+
     if (is_platform_admin($user)) {
         return str_starts_with($route, 'platform-') || in_array($route, ['profile', 'settings', 'novedades', 'global-search'], true);
     }
@@ -561,6 +565,25 @@ function platform_payment_status_label(?string $status): string
         'OVERDUE' => 'Vencido',
         'CANCELLED' => 'Anulado',
     ]);
+}
+
+function trial_period_details(?string $startedAt, int $trialDays, ?DateTimeImmutable $today = null): array
+{
+    try {
+        $started = new DateTimeImmutable(trim((string) $startedAt) ?: 'now');
+    } catch (Throwable) {
+        $started = new DateTimeImmutable('now');
+    }
+
+    $today = ($today ?? new DateTimeImmutable('today'))->setTime(0, 0);
+    $expiresAt = $started->setTime(0, 0)->modify('+' . max(1, min(365, $trialDays)) . ' days');
+    $expired = $expiresAt <= $today;
+
+    return [
+        'expires_at' => $expiresAt->format('Y-m-d'),
+        'remaining_days' => $expired ? 0 : (int) $today->diff($expiresAt)->format('%a'),
+        'expired' => $expired,
+    ];
 }
 
 function csrf_token(): string
@@ -748,6 +771,7 @@ function audit_action_label(?string $action): string
         'cancel_empresa_subscription' => 'Cancelacion de suscripción',
         'resume_empresa_subscription' => 'Reactivacion de suscripción',
         'create_empresa_stripe_checkout' => 'Inicio de Stripe Checkout',
+        'create_tenant_stripe_checkout' => 'Mejora de plan con Stripe Checkout',
         'cancel_empresa_stripe_subscription' => 'Cancelacion de Stripe al final del periodo',
         'create_platform_payment' => 'Creación de pago CRM',
         'update_platform_payment' => 'Actualizacion de pago CRM',
@@ -836,6 +860,7 @@ function audit_area_label(?string $route): string
         'platform-plans' => 'Planes CRM',
         'platform-users' => 'Usuarios Admin',
         'platform-web' => 'Web comercial',
+        'upgrade-plan' => 'Mejorar plan',
         'dashboard' => 'Panel',
         'profile' => 'Perfil',
         'settings' => 'Configuración',

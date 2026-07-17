@@ -251,6 +251,7 @@ Automatismos principales:
 - Crea `trial_registrations` para altas self-service verificadas por email antes de provisionar el tenant.
 - Crea `login_attempts`, `auth_tokens` y `demo_resets` para autenticacion, recuperacion y mantenimiento de la demo.
 - Crea `stripe_events` y columnas Stripe en empresas, planes, pagos y facturas cuando se inicializa la integracion de prueba.
+- `empresas.stripe_pending_plan_code` y `stripe_pending_renewal_period` conservan la eleccion hecha en Checkout sin activar el plan antes del webhook. `invoice.paid` aplica esos valores y los limpia dentro de la misma transaccion que crea el pago y la factura.
 - Anade columnas auxiliares de imagen, color, planes, clases y suscripciones si faltan.
 
 Requisito operativo:
@@ -259,7 +260,7 @@ Requisito operativo:
 
 ## 9. Fuera del alcance actual
 
-La integracion Stripe Billing funciona en modo `stripe_test`, con checkout alojado, webhooks firmados, suscripciones e idempotencia. Quedan fuera del alcance cerrado:
+La integracion Stripe Billing funciona en modo `stripe_test`, con seleccion de plan desde cuentas `TRIAL`, checkout alojado, webhooks firmados, suscripciones, pagos, facturas e idempotencia. Quedan fuera del alcance cerrado:
 
 - Activacion de Stripe Live con claves de produccion y cuenta bancaria validada.
 - Validacion fiscal/comercial definitiva antes de cobrar a clientes reales.

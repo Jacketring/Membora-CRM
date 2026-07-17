@@ -16,7 +16,7 @@ vendor/bin/phpstan analyse
 vendor/bin/captainhook install
 ```
 
-La ejecución local del 17 de julio de 2026 completa **54 tests y 251 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
+La ejecución local del 17 de julio de 2026 completa **54 tests y 260 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
 
 Playwright está en `e2e/` y es solo para desarrollo/CI; Node.js no forma parte del despliegue. Debe apuntar exclusivamente a una app y BD local o de staging preparadas para pruebas, nunca a producción:
 
@@ -305,12 +305,14 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 - Estado de pago: al dia, pendiente, vencido o prueba.
 - Precio mensual y proximo pago para planes de pago.
 - Plan de prueba con duracion configurable por dias; solo cuando el plan es `Prueba` se oculta el proximo pago y no aparece renovacion.
+- Aviso superior para cuentas `TRIAL` con los dias restantes y acceso a `Mejorar el plan`.
+- Seleccion de planes de pago y Stripe Checkout alojado para que el administrador del gimnasio introduzca la forma de pago sin almacenar datos bancarios en Membora.
 - MRR estimado.
 - Seccion `Facturacion` para gestionar facturas SaaS, pagos asociados, vencimientos, cobros pagados, pendientes y cancelados.
 - Seccion `Usuarios` para gestionar cuentas de plataforma separadas de los usuarios de gimnasio.
 - Seccion `Planes` para definir catalogo comercial, precio mensual, setup, rebajas, limites y prestaciones sincronizadas con la web publica.
 - Stripe Billing en modo de prueba con checkout, webhooks firmados, idempotencia, renovaciones y cancelacion al final del periodo.
-- Los controles y diagnosticos Stripe no se muestran en la interfaz entregable; el backend y el webhook de prueba se mantienen para validacion tecnica.
+- El checkout se ofrece al administrador del gimnasio desde `Mejorar el plan`; los controles tecnicos y diagnosticos Stripe siguen ocultos en las pantallas administrativas.
 - Ruta interna `platform-web`, oculta del menu y exclusiva de superadministradores, para diagnosticar el formulario publico y los envios cuando sea necesario.
 - Seccion `Logs` para filtrar actividad por empresa, accion, fecha y texto.
 - Acceso de soporte al CRM de una empresa conectada.

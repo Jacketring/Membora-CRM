@@ -157,12 +157,12 @@ if ($isStripeWebhookRequest) {
 
 if ($requestPath === '/stripe/checkout/success') {
     flash('Checkout completado. El acceso se activara cuando Stripe confirme el pago por webhook.');
-    redirect('platform-contacts');
+    redirect(($_GET['source'] ?? '') === 'tenant' ? 'dashboard' : 'platform-contacts');
 }
 
 if ($requestPath === '/stripe/checkout/cancel') {
     flash('Checkout cancelado. No se ha activado ningun acceso ni se ha registrado ningun cobro.', 'error');
-    redirect('platform-contacts');
+    redirect(($_GET['source'] ?? '') === 'tenant' ? 'upgrade-plan' : 'platform-contacts');
 }
 
 $postAction = $_SERVER['REQUEST_METHOD'] === 'POST' ? (string) ($_POST['action'] ?? '') : '';
@@ -272,15 +272,10 @@ if (!can_access_route((string) $route, $currentUser)) {
     redirect(is_platform_admin($currentUser) ? 'platform-dashboard' : 'dashboard');
 }
 
-if (!is_platform_admin($currentUser) && !is_platform_support_context()) {
+if (!is_platform_admin($currentUser) && !is_platform_support_context() && $route !== 'upgrade-plan') {
     $subscriptionAccessState = EmpresaRepository::accessStateForTenant((string) ($currentUser['tenant_id'] ?? ''));
     if (!empty($subscriptionAccessState['blocked'])) {
-        http_response_code(403);
-        render('subscription-required', [
-            'title' => 'Suscripcion requerida',
-            'accessState' => $subscriptionAccessState,
-        ]);
-        exit;
+        redirect('upgrade-plan');
     }
 }
 
@@ -373,6 +368,25 @@ if ($route === 'billing-export') {
 }
 
 switch ($route) {
+    case 'upgrade-plan':
+        if (is_platform_admin($currentUser) || is_platform_support_context()) {
+            redirect('dashboard');
+        }
+
+        $empresa = EmpresaRepository::findByTenant((string) ($currentUser['tenant_id'] ?? ''));
+        $accessState = EmpresaRepository::accessStateForTenant((string) ($currentUser['tenant_id'] ?? ''));
+        render_layout('Mejorar plan', 'upgrade-plan', [
+            'empresa' => $empresa,
+            'accessState' => $accessState,
+            'plans' => PlatformPlanRepository::publicPlans(),
+            'canPurchase' => is_gym_admin($currentUser),
+            'stripeReady' => StripeBillingConfig::enabled()
+                && class_exists(\Stripe\Stripe::class)
+                && str_starts_with(StripeBillingConfig::secretKey(), 'sk_test_')
+                && StripeBillingConfig::webhookSecret() !== '',
+        ]);
+        break;
+
     case 'platform-dashboard':
         if (!is_platform_admin($currentUser)) {
             redirect('dashboard');

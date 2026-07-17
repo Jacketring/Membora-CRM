@@ -898,6 +898,76 @@ a.global-search-result:hover {
   background: #ffedd5;
   color: #7c2d12;
 }
+.trial-upgrade-banner {
+  align-items: center;
+  background: linear-gradient(110deg, #082f49, #004bf2 72%, #2563eb);
+  color: #fff;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 13px 28px;
+}
+.trial-upgrade-banner strong,
+.trial-upgrade-banner span { display: block; }
+.trial-upgrade-banner strong { font-size: 15px; }
+.trial-upgrade-banner span { color: #dbeafe; font-size: 12px; margin-top: 2px; }
+.trial-upgrade-action {
+  background: #fff;
+  border-radius: 10px;
+  color: #004bf2;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 10px 15px;
+  text-decoration: none;
+}
+.trial-upgrade-action:hover,
+.trial-upgrade-action:focus-visible { background: #eff6ff; color: #0036b8; }
+
+.upgrade-plan-header { align-items: center; }
+.upgrade-plan-header p { max-width: 760px; }
+.upgrade-plan-days {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 14px;
+  display: grid;
+  min-width: 170px;
+  padding: 14px 18px;
+  text-align: center;
+}
+.upgrade-plan-days strong { color: var(--primary); font-size: 28px; }
+.upgrade-plan-days span { color: var(--muted); font-size: 12px; font-weight: 800; }
+.upgrade-plan-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.upgrade-plan-card {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+}
+.upgrade-plan-card > header { align-items: flex-start; display: flex; justify-content: space-between; }
+.upgrade-plan-card h3 { font-size: 23px; margin: 4px 0 0; }
+.upgrade-plan-code { color: var(--primary); font-size: 11px; font-weight: 950; letter-spacing: .08em; }
+.upgrade-plan-offer { background: #dcfce7; border-radius: 999px; color: #166534; font-size: 11px; font-weight: 900; padding: 6px 9px; }
+.upgrade-plan-price { align-items: baseline; display: flex; flex-wrap: wrap; gap: 8px; }
+.upgrade-plan-price del { color: var(--muted); font-size: 13px; width: 100%; }
+.upgrade-plan-price strong { color: var(--primary); font-size: 30px; }
+.upgrade-plan-price span { color: var(--muted); font-size: 13px; }
+.upgrade-plan-card ul { display: grid; gap: 8px; margin: 0; padding-left: 20px; }
+.upgrade-plan-card li { color: var(--muted); line-height: 1.4; }
+.upgrade-plan-actions { display: grid; gap: 10px; margin-top: auto; }
+.upgrade-plan-actions form,
+.upgrade-plan-actions button { width: 100%; }
+.upgrade-plan-actions button:disabled { cursor: not-allowed; opacity: .48; }
+.upgrade-plan-unavailable { color: var(--danger); font-weight: 800; text-align: center; }
+.upgrade-plan-security { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 18px 0 0; text-align: center; }
 
 .lead-metrics {
   display: grid;
@@ -4048,12 +4118,14 @@ body[data-theme="dark"] .subscription-plan-grid article {
   .sidebar { min-height: auto; position: static; width: 100%; }
   .workspace { margin-left: 0; width: 100%; }
   .content { padding: 24px; }
+  .trial-upgrade-banner { align-items: flex-start; flex-direction: column; padding: 14px 20px; }
+  .trial-upgrade-action { text-align: center; width: 100%; }
   .demo-session-banner { align-items: flex-start; flex-direction: column; }
   .demo-session-actions { justify-content: space-between; width: 100%; }
   .invoice-modal .empresa-form {
     grid-template-columns: 1fr;
   }
-  .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid, .platform-module-grid, .platform-dashboard-grid, .platform-plan-cards, .subscription-plan-grid, .webhook-grid, .admin-dashboard-hero, .admin-dashboard-kpis, .admin-dashboard-actions, .admin-dashboard-tables, .admin-dashboard-bottom, .novedades-hero { grid-template-columns: 1fr; }
+  .lead-metrics, .dashboard-grid, .dashboard-metrics, .dashboard-layout, .platform-ops-grid, .platform-admin-grid, .platform-module-grid, .platform-dashboard-grid, .platform-plan-cards, .subscription-plan-grid, .upgrade-plan-grid, .webhook-grid, .admin-dashboard-hero, .admin-dashboard-kpis, .admin-dashboard-actions, .admin-dashboard-tables, .admin-dashboard-bottom, .novedades-hero { grid-template-columns: 1fr; }
   .admin-dashboard-panel-header { flex-direction: column; }
   .dashboard-hero { align-items: flex-start; flex-direction: column; gap: 18px; }
   .dashboard-hero-actions { flex-wrap: wrap; }
