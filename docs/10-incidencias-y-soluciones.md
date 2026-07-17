@@ -1,6 +1,6 @@
 # Incidencias tecnicas y soluciones aplicadas - Membora CRM
 
-Fecha de actualizacion: 16/07/2026.
+Fecha de actualizacion: 17/07/2026.
 
 ## 1. Objetivo del documento
 
@@ -154,7 +154,7 @@ Solucion aplicada:
 - Soporte de `OPTIONS`.
 - Respuestas JSON.
 - Logs tecnicos en `webhook_logs`.
-- Diagnostico visible en `Admin CRM > Web`.
+- Diagnostico disponible por URL directa en `?route=platform-web`, solo para superadministradores y oculto del menu normal.
 
 Resultado:
 

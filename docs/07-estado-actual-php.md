@@ -1,6 +1,6 @@
 # Estado actual de la version PHP - Membora CRM
 
-Fecha de actualizacion: 16/07/2026.
+Fecha de actualizacion: 17/07/2026.
 
 ## 1. Resumen
 
@@ -28,9 +28,9 @@ No se usa Node.js en produccion.
 
 El desarrollo sigue el proceso incremental documentado en `docs/19-metodologia-desarrollo.md`: alcance, requisitos, historias, especificación, pruebas, implementación, integración continua y validación del despliegue.
 
-Estado verificado el 16/07/2026:
+Estado verificado el 17/07/2026:
 
-- PHPUnit: **50 tests y 243 aserciones**, sin errores.
+- PHPUnit: **54 tests y 251 aserciones**, sin errores.
 - PHPStan: sin errores.
 - GitHub Actions: sintaxis PHP, PHPUnit, umbral de cobertura y PHPStan; E2E condicionado a un staging configurado.
 
@@ -174,14 +174,16 @@ Estado verificado el 16/07/2026:
 
 ### Administracion SaaS de Membora CRM
 
-- Panel `Admin CRM` separado en resumen, contactos, empresas, usuarios, pagos, facturas, planes, web comercial y auditoria.
+- Panel `Admin CRM` separado en resumen, contactos, empresas, usuarios de plataforma, pagos, facturas, planes y auditoria. La herramienta de web/correo permanece accesible solo por URL directa para diagnostico y esta oculta del menu.
 - Resumen ejecutivo con MRR, ARR, ARPA, pagos pendientes, cobrado en el mes y prioridades.
 - Tabla unificada de `Contactos` en la interfaz de administracion, combinando `platform_leads` y `platform_clients`.
 - Gestion de solicitudes web con estados nuevo, contactado, cualificado, convertido o perdido.
 - Gestion de clientes comerciales con estado lead, cualificado, cliente o perdido.
 - Conversion de lead web a cliente comercial y eliminacion controlada de leads web desde la misma seccion.
+- Eliminacion tanto de leads como de clientes comerciales, sin exigir cambiar artificialmente su tipo antes de borrarlos.
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente desde clientes comerciales.
+- Eliminacion controlada de empresas de prueba y de sus datos operativos asociados, conservando el contacto comercial y la auditoria.
 - Creacion de tenant y usuario administrador al crear una empresa con CRM.
 - Estado del CRM: activo, prueba, suspendido o cancelado.
 - Estado de pago: al dia, pendiente, vencido o prueba.
@@ -197,7 +199,9 @@ Estado verificado el 16/07/2026:
 - Endpoint publico de planes activos consumido por la web comercial.
 - Web comercial externa en `httpdocs`.
 - Web comercial con enlaces a aviso legal, privacidad y cookies.
-- El alta self-service verificada crea automaticamente un contacto `Cliente CRM` y lo vincula a su empresa `TRIAL` de 14 dias.
+- El alta self-service verificada crea automaticamente un contacto `Cliente CRM`, su empresa `TRIAL` de 14 dias, el tenant y un usuario `GYM_ADMIN` activo y vinculado al mismo `tenant_id`.
+- La contrasena inicial se entrega en un segundo correo mediante un enlace cifrado, temporal y de una sola visualizacion; no se incluye en el mensaje.
+- Al abrir Contactos se reparan registros comerciales ausentes a partir de empresas existentes, lo que evita empresas sin su `Cliente CRM` visible.
 - Enlaces de demo desde la web publica hacia una sesion funcional del CRM durante 20 minutos.
 - Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Contactos`.
 - Email HTML automatico de confirmacion para el visitante cuando envia el formulario web.
@@ -205,6 +209,7 @@ Estado verificado el 16/07/2026:
 - Banner de modo soporte y retorno al panel de administracion.
 - Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
 - Stripe Billing funcional en modo `stripe_test`: checkout alojado, webhook firmado, idempotencia, suscripciones, cancelacion al final del periodo y sincronizacion de cobros y facturas.
+- Los controles visibles de checkout/cancelacion Stripe y el bloque de diagnostico se han retirado de empresas y facturas; el backend de prueba y el webhook permanecen disponibles para validacion tecnica.
 
 ## 5. Pendiente para operacion real
 

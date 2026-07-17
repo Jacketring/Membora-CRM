@@ -1,12 +1,12 @@
 # Plan de pruebas - Membora CRM
 
-Fecha de actualización: 16/07/2026.
+Fecha de actualización: 17/07/2026.
 
 Este plan corresponde a la fase de verificación de la metodología incremental descrita en `docs/19-metodologia-desarrollo.md`.
 
 ## Automatización
 
-La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 16 de julio de 2026 completa **50 tests y 243 aserciones** sin errores.
+La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 17 de julio de 2026 completa **54 tests y 251 aserciones** sin errores.
 
 El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %. Esta cobertura es la última medición guardada y debe tratarse como evidencia histórica de esa capa, no como cobertura actual de todo el producto.
 
@@ -137,16 +137,18 @@ Pasos:
 1. Abrir `https://membora.es/#prueba-gratis`.
 2. Completar el formulario y aceptar la politica de privacidad.
 3. Abrir el enlace de verificacion recibido por correo.
-4. Definir la contrasena desde la pantalla segura de recuperacion.
-5. Iniciar sesion con la nueva cuenta.
+4. Confirmar expresamente la activacion.
+5. Abrir el segundo correo y revelar la contrasena inicial desde su enlace temporal.
+6. Guardar la credencial e iniciar sesion con la nueva cuenta.
+7. Recargar el enlace de credenciales y comprobar que ya no vuelve a mostrarla.
 
 Resultado esperado:
 
 - El formulario no revela si un correo ya estaba registrado.
 - Sin verificar el correo no se crea ninguna empresa ni usuario del CRM.
 - El enlace solo se puede usar una vez y caduca al cabo de una hora.
-- Tras verificarlo aparece un contacto `Cliente CRM` con empresa vinculada, tenant aislado y 14 dias de prueba.
-- La contrasena nunca se envia por correo y la establece el propio usuario.
+- Tras verificarlo aparece un contacto `Cliente CRM`, una empresa vinculada, un tenant aislado, 14 dias de prueba y un usuario `GYM_ADMIN` activo con el mismo `tenant_id`.
+- La contrasena no se incluye en el correo: se genera aleatoriamente, permanece cifrada y solo puede revelarse una vez durante una hora.
 
 ## 4. Pruebas funcionales de gimnasio
 
@@ -496,7 +498,7 @@ Precondicion: `PAYMENTS_MODE=stripe_test`, claves de prueba y Price IDs validos.
 
 Pasos:
 
-1. Iniciar checkout para una empresa y completar un pago con tarjeta de prueba.
+1. Invocar el checkout de prueba desde el flujo tecnico o la accion interna preparada para una empresa y completar un pago con tarjeta de prueba.
 2. Confirmar que el retorno por si solo no activa el acceso.
 3. Enviar o esperar el webhook firmado.
 4. Repetir el mismo evento.
@@ -515,12 +517,12 @@ Pasos:
 
 1. Enviar una solicitud desde la web publica sin token manual.
 2. Comprobar su aparicion en Contactos y el log de confirmacion.
-3. Ejecutar la prueba de correo desde `Admin CRM > Web`.
+3. Si hace falta diagnosticar SMTP, abrir directamente `?route=platform-web` como superadministrador y ejecutar la prueba tecnica; la ruta esta oculta del menu.
 4. Enviar una integracion de tenant con token valido e invalido.
 
 Resultado esperado:
 
-- La captacion publica exige origen permitido, honeypot vacio y rate limit.
+- La captacion publica general exige origen permitido, honeypot vacio y rate limit. El alta `TRIAL` conserva origen y honeypot, pero su limite especifico esta desactivado por defecto y se reactiva con `TRIAL_RATE_LIMIT_ENABLED=true`.
 - La integracion con token solo escribe en su tenant activo.
 - Los errores SMTP quedan registrados sin impedir la creacion del contacto.
 

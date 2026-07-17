@@ -75,8 +75,9 @@ Recorrido recomendado:
 13. Usuarios internos y permisos por rol.
 14. Perfil y configuracion visual.
 15. Login como administrador de plataforma.
-16. Panel `Admin CRM`, leads web, empresas, pagos, logs, web comercial y acceso de soporte.
+16. Panel `Admin CRM`: contactos, empresas, renovaciones, facturas, planes, auditoria y acceso de soporte. No abrir la herramienta oculta de correo salvo que sea necesario diagnosticar SMTP.
 17. Web publica: formulario, opiniones y enlaces legales.
+18. Diferenciar verbalmente Stripe Test preparado en backend de los controles visibles: no presentar Stripe Live ni un checkout comercial activo.
 
 ## 5. Slides
 
@@ -85,6 +86,10 @@ Estado:
 - [x] Crear presentacion del proyecto.
 - [x] Adjuntar el documento al codigo.
 - [x] Anadir referencia de slides al README.
+- [ ] Alinear el PPTX incluido con el guion final de 11 diapositivas; el archivo actual conserva 10 diapositivas de una version anterior.
+- [ ] Corregir en la diapositiva de arquitectura `web-app/public` y `php-app/public` por `httpdocs`, `apps/crm` y el puente publico `httpdocs/app`.
+- [ ] Sustituir en la diapositiva de demo `Admin CRM: web` por `Admin CRM: contactos, empresas, facturas, auditoria y soporte`.
+- [ ] Quitar de la diapositiva final que las slides siguen pendientes; a fecha de entrega solo quedan la validacion final y el video.
 - [ ] Publicar URL de acceso publico si la entrega lo exige.
 
 Archivo:
@@ -136,13 +141,21 @@ Guion recomendado:
 - [x] `docs/03-historias-usuario.md`
 - [x] `docs/04-modelo-datos.md`
 - [x] `docs/05-pruebas.md`
+- [x] `docs/06-api-backend.md`
 - [x] `docs/07-estado-actual-php.md`
 - [x] `docs/08-auditoria-testing-2026-06-29.md`
 - [x] `docs/09-seguridad-y-captacion-web.md`
 - [x] `docs/10-incidencias-y-soluciones.md`
+- [x] `docs/11-web-publica.md`
+- [x] `docs/13-historial-cambios-recientes.md`
+- [x] `docs/16-stripe-billing-saas.md`
+- [x] `docs/18-arquitectura-y-flujos.md`
 - [x] `docs/19-metodologia-desarrollo.md`
 
 ## 8. Riesgos pendientes
 
 - Hay que validar credenciales y URL final antes de grabar el video.
 - Hay que revisar que el README final incluya slides, video, nombre y email del alumno.
+- El PPTX incluido es anterior al guion final: contiene 10 diapositivas y conserva referencias a carpetas antiguas. Debe corregirse antes de usarlo en la grabacion.
+- Hay que hacer una solicitud real de prueba con un correo controlado antes de grabar si ese flujo va a mostrarse; no revelar la contrasena recibida en la grabacion.
+- La ruta interna `platform-web` y los detalles SMTP/Stripe deben permanecer fuera del video salvo una explicacion tecnica sin secretos.

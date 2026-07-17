@@ -1,6 +1,6 @@
 # Stripe Billing SaaS - Membora CRM
 
-Fecha de actualizacion: 11/07/2026.
+Fecha de actualizacion: 17/07/2026.
 
 ## 1. Alcance
 
@@ -85,7 +85,7 @@ El webhook verifica obligatoriamente la cabecera `Stripe-Signature`.
 ## 7. Flujo funcional
 
 1. El administrador configura planes locales con Price IDs.
-2. En `Contactos > Suscripcion`, pulsa `Checkout Stripe`.
+2. Para una prueba tecnica se invoca la accion interna de checkout de una empresa; el boton ya no se muestra en el modal de suscripcion.
 3. Membora crea/reutiliza `stripe_customer_id`.
 4. Se crea una Checkout Session con `mode=subscription`.
 5. Stripe redirige al checkout alojado.
@@ -94,6 +94,16 @@ El webhook verifica obligatoriamente la cabecera `Stripe-Signature`.
 8. `invoice.paid` marca empresa al dia, actualiza `access_until`, registra pago y factura local.
 9. `invoice.payment_failed` marca el pago como vencido/error y no amplia acceso.
 10. `customer.subscription.updated/deleted` sincroniza estado, cancelacion al final del periodo y `current_period_end`.
+
+### Estado de la interfaz
+
+La integracion de backend se conserva, pero la interfaz entregable no muestra actualmente:
+
+- El bloque `Stripe Billing` ni el webhook en la pantalla de facturas.
+- El boton `Checkout Stripe` en la suscripcion de empresa.
+- El enlace `Cancelar renovacion` conectado directamente a Stripe.
+
+La gestion visible usa el bloque `Gestion de renovacion` y los estados locales. Esta decision evita mezclar controles tecnicos de prueba con la administracion diaria y no elimina `StripeBilling.php`, las acciones internas ni `/stripe/webhook`.
 
 ## 8. Migracion
 
@@ -146,10 +156,10 @@ Prueba:
 3. Crear Price mensual/anual en Stripe.
 4. Pegar Price IDs en el plan local.
 5. Asignar ese plan a una empresa.
-6. Pulsar `Checkout Stripe`.
+6. Invocar la accion interna `create_empresa_stripe_checkout` desde una prueba tecnica controlada; no hay un boton visible en la interfaz entregable.
 7. Completar pago con `4242 4242 4242 4242`.
-8. Revisar `Admin CRM > Facturacion > Facturas`.
-9. Confirmar que aparece el evento `invoice.paid`.
+8. Revisar las tablas de facturas/cobros y el registro tecnico `stripe_events`; la pantalla de Facturas no muestra un bloque de diagnostico Stripe.
+9. Confirmar que el evento `invoice.paid` queda procesado en `stripe_events`.
 10. Confirmar que la empresa queda `PAID`, con `access_until` actualizado.
 
 Prueba de fallo:

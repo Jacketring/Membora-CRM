@@ -16,7 +16,7 @@ vendor/bin/phpstan analyse
 vendor/bin/captainhook install
 ```
 
-La ejecución local del 16 de julio de 2026 completa **50 tests y 243 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
+La ejecución local del 17 de julio de 2026 completa **54 tests y 251 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
 
 Playwright está en `e2e/` y es solo para desarrollo/CI; Node.js no forma parte del despliegue. Debe apuntar exclusivamente a una app y BD local o de staging preparadas para pruebas, nunca a producción:
 
@@ -58,7 +58,7 @@ Pantallas disponibles:
 - Perfil de usuario.
 - Configuracion visual personal.
 - Canal de novedades con version actual del CRM e historial de cambios.
-- Panel de administracion de Membora CRM separado en resumen, contactos, empresas, usuarios, cobros, facturas, planes, web comercial y logs.
+- Panel de administracion de Membora CRM separado en resumen, contactos, empresas, usuarios, cobros, facturas, planes y logs; el diagnostico de web/correo esta oculto del menu.
 - Demo funcional desde la web publica con usuario temporal unico, contador de 20 minutos, limpieza al cerrar o caducar y retorno automatico a la web.
 - Alta self-service con verificacion por email, tenant propio y prueba gratuita de 14 dias sin tarjeta.
 
@@ -295,11 +295,11 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 
 - Panel `Admin CRM`.
 - Resumen SaaS con MRR, ARR, ARPA, riesgo, cobros y prioridades.
-- Seccion `Contactos` para unificar solicitudes web y clientes comerciales, con estados, filtros, conversion a cliente y eliminacion controlada de leads.
+- Seccion `Contactos` para unificar solicitudes web y clientes comerciales, con estados, filtros, conversion, eliminacion de leads o clientes y reparacion de contactos ausentes vinculados a empresas.
 - Email automatico de confirmacion para solicitudes recibidas desde la web publica.
 - Alta manual de contactos comerciales antes de crear su CRM.
 - Tabla `empresas`.
-- Alta y edicion de empresas cliente desde un cliente comercial.
+- Alta, edicion y eliminacion controlada de empresas cliente desde un cliente comercial.
 - Creacion de tenant y usuario administrador al crear una empresa CRM.
 - Estado del CRM: activo, prueba, suspendido o cancelado.
 - Estado de pago: al dia, pendiente, vencido o prueba.
@@ -310,7 +310,8 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 - Seccion `Usuarios` para gestionar cuentas de plataforma separadas de los usuarios de gimnasio.
 - Seccion `Planes` para definir catalogo comercial, precio mensual, setup, rebajas, limites y prestaciones sincronizadas con la web publica.
 - Stripe Billing en modo de prueba con checkout, webhooks firmados, idempotencia, renovaciones y cancelacion al final del periodo.
-- Seccion `Web` para revisar el estado tecnico del formulario publico y envios recientes.
+- Los controles y diagnosticos Stripe no se muestran en la interfaz entregable; el backend y el webhook de prueba se mantienen para validacion tecnica.
+- Ruta interna `platform-web`, oculta del menu y exclusiva de superadministradores, para diagnosticar el formulario publico y los envios cuando sea necesario.
 - Seccion `Logs` para filtrar actividad por empresa, accion, fecha y texto.
 - Acceso de soporte al CRM de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
@@ -340,6 +341,7 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 - `docs/19-metodologia-desarrollo.md`: metodología incremental, trazabilidad, validación y criterio de finalización.
 - `docs/adr/`: decisiones arquitectonicas vigentes.
 - `docs/specs/`: especificaciones y criterios de aceptacion por incremento.
+- `docs/entrega/guion-y-estructura-defensa-membora.md`: guion, tiempos, mensajes y checklist para grabar el video y defender el proyecto.
 
 ## Presentacion TFM
 

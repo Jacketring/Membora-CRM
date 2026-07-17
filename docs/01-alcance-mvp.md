@@ -1,6 +1,6 @@
 # Alcance del MVP - Membora CRM
 
-Fecha de actualizacion: 16/07/2026.
+Fecha de actualizacion: 17/07/2026.
 
 Este alcance constituye la primera fase de la metodología incremental descrita en `docs/19-metodologia-desarrollo.md`. Permite distinguir el MVP demostrable de las mejoras futuras antes de definir requisitos, historias y especificaciones.
 
@@ -62,7 +62,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Pagos SaaS por empresa.
 - Facturas SaaS emitidas por Membora a empresas cliente, con borradores, emision, serie/numero correlativo por empresa, datos historicos de emisor/cliente, lineas, descuentos, IVA desglosado, pagos parciales, estado de cobro y vista imprimible/PDF.
 - Base funcional para checkout y cobros SaaS: la demo pide pocos datos y la contratacion debe completar datos fiscales, plan y forma de pago antes de activar el acceso.
-- Web comercial: diagnostico de webhook, correo y ultimos envios.
+- Diagnostico interno de webhook, correo y ultimos envios en una ruta directa exclusiva de superadministracion, oculta del menu por tratarse de una herramienta de depuracion.
 - Acceso de soporte al CRM de una empresa conectada.
 
 ### Web comercial
@@ -166,6 +166,8 @@ La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba
 ## 8. Stripe, cobros y checkout
 
 Para los pagos de Membora se usa Stripe como proveedor principal. El MVP incluye una integracion funcional restringida a `stripe_test`: checkout alojado, webhooks firmados, suscripciones recurrentes, cancelacion al final del periodo, facturas, cobros e idempotencia. No se habilita Stripe Live ni se realizan cargos reales hasta completar la configuracion bancaria, fiscal y comercial.
+
+El backend conserva las acciones de checkout y cancelacion Stripe para validacion tecnica, pero esos controles y el bloque de diagnostico no se muestran en las pantallas actuales de empresas o facturas. En la demo visible, el ciclo de vida se gestiona con el estado local de renovacion; Stripe debe presentarse como integracion tecnica en modo de prueba, no como cobro comercial activo.
 
 Cuando Jose cree la cuenta de Stripe, debera configurar:
 

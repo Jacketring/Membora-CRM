@@ -1,6 +1,6 @@
 # Backend PHP, rutas y acciones - Membora CRM
 
-Fecha de actualizacion: 16/07/2026.
+Fecha de actualizacion: 17/07/2026.
 
 ## 1. Arquitectura activa
 
@@ -29,6 +29,7 @@ Rutas publicas o de autenticacion:
 - `?route=forgot-password`
 - `?route=reset-password&token=...`
 - `?route=activate-trial&token=...`
+- `?route=trial-credentials&token=...`
 - `?route=demo-expired`
 
 Rutas autenticadas de gimnasio:
@@ -54,13 +55,13 @@ La autorizacion efectiva se define en `route_permissions()` y `action_permission
 Autenticacion, sesion y perfil:
 
 - `login`, `demo_login`, `keep_demo_session`, `schedule_demo_cleanup` y `logout`.
-- `request_password_reset`, `reset_password` y `update_profile`.
+- `request_password_reset`, `reset_password`, `confirm_trial_activation`, `reveal_trial_credentials` y `update_profile`.
 
 Administracion SaaS, contactos y empresas:
 
-- `update_platform_lead`, `convert_platform_lead`, `delete_platform_lead` y `send_platform_test_email`.
+- `update_platform_lead`, `convert_platform_lead`, `delete_platform_lead`, `send_platform_test_email` y `reset_platform_trial_attempts`.
 - `create_platform_client`, `update_platform_client` y `delete_platform_client`.
-- `create_empresa`, `update_empresa` y `update_empresa_subscription`.
+- `create_empresa`, `update_empresa`, `delete_empresa` y `update_empresa_subscription`.
 - `renew_empresa_subscription`, `cancel_empresa_subscription` y `resume_empresa_subscription`.
 - `create_empresa_stripe_checkout` y `cancel_empresa_stripe_subscription`.
 - `enter_empresa_crm` y `exit_empresa_crm`.
@@ -103,7 +104,7 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 ### Prueba self-service
 
-`POST /api/trial` acepta nombre, empresa, email, consentimiento y honeypot. Valida el origen contra `WEB_APP_URL`, limita solicitudes por IP y email y envia un enlace de activacion valido durante una hora. Solo tras verificarlo crea o actualiza el contacto como `Cliente CRM`, vincula una empresa `TRIAL`, crea tenant y administrador; la persona define su propia contrasena. Si el email ya pertenece a un usuario, no duplica datos y envia un aviso con acceso y recuperacion.
+`POST /api/trial` acepta nombre, empresa, email, consentimiento y honeypot. Valida el origen contra `WEB_APP_URL` y envia un enlace de activacion valido durante una hora. El limite adicional por IP y email esta desactivado por defecto durante la depuracion y se habilita con `TRIAL_RATE_LIMIT_ENABLED=true`. Solo tras una confirmacion `POST` crea o actualiza el contacto como `Cliente CRM`, vincula una empresa `TRIAL`, crea tenant y administrador y comprueba que ambos comparten `tenant_id`. La contrasena inicial aleatoria se cifra y se entrega mediante un segundo enlace: requiere confirmacion, caduca en una hora y se consume al revelarse. Si el correo ya estaba ocupado, se busca un identificador de cuenta disponible sin duplicar el correo de entrega comercial.
 
 ### Captacion web
 
@@ -117,7 +118,7 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 - Sesion estricta con cookie propia, `HttpOnly`, `SameSite=Lax` y `Secure` bajo HTTPS.
 - Tokens CSRF en formularios y validacion de `Origin`/`Referer` en POST internos.
-- Rate limit de login, captacion y alta de prueba.
+- Rate limit de login y captacion; el del alta de prueba es configurable mediante `TRIAL_RATE_LIMIT_ENABLED` y esta desactivado por defecto durante su depuracion.
 - Tokens de recuerdo y recuperacion con selector/verificador, caducidad y uso unico cuando corresponde.
 - Consultas preparadas PDO, escape de salida y validacion MIME/tamano de uploads.
 - Aislamiento por `tenant_id`, permisos por ruta/accion y modo soporte explicito.
@@ -130,7 +131,7 @@ La referencia completa es `apps/crm/.env.example`. Grupos principales:
 
 - Aplicacion: `APP_NAME`, `APP_ENV`, `APP_URL`, `WEB_APP_URL`, `APP_STRICT_POST_ORIGIN`, `SESSION_COOKIE_NAME` y `APP_KEY`.
 - Base de datos: `DATABASE_URL` o `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD`.
-- Administracion/demo: `PLATFORM_ADMIN_PASSWORD` y `DEMO_CLIENT_PASSWORD`.
+- Administracion/demo: `PLATFORM_ADMIN_PASSWORD`, `DEMO_CLIENT_PASSWORD` y `TRIAL_RATE_LIMIT_ENABLED`.
 - Correo: `MAIL_*` y `SMTP_*`.
 - Facturas: `INVOICE_ISSUER_*`.
 - Stripe: `PAYMENTS_MODE`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET`.

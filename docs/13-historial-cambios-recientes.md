@@ -1,6 +1,6 @@
 # Historial de cambios recientes - Membora CRM
 
-Fecha de actualizacion: 16/07/2026.
+Fecha de actualizacion: 17/07/2026.
 
 ## 1. Objetivo
 
@@ -99,7 +99,21 @@ La estrategia inicial de Stripe como proveedor de cobros SaaS se completo despue
 
 El estado actual incluye checkout, webhooks firmados, idempotencia, suscripciones, facturas y cobros de prueba. Stripe Live y los cargos reales siguen pendientes.
 
-## 6. Verifactu
+Para la entrega se retiraron de la interfaz el bloque diagnostico de Stripe, el boton de Checkout y la cancelacion directa de Stripe. El webhook y las acciones de backend siguen implementados para pruebas tecnicas; el modal visible concentra ahora la gestion local de renovacion con mas espacio y una jerarquia mas clara.
+
+## 6. Alta self-service y limpieza de pruebas
+
+La activacion por correo se completo como un flujo de dos mensajes:
+
+- El primer enlace confirma la propiedad del correo y requiere una accion `POST` antes de crear datos.
+- La activacion crea `Cliente CRM`, empresa `TRIAL`, tenant y usuario `GYM_ADMIN` vinculados.
+- El segundo enlace revela una contrasena inicial aleatoria cifrada, durante una hora y una sola vez.
+- Si falla una parte del aprovisionamiento o del segundo correo, se revierte el alta parcial y la solicitud vuelve a un estado reintentable.
+- El rate limit especifico de la prueba esta desactivado por defecto durante la depuracion y puede reactivarse con `TRIAL_RATE_LIMIT_ENABLED=true`.
+
+Tambien se incorporo la eliminacion controlada de empresas de prueba, la eliminacion directa de leads y clientes comerciales y la reparacion automatica de contactos que falten para empresas ya existentes. La herramienta `platform-web` se conserva oculta como apoyo interno para diagnosticar correos.
+
+## 7. Verifactu
 
 El proyecto no esta conectado actualmente a Verifactu.
 
@@ -115,7 +129,7 @@ La facturacion SaaS permite guardar facturas internas y estados de cobro, pero n
 
 La estrategia documentada es integrar mas adelante un proveedor especializado o desarrollar un conector completo cuando se cierre el criterio legal y tecnico definitivo.
 
-## 7. Web publica y captacion
+## 8. Web publica y captacion
 
 Se han aplicado cambios para que la web publica funcione mejor como entrada comercial:
 
@@ -128,7 +142,7 @@ Se han aplicado cambios para que la web publica funcione mejor como entrada come
 
 La web publica sigue separada del CRM y vive en `httpdocs`.
 
-## 8. Despliegue en Plesk
+## 9. Despliegue en Plesk
 
 Se ha reforzado la estructura del repositorio para el despliegue en Plesk:
 
@@ -140,7 +154,7 @@ Se ha reforzado la estructura del repositorio para el despliegue en Plesk:
 
 El criterio operativo sigue siendo no usar Node.js, Prisma ni builds frontend en produccion.
 
-## 9. Pagos y membresias de gimnasio
+## 10. Pagos y membresias de gimnasio
 
 Se ha ampliado la parte operativa de gimnasio con facturacion recurrente de socios:
 
@@ -152,10 +166,18 @@ Se ha ampliado la parte operativa de gimnasio con facturacion recurrente de soci
 
 Esta parte pertenece al gimnasio. No debe confundirse con las facturas SaaS que Membora emite a sus empresas cliente.
 
-## 10. Commits relacionados
+## 11. Commits relacionados
 
 Referencias recientes en Git:
 
+- `e917f34` - Reordenar la gestion visible de renovacion y retirar controles Stripe del modal.
+- `f98263e` - Diferenciar cancelacion de renovacion y retirar diagnostico Stripe de Facturas.
+- `aa3d490` - Reparar contactos ausentes a partir de empresas existentes.
+- `2a5f6ac` - Hacer configurable el limite de solicitudes de prueba.
+- `58b02a9` - Garantizar el usuario administrador al activar una prueba.
+- `653d531` - Entregar la credencial inicial mediante un enlace cifrado de un solo uso.
+- `f3bc90d` - Permitir eliminar leads comerciales directamente.
+- `c79d52e` - Incorporar limpieza de empresas de prueba y ocultar la herramienta web/correo.
 - `fcf670f` - Agrupar pagos de cliente dentro de facturacion.
 - `e2f889c` - Sustituir facturacion antigua de cliente por flujo de facturas.
 - `b8ce879` - Aplicar control de acceso por suscripcion SaaS.
@@ -177,7 +199,7 @@ Referencias recientes en Git:
 - `d51853c` - Actualizar assets de marca de Membora.
 - `013813c` - Reestructurar repo para despliegue en Plesk.
 
-## 11. Pendientes declarados
+## 12. Pendientes declarados
 
 Quedan pendientes para siguientes fases:
 

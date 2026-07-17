@@ -8,7 +8,7 @@ La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/inde
 
 El CRM se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
 
-Estado verificado el 16/07/2026: **50 tests y 243 aserciones** de PHPUnit, además de PHPStan sin errores.
+Estado verificado el 17/07/2026: **54 tests y 251 aserciones** de PHPUnit, además de PHPStan sin errores.
 
 ## Requisitos
 
@@ -89,7 +89,7 @@ No hace falta ejecutar `npm install`, `npm run build`, `prisma generate` ni rein
 - Perfil.
 - Configuracion visual.
 - Novedades.
-- Panel de administracion SaaS con resumen, contactos, empresas, usuarios, pagos, facturas, planes, web comercial y auditoria.
+- Panel de administracion SaaS con resumen, contactos, empresas, usuarios, pagos, facturas, planes y auditoria; la herramienta de web/correo queda oculta del menu y accesible solo por URL directa para diagnostico.
 
 ## Administracion SaaS
 
@@ -110,8 +110,9 @@ La app crea y usa tablas de administracion SaaS para controlar clientes, empresa
 - Facturas SaaS y de clientes: lineas, impuestos, emision, pagos asociados y vista imprimible.
 - Usuarios de plataforma separados de los usuarios de gimnasio.
 - Planes SaaS: codigo, precio mensual, coste de alta, limites y prestaciones.
-- Contactos: tabla unificada de solicitudes web y clientes comerciales, con edicion, conversion a cliente, alta manual y eliminacion controlada de leads.
-- Web comercial: estado tecnico del formulario publico y logs de envios recibidos.
+- Contactos: tabla unificada de solicitudes web y clientes comerciales, con edicion, conversion, alta manual, eliminacion de leads/clientes y reparacion de vinculos ausentes con empresas.
+- Empresas: alta, edicion, ciclo de renovacion, acceso de soporte y eliminacion controlada de datos operativos de pruebas antiguas.
+- Web/correo: herramienta tecnica oculta del menu, disponible solo por URL directa para superadministradores.
 
 Usuario de administracion de plataforma:
 

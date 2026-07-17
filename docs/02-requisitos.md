@@ -183,7 +183,7 @@ KPIs previstos:
 
 ### RF-16 Administracion SaaS
 
-El superadministrador debe disponer de un espacio separado para gestionar contactos, empresas cliente, usuarios de plataforma, planes, cobros, facturas, estado de la web y auditoria global.
+El superadministrador debe disponer de un espacio separado para gestionar contactos, empresas cliente, usuarios de plataforma, planes, cobros, facturas y auditoria global. El diagnostico de web/correo se mantiene como herramienta interna oculta del menu.
 
 - Los usuarios de gimnasio no deben acceder a rutas ni acciones de plataforma.
 - El superadministrador puede entrar en modo soporte sobre una empresa conectada y volver al panel global.
@@ -205,7 +205,9 @@ Una persona debe poder solicitar una prueba gratuita de 14 dias desde la web pub
 - El email se verifica mediante un enlace de un solo uso y una hora de validez.
 - No se crea tenant, empresa ni usuario antes de verificar el email.
 - Tras la activacion se crea o actualiza un contacto `Cliente CRM`, se vincula una empresa `TRIAL`, un tenant aislado y su administrador.
-- La contrasena la establece la propia persona mediante un token seguro; nunca se envia en claro.
+- El sistema genera una contrasena inicial aleatoria y envia un segundo correo con un enlace temporal para revelarla una sola vez; la contrasena no viaja en el correo.
+- La credencial temporal permanece cifrada, caduca en una hora y se consume antes de mostrarse para impedir una segunda visualizacion.
+- El limite especifico por IP y email se puede activar con `TRIAL_RATE_LIMIT_ENABLED=true`; durante la depuracion final permanece desactivado por defecto, sin desactivar origen permitido ni honeypot.
 
 ### RF-19 Facturacion SaaS
 

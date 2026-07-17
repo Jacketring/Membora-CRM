@@ -218,10 +218,11 @@ Como propietario de un gimnasio, quiero verificar mi email y crear una prueba de
 
 Criterios de aceptacion:
 
-- La solicitud valida consentimiento, origen, honeypot y limites de frecuencia.
+- La solicitud valida consentimiento, origen y honeypot; el limite especifico de frecuencia es configurable y esta desactivado por defecto durante la depuracion final.
 - Antes de verificar el email no se crea ninguna empresa ni cuenta operativa.
-- El enlace caduca, solo se usa una vez y permite definir la contrasena de forma segura.
+- El enlace de activacion caduca y solo se usa una vez.
 - El contacto aparece como `Cliente CRM` con empresa vinculada y el nuevo usuario entra en un tenant propio con plan `TRIAL` durante 14 dias.
+- Un segundo correo entrega un enlace temporal para revelar la contrasena inicial una sola vez, sin incluirla en el cuerpo del mensaje.
 
 ### HU-23 Recuperar la contrasena
 

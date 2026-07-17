@@ -184,8 +184,10 @@ membora.es
   -> honeypot/rate limit
   -> insercion en platform_leads
   -> intento de email de confirmacion
-  -> logs en Admin CRM > Web
+  -> logs en la ruta interna ?route=platform-web
 ```
+
+La ruta de diagnostico solo admite superadministradores y esta oculta del menu. Se conserva para depurar SMTP y captacion, no como modulo funcional de la demo.
 
 Ventajas:
 

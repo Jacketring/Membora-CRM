@@ -1,6 +1,6 @@
 # Arquitectura y flujos
 
-Fecha de actualización: 16/07/2026.
+Fecha de actualización: 17/07/2026.
 
 ## Flujo metodológico
 
@@ -73,13 +73,18 @@ sequenceDiagram
     participant M as Email
     participant CRM as CRM
     U->>API: Datos y consentimiento
-    API->>API: Origen, honeypot y rate limit
+    API->>API: Origen, honeypot y rate limit configurable
     API->>DB: Guarda solicitud y hash del token
     API->>M: Enlace de activación de una hora
-    U->>CRM: activate-trial?token=...
-    CRM->>DB: Crea tenant, empresa TRIAL y administrador
-    CRM-->>U: Token de un solo uso para definir contraseña
+    U->>CRM: activate-trial?token=... y confirmación POST
+    CRM->>DB: Crea Cliente CRM, empresa TRIAL, tenant y administrador
+    CRM->>M: Segundo enlace para revelar la credencial
+    U->>CRM: trial-credentials?token=... y confirmación POST
+    CRM->>DB: Consume la credencial cifrada
+    CRM-->>U: Muestra la contraseña inicial una sola vez
 ```
+
+El limite especifico del alta se controla con `TRIAL_RATE_LIMIT_ENABLED` y esta desactivado por defecto durante la depuracion. La validacion de origen y el honeypot siguen siendo obligatorios. La entrega usa AES-256-GCM, cabeceras `no-store` y consumo previo a la visualizacion.
 
 La recuperación ordinaria reutiliza `auth_tokens`: responde de forma neutra, envía un enlace temporal y revoca el token después de cambiar la contraseña.
 
@@ -106,7 +111,7 @@ sequenceDiagram
     participant CRM as StripeBillingService
     participant S as Stripe Test
     participant DB as MariaDB
-    A->>CRM: Crear checkout para empresa y plan
+    A->>CRM: Invocar acción técnica de checkout para empresa y plan
     CRM->>S: Customer, Price y Checkout Session
     S-->>A: Checkout alojado
     S->>CRM: Webhook firmado
@@ -115,6 +120,8 @@ sequenceDiagram
 ```
 
 La URL de éxito no confirma el pago. Solo el webhook firmado modifica el estado financiero y de acceso. El código rechaza claves que no sean `sk_test_`; Stripe Live permanece pendiente.
+
+La interfaz visible de empresas y facturas no muestra actualmente el bloque de diagnostico, el boton de Checkout ni la cancelacion directa en Stripe. El backend y el webhook de prueba se conservan como integracion tecnica, mientras la gestion diaria visible usa el estado local de renovacion.
 
 ## Modo soporte multi-tenant
 
