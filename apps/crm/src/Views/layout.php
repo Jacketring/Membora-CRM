@@ -23,6 +23,10 @@ $subscriptionAccessState = (!$isPlatformAdmin && !is_platform_support_context())
     ? EmpresaRepository::accessStateForTenant((string) ($user['tenant_id'] ?? ''))
     : null;
 $subscriptionBlocked = !empty($subscriptionAccessState['blocked']) && !in_array($route, ['upgrade-plan', 'simulated-checkout'], true);
+$subscriptionPlanCode = strtoupper((string) ($subscriptionAccessState['empresa']['plan'] ?? ''));
+$showPlanUpgradeBanner = !$isPlatformAdmin
+    && !is_platform_support_context()
+    && (!empty($subscriptionAccessState['is_trial']) || in_array($subscriptionPlanCode, ['BASIC', 'PRO', 'BUSINESS'], true));
 $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : [];
 ?>
 <body data-tenant-accent="<?= e($tenantPrimaryColor) ?>" <?= $demoRemainingSeconds > 0 ? 'data-demo-expires-in="' . e((string) $demoRemainingSeconds) . '"' : '' ?> <?= $subscriptionBlocked ? 'data-subscription-blocked="true"' : '' ?>>
@@ -91,12 +95,17 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
     </aside>
 
     <section class="workspace">
-      <?php if (!empty($subscriptionAccessState['is_trial']) && !is_platform_support_context()): ?>
-        <div class="trial-upgrade-banner" role="region" aria-label="Estado de la prueba gratuita">
+      <?php if ($showPlanUpgradeBanner): ?>
+        <div class="trial-upgrade-banner" role="region" aria-label="Opciones para mejorar el plan">
           <div>
-            <?php $trialRemainingDays = (int) ($subscriptionAccessState['remaining_days'] ?? 0); ?>
-            <strong><?= $trialRemainingDays > 0 ? ($trialRemainingDays === 1 ? 'Te queda 1 día de prueba' : 'Te quedan ' . $trialRemainingDays . ' días de prueba') : 'Tu prueba gratuita ha finalizado' ?></strong>
-            <span><?= !empty($subscriptionAccessState['expires_at']) ? 'Acceso de prueba hasta el ' . e(format_date_short($subscriptionAccessState['expires_at'])) . '.' : 'Elige un plan para mantener el acceso.' ?></span>
+            <?php if (!empty($subscriptionAccessState['is_trial'])): ?>
+              <?php $trialRemainingDays = (int) ($subscriptionAccessState['remaining_days'] ?? 0); ?>
+              <strong><?= $trialRemainingDays > 0 ? ($trialRemainingDays === 1 ? 'Te queda 1 día de prueba' : 'Te quedan ' . $trialRemainingDays . ' días de prueba') : 'Tu prueba gratuita ha finalizado' ?></strong>
+              <span><?= !empty($subscriptionAccessState['expires_at']) ? 'Acceso de prueba hasta el ' . e(format_date_short($subscriptionAccessState['expires_at'])) . '.' : 'Elige un plan para mantener el acceso.' ?></span>
+            <?php else: ?>
+              <strong>Tu plan <?= e(ucfirst(strtolower($subscriptionPlanCode))) ?> puede crecer contigo</strong>
+              <span>Amplía los límites de usuarios y socios y accede a más funcionalidades.</span>
+            <?php endif; ?>
           </div>
           <a class="trial-upgrade-action" href="index.php?route=upgrade-plan">Mejorar el plan</a>
         </div>

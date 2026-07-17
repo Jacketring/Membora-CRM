@@ -104,7 +104,7 @@ function renderPlanCard(plan) {
   action.className = 'plan-action';
   const isEnterprise = String(plan.code).toUpperCase() === 'ENTERPRISE';
   action.href = isEnterprise ? '#contacto' : '#prueba-gratis';
-  action.textContent = isEnterprise ? 'Contratar' : 'Probar gratis 14 días';
+  action.textContent = isEnterprise ? 'Contactar' : 'Probar gratis 14 días';
   article.appendChild(action);
 
   return article;
