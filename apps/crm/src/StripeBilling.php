@@ -817,12 +817,13 @@ final class StripeBillingService
         if (!in_array($period, ['MONTHLY', 'ANNUAL'], true)) {
             throw new RuntimeException('Selecciona una periodicidad de pago valida.');
         }
-        $priceId = $period === 'ANNUAL'
+        $configuredPriceId = $period === 'ANNUAL'
             ? trim((string) ($plan['stripe_annual_price_id'] ?? ''))
             : trim((string) ($plan['stripe_monthly_price_id'] ?? ''));
-        if ($priceId === '') {
+        if ($configuredPriceId === '') {
             throw new RuntimeException('Falta el Price ID de Stripe para el plan ' . $plan['code'] . ' en modalidad ' . empresa_renewal_period_label($period) . '.');
         }
+        $priceId = self::resolveConfiguredPriceId($configuredPriceId, $period);
 
         $customerId = trim((string) ($empresa['stripe_customer_id'] ?? ''));
         if ($customerId === '') {
@@ -877,6 +878,42 @@ final class StripeBillingService
         StripeBillingRepository::markCheckoutSession($empresaId, (string) $session->id, (string) $plan['code'], $period);
 
         return (string) $session->url;
+    }
+
+    private static function resolveConfiguredPriceId(string $configuredId, string $period): string
+    {
+        if (str_starts_with($configuredId, 'price_')) {
+            return $configuredId;
+        }
+
+        if (!str_starts_with($configuredId, 'prod_')) {
+            throw new RuntimeException('La referencia de Stripe debe comenzar por price_ o prod_.');
+        }
+
+        try {
+            $prices = \Stripe\Price::all([
+                'active' => true,
+                'limit' => 100,
+                'product' => $configuredId,
+                'type' => 'recurring',
+            ]);
+        } catch (\Stripe\Exception\ApiErrorException $exception) {
+            throw new RuntimeException('No se pudo consultar el producto ' . $configuredId . ' en Stripe: ' . $exception->getMessage(), 0, $exception);
+        }
+
+        $expectedInterval = $period === 'ANNUAL' ? 'year' : 'month';
+        foreach ($prices->data as $price) {
+            $interval = (string) ($price->recurring->interval ?? '');
+            $intervalCount = (int) ($price->recurring->interval_count ?? 1);
+            if ($interval === $expectedInterval && $intervalCount === 1) {
+                return (string) $price->id;
+            }
+        }
+
+        throw new RuntimeException(
+            'El producto ' . $configuredId . ' no tiene una tarifa recurrente '
+            . ($period === 'ANNUAL' ? 'anual' : 'mensual') . ' activa en Stripe.'
+        );
     }
 
     public static function cancelAtPeriodEnd(string $empresaId): void

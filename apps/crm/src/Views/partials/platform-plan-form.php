@@ -53,13 +53,14 @@ $planStatusOptions = [
     <input name="discount_label" value="<?= e((string) ($planValues['discount_label'] ?? '')) ?>" placeholder="Oferta lanzamiento">
   </label>
   <label class="field">
-    <span>Stripe Price mensual</span>
-    <input name="stripe_monthly_price_id" value="<?= e((string) ($planValues['stripe_monthly_price_id'] ?? '')) ?>" placeholder="price_...">
+    <span>Stripe Price o producto mensual</span>
+    <input name="stripe_monthly_price_id" value="<?= e((string) ($planValues['stripe_monthly_price_id'] ?? '')) ?>" placeholder="price_... o prod_...">
   </label>
   <label class="field">
-    <span>Stripe Price anual</span>
-    <input name="stripe_annual_price_id" value="<?= e((string) ($planValues['stripe_annual_price_id'] ?? '')) ?>" placeholder="price_...">
+    <span>Stripe Price o producto anual</span>
+    <input name="stripe_annual_price_id" value="<?= e((string) ($planValues['stripe_annual_price_id'] ?? '')) ?>" placeholder="price_... o prod_...">
   </label>
+  <small class="form-full">Puedes pegar directamente un <code>price_...</code>. Si pegas un <code>prod_...</code>, Membora buscara dentro del producto la tarifa recurrente mensual o anual correspondiente.</small>
   <label class="field">
     <span>Usuarios incluidos</span>
     <input name="max_users" inputmode="numeric" value="<?= e((string) $planValues['max_users']) ?>" placeholder="8">

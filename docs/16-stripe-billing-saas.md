@@ -48,10 +48,10 @@ Donde pegar cada valor:
 
 Cada plan local de `Admin CRM > Planes` tiene dos campos:
 
-- `Stripe Price mensual`
-- `Stripe Price anual`
+- `Stripe Price o producto mensual`
+- `Stripe Price o producto anual`
 
-Crear en Stripe un producto/precio para cada plan y pegar los IDs `price_...` en esos campos. No se deben inventar IDs.
+Crear en Stripe un producto con sus precios recurrentes para cada plan. Se puede pegar directamente el ID `price_...` de la tarifa o el ID `prod_...` del producto. Cuando recibe un `prod_...`, Membora consulta Stripe y selecciona la tarifa activa de intervalo mensual o anual segun el campo. No se deben inventar IDs ni mezclar objetos del modo test y live.
 
 ## 5. URL del webhook
 
