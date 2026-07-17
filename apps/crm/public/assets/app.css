@@ -924,50 +924,215 @@ a.global-search-result:hover {
 .trial-upgrade-action:hover,
 .trial-upgrade-action:focus-visible { background: #eff6ff; color: #0036b8; }
 
-.upgrade-plan-header { align-items: center; }
-.upgrade-plan-header p { max-width: 760px; }
-.upgrade-plan-days {
-  background: var(--surface);
-  border: 1px solid var(--outline);
-  border-radius: 14px;
-  display: grid;
-  min-width: 170px;
-  padding: 14px 18px;
+.upgrade-plan-page { margin: 0 auto; max-width: 1540px; }
+.upgrade-plan-hero {
+  align-items: center;
+  background:
+    radial-gradient(circle at 78% -30%, rgba(96, 165, 250, .38), transparent 38%),
+    linear-gradient(120deg, #07182b 0%, #0b2f68 57%, #004bf2 100%);
+  border-radius: 24px;
+  box-shadow: 0 20px 45px rgba(4, 30, 66, .18);
+  color: #fff;
+  display: flex;
+  gap: 42px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  min-height: 260px;
+  overflow: hidden;
+  padding: 38px 44px;
+  position: relative;
+}
+.upgrade-plan-hero::after {
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 999px;
+  content: "";
+  height: 320px;
+  position: absolute;
+  right: -100px;
+  top: -150px;
+  width: 320px;
+}
+.upgrade-plan-hero-copy { max-width: 760px; position: relative; z-index: 1; }
+.upgrade-plan-kicker {
+  align-items: center;
+  color: #bfdbfe;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 950;
+  gap: 8px;
+  letter-spacing: .12em;
+  margin-bottom: 15px;
+}
+.upgrade-plan-kicker i,
+.upgrade-plan-demo-pill i {
+  background: #34d399;
+  border: 3px solid rgba(52, 211, 153, .2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, .12);
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+.upgrade-plan-hero h2 { font-size: clamp(32px, 3vw, 46px); letter-spacing: -.035em; line-height: 1.05; margin: 0 0 16px; }
+.upgrade-plan-hero-copy > p { color: #dbeafe; font-size: 15px; line-height: 1.65; margin: 0; max-width: 680px; }
+.upgrade-plan-trust { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 23px; }
+.upgrade-plan-trust span { color: #e0ecff; font-size: 12px; font-weight: 750; }
+.upgrade-plan-trial-card {
+  align-items: center;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, .11);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 220px;
+  padding: 24px 30px;
+  position: relative;
   text-align: center;
+  z-index: 1;
 }
-.upgrade-plan-days strong { color: var(--primary); font-size: 28px; }
-.upgrade-plan-days span { color: var(--muted); font-size: 12px; font-weight: 800; }
-.upgrade-plan-grid {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.upgrade-plan-trial-card > span { color: #bfdbfe; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.upgrade-plan-trial-number { font-size: 58px; font-weight: 950; letter-spacing: -.06em; line-height: 1; margin: 10px 0 2px; }
+.upgrade-plan-trial-card strong { font-size: 14px; }
+.upgrade-plan-trial-card small { color: #bfdbfe; margin-top: 8px; }
+.upgrade-plan-pricing { margin-top: 26px; }
+.upgrade-plan-pricing-header { align-items: flex-end; display: flex; gap: 20px; justify-content: space-between; margin: 0 2px 20px; }
+.upgrade-plan-pricing-header span { color: var(--primary); font-size: 10px; font-weight: 950; letter-spacing: .12em; }
+.upgrade-plan-pricing-header h3 { font-size: 25px; letter-spacing: -.02em; margin: 5px 0 0; }
+.upgrade-plan-demo-pill {
+  align-items: center;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
+  color: #047857;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 850;
+  gap: 9px;
+  padding: 9px 13px;
 }
+.upgrade-plan-grid { align-items: stretch; display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .upgrade-plan-card {
   background: var(--surface);
   border: 1px solid var(--outline);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
+  border-radius: 19px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .055);
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 24px;
+  min-width: 0;
+  padding: 23px;
+  position: relative;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
-.upgrade-plan-card > header { align-items: flex-start; display: flex; justify-content: space-between; }
-.upgrade-plan-card h3 { font-size: 23px; margin: 4px 0 0; }
-.upgrade-plan-code { color: var(--primary); font-size: 11px; font-weight: 950; letter-spacing: .08em; }
-.upgrade-plan-offer { background: #dcfce7; border-radius: 999px; color: #166534; font-size: 11px; font-weight: 900; padding: 6px 9px; }
-.upgrade-plan-price { align-items: baseline; display: flex; flex-wrap: wrap; gap: 8px; }
-.upgrade-plan-price del { color: var(--muted); font-size: 13px; width: 100%; }
-.upgrade-plan-price strong { color: var(--primary); font-size: 30px; }
-.upgrade-plan-price span { color: var(--muted); font-size: 13px; }
-.upgrade-plan-card ul { display: grid; gap: 8px; margin: 0; padding-left: 20px; }
-.upgrade-plan-card li { color: var(--muted); line-height: 1.4; }
-.upgrade-plan-actions { display: grid; gap: 10px; margin-top: auto; }
-.upgrade-plan-actions form,
-.upgrade-plan-actions button { width: 100%; }
-.upgrade-plan-actions button:disabled { cursor: not-allowed; opacity: .48; }
-.upgrade-plan-unavailable { color: var(--danger); font-weight: 800; text-align: center; }
-.upgrade-plan-security { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 18px 0 0; text-align: center; }
+.upgrade-plan-card:hover { border-color: #9db9f9; box-shadow: 0 18px 38px rgba(15, 23, 42, .1); transform: translateY(-4px); }
+.upgrade-plan-card--featured { border: 2px solid var(--primary); box-shadow: 0 18px 38px rgba(0, 75, 242, .14); padding: 22px; }
+.upgrade-plan-popular {
+  background: var(--primary);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .11em;
+  padding: 7px 12px;
+  position: absolute;
+  right: 18px;
+  top: -13px;
+}
+.upgrade-plan-card-header { align-items: center; display: flex; gap: 12px; }
+.upgrade-plan-card-icon {
+  align-items: center;
+  background: #eaf1ff;
+  border-radius: 12px;
+  color: var(--primary);
+  display: flex;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 950;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+.upgrade-plan-card--pro .upgrade-plan-card-icon { background: var(--primary); color: #fff; }
+.upgrade-plan-card--business .upgrade-plan-card-icon { background: #ede9fe; color: #6d28d9; }
+.upgrade-plan-card--enterprise .upgrade-plan-card-icon { background: #e2e8f0; color: #0f172a; }
+.upgrade-plan-card-header span { color: var(--muted); font-size: 9px; font-weight: 950; letter-spacing: .12em; }
+.upgrade-plan-card-header h3 { font-size: 20px; margin: 2px 0 0; }
+.upgrade-plan-price { margin-top: 22px; }
+.upgrade-plan-price del { color: var(--muted); display: block; font-size: 11px; margin-bottom: 3px; }
+.upgrade-plan-price > div { align-items: baseline; display: flex; gap: 6px; white-space: nowrap; }
+.upgrade-plan-price strong { color: var(--text); font-size: clamp(24px, 2vw, 31px); letter-spacing: -.035em; }
+.upgrade-plan-price span { color: var(--muted); font-size: 11px; }
+.upgrade-plan-price small { color: var(--muted); display: block; font-size: 10px; margin-top: 5px; }
+.upgrade-plan-offer { align-self: flex-start; background: #dcfce7; border-radius: 999px; color: #166534; font-size: 10px; font-weight: 900; margin-top: 10px; padding: 6px 9px; }
+.upgrade-plan-divider { background: var(--outline); height: 1px; margin: 20px 0 17px; }
+.upgrade-plan-includes { font-size: 11px; margin-bottom: 12px; }
+.upgrade-plan-features { display: grid; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.upgrade-plan-features li { color: var(--muted); font-size: 11px; line-height: 1.4; padding-left: 21px; position: relative; }
+.upgrade-plan-features li::before {
+  align-items: center;
+  background: #eaf1ff;
+  border-radius: 50%;
+  color: var(--primary);
+  content: "✓";
+  display: flex;
+  font-size: 9px;
+  font-weight: 950;
+  height: 15px;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 15px;
+}
+.upgrade-plan-actions { display: grid; gap: 9px; margin-top: auto; padding-top: 24px; }
+.upgrade-plan-actions form { margin: 0; width: 100%; }
+.upgrade-plan-button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  font-size: 11px;
+  font-weight: 900;
+  justify-content: center;
+  min-height: 43px;
+  padding: 10px 13px;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  width: 100%;
+}
+.upgrade-plan-button span { font-size: 16px; margin-left: 8px; }
+.upgrade-plan-button--primary { background: var(--primary); color: #fff; }
+.upgrade-plan-button--primary:hover { background: #003fd0; transform: translateY(-1px); }
+.upgrade-plan-button--secondary { background: #f4f7fc; border-color: #e1e8f5; color: #19304f; }
+.upgrade-plan-button--secondary:hover { background: #eaf1ff; border-color: #b9cdf8; }
+.upgrade-plan-button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
+.upgrade-plan-unavailable { color: var(--danger); font-size: 10px; font-weight: 800; margin-top: 10px; text-align: center; }
+.upgrade-plan-security {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 16px;
+  display: flex;
+  gap: 13px;
+  margin: 22px 0 0;
+  padding: 15px 18px;
+  text-align: left;
+}
+.upgrade-plan-security-icon {
+  align-items: center;
+  background: #dcfce7;
+  border-radius: 50%;
+  color: #047857;
+  display: flex;
+  flex-shrink: 0;
+  font-weight: 950;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+.upgrade-plan-security strong { font-size: 12px; }
+.upgrade-plan-security p { color: var(--muted); font-size: 11px; line-height: 1.45; margin: 2px 0 0; }
 
 .simulated-checkout-shell { margin: 0 auto; max-width: 1040px; }
 .simulated-checkout-back { color: var(--primary); display: inline-flex; font-weight: 850; margin-bottom: 18px; text-decoration: none; }
@@ -4150,6 +4315,7 @@ body[data-theme="dark"] .subscription-plan-grid article {
 }
 
 @media (max-width: 1200px) {
+  .upgrade-plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .modal-card.invoice-modal .empresa-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4170,6 +4336,9 @@ body[data-theme="dark"] .subscription-plan-grid article {
   .sidebar { min-height: auto; position: static; width: 100%; }
   .workspace { margin-left: 0; width: 100%; }
   .content { padding: 24px; }
+  .upgrade-plan-hero { align-items: stretch; flex-direction: column; padding: 30px; }
+  .upgrade-plan-trial-card { min-width: 0; }
+  .upgrade-plan-pricing-header { align-items: flex-start; flex-direction: column; }
   .trial-upgrade-banner { align-items: flex-start; flex-direction: column; padding: 14px 20px; }
   .trial-upgrade-action { text-align: center; width: 100%; }
   .demo-session-banner { align-items: flex-start; flex-direction: column; }
@@ -4250,4 +4419,13 @@ body[data-theme="dark"] .subscription-plan-grid article {
   .calendar-grid { grid-template-columns: 1fr; }
   .calendar-weekday, .calendar-day--empty { display: none; }
   .calendar-day { min-height: auto; }
+}
+
+@media (max-width: 560px) {
+  .upgrade-plan-hero { border-radius: 18px; padding: 25px 21px; }
+  .upgrade-plan-hero h2 { font-size: 31px; }
+  .upgrade-plan-trust { align-items: flex-start; flex-direction: column; }
+  .upgrade-plan-card { padding: 20px; }
+  .upgrade-plan-card--featured { padding: 19px; }
+  .upgrade-plan-security { align-items: flex-start; }
 }
