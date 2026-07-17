@@ -8,7 +8,7 @@ La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/inde
 
 El CRM se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
 
-Estado verificado el 17/07/2026: **58 tests y 278 aserciones** de PHPUnit, además de PHPStan sin errores.
+Estado verificado el 17/07/2026: **60 tests y 291 aserciones** de PHPUnit, además de PHPStan sin errores.
 
 ## Requisitos
 

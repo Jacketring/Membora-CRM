@@ -32,7 +32,9 @@ Este bloqueo no sustituye a una pasarela de pago real. Es una base funcional par
 
 ### Planes SaaS
 
-Los planes comerciales se gestionan desde `Admin CRM > Planes` y se sincronizan con la web publica. El catalogo permite mantener precios, limites y prestaciones desde el panel de administracion sin editar la web estatica manualmente.
+Los planes comerciales se gestionan desde `Admin CRM > Planes` y `saas_plans` actua como fuente de ejecucion para panel, API, landing y checkout. El catalogo se unifico en Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR mensuales sin IVA, con limites y prestaciones visibles.
+
+La landing consulta el proxy y `/app/api/plans`; solo si fallan ambos usa un fallback equivalente. Las tarjetas estaticas antiguas, los precios de mockups y el `AggregateOffer` incoherente se retiraron. El marcado `schema.org` se construye con los planes realmente mostrados.
 
 ## 3. Facturacion SaaS de Membora
 
@@ -105,6 +107,8 @@ Posteriormente se incorporo un checkout visible con un alcance distinto: las emp
 
 Para la demostracion final se incorporo un proveedor `simulated` separado del flujo Stripe. Presenta un checkout propio con una unica tarjeta ficticia admitida, no contacta con bancos, censura todos los campos `card_*` y crea pago/factura con marcas explicitas de simulacion. Stripe se conserva seleccionable mediante `CHECKOUT_PROVIDER=stripe`.
 
+El recorrido se amplio despues a clientes activos: Basic, Pro y Business ven el aviso de mejora; la pantalla marca `PLAN ACTUAL` y solo habilita rangos superiores. La misma regla se valida al abrir y completar el checkout simulado, por lo que un POST manipulado no permite repetir plan ni hacer downgrade. Enterprise no recibe el aviso. Stripe Checkout continua limitado al alta desde `TRIAL` para evitar una segunda suscripcion en lugar de una actualizacion controlada.
+
 ## 6. Alta self-service y limpieza de pruebas
 
 La activacion por correo se completo como un flujo de dos mensajes:
@@ -174,6 +178,14 @@ Esta parte pertenece al gimnasio. No debe confundirse con las facturas SaaS que 
 
 Referencias recientes en Git:
 
+- `3b90f12` - Marcar el plan actual y permitir solo ascensos en el checkout simulado.
+- `c233f87` - Mostrar la llamada de mejora a clientes Basic, Pro y Business.
+- `31e83e2` - Unificar catalogo, API, landing, schema, IVA y datos fiscales de ejemplo.
+- `21072bb` - Redisenar la pantalla de seleccion de planes.
+- `e848e63` - Incorporar el checkout interno estrictamente simulado.
+- `b98c1e8` - Admitir Price IDs y Product IDs de Stripe Test.
+- `dbb1f11` - Crear el recorrido `Mejorar el plan` para empresas `TRIAL`.
+- `2a76cd0` - Retirar materiales antiguos de presentacion del repositorio.
 - `e917f34` - Reordenar la gestion visible de renovacion y retirar controles Stripe del modal.
 - `f98263e` - Diferenciar cancelacion de renovacion y retirar diagnostico Stripe de Facturas.
 - `aa3d490` - Reparar contactos ausentes a partir de empresas existentes.

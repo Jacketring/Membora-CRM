@@ -67,7 +67,7 @@ Después de superar estas comprobaciones, el incremento puede desplegarse en Ple
 | Pruebas | `apps/crm/tests/`, `e2e/`, `docs/05-pruebas.md` |
 | Integración continua | `.github/workflows/ci.yml` |
 | Incidencias y aprendizaje | `docs/10-incidencias-y-soluciones.md` |
-| Despliegue y defensa | `README.md`, `docs/entrega/` |
+| Despliegue y defensa | `README.md`, `docs/00-checklist-entrega-tfm.md` |
 
 ## 4. Criterio de finalización de un incremento
 
@@ -84,7 +84,7 @@ Un cambio se considera terminado cuando, de forma proporcional a su alcance:
 
 ## 5. Estado verificable de calidad
 
-La ejecución local repetida el 17/07/2026 completó **58 tests y 278 aserciones** sin errores. PHPStan también finalizó sin errores.
+La ejecución local repetida el 17/07/2026 completó **60 tests y 291 aserciones** sin errores. PHPStan también finalizó sin errores.
 
 La última medición de cobertura guardada corresponde al 11/07/2026: **93,50 % de líneas (604/646)** en la capa lógica configurada. Esta cifra es una evidencia histórica y no debe confundirse con una medición de todo el producto ni con el número actual de pruebas. El pipeline exige al menos un 80 % de cobertura de sentencias sobre la capa incluida en su filtro.
 

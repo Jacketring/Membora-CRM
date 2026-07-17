@@ -117,9 +117,9 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 `POST /stripe/webhook` funciona cuando `PAYMENTS_MODE=stripe_test`, verifica la firma, registra `stripe_events` para idempotencia y sincroniza suscripciones, cobros y facturas. El checkout no activa el acceso por la URL de retorno: espera la confirmacion firmada del webhook.
 
-`POST action=create_tenant_stripe_checkout` acepta `plan_code` y `renewal_period`, pero obtiene la empresa exclusivamente desde el `tenant_id` de la sesion. Solo admite planes activos distintos de `TRIAL` y Price IDs configurados. Guarda la eleccion como pendiente, envia al administrador del gimnasio a Stripe Checkout y requiere `STRIPE_WEBHOOK_SECRET`. `invoice.paid` activa el plan, actualiza el acceso y crea pago y factura; Membora no recibe ni almacena los datos de tarjeta.
+`POST action=create_tenant_stripe_checkout` acepta `plan_code` y `renewal_period`, pero obtiene la empresa exclusivamente desde el `tenant_id` de la sesion. Solo se ofrece desde una empresa `TRIAL`, admite planes activos de pago y Price IDs configurados. Guarda la eleccion como pendiente, envia al administrador del gimnasio a Stripe Checkout y requiere `STRIPE_WEBHOOK_SECRET`. `invoice.paid` activa el plan, actualiza el acceso y crea pago y factura; Membora no recibe ni almacena los datos de tarjeta.
 
-`POST action=open_tenant_simulated_checkout` prepara la pantalla interna y `POST action=complete_tenant_simulated_checkout` valida exclusivamente la tarjeta ficticia documentada. La empresa siempre se obtiene de la sesion; el servidor recalcula plan, importe y periodo y crea pago, justificante y acceso dentro de una transaccion. Los campos `card_*` se descartan y se censuran en auditoria.
+`POST action=open_tenant_simulated_checkout` prepara la pantalla interna y `POST action=complete_tenant_simulated_checkout` valida exclusivamente la tarjeta ficticia documentada. La empresa siempre se obtiene de la sesion; el servidor recalcula plan, importe y periodo, exige que el destino sea superior al plan actual y crea pago, justificante y acceso dentro de una transaccion. La jerarquia es `TRIAL < BASIC < PRO < BUSINESS < ENTERPRISE`; los campos `card_*` se descartan y se censuran en auditoria.
 
 ## 6. Seguridad de backend
 

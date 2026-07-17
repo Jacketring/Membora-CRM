@@ -6,7 +6,7 @@ Este plan corresponde a la fase de verificación de la metodología incremental 
 
 ## Automatización
 
-La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, checkout simulado, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 17 de julio de 2026 completa **58 tests y 278 aserciones** sin errores.
+La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, catálogo y jerarquía de planes, webhook, checkout simulado, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 17 de julio de 2026 completa **60 tests y 291 aserciones** sin errores.
 
 El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %. Esta cobertura es la última medición guardada y debe tratarse como evidencia histórica de esa capa, no como cobertura actual de todo el producto.
 
@@ -22,7 +22,7 @@ Playwright valida login correcto e incorrecto, bloqueo de rutas de plataforma pa
 | Perfil y novedades | RF-23 | HU-25 | PF-09 |
 | Plataforma SaaS | RF-16, RF-17 y RF-19 | HU-26 a HU-28, HU-30 | PA-01 a PA-07 y PA-10 |
 | Trial y planes publicos | RF-18 y RF-24 | HU-22 y HU-31 | PD-05 y PA-08 |
-| Stripe Test | RF-20 | HU-29 | PA-09 y `docs/16-stripe-billing-saas.md` |
+| Stripe Test | RF-20 | HU-29 y HU-33 | PA-09, PA-09B y `docs/16-stripe-billing-saas.md` |
 | Demo y despliegue | RNF-05, RNF-06 | HU-21 | PD-01 a PD-04 |
 
 ## 1. Objetivo
@@ -483,14 +483,16 @@ Resultado esperado:
 
 Pasos:
 
-1. Crear o editar un plan activo.
+1. Revisar Basic, Pro, Business y Enterprise en `Admin CRM > Planes`.
 2. Consultar `/app/api/plans` y el proxy `/api/plans.php`.
-3. Desactivar el plan y repetir la consulta.
+3. Bloquear temporalmente ambas rutas en un entorno local y comprobar el fallback de la landing.
 
 Resultado esperado:
 
-- Solo se publican planes activos y datos comerciales permitidos.
-- La moneda y los importes coinciden con el panel.
+- Se publican exactamente los cuatro planes comerciales, sin incluir `TRIAL` ni planes auxiliares.
+- Nombres, precios, limites y prestaciones coinciden con `saas_plans`: 49, 89, 149 y 299 EUR/mes sin IVA.
+- Cada tarjeta muestra usuarios, socios, prestaciones y CTA; `schema.org` usa los mismos planes mostrados.
+- El fallback solo aparece cuando fallan proxy y endpoint directo y conserva el mismo catalogo.
 
 ### PA-09 Stripe Billing de prueba
 
@@ -525,6 +527,8 @@ Pasos:
 2. Confirmar que el checkout se muestra dentro de Membora y advierte que no acepta tarjetas reales.
 3. Completarlo con `4242 4242 4242 4242`, una fecha futura y un CVC ficticio de tres cifras.
 4. Revisar Pagos y Facturas en el panel del superadministrador.
+5. Repetir desde una empresa Basic: confirmar la etiqueta `PLAN ACTUAL`, comprobar que Basic queda bloqueado y mejorar a Pro, Business o Enterprise.
+6. Repetir desde Pro y Business y comprobar que solo se habilitan niveles superiores; manipular un POST con el mismo plan o uno inferior.
 
 Resultado esperado:
 
@@ -532,6 +536,7 @@ Resultado esperado:
 - Los campos de tarjeta no se persisten y aparecen censurados en cualquier metadato de auditoria.
 - La empresa queda activa con el plan elegido y el acceso mensual o anual calculado.
 - Se crean un pago y un justificante con metodo `SIMULATED` y textos que indican que no acreditan un cargo real.
+- La jerarquia se valida tanto en la vista como al abrir y completar el checkout: no se admiten repeticiones, descensos ni codigos desconocidos.
 
 ### PA-10 Web, correo y captacion
 

@@ -228,6 +228,8 @@ El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el re
 - Debe permitir cancelar al final del periodo y consultar el estado sincronizado de la suscripcion.
 - Stripe Live queda pendiente de configuracion bancaria, fiscal y comercial.
 - Una empresa `TRIAL` debe ver los dias restantes y poder elegir un plan de pago desde su propio CRM.
+- Las empresas `BASIC`, `PRO` y `BUSINESS` deben ver una llamada de mejora; la pantalla debe marcar su plan actual y habilitar unicamente planes de rango superior.
+- El backend debe rechazar la seleccion del mismo plan, los descensos y codigos fuera del catalogo, aunque se manipule el formulario.
 - Solo el administrador del gimnasio puede iniciar Checkout; los demas roles pueden consultar los planes.
 - En modo simulado solo se admite la tarjeta ficticia documentada; sus campos se descartan y censuran en auditoria, sin contactar con Stripe ni bancos.
 - El pago simulado crea pago y justificante administrativo diferenciados y activa el acceso en una unica transaccion. Con el proveedor Stripe, el plan permanece pendiente hasta `invoice.paid`.
@@ -252,6 +254,10 @@ Los usuarios autenticados deben poder actualizar su perfil, imagen y preferencia
 ### RF-24 Planes publicos
 
 La web comercial debe poder consultar mediante un endpoint de solo lectura los planes SaaS activos, su precio y prestaciones sin acceder al panel administrativo.
+
+- El catalogo publico debe contener Basic, Pro, Business y Enterprise con los mismos precios, limites y prestaciones que `saas_plans`.
+- La landing debe consultar primero la API y utilizar un fallback equivalente solo cuando fallen el proxy y el endpoint directo.
+- Los precios deben indicarse sin IVA y el marcado `schema.org` debe generarse a partir del catalogo mostrado.
 
 ## 3. Requisitos no funcionales
 

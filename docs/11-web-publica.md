@@ -17,6 +17,12 @@ httpdocs
 
 No necesita Node.js, npm ni build.
 
+## Planes comerciales
+
+La landing no mantiene un catalogo independiente. Consulta primero `api/plans.php`, proxy de `/app/api/plans`, y si ese proxy falla prueba la ruta directa del CRM. Solo cuando fallan ambas utiliza el fallback incluido en `assets/site.js`.
+
+El catalogo visible contiene Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR al mes, siempre con el texto `Precios sin IVA.`, limites de usuarios y socios y prestaciones. Basic, Pro y Business enlazan a la prueba gratuita; Enterprise usa el CTA `Contactar`. Los datos estructurados `schema.org` se generan en el navegador a partir de los mismos planes que se muestran. Los importes ilustrativos de membresias de gimnasio se retiraron de los mockups para no confundirlos con precios SaaS.
+
 ## Demo temporal
 
 La web no mantiene una demo estatica separada. Los enlaces de demo envian al CRM real y abren una sesion temporal con datos de prueba:

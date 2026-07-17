@@ -58,7 +58,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Plan de prueba configurable por dias, sin proximo pago visible solo cuando el plan seleccionado es `Prueba`.
 - Gestion central de suscripcion SaaS por empresa cliente: fecha de alta, fecha desde la que paga, fecha de acceso hasta, plan, periodicidad mensual/anual, estado de renovacion, cancelacion al final del periodo y reactivacion.
 - Bloqueo visual del CRM cliente cuando la demo o el acceso contratado han caducado, con modal para elegir plan y continuar el proceso de contratacion.
-- Planes comerciales SaaS con precio mensual, alta, rebajas y sincronizacion publica con la web comercial.
+- Catalogo SaaS canonico con Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR mensuales sin IVA; incluye limites de usuarios/socios, prestaciones y sincronizacion con panel, API, landing y checkout.
 - Pagos SaaS por empresa.
 - Facturas SaaS emitidas por Membora a empresas cliente, con borradores, emision, serie/numero correlativo por empresa, datos historicos de emisor/cliente, lineas, descuentos, IVA desglosado, pagos parciales, estado de cobro y vista imprimible/PDF.
 - Base funcional para checkout y cobros SaaS: la demo pide pocos datos y la contratacion debe completar datos fiscales, plan y forma de pago antes de activar el acceso.
@@ -169,7 +169,7 @@ Para los pagos de Membora se usa Stripe como proveedor principal. El MVP incluye
 
 El backend conserva las acciones de checkout y cancelacion Stripe para validacion tecnica, pero esos controles y el bloque de diagnostico no se muestran en las pantallas actuales de empresas o facturas. En la demo visible, el ciclo de vida se gestiona con el estado local de renovacion; Stripe debe presentarse como integracion tecnica en modo de prueba, no como cobro comercial activo.
 
-Las empresas en prueba disponen de un recorrido visible independiente: un banner muestra los dias restantes y `Mejorar el plan` presenta exclusivamente planes de pago. Para la demostracion, el administrador completa un checkout interno con valores de tarjeta exclusivamente ficticios; no se contacta con bancos y el pago/factura quedan marcados como simulados. El proveedor alternativo Stripe conserva la activacion exclusiva mediante `invoice.paid`.
+Las empresas en prueba disponen de un banner con los dias restantes y las empresas Basic, Pro o Business conservan una llamada visible a `Mejorar el plan`. La pantalla identifica el plan actual y solo habilita niveles superiores; no permite contratar de nuevo el mismo plan ni bajar de nivel. Para la demostracion, el administrador completa un checkout interno con valores de tarjeta exclusivamente ficticios; no se contacta con bancos y el pago/factura quedan marcados como simulados. El proveedor alternativo Stripe conserva la activacion exclusiva mediante `invoice.paid` y, para evitar suscripciones duplicadas, el ascenso directo de clientes ya pagados queda limitado al proveedor simulado.
 
 Cuando Jose cree la cuenta de Stripe, debera configurar:
 

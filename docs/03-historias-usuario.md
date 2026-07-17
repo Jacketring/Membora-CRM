@@ -304,6 +304,17 @@ Criterios de aceptacion:
 - El contexto de soporte muestra un banner y fija el tenant objetivo.
 - Salir restaura el contexto de plataforma sin mezclar datos.
 
+### HU-33 Mejorar el plan contratado
+
+Como administrador de gimnasio con un plan de pago, quiero identificar mi plan actual y comparar niveles superiores para ampliar capacidad sin seleccionar por error el mismo plan o uno inferior.
+
+Criterios de aceptacion:
+
+- La tarjeta contratada se distingue con la etiqueta `PLAN ACTUAL`.
+- Basic solo puede subir a Pro, Business o Enterprise; Pro a Business o Enterprise; y Business a Enterprise.
+- Enterprise no recibe una llamada de mejora porque ya es el nivel maximo.
+- El servidor vuelve a validar la jerarquia antes de abrir o completar el checkout simulado.
+
 ## 10. Web comercial e integraciones
 
 ### HU-31 Consultar planes publicos

@@ -77,26 +77,17 @@ Recorrido recomendado:
 15. Login como administrador de plataforma.
 16. Panel `Admin CRM`: contactos, empresas, renovaciones, facturas, planes, auditoria y acceso de soporte. No abrir la herramienta oculta de correo salvo que sea necesario diagnosticar SMTP.
 17. Web publica: formulario, opiniones y enlaces legales.
-18. Mostrar, si Stripe Test esta configurado, el banner de dias restantes y `Mejorar el plan`; explicar que Checkout es de prueba y que Stripe Live todavia no esta activo.
+18. Mostrar el plan actual y `Mejorar el plan`: desde `TRIAL` se elige un plan y desde Basic, Pro o Business solo se permiten ascensos simulados; explicar que Stripe Live todavia no esta activo.
 
 ## 5. Slides
 
-Estado:
+Los materiales antiguos de presentacion se retiraron del repositorio porque describian carpetas y pantallas anteriores. No existe actualmente un PPTX canonico dentro del proyecto.
 
-- [x] Crear presentacion del proyecto.
-- [x] Adjuntar el documento al codigo.
-- [x] Anadir referencia de slides al README.
-- [ ] Alinear el PPTX incluido con el guion final de 11 diapositivas; el archivo actual conserva 10 diapositivas de una version anterior.
-- [ ] Corregir en la diapositiva de arquitectura `web-app/public` y `php-app/public` por `httpdocs`, `apps/crm` y el puente publico `httpdocs/app`.
-- [ ] Sustituir en la diapositiva de demo `Admin CRM: web` por `Admin CRM: contactos, empresas, facturas, auditoria y soporte`.
-- [ ] Quitar de la diapositiva final que las slides siguen pendientes; a fecha de entrega solo quedan la validacion final y el video.
-- [ ] Publicar URL de acceso publico si la entrega lo exige.
+Pendiente fuera del repositorio:
 
-Archivo:
-
-```text
-docs/entrega/membora-crm-tfm-presentacion.pptx
-```
+- [ ] Preparar una presentacion nueva a partir de la arquitectura y funcionalidades vigentes.
+- [ ] Revisar que la demo incluya planes canonicos, checkout simulado y mejora sin downgrade.
+- [ ] Publicar la URL de las slides si la entrega lo exige.
 
 Contenido recomendado:
 
@@ -155,7 +146,6 @@ Guion recomendado:
 ## 8. Riesgos pendientes
 
 - Hay que validar credenciales y URL final antes de grabar el video.
-- Hay que revisar que el README final incluya slides, video, nombre y email del alumno.
-- El PPTX incluido es anterior al guion final: contiene 10 diapositivas y conserva referencias a carpetas antiguas. Debe corregirse antes de usarlo en la grabacion.
+- Hay que revisar que el README final incluya video, nombre y email del alumno y, si se prepara una nueva presentacion externa, su enlace.
 - Hay que hacer una solicitud real de prueba con un correo controlado antes de grabar si ese flujo va a mostrarse; no revelar la contrasena recibida en la grabacion.
 - La ruta interna `platform-web` y los detalles SMTP/Stripe deben permanecer fuera del video salvo una explicacion tecnica sin secretos.

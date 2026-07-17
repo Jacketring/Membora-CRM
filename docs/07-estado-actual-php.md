@@ -30,7 +30,7 @@ El desarrollo sigue el proceso incremental documentado en `docs/19-metodologia-d
 
 Estado verificado el 17/07/2026:
 
-- PHPUnit: **58 tests y 278 aserciones**, sin errores.
+- PHPUnit: **60 tests y 291 aserciones**, sin errores.
 - PHPStan: sin errores.
 - GitHub Actions: sintaxis PHP, PHPUnit, umbral de cobertura y PHPStan; E2E condicionado a un staging configurado.
 
@@ -189,16 +189,16 @@ Estado verificado el 17/07/2026:
 - Estado de pago: al dia, pendiente, vencido o prueba.
 - Precio mensual y proximo pago para planes de pago.
 - Plan de prueba configurable por dias. Solo cuando el plan seleccionado es `Prueba`, se oculta el proximo pago, se muestra la duracion de prueba y no se ofrece renovacion.
-- Banner superior para cuentas `TRIAL` con fecha de caducidad, dias restantes y boton `Mejorar el plan`.
-- Catalogo exclusivo de planes de pago dentro del CRM del gimnasio. Los roles del tenant pueden consultarlo y solo el administrador inicia el checkout configurado: simulador interno o Stripe.
+- Banner superior para cuentas `TRIAL` con dias restantes y para clientes Basic, Pro o Business con una llamada a `Mejorar el plan`; Enterprise queda excluido del upselling.
+- Catalogo exclusivo de planes de pago dentro del CRM del gimnasio. La tarjeta contratada se marca como `PLAN ACTUAL`; solo los niveles superiores quedan disponibles y el backend rechaza repeticiones o descensos.
 - MRR estimado.
 - Tabla `empresa_payments` para cobros SaaS por empresa.
 - Registro y edicion de pagos con concepto, importe, vencimiento, fecha de pago, estado y notas.
 - Facturas SaaS y facturas manuales para clientes, con lineas, impuestos, emision, vista imprimible y pagos parciales o totales.
 - Usuarios de plataforma gestionados en una ruta exclusiva para administradores globales.
 - Tabla `saas_plans` para catalogo comercial.
-- Gestion de planes con precio mensual, setup, limites de usuarios/socios, estado y prestaciones.
-- Endpoint publico de planes activos consumido por la web comercial.
+- Gestion de los planes canonicos Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR, con precio mensual sin IVA, setup, limites de usuarios/socios, estado y prestaciones.
+- Endpoint publico de cuatro planes consumido por la web comercial; la landing usa fallback equivalente solo si fallan el proxy y la ruta directa y actualiza `schema.org` desde el catalogo mostrado.
 - Web comercial externa en `httpdocs`.
 - Web comercial con enlaces a aviso legal, privacidad y cookies.
 - El alta self-service verificada crea automaticamente un contacto `Cliente CRM`, su empresa `TRIAL` de 14 dias, el tenant y un usuario `GYM_ADMIN` activo y vinculado al mismo `tenant_id`.
@@ -211,8 +211,8 @@ Estado verificado el 17/07/2026:
 - Banner de modo soporte y retorno al panel de administracion.
 - Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
 - Stripe Billing funcional en modo `stripe_test`: checkout alojado, webhook firmado, idempotencia, suscripciones, cancelacion al final del periodo y sincronizacion de cobros y facturas.
-- Los controles tecnicos de checkout/cancelacion Stripe y el bloque de diagnostico se mantienen fuera de empresas y facturas. El checkout visible se limita al flujo seguro `Mejorar el plan` de empresas en prueba.
-- En modo simulado se crean inmediatamente un pago y justificante diferenciados y se activa el plan; en modo Stripe el plan no se activa hasta `invoice.paid`.
+- Los controles tecnicos de checkout/cancelacion Stripe y el bloque de diagnostico se mantienen fuera de empresas y facturas. Stripe Checkout visible conserva el alta desde `TRIAL`; los ascensos de clientes pagados se realizan solo con el proveedor simulado para no crear suscripciones Stripe duplicadas.
+- En modo simulado se crean inmediatamente un pago y justificante diferenciados y se activa el plan, tanto desde `TRIAL` como al subir de Basic, Pro o Business; en modo Stripe el plan no se activa hasta `invoice.paid`.
 
 ## 5. Pendiente para operacion real
 

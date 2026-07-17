@@ -105,7 +105,17 @@ El webhook verifica obligatoriamente la cabecera `Stripe-Signature`.
 
 ### Checkout interno de demostracion
 
-Con `PAYMENTS_MODE=stripe_test` y `CHECKOUT_PROVIDER=simulated`, el administrador de una empresa en prueba puede completar el pago dentro de Membora con la tarjeta ficticia `4242 4242 4242 4242`, una caducidad futura y cualquier CVC ficticio de tres cifras. El flujo no llama a Stripe, no contacta con bancos y descarta los campos de tarjeta inmediatamente; tambien los censura en auditoria. Al confirmar, crea transaccionalmente un pago y un justificante con metodo `SIMULATED`, activa el plan y actualiza el acceso mensual o anual. Estos registros son exclusivamente demostrativos y no acreditan un cobro real.
+Con `PAYMENTS_MODE=stripe_test` y `CHECKOUT_PROVIDER=simulated`, el administrador de una empresa `TRIAL`, Basic, Pro o Business puede completar el pago dentro de Membora con la tarjeta ficticia `4242 4242 4242 4242`, una caducidad futura y cualquier CVC ficticio de tres cifras. El flujo no llama a Stripe, no contacta con bancos y descarta los campos de tarjeta inmediatamente; tambien los censura en auditoria. Al confirmar, crea transaccionalmente un pago y un justificante con metodo `SIMULATED`, activa el plan y actualiza el acceso mensual o anual. Estos registros son exclusivamente demostrativos y no acreditan un cobro real.
+
+La pantalla marca el plan contratado como `PLAN ACTUAL`. La jerarquia permitida es:
+
+- `TRIAL` puede elegir cualquier plan de pago.
+- Basic puede subir a Pro, Business o Enterprise.
+- Pro puede subir a Business o Enterprise.
+- Business solo puede subir a Enterprise.
+- Enterprise no puede mejorar porque es el nivel maximo.
+
+La vista, la accion que abre el checkout y el servicio que lo completa validan esta jerarquia. Stripe Checkout alojado permanece limitado al alta desde `TRIAL`: actualizar una suscripcion Stripe existente requiere un flujo especifico de cambio de Price y prorrateo, y no se simula creando una segunda suscripcion.
 
 ### Stripe Checkout
 
@@ -129,7 +139,7 @@ La integracion de backend se conserva, pero la interfaz entregable no muestra ac
 
 La gestion visible usa el bloque `Gestion de renovacion` y los estados locales. Esta decision evita mezclar controles tecnicos de prueba con la administracion diaria y no elimina `StripeBilling.php`, las acciones internas ni `/stripe/webhook`.
 
-Esta ocultacion se refiere al panel del superadministrador. La pantalla `Mejorar el plan` del tenant muestra el checkout necesario para convertir una prueba en suscripcion pagada, sin mostrar IDs, secretos ni diagnosticos Stripe.
+Esta ocultacion se refiere al panel del superadministrador. La pantalla `Mejorar el plan` del tenant permite convertir una prueba en suscripcion pagada y, con el proveedor simulado, subir desde Basic, Pro o Business. No muestra IDs, secretos ni diagnosticos Stripe.
 
 ## 8. Migracion
 
