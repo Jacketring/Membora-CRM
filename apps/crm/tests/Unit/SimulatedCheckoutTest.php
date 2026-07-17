@@ -36,7 +36,42 @@ final class SimulatedCheckoutTest extends TestCase
         require dirname(__DIR__, 2) . '/src/Views/upgrade-plan.php';
         $plansHtml = (string) ob_get_clean();
         self::assertStringContainsString('open_tenant_simulated_checkout', $plansHtml);
-        self::assertStringContainsString('Probar pago anual', $plansHtml);
+        self::assertStringContainsString('Mejorar con pago anual', $plansHtml);
+    }
+
+    public function testPaidClientSeesCurrentPlanAndCanOnlyUpgrade(): void
+    {
+        self::assertTrue(PlatformPlanRepository::canUpgrade('BASIC', 'PRO'));
+        self::assertTrue(PlatformPlanRepository::canUpgrade('BASIC', 'ENTERPRISE'));
+        self::assertFalse(PlatformPlanRepository::canUpgrade('BASIC', 'BASIC'));
+        self::assertFalse(PlatformPlanRepository::canUpgrade('PRO', 'BASIC'));
+        self::assertFalse(PlatformPlanRepository::canUpgrade('ENTERPRISE', 'ENTERPRISE'));
+
+        $empresa = ['name' => 'Gimnasio Demo', 'plan' => 'BASIC', 'status' => 'ACTIVE'];
+        $accessState = ['remaining_days' => 0];
+        $simulatedCheckout = true;
+        $stripeReady = false;
+        $canPurchase = true;
+        $plans = [
+            [
+                'code' => 'BASIC', 'name' => 'Basic', 'monthly_price' => '49.00', 'original_monthly_price' => null,
+                'discount_label' => null, 'features' => [], 'max_users' => 3, 'max_members' => 300,
+                'stripe_monthly_available' => false, 'stripe_annual_available' => false,
+            ],
+            [
+                'code' => 'PRO', 'name' => 'Pro', 'monthly_price' => '89.00', 'original_monthly_price' => null,
+                'discount_label' => null, 'features' => [], 'max_users' => 8, 'max_members' => 1000,
+                'stripe_monthly_available' => false, 'stripe_annual_available' => false,
+            ],
+        ];
+
+        ob_start();
+        require dirname(__DIR__, 2) . '/src/Views/upgrade-plan.php';
+        $plansHtml = (string) ob_get_clean();
+
+        self::assertStringContainsString('PLAN ACTUAL', $plansHtml);
+        self::assertStringContainsString('Tu plan actual es BASIC', $plansHtml);
+        self::assertStringContainsString('Mejorar con pago mensual', $plansHtml);
     }
 
     public function testRejectsARealOrUnknownCardNumber(): void

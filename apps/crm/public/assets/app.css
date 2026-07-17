@@ -1027,6 +1027,7 @@ a.global-search-result:hover {
 }
 .upgrade-plan-card:hover { border-color: #9db9f9; box-shadow: 0 18px 38px rgba(15, 23, 42, .1); transform: translateY(-4px); }
 .upgrade-plan-card--featured { border: 2px solid var(--primary); box-shadow: 0 18px 38px rgba(0, 75, 242, .14); padding: 22px; }
+.upgrade-plan-card--current { border: 2px solid #10b981; box-shadow: 0 18px 38px rgba(16, 185, 129, .13); padding: 22px; }
 .upgrade-plan-popular {
   background: var(--primary);
   border-radius: 999px;
@@ -1039,6 +1040,7 @@ a.global-search-result:hover {
   right: 18px;
   top: -13px;
 }
+.upgrade-plan-current-badge { background: #059669; }
 .upgrade-plan-card-header { align-items: center; display: flex; gap: 12px; }
 .upgrade-plan-card-icon {
   align-items: center;

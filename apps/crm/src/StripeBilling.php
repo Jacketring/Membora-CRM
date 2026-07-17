@@ -851,15 +851,13 @@ final class SimulatedCheckoutService
             throw new RuntimeException('No se encontro la empresa vinculada al pago.');
         }
 
-        $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
-        if (!$isTrial) {
-            throw new RuntimeException('Este checkout de prueba solo esta disponible para empresas en demo.');
-        }
-
         $planCode = strtoupper(trim($planCode));
         $plan = StripeBillingRepository::planByCode($planCode);
         if (!$plan || $planCode === 'TRIAL' || (string) ($plan['status'] ?? '') !== 'ACTIVE') {
             throw new RuntimeException('Selecciona un plan de pago activo.');
+        }
+        if (!PlatformPlanRepository::canUpgrade((string) ($empresa['plan'] ?? ''), $planCode)) {
+            throw new RuntimeException('Selecciona un plan superior al que tienes actualmente.');
         }
 
         $period = strtoupper(trim($period));

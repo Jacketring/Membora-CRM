@@ -4,6 +4,22 @@ declare(strict_types=1);
 
 final class PlatformPlanRepository
 {
+    private const PLAN_RANKS = [
+        'TRIAL' => 0,
+        'BASIC' => 1,
+        'PRO' => 2,
+        'BUSINESS' => 3,
+        'ENTERPRISE' => 4,
+    ];
+
+    public static function canUpgrade(string $currentPlanCode, string $targetPlanCode): bool
+    {
+        $currentRank = self::PLAN_RANKS[strtoupper(trim($currentPlanCode))] ?? null;
+        $targetRank = self::PLAN_RANKS[strtoupper(trim($targetPlanCode))] ?? null;
+
+        return $currentRank !== null && $targetRank !== null && $targetRank > $currentRank;
+    }
+
     public static function ensureTable(): void
     {
         Database::connection()->exec(

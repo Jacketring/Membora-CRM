@@ -388,10 +388,9 @@ switch ($route) {
             flash('No se pudo preparar el plan seleccionado.', 'error');
             redirect('upgrade-plan');
         }
-        $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
-        if (!$isTrial) {
-            flash('El checkout de prueba solo esta disponible durante la demo.', 'error');
-            redirect('dashboard');
+        if (!PlatformPlanRepository::canUpgrade((string) ($empresa['plan'] ?? ''), $planCode)) {
+            flash('Selecciona un plan superior al que tienes actualmente.', 'error');
+            redirect('upgrade-plan');
         }
 
         $checkoutAmount = (float) $selectedPlan['monthly_price'] * ($renewalPeriod === 'ANNUAL' ? 12 : 1);

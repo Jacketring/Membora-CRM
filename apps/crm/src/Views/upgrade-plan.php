@@ -1,5 +1,6 @@
 <?php
 $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
+$currentPlanCode = $isTrial ? 'TRIAL' : strtoupper((string) ($empresa['plan'] ?? ''));
 $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
 ?>
 <div class="upgrade-plan-page">
@@ -29,8 +30,10 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
 
   <?php if (!$isTrial && !empty($accessState['blocked'])): ?>
     <div class="notice notice-error">Tu suscripción no tiene acceso activo. Contacta con el equipo de Membora para revisar la reactivación del plan <?= e((string) ($empresa['plan'] ?? 'actual')) ?>.</div>
+  <?php elseif ($currentPlanCode === 'ENTERPRISE'): ?>
+    <div class="notice notice-success">Tu empresa ya tiene Enterprise, el plan más completo de Membora.</div>
   <?php elseif (!$isTrial): ?>
-    <div class="notice notice-success">Tu empresa ya tiene el plan <?= e((string) ($empresa['plan'] ?? 'activo')) ?>. Los cambios posteriores se gestionan con el equipo de Membora.</div>
+    <div class="notice notice-success">Tu plan actual es <?= e($currentPlanCode) ?>. Puedes seleccionar cualquiera de los planes superiores.</div>
   <?php elseif (!$canPurchase): ?>
     <div class="notice notice-error">Solo el administrador del gimnasio puede contratar un plan. Puedes consultar las opciones y pedirle que complete el pago.</div>
   <?php elseif (!$simulatedCheckout && !$stripeReady): ?>
@@ -52,16 +55,22 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
       <?php foreach ($plans as $plan): ?>
         <?php
           $planCode = strtoupper((string) $plan['code']);
+          $isCurrent = !$isTrial && $planCode === $currentPlanCode;
+          $isUpgrade = PlatformPlanRepository::canUpgrade($currentPlanCode, $planCode);
           $isFeatured = $planCode === 'PRO';
-          $monthlyAvailable = $simulatedCheckout || ($stripeReady && !empty($plan['stripe_monthly_available']));
-          $annualAvailable = $simulatedCheckout || ($stripeReady && !empty($plan['stripe_annual_available']));
+          $monthlyAvailable = $isUpgrade && ($simulatedCheckout || ($isTrial && $stripeReady && !empty($plan['stripe_monthly_available'])));
+          $annualAvailable = $isUpgrade && ($simulatedCheckout || ($isTrial && $stripeReady && !empty($plan['stripe_annual_available'])));
           $checkoutAction = $simulatedCheckout ? 'open_tenant_simulated_checkout' : 'create_tenant_stripe_checkout';
           $features = array_slice($plan['features'] ?? [], 0, 4);
           $annualAmount = (float) $plan['monthly_price'] * 12;
           $planClass = strtolower(preg_replace('/[^A-Z0-9_-]/', '', $planCode) ?: 'plan');
         ?>
-        <article class="upgrade-plan-card upgrade-plan-card--<?= e($planClass) ?><?= $isFeatured ? ' upgrade-plan-card--featured' : '' ?>">
-          <?php if ($isFeatured): ?><div class="upgrade-plan-popular">MÁS ELEGIDO</div><?php endif; ?>
+        <article class="upgrade-plan-card upgrade-plan-card--<?= e($planClass) ?><?= $isFeatured && !$isCurrent ? ' upgrade-plan-card--featured' : '' ?><?= $isCurrent ? ' upgrade-plan-card--current' : '' ?>">
+          <?php if ($isCurrent): ?>
+            <div class="upgrade-plan-popular upgrade-plan-current-badge">PLAN ACTUAL</div>
+          <?php elseif ($isFeatured): ?>
+            <div class="upgrade-plan-popular">MÁS ELEGIDO</div>
+          <?php endif; ?>
 
           <header class="upgrade-plan-card-header">
             <div class="upgrade-plan-card-icon"><?= e(substr($planCode, 0, 1)) ?></div>
@@ -99,8 +108,8 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
               <input type="hidden" name="action" value="<?= e($checkoutAction) ?>">
               <input type="hidden" name="plan_code" value="<?= e($planCode) ?>">
               <input type="hidden" name="renewal_period" value="MONTHLY">
-              <button class="upgrade-plan-button upgrade-plan-button--primary" type="submit" <?= !$monthlyAvailable || !$isTrial || !$canPurchase ? 'disabled' : '' ?>>
-                <?= $simulatedCheckout ? 'Probar pago mensual' : 'Elegir pago mensual' ?><span>→</span>
+              <button class="upgrade-plan-button upgrade-plan-button--primary" type="submit" <?= !$monthlyAvailable || !$canPurchase ? 'disabled' : '' ?>>
+                <?= $isCurrent ? 'Plan actual' : (!$isUpgrade ? 'Plan inferior' : ($simulatedCheckout ? 'Mejorar con pago mensual' : 'Elegir pago mensual')) ?><span>→</span>
               </button>
             </form>
             <?php if ($simulatedCheckout || !empty($plan['stripe_annual_available'])): ?>
@@ -108,7 +117,7 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
                 <input type="hidden" name="action" value="<?= e($checkoutAction) ?>">
                 <input type="hidden" name="plan_code" value="<?= e($planCode) ?>">
                 <input type="hidden" name="renewal_period" value="ANNUAL">
-                <button class="upgrade-plan-button upgrade-plan-button--secondary" type="submit" <?= !$annualAvailable || !$isTrial || !$canPurchase ? 'disabled' : '' ?>>Probar pago anual</button>
+                <button class="upgrade-plan-button upgrade-plan-button--secondary" type="submit" <?= !$annualAvailable || !$canPurchase ? 'disabled' : '' ?>><?= $isCurrent ? 'Plan actual' : (!$isUpgrade ? 'Plan inferior' : ($simulatedCheckout ? 'Mejorar con pago anual' : 'Elegir pago anual')) ?></button>
               </form>
             <?php endif; ?>
           </div>

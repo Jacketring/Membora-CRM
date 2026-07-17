@@ -642,6 +642,12 @@ final class Actions
             redirect('upgrade-plan');
         }
 
+        $empresa = EmpresaRepository::findByTenant((string) ($user['tenant_id'] ?? ''));
+        if (!$empresa || !PlatformPlanRepository::canUpgrade((string) ($empresa['plan'] ?? ''), $planCode)) {
+            flash('Selecciona un plan superior al que tienes actualmente.', 'error');
+            redirect('upgrade-plan');
+        }
+
         header('Location: index.php?route=simulated-checkout&plan=' . rawurlencode($planCode) . '&period=' . rawurlencode($renewalPeriod));
         exit;
     }
