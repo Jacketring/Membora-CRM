@@ -6,7 +6,7 @@ Este plan corresponde a la fase de verificación de la metodología incremental 
 
 ## Automatización
 
-La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 17 de julio de 2026 completa **54 tests y 260 aserciones** sin errores.
+La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, webhook, checkout simulado, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 17 de julio de 2026 completa **58 tests y 278 aserciones** sin errores.
 
 El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %. Esta cobertura es la última medición guardada y debe tratarse como evidencia histórica de esa capa, no como cobertura actual de todo el producto.
 
@@ -514,6 +514,24 @@ Resultado esperado:
 - El mismo `stripe_event_id` no se procesa dos veces.
 - La cancelacion conserva el acceso hasta el final del periodo y queda sincronizada por webhook.
 - Ninguna prueba usa claves Live ni dinero real.
+
+### PA-09B Checkout interno simulado
+
+Precondicion: `PAYMENTS_MODE=stripe_test` y `CHECKOUT_PROVIDER=simulated`.
+
+Pasos:
+
+1. Entrar como administrador de una empresa `TRIAL` y seleccionar un plan mensual o anual.
+2. Confirmar que el checkout se muestra dentro de Membora y advierte que no acepta tarjetas reales.
+3. Completarlo con `4242 4242 4242 4242`, una fecha futura y un CVC ficticio de tres cifras.
+4. Revisar Pagos y Facturas en el panel del superadministrador.
+
+Resultado esperado:
+
+- No se realiza ninguna solicitud a Stripe ni a entidades financieras.
+- Los campos de tarjeta no se persisten y aparecen censurados en cualquier metadato de auditoria.
+- La empresa queda activa con el plan elegido y el acceso mensual o anual calculado.
+- Se crean un pago y un justificante con metodo `SIMULATED` y textos que indican que no acreditan un cargo real.
 
 ### PA-10 Web, correo y captacion
 

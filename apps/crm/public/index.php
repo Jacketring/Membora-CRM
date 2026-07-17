@@ -272,7 +272,7 @@ if (!can_access_route((string) $route, $currentUser)) {
     redirect(is_platform_admin($currentUser) ? 'platform-dashboard' : 'dashboard');
 }
 
-if (!is_platform_admin($currentUser) && !is_platform_support_context() && $route !== 'upgrade-plan') {
+if (!is_platform_admin($currentUser) && !is_platform_support_context() && !in_array($route, ['upgrade-plan', 'simulated-checkout'], true)) {
     $subscriptionAccessState = EmpresaRepository::accessStateForTenant((string) ($currentUser['tenant_id'] ?? ''));
     if (!empty($subscriptionAccessState['blocked'])) {
         redirect('upgrade-plan');
@@ -368,6 +368,41 @@ if ($route === 'billing-export') {
 }
 
 switch ($route) {
+    case 'simulated-checkout':
+        if (!StripeBillingConfig::simulatedCheckoutEnabled()) {
+            flash('El checkout interno de demostracion no esta habilitado.', 'error');
+            redirect('upgrade-plan');
+        }
+
+        $empresa = EmpresaRepository::findByTenant((string) ($currentUser['tenant_id'] ?? ''));
+        $planCode = strtoupper(trim((string) ($_GET['plan'] ?? '')));
+        $renewalPeriod = strtoupper(trim((string) ($_GET['period'] ?? 'MONTHLY')));
+        $selectedPlan = null;
+        foreach (PlatformPlanRepository::publicPlans() as $availablePlan) {
+            if ((string) ($availablePlan['code'] ?? '') === $planCode) {
+                $selectedPlan = $availablePlan;
+                break;
+            }
+        }
+        if (!$empresa || !$selectedPlan || !in_array($renewalPeriod, ['MONTHLY', 'ANNUAL'], true)) {
+            flash('No se pudo preparar el plan seleccionado.', 'error');
+            redirect('upgrade-plan');
+        }
+        $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
+        if (!$isTrial) {
+            flash('El checkout de prueba solo esta disponible durante la demo.', 'error');
+            redirect('dashboard');
+        }
+
+        $checkoutAmount = (float) $selectedPlan['monthly_price'] * ($renewalPeriod === 'ANNUAL' ? 12 : 1);
+        render_layout('Checkout de prueba', 'simulated-checkout', [
+            'empresa' => $empresa,
+            'plan' => $selectedPlan,
+            'renewalPeriod' => $renewalPeriod,
+            'checkoutAmount' => number_format($checkoutAmount, 2, '.', ''),
+        ]);
+        break;
+
     case 'upgrade-plan':
         if (is_platform_admin($currentUser) || is_platform_support_context()) {
             redirect('dashboard');
@@ -380,6 +415,7 @@ switch ($route) {
             'accessState' => $accessState,
             'plans' => PlatformPlanRepository::publicPlans(),
             'canPurchase' => is_gym_admin($currentUser),
+            'simulatedCheckout' => StripeBillingConfig::simulatedCheckoutEnabled(),
             'stripeReady' => StripeBillingConfig::enabled()
                 && class_exists(\Stripe\Stripe::class)
                 && str_starts_with(StripeBillingConfig::secretKey(), 'sk_test_')

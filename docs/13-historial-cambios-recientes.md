@@ -103,6 +103,8 @@ Para la entrega se retiraron de la interfaz el bloque diagnostico de Stripe, el 
 
 Posteriormente se incorporo un checkout visible con un alcance distinto: las empresas `TRIAL` ven los dias restantes y pueden abrir `Mejorar el plan`. El administrador del gimnasio elige un plan pagado y completa los datos bancarios en Stripe. La eleccion queda pendiente y solo `invoice.paid` cambia el plan y crea el pago y la factura administrativa. Los diagnosticos y controles Stripe del superadministrador continúan ocultos.
 
+Para la demostracion final se incorporo un proveedor `simulated` separado del flujo Stripe. Presenta un checkout propio con una unica tarjeta ficticia admitida, no contacta con bancos, censura todos los campos `card_*` y crea pago/factura con marcas explicitas de simulacion. Stripe se conserva seleccionable mediante `CHECKOUT_PROVIDER=stripe`.
+
 ## 6. Alta self-service y limpieza de pruebas
 
 La activacion por correo se completo como un flujo de dos mensajes:

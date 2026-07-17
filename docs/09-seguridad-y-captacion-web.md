@@ -167,7 +167,7 @@ El formulario publico incluye:
 
 ### 10. Stripe y eventos externos
 
-- La integracion solo se habilita con `PAYMENTS_MODE=stripe_test` y rechaza claves que no empiecen por `sk_test_`.
+- La facturacion SaaS solo se habilita con `PAYMENTS_MODE=stripe_test`. El proveedor Stripe rechaza claves que no empiecen por `sk_test_`; el proveedor simulado no hace llamadas externas, solo admite la tarjeta ficticia documentada y censura todos los campos `card_*` en auditoria.
 - `/stripe/webhook` exige `Stripe-Signature` y el secreto configurado en `STRIPE_WEBHOOK_SECRET`.
 - `stripe_events` mantiene un identificador unico por evento para evitar efectos duplicados.
 - La URL de exito de checkout nunca activa acceso ni marca un pago; solo lo hace el webhook verificado.

@@ -169,7 +169,7 @@ Para los pagos de Membora se usa Stripe como proveedor principal. El MVP incluye
 
 El backend conserva las acciones de checkout y cancelacion Stripe para validacion tecnica, pero esos controles y el bloque de diagnostico no se muestran en las pantallas actuales de empresas o facturas. En la demo visible, el ciclo de vida se gestiona con el estado local de renovacion; Stripe debe presentarse como integracion tecnica en modo de prueba, no como cobro comercial activo.
 
-Las empresas en prueba disponen de un recorrido visible independiente: un banner muestra los dias restantes, `Mejorar el plan` presenta exclusivamente planes de pago y el administrador del gimnasio completa el metodo de pago en Stripe Checkout. La seleccion no modifica el plan por la URL de retorno; queda pendiente hasta que `invoice.paid` confirma el cobro y crea el pago y la factura en Admin CRM.
+Las empresas en prueba disponen de un recorrido visible independiente: un banner muestra los dias restantes y `Mejorar el plan` presenta exclusivamente planes de pago. Para la demostracion, el administrador completa un checkout interno con valores de tarjeta exclusivamente ficticios; no se contacta con bancos y el pago/factura quedan marcados como simulados. El proveedor alternativo Stripe conserva la activacion exclusiva mediante `invoice.paid`.
 
 Cuando Jose cree la cuenta de Stripe, debera configurar:
 

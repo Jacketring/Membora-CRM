@@ -33,12 +33,16 @@ En `apps/crm/.env`:
 
 ```env
 PAYMENTS_MODE="stripe_test"
+CHECKOUT_PROVIDER="simulated"
 STRIPE_PUBLISHABLE_KEY="pk_test_PEGAR_AQUI"
 STRIPE_SECRET_KEY="sk_test_PEGAR_AQUI"
 STRIPE_WEBHOOK_SECRET="whsec_PEGAR_AQUI"
 ```
 
 Donde pegar cada valor:
+
+- `CHECKOUT_PROVIDER=simulated`: usa el checkout interno con tarjeta ficticia, sin contactar con Stripe ni bancos. Es el valor entregado para la demostracion.
+- `CHECKOUT_PROVIDER=stripe`: recupera Stripe Checkout y exige todas las claves y el webhook configurados.
 
 - `STRIPE_PUBLISHABLE_KEY`: Stripe Dashboard > Developers > API keys > Publishable key.
 - `STRIPE_SECRET_KEY`: Stripe Dashboard > Developers > API keys > Secret key, siempre `sk_test_...` en esta fase.
@@ -84,7 +88,13 @@ El webhook verifica obligatoriamente la cabecera `Stripe-Signature`.
 
 ## 7. Flujo funcional
 
-1. El administrador configura planes locales con Price IDs.
+### Checkout interno de demostracion
+
+Con `PAYMENTS_MODE=stripe_test` y `CHECKOUT_PROVIDER=simulated`, el administrador de una empresa en prueba puede completar el pago dentro de Membora con la tarjeta ficticia `4242 4242 4242 4242`, una caducidad futura y cualquier CVC ficticio de tres cifras. El flujo no llama a Stripe, no contacta con bancos y descarta los campos de tarjeta inmediatamente; tambien los censura en auditoria. Al confirmar, crea transaccionalmente un pago y un justificante con metodo `SIMULATED`, activa el plan y actualiza el acceso mensual o anual. Estos registros son exclusivamente demostrativos y no acreditan un cobro real.
+
+### Stripe Checkout
+
+1. El administrador cambia `CHECKOUT_PROVIDER` a `stripe` y configura planes locales con Price IDs.
 2. Una empresa `TRIAL` ve en la parte superior los dias restantes y pulsa `Mejorar el plan`.
 3. Todos los roles pueden consultar los planes pagados, pero solo `GYM_ADMIN` puede iniciar el cobro.
 4. El administrador elige plan y periodicidad; Membora obtiene la empresa desde el `tenant_id` de la sesion y guarda la eleccion como pendiente.
@@ -152,7 +162,7 @@ Datos:
 
 Prueba:
 
-1. Configurar `PAYMENTS_MODE=stripe_test`.
+1. Configurar `PAYMENTS_MODE=stripe_test` y `CHECKOUT_PROVIDER=stripe`.
 2. Pegar `sk_test_...`, `pk_test_...` y `whsec_...`.
 3. Crear Price mensual/anual en Stripe.
 4. Pegar Price IDs en el plan local.

@@ -461,12 +461,12 @@ final class AuditLogRepository
 
     private static function sanitizePayload(array $payload): array
     {
-        $blocked = ['password', 'password_hash', 'token', 'csrf', 'form_token', 'webhook_token'];
+        $blocked = ['password', 'password_hash', 'token', 'csrf', 'form_token', 'webhook_token', 'card_number', 'card_expiry', 'card_cvc'];
         $sanitized = [];
 
         foreach ($payload as $key => $value) {
             $normalizedKey = strtolower((string) $key);
-            if (in_array($normalizedKey, $blocked, true) || str_contains($normalizedKey, 'password') || str_contains($normalizedKey, 'token')) {
+            if (in_array($normalizedKey, $blocked, true) || str_contains($normalizedKey, 'password') || str_contains($normalizedKey, 'token') || str_contains($normalizedKey, 'card_')) {
                 $sanitized[$key] = '[redacted]';
                 continue;
             }

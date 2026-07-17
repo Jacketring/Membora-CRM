@@ -69,6 +69,9 @@ final class ComprehensiveSupportTest extends TestCase
         self::assertTrue(can_access_route('upgrade-plan', $gym));
         self::assertTrue(can_access_route('upgrade-plan', ['role' => 'STAFF']));
         self::assertFalse(can_access_route('upgrade-plan', $platform));
+        self::assertTrue(can_access_route('simulated-checkout', $gym));
+        self::assertFalse(can_access_route('simulated-checkout', ['role' => 'STAFF']));
+        self::assertFalse(can_access_route('simulated-checkout', $platform));
         self::assertFalse(can_access_route('platform-plans', $gym));
 
         foreach (['SALES_RECEPTION', 'RECEPTION', 'SALES', 'TRAINER', 'STAFF', 'UNKNOWN'] as $role) {
@@ -82,6 +85,8 @@ final class ComprehensiveSupportTest extends TestCase
         self::assertFalse(can_perform_action('create_member', $platform));
         self::assertTrue(can_perform_action('create_member', $gym));
         self::assertTrue(can_perform_action('create_tenant_stripe_checkout', $gym));
+        self::assertTrue(can_perform_action('open_tenant_simulated_checkout', $gym));
+        self::assertTrue(can_perform_action('complete_tenant_simulated_checkout', $gym));
         self::assertFalse(can_perform_action('platform_create_plan', $gym));
         self::assertFalse(can_perform_action('create_platform_user', $gym));
         self::assertFalse(can_perform_action('update_platform_user', $gym));

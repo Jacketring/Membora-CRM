@@ -22,7 +22,7 @@ $demoRemainingSeconds = Auth::demoRemainingSeconds();
 $subscriptionAccessState = (!$isPlatformAdmin && !is_platform_support_context())
     ? EmpresaRepository::accessStateForTenant((string) ($user['tenant_id'] ?? ''))
     : null;
-$subscriptionBlocked = !empty($subscriptionAccessState['blocked']) && $route !== 'upgrade-plan';
+$subscriptionBlocked = !empty($subscriptionAccessState['blocked']) && !in_array($route, ['upgrade-plan', 'simulated-checkout'], true);
 $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : [];
 ?>
 <body data-tenant-accent="<?= e($tenantPrimaryColor) ?>" <?= $demoRemainingSeconds > 0 ? 'data-demo-expires-in="' . e((string) $demoRemainingSeconds) . '"' : '' ?> <?= $subscriptionBlocked ? 'data-subscription-blocked="true"' : '' ?>>

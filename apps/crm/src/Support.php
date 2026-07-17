@@ -411,6 +411,10 @@ function can_access_route(string $route, ?array $user = null): bool
         return $user !== null && !is_platform_admin($user) && empty($user['tenant_context']);
     }
 
+    if ($route === 'simulated-checkout') {
+        return is_gym_admin($user) && !is_platform_admin($user) && empty($user['tenant_context']);
+    }
+
     if (is_platform_admin($user)) {
         return str_starts_with($route, 'platform-') || in_array($route, ['profile', 'settings', 'novedades', 'global-search'], true);
     }
@@ -642,6 +646,7 @@ function payment_method_label(?string $method): string
         'CASH' => 'Efectivo',
         'CARD' => 'Tarjeta',
         'STRIPE' => 'Stripe',
+        'SIMULATED' => 'Tarjeta de prueba',
         'TRANSFER' => 'Transferencia',
         'TPV' => 'TPV',
         'DIRECT_DEBIT' => 'Domiciliacion',
@@ -772,6 +777,8 @@ function audit_action_label(?string $action): string
         'resume_empresa_subscription' => 'Reactivacion de suscripción',
         'create_empresa_stripe_checkout' => 'Inicio de Stripe Checkout',
         'create_tenant_stripe_checkout' => 'Mejora de plan con Stripe Checkout',
+        'open_tenant_simulated_checkout' => 'Inicio de checkout simulado',
+        'complete_tenant_simulated_checkout' => 'Pago simulado de plan',
         'cancel_empresa_stripe_subscription' => 'Cancelacion de Stripe al final del periodo',
         'create_platform_payment' => 'Creación de pago CRM',
         'update_platform_payment' => 'Actualizacion de pago CRM',
@@ -861,6 +868,7 @@ function audit_area_label(?string $route): string
         'platform-users' => 'Usuarios Admin',
         'platform-web' => 'Web comercial',
         'upgrade-plan' => 'Mejorar plan',
+        'simulated-checkout' => 'Checkout de prueba',
         'dashboard' => 'Panel',
         'profile' => 'Perfil',
         'settings' => 'Configuración',

@@ -5,7 +5,9 @@ $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string)
   <div>
     <span class="eyebrow">PLANES DE PAGO</span>
     <h2>Mejora tu plan de Membora</h2>
-    <p>Elige el plan y la periodicidad. Los datos bancarios se introducen de forma segura en Stripe y Membora no almacena los datos de tu tarjeta.</p>
+    <p><?= $simulatedCheckout
+      ? 'Elige un plan y prueba el flujo completo con una tarjeta ficticia. No se realiza ningún cargo bancario.'
+      : 'Elige el plan y la periodicidad. Los datos bancarios se introducen de forma segura en Stripe y Membora no almacena los datos de tu tarjeta.' ?></p>
   </div>
   <?php if (!empty($accessState['remaining_days'])): ?>
     <div class="upgrade-plan-days">
@@ -21,15 +23,16 @@ $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string)
   <div class="notice notice-success">Tu empresa ya tiene el plan <?= e((string) ($empresa['plan'] ?? 'activo')) ?>. Los cambios posteriores se gestionan con el equipo de Membora.</div>
 <?php elseif (!$canPurchase): ?>
   <div class="notice notice-error">Solo el administrador del gimnasio puede contratar un plan. Puedes consultar las opciones y pedirle que complete el pago.</div>
-<?php elseif (!$stripeReady): ?>
+<?php elseif (!$simulatedCheckout && !$stripeReady): ?>
   <div class="notice notice-error">El pago todavía no está disponible. El administrador de Membora debe completar el modo Stripe Test, el secreto del webhook y los Price ID de los planes.</div>
 <?php endif; ?>
 
 <div class="upgrade-plan-grid">
   <?php foreach ($plans as $plan): ?>
     <?php
-      $monthlyAvailable = $stripeReady && !empty($plan['stripe_monthly_available']);
-      $annualAvailable = $stripeReady && !empty($plan['stripe_annual_available']);
+      $monthlyAvailable = $simulatedCheckout || ($stripeReady && !empty($plan['stripe_monthly_available']));
+      $annualAvailable = $simulatedCheckout || ($stripeReady && !empty($plan['stripe_annual_available']));
+      $checkoutAction = $simulatedCheckout ? 'open_tenant_simulated_checkout' : 'create_tenant_stripe_checkout';
       $features = array_slice($plan['features'] ?? [], 0, 4);
     ?>
     <article class="upgrade-plan-card">
@@ -58,25 +61,27 @@ $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string)
       </ul>
       <div class="upgrade-plan-actions">
         <form method="post" action="index.php?route=upgrade-plan">
-          <input type="hidden" name="action" value="create_tenant_stripe_checkout">
+          <input type="hidden" name="action" value="<?= e($checkoutAction) ?>">
           <input type="hidden" name="plan_code" value="<?= e((string) $plan['code']) ?>">
           <input type="hidden" name="renewal_period" value="MONTHLY">
-          <button class="primary-action" type="submit" <?= !$monthlyAvailable || !$isTrial || !$canPurchase ? 'disabled' : '' ?>>Pagar mensualmente</button>
+          <button class="primary-action" type="submit" <?= !$monthlyAvailable || !$isTrial || !$canPurchase ? 'disabled' : '' ?>><?= $simulatedCheckout ? 'Probar pago mensual' : 'Pagar mensualmente' ?></button>
         </form>
-        <?php if (!empty($plan['stripe_annual_available'])): ?>
+        <?php if ($simulatedCheckout || !empty($plan['stripe_annual_available'])): ?>
           <form method="post" action="index.php?route=upgrade-plan">
-            <input type="hidden" name="action" value="create_tenant_stripe_checkout">
+            <input type="hidden" name="action" value="<?= e($checkoutAction) ?>">
             <input type="hidden" name="plan_code" value="<?= e((string) $plan['code']) ?>">
             <input type="hidden" name="renewal_period" value="ANNUAL">
-            <button class="secondary-action" type="submit" <?= !$annualAvailable || !$isTrial || !$canPurchase ? 'disabled' : '' ?>>Pagar anualmente</button>
+            <button class="secondary-action" type="submit" <?= !$annualAvailable || !$isTrial || !$canPurchase ? 'disabled' : '' ?>><?= $simulatedCheckout ? 'Probar pago anual' : 'Pagar anualmente' ?></button>
           </form>
         <?php endif; ?>
       </div>
-      <?php if (!$monthlyAvailable && !$annualAvailable): ?>
+      <?php if (!$simulatedCheckout && !$monthlyAvailable && !$annualAvailable): ?>
         <small class="upgrade-plan-unavailable">Plan pendiente de configuración en Stripe.</small>
       <?php endif; ?>
     </article>
   <?php endforeach; ?>
 </div>
 
-<p class="upgrade-plan-security">El plan no cambia al volver del Checkout. Solo se activa cuando el webhook firmado de Stripe confirma el pago; entonces se crean el pago y la factura en la administración de Membora.</p>
+<p class="upgrade-plan-security"><?= $simulatedCheckout
+  ? 'Modo de demostración: la tarjeta es ficticia, no se contacta con bancos y no se almacena ningún dato de tarjeta. El resultado se registra como pago simulado en administración.'
+  : 'El plan no cambia al volver del Checkout. Solo se activa cuando el webhook firmado de Stripe confirma el pago; entonces se crean el pago y la factura en la administración de Membora.' ?></p>

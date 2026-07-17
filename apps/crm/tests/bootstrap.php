@@ -8,5 +8,6 @@ require_once dirname(__DIR__) . '/src/Security/LoginRateLimitPolicy.php';
 require_once dirname(__DIR__) . '/src/Security/UserMutationPolicy.php';
 require_once dirname(__DIR__) . '/src/Auth.php';
 require_once dirname(__DIR__) . '/src/Repositories.php';
+require_once dirname(__DIR__) . '/src/StripeBilling.php';
 $_SESSION = [];
 $_POST = [];

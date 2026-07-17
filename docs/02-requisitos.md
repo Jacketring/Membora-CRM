@@ -229,8 +229,8 @@ El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el re
 - Stripe Live queda pendiente de configuracion bancaria, fiscal y comercial.
 - Una empresa `TRIAL` debe ver los dias restantes y poder elegir un plan de pago desde su propio CRM.
 - Solo el administrador del gimnasio puede iniciar Checkout; los demas roles pueden consultar los planes.
-- Los datos bancarios se recogen en la pagina alojada de Stripe y no se persisten en Membora.
-- El plan seleccionado debe permanecer pendiente hasta `invoice.paid`; al confirmarse se crean el pago y la factura administrativa y se activa el acceso contratado.
+- En modo simulado solo se admite la tarjeta ficticia documentada; sus campos se descartan y censuran en auditoria, sin contactar con Stripe ni bancos.
+- El pago simulado crea pago y justificante administrativo diferenciados y activa el acceso en una unica transaccion. Con el proveedor Stripe, el plan permanece pendiente hasta `invoice.paid`.
 
 ### RF-21 Autenticacion recuperable
 

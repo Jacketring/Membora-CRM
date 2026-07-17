@@ -30,7 +30,7 @@ El desarrollo sigue el proceso incremental documentado en `docs/19-metodologia-d
 
 Estado verificado el 17/07/2026:
 
-- PHPUnit: **54 tests y 260 aserciones**, sin errores.
+- PHPUnit: **58 tests y 278 aserciones**, sin errores.
 - PHPStan: sin errores.
 - GitHub Actions: sintaxis PHP, PHPUnit, umbral de cobertura y PHPStan; E2E condicionado a un staging configurado.
 
@@ -190,7 +190,7 @@ Estado verificado el 17/07/2026:
 - Precio mensual y proximo pago para planes de pago.
 - Plan de prueba configurable por dias. Solo cuando el plan seleccionado es `Prueba`, se oculta el proximo pago, se muestra la duracion de prueba y no se ofrece renovacion.
 - Banner superior para cuentas `TRIAL` con fecha de caducidad, dias restantes y boton `Mejorar el plan`.
-- Catalogo exclusivo de planes de pago dentro del CRM del gimnasio. Los roles del tenant pueden consultarlo y solo el administrador inicia Stripe Checkout.
+- Catalogo exclusivo de planes de pago dentro del CRM del gimnasio. Los roles del tenant pueden consultarlo y solo el administrador inicia el checkout configurado: simulador interno o Stripe.
 - MRR estimado.
 - Tabla `empresa_payments` para cobros SaaS por empresa.
 - Registro y edicion de pagos con concepto, importe, vencimiento, fecha de pago, estado y notas.
@@ -212,7 +212,7 @@ Estado verificado el 17/07/2026:
 - Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
 - Stripe Billing funcional en modo `stripe_test`: checkout alojado, webhook firmado, idempotencia, suscripciones, cancelacion al final del periodo y sincronizacion de cobros y facturas.
 - Los controles tecnicos de checkout/cancelacion Stripe y el bloque de diagnostico se mantienen fuera de empresas y facturas. El checkout visible se limita al flujo seguro `Mejorar el plan` de empresas en prueba.
-- El plan elegido no se activa hasta `invoice.paid`; el webhook crea automaticamente el pago y la factura para el superadministrador.
+- En modo simulado se crean inmediatamente un pago y justificante diferenciados y se activa el plan; en modo Stripe el plan no se activa hasta `invoice.paid`.
 
 ## 5. Pendiente para operacion real
 

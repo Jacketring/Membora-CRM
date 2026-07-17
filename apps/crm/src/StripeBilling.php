@@ -27,6 +27,18 @@ final class StripeBillingConfig
         return trim((string) (getenv('STRIPE_PUBLISHABLE_KEY') ?: ''));
     }
 
+    public static function checkoutProvider(): string
+    {
+        $provider = strtolower(trim((string) (getenv('CHECKOUT_PROVIDER') ?: 'simulated')));
+
+        return in_array($provider, ['simulated', 'stripe'], true) ? $provider : 'simulated';
+    }
+
+    public static function simulatedCheckoutEnabled(): bool
+    {
+        return self::checkoutProvider() === 'simulated' && self::mode() === 'stripe_test';
+    }
+
     public static function webhookUrl(): string
     {
         return app_base_url() . '/stripe/webhook';
@@ -512,6 +524,7 @@ final class StripeBillingRepository
 
     private static function upsertPlatformPayment(array $invoice, array $empresa, string $status, string $amount, ?string $paidAt, string $concept, string $paymentIntentId, ?string $dueAt = null): void
     {
+        $simulated = !empty($invoice['_membora_simulated']);
         $invoiceId = (string) ($invoice['id'] ?? '');
         $stmt = Database::connection()->prepare('SELECT id FROM empresa_payments WHERE stripe_invoice_id = :stripe_invoice_id LIMIT 1');
         $stmt->execute(['stripe_invoice_id' => $invoiceId]);
@@ -520,7 +533,7 @@ final class StripeBillingRepository
             'empresa_id' => $empresa['id'],
             'stripe_invoice_id' => $invoiceId,
             'stripe_payment_intent_id' => $paymentIntentId ?: null,
-            'stripe_status' => (string) ($invoice['status'] ?? ''),
+            'stripe_status' => $simulated ? 'simulated_paid' : (string) ($invoice['status'] ?? ''),
             'hosted_invoice_url' => $invoice['hosted_invoice_url'] ?? null,
             'invoice_pdf' => $invoice['invoice_pdf'] ?? null,
             'billing_reason' => $invoice['billing_reason'] ?? null,
@@ -529,7 +542,9 @@ final class StripeBillingRepository
             'status' => $status,
             'due_at' => $dueAt ?: self::invoicePeriodEndDate($invoice),
             'paid_at' => $paidAt,
-            'notes' => 'Sincronizado desde Stripe. No contiene datos de tarjeta.',
+            'notes' => $simulated
+                ? 'Pago simulado desde el checkout interno de Membora. No es un cargo bancario y no contiene datos de tarjeta.'
+                : 'Sincronizado desde Stripe. No contiene datos de tarjeta.',
         ];
 
         if ($paymentId) {
@@ -561,6 +576,7 @@ final class StripeBillingRepository
 
     private static function upsertPlatformInvoice(array $invoice, array $empresa, string $invoiceStatus, string $collectionStatus, string $amount, ?string $periodStart, ?string $periodEnd, string $paymentIntentId): void
     {
+        $simulated = !empty($invoice['_membora_simulated']);
         $invoiceId = (string) ($invoice['id'] ?? '');
         $stmt = Database::connection()->prepare('SELECT id FROM platform_invoices WHERE stripe_invoice_id = :stripe_invoice_id LIMIT 1');
         $stmt->execute(['stripe_invoice_id' => $invoiceId]);
@@ -575,7 +591,7 @@ final class StripeBillingRepository
             'stripe_payment_intent_id' => $paymentIntentId ?: null,
             'hosted_invoice_url' => $invoice['hosted_invoice_url'] ?? null,
             'invoice_pdf' => $invoice['invoice_pdf'] ?? null,
-            'invoice_series' => 'STRIPE',
+            'invoice_series' => $simulated ? 'DEMO' : 'STRIPE',
             'invoice_code' => $invoiceCode,
             'invoice_status' => $invoiceStatus,
             'collection_status' => $collectionStatus,
@@ -603,9 +619,11 @@ final class StripeBillingRepository
             'paid_amount' => $collectionStatus === 'PAID' ? $amount : '0.00',
             'pending_amount' => $collectionStatus === 'PAID' ? '0.00' : $amount,
             'currency' => substr($currency, 0, 3),
-            'payment_method' => 'STRIPE',
+            'payment_method' => $simulated ? 'SIMULATED' : 'STRIPE',
             'status' => $collectionStatus === 'PAID' ? 'PAID' : 'SENT',
-            'notes' => 'Factura sincronizada desde Stripe. PDF/hosted URL se guardan si Stripe los entrega.',
+            'notes' => $simulated
+                ? 'Justificante de demostracion generado por un pago simulado. No acredita un cargo bancario real.'
+                : 'Factura sincronizada desde Stripe. PDF/hosted URL se guardan si Stripe los entrega.',
         ];
 
         if ($localInvoiceId) {
@@ -671,14 +689,18 @@ final class StripeBillingRepository
 
         Database::connection()->prepare(
             'INSERT INTO platform_invoice_payments (id, invoice_id, stripe_payment_intent_id, paid_at, amount, payment_method, reference, notes, created_at, updated_at)
-             VALUES (:id, :invoice_id, :stripe_payment_intent_id, :paid_at, :amount, "STRIPE", :reference, "Sincronizado desde Stripe.", NOW(), NOW())'
+             VALUES (:id, :invoice_id, :stripe_payment_intent_id, :paid_at, :amount, :payment_method, :reference, :notes, NOW(), NOW())'
         )->execute([
             'id' => cuid(),
             'invoice_id' => $localInvoiceId,
             'stripe_payment_intent_id' => $paymentIntentId,
             'paid_at' => date('Y-m-d'),
             'amount' => $invoiceParams['paid_amount'] ?? $invoiceParams['total_amount'] ?? '0.00',
+            'payment_method' => $invoiceParams['payment_method'] ?? 'STRIPE',
             'reference' => $paymentIntentId,
+            'notes' => ($invoiceParams['payment_method'] ?? 'STRIPE') === 'SIMULATED'
+                ? 'Pago simulado sin cargo bancario.'
+                : 'Sincronizado desde Stripe.',
         ]);
     }
 
@@ -788,6 +810,104 @@ final class StripeBillingRepository
     private static function centsToDecimal(int $cents): string
     {
         return number_format(max(0, $cents) / 100, 2, '.', '');
+    }
+}
+
+final class SimulatedCheckoutService
+{
+    public const TEST_CARD_NUMBER = '4242424242424242';
+
+    public static function validateCard(string $number, string $expiry, string $cvc): void
+    {
+        $normalizedNumber = preg_replace('/\D+/', '', $number) ?: '';
+        if (!hash_equals(self::TEST_CARD_NUMBER, $normalizedNumber)) {
+            throw new RuntimeException('Usa la tarjeta ficticia 4242 4242 4242 4242. No introduzcas una tarjeta real.');
+        }
+
+        if (!preg_match('/^(0[1-9]|1[0-2])\/(\d{2})$/', trim($expiry), $matches)) {
+            throw new RuntimeException('La caducidad ficticia debe tener formato MM/AA.');
+        }
+
+        $expiryMonth = (int) $matches[1];
+        $expiryYear = 2000 + (int) $matches[2];
+        if ($expiryYear < (int) date('Y') || ($expiryYear === (int) date('Y') && $expiryMonth < (int) date('n'))) {
+            throw new RuntimeException('Usa una fecha de caducidad ficticia futura.');
+        }
+
+        if (!preg_match('/^\d{3}$/', trim($cvc))) {
+            throw new RuntimeException('El CVC ficticio debe tener tres numeros.');
+        }
+    }
+
+    public static function complete(string $empresaId, string $planCode, string $period): array
+    {
+        if (!StripeBillingConfig::simulatedCheckoutEnabled()) {
+            throw new RuntimeException('El checkout simulado no esta habilitado.');
+        }
+
+        StripeBillingRepository::ensureSchema();
+        $empresa = EmpresaRepository::find($empresaId);
+        if (!$empresa) {
+            throw new RuntimeException('No se encontro la empresa vinculada al pago.');
+        }
+
+        $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
+        if (!$isTrial) {
+            throw new RuntimeException('Este checkout de prueba solo esta disponible para empresas en demo.');
+        }
+
+        $planCode = strtoupper(trim($planCode));
+        $plan = StripeBillingRepository::planByCode($planCode);
+        if (!$plan || $planCode === 'TRIAL' || (string) ($plan['status'] ?? '') !== 'ACTIVE') {
+            throw new RuntimeException('Selecciona un plan de pago activo.');
+        }
+
+        $period = strtoupper(trim($period));
+        if (!in_array($period, ['MONTHLY', 'ANNUAL'], true)) {
+            throw new RuntimeException('Selecciona una periodicidad valida.');
+        }
+
+        $monthlyAmount = (float) (PlatformPlanRepository::priceMap()[$planCode] ?? 0);
+        $amount = $period === 'ANNUAL' ? $monthlyAmount * 12 : $monthlyAmount;
+        if ($amount <= 0) {
+            throw new RuntimeException('El plan seleccionado no tiene un precio valido.');
+        }
+
+        $now = time();
+        $periodEnd = strtotime($period === 'ANNUAL' ? '+1 year' : '+1 month', $now);
+        $simulationId = 'sim_' . cuid();
+        $invoice = [
+            'id' => 'sim_invoice_' . $simulationId,
+            'number' => 'DEMO-' . strtoupper(substr(hash('sha256', $simulationId), 0, 10)),
+            'status' => 'paid',
+            'currency' => 'eur',
+            'amount_paid' => (int) round($amount * 100),
+            'total' => (int) round($amount * 100),
+            'created' => $now,
+            'status_transitions' => ['paid_at' => $now],
+            'payment_intent' => 'sim_payment_' . $simulationId,
+            'billing_reason' => 'simulated_subscription',
+            'metadata' => ['empresa_id' => $empresaId],
+            '_membora_subscription_metadata' => [
+                'plan_code' => $planCode,
+                'renewal_period' => $period,
+            ],
+            '_membora_simulated' => true,
+            'lines' => [
+                'data' => [[
+                    'description' => 'Pago simulado plan ' . (string) ($plan['name'] ?? $planCode) . ' - ' . empresa_renewal_period_label($period),
+                    'period' => ['start' => $now, 'end' => $periodEnd],
+                ]],
+            ],
+        ];
+
+        StripeBillingRepository::syncInvoicePaid($invoice);
+
+        return [
+            'amount' => number_format($amount, 2, '.', ''),
+            'period' => $period,
+            'plan_code' => $planCode,
+        ];
     }
 }
 

@@ -123,7 +123,7 @@ La URL de éxito no confirma el pago. Solo el webhook firmado modifica el estado
 
 La interfaz visible de empresas y facturas no muestra actualmente el bloque de diagnostico, el boton de Checkout ni la cancelacion directa en Stripe. El backend y el webhook de prueba se conservan como integracion tecnica, mientras la gestion diaria visible usa el estado local de renovacion.
 
-Las cuentas `TRIAL` sí disponen de un recorrido especifico: el banner calcula los dias restantes, `upgrade-plan` muestra solo planes pagados y `create_tenant_stripe_checkout` obtiene la empresa desde la sesion. La eleccion se guarda en campos pendientes y Stripe recoge el metodo de pago. `invoice.paid` aplica el plan dentro de la transaccion que crea el pago y la factura de plataforma.
+Las cuentas `TRIAL` disponen de un recorrido especifico: el banner calcula los dias restantes y `upgrade-plan` muestra solo planes pagados. `CHECKOUT_PROVIDER=simulated` abre una vista propia, valida unicamente datos ficticios y crea transaccionalmente pago, justificante y acceso sin llamadas externas. `CHECKOUT_PROVIDER=stripe` conserva la seleccion pendiente y `invoice.paid` aplica el plan dentro de la transaccion que crea el pago y la factura de plataforma.
 
 ## Modo soporte multi-tenant
 

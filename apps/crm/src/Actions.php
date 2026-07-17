@@ -24,6 +24,8 @@ final class Actions
         if ($action !== 'logout'
             && $action !== 'reveal_trial_credentials'
             && $action !== 'create_tenant_stripe_checkout'
+            && $action !== 'open_tenant_simulated_checkout'
+            && $action !== 'complete_tenant_simulated_checkout'
             && $user
             && !is_platform_admin($user)
             && !is_platform_support_context()
@@ -65,6 +67,8 @@ final class Actions
             'resume_empresa_subscription' => self::resumeEmpresaSubscription(),
             'create_empresa_stripe_checkout' => self::createEmpresaStripeCheckout(),
             'create_tenant_stripe_checkout' => self::createTenantStripeCheckout(),
+            'open_tenant_simulated_checkout' => self::openTenantSimulatedCheckout(),
+            'complete_tenant_simulated_checkout' => self::completeTenantSimulatedCheckout(),
             'cancel_empresa_stripe_subscription' => self::cancelEmpresaStripeSubscription(),
             'create_platform_payment' => self::createPlatformPayment(),
             'update_platform_payment' => self::updatePlatformPayment(),
@@ -611,6 +615,69 @@ final class Actions
 
         header('Location: ' . $url);
         exit;
+    }
+
+    private static function openTenantSimulatedCheckout(): never
+    {
+        $user = Auth::requireUser();
+        if (!is_gym_admin($user) || is_platform_admin($user) || is_platform_support_context()) {
+            flash('Solo el administrador del gimnasio puede abrir el checkout de prueba.', 'error');
+            redirect('dashboard');
+        }
+        if (!StripeBillingConfig::simulatedCheckoutEnabled()) {
+            flash('El checkout interno de demostracion no esta habilitado.', 'error');
+            redirect('upgrade-plan');
+        }
+
+        $planCode = strtoupper(post_value('plan_code', ''));
+        $renewalPeriod = strtoupper(post_value('renewal_period', 'MONTHLY'));
+        if (!in_array($renewalPeriod, ['MONTHLY', 'ANNUAL'], true)) {
+            flash('Selecciona una periodicidad valida.', 'error');
+            redirect('upgrade-plan');
+        }
+
+        $plan = StripeBillingRepository::planByCode($planCode);
+        if (!$plan || $planCode === 'TRIAL' || (string) ($plan['status'] ?? '') !== 'ACTIVE') {
+            flash('Selecciona un plan de pago activo.', 'error');
+            redirect('upgrade-plan');
+        }
+
+        header('Location: index.php?route=simulated-checkout&plan=' . rawurlencode($planCode) . '&period=' . rawurlencode($renewalPeriod));
+        exit;
+    }
+
+    private static function completeTenantSimulatedCheckout(): never
+    {
+        $user = Auth::requireUser();
+        if (!is_gym_admin($user) || is_platform_admin($user) || is_platform_support_context()) {
+            flash('Solo el administrador del gimnasio puede completar el checkout de prueba.', 'error');
+            redirect('dashboard');
+        }
+
+        $empresa = EmpresaRepository::findByTenant((string) ($user['tenant_id'] ?? ''));
+        if (!$empresa) {
+            flash('No se encontro la empresa vinculada a tu cuenta.', 'error');
+            redirect('dashboard');
+        }
+
+        $planCode = strtoupper(post_value('plan_code', ''));
+        $renewalPeriod = strtoupper(post_value('renewal_period', 'MONTHLY'));
+        try {
+            SimulatedCheckoutService::validateCard(
+                post_value('card_number', ''),
+                post_value('card_expiry', ''),
+                post_value('card_cvc', '')
+            );
+            $result = SimulatedCheckoutService::complete((string) $empresa['id'], $planCode, $renewalPeriod);
+        } catch (Throwable $exception) {
+            log_server_error($exception, 'simulated_checkout');
+            flash('No se pudo completar el pago de prueba: ' . $exception->getMessage(), 'error');
+            header('Location: index.php?route=simulated-checkout&plan=' . rawurlencode($planCode) . '&period=' . rawurlencode($renewalPeriod));
+            exit;
+        }
+
+        flash('Pago simulado completado por ' . money_amount($result['amount']) . '. El plan ya esta activo y el movimiento aparece en la administracion.');
+        redirect('dashboard');
     }
 
     private static function cancelEmpresaStripeSubscription(): never

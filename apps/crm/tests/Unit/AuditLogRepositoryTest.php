@@ -35,4 +35,20 @@ final class AuditLogRepositoryTest extends TestCase
         self::assertFalse($method->invoke(null, 'delete_member'));
         self::assertFalse($method->invoke(null, 'login'));
     }
+
+    public function testCardFieldsAreAlwaysRedactedFromAuditMetadata(): void
+    {
+        $method = new ReflectionMethod(AuditLogRepository::class, 'sanitizePayload');
+        $payload = $method->invoke(null, [
+            'plan_code' => 'PRO',
+            'card_number' => '4242424242424242',
+            'card_expiry' => '12/30',
+            'card_cvc' => '123',
+        ]);
+
+        self::assertSame('PRO', $payload['plan_code']);
+        self::assertSame('[redacted]', $payload['card_number']);
+        self::assertSame('[redacted]', $payload['card_expiry']);
+        self::assertSame('[redacted]', $payload['card_cvc']);
+    }
 }

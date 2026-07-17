@@ -35,7 +35,8 @@ Rutas publicas o de autenticacion:
 Rutas autenticadas de gimnasio:
 
 - `dashboard`, `leads`, `tasks`, `users`, `profile`, `settings` y `novedades`.
-- `upgrade-plan`: dias restantes, catalogo de planes de pago e inicio de Stripe Checkout. Todos los roles del tenant pueden consultar; solo `GYM_ADMIN` puede contratar.
+- `upgrade-plan`: dias restantes y catalogo de planes de pago. Todos los roles del tenant pueden consultar; solo `GYM_ADMIN` puede abrir el proveedor de checkout configurado.
+- `simulated-checkout`: formulario interno exclusivo de `GYM_ADMIN`, con tarjeta ficticia y sin conexion bancaria.
 - `members`, `memberships`, `payments`, `payment-invoice` y `client-invoice`.
 - `billing`, `checkins`, `alerts`, `audit` y `classes`.
 - `global-search`: buscador/autocompletado JSON limitado al tenant actual.
@@ -118,6 +119,8 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 `POST action=create_tenant_stripe_checkout` acepta `plan_code` y `renewal_period`, pero obtiene la empresa exclusivamente desde el `tenant_id` de la sesion. Solo admite planes activos distintos de `TRIAL` y Price IDs configurados. Guarda la eleccion como pendiente, envia al administrador del gimnasio a Stripe Checkout y requiere `STRIPE_WEBHOOK_SECRET`. `invoice.paid` activa el plan, actualiza el acceso y crea pago y factura; Membora no recibe ni almacena los datos de tarjeta.
 
+`POST action=open_tenant_simulated_checkout` prepara la pantalla interna y `POST action=complete_tenant_simulated_checkout` valida exclusivamente la tarjeta ficticia documentada. La empresa siempre se obtiene de la sesion; el servidor recalcula plan, importe y periodo y crea pago, justificante y acceso dentro de una transaccion. Los campos `card_*` se descartan y se censuran en auditoria.
+
 ## 6. Seguridad de backend
 
 - Sesion estricta con cookie propia, `HttpOnly`, `SameSite=Lax` y `Secure` bajo HTTPS.
@@ -138,7 +141,7 @@ La referencia completa es `apps/crm/.env.example`. Grupos principales:
 - Administracion/demo: `PLATFORM_ADMIN_PASSWORD`, `DEMO_CLIENT_PASSWORD` y `TRIAL_RATE_LIMIT_ENABLED`.
 - Correo: `MAIL_*` y `SMTP_*`.
 - Facturas: `INVOICE_ISSUER_*`.
-- Stripe: `PAYMENTS_MODE`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET`.
+- Pagos SaaS: `PAYMENTS_MODE`, `CHECKOUT_PROVIDER`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` y `STRIPE_WEBHOOK_SECRET`.
 - Observabilidad: `SENTRY_DSN` y `SENTRY_ENVIRONMENT`.
 
 Variables opcionales de infraestructura:
