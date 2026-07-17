@@ -27,6 +27,19 @@ Antes de integrar Stripe, Membora CRM ya tenia:
 
 La integracion reutiliza esas tablas y solo anade campos Stripe. La unica tabla nueva es `stripe_events`, necesaria para idempotencia de webhooks mediante `stripe_event_id` unico.
 
+### Catalogo comercial canonico
+
+`saas_plans` es la fuente de ejecucion para el panel de administracion, `/app/api/plans`, la landing y el checkout. Los cuatro planes publicos, con precios mensuales sin IVA, son:
+
+| Codigo | Nombre | Precio/mes | Usuarios | Socios |
+| --- | --- | ---: | ---: | ---: |
+| `BASIC` | Basic | 49 EUR | 3 | 300 |
+| `PRO` | Pro | 89 EUR | 8 | 1.000 |
+| `BUSINESS` | Business | 149 EUR | 20 | 3.000 |
+| `ENTERPRISE` | Enterprise | 299 EUR | Sin limite | Sin limite |
+
+La web consulta primero la API. Solo si fallan tanto el proxy publico como `/app/api/plans` utiliza un fallback con este mismo catalogo.
+
 ## 3. Variables de entorno
 
 En `apps/crm/.env`:
@@ -38,6 +51,8 @@ STRIPE_PUBLISHABLE_KEY="pk_test_PEGAR_AQUI"
 STRIPE_SECRET_KEY="sk_test_PEGAR_AQUI"
 STRIPE_WEBHOOK_SECRET="whsec_PEGAR_AQUI"
 ```
+
+Antes de generar facturas de demostracion, completar tambien las variables `INVOICE_ISSUER_*` con los datos fiscales del emisor del entorno. El codigo no contiene datos fiscales reales; estas variables alimentan la instantanea del emisor que queda guardada en cada factura.
 
 Donde pegar cada valor:
 

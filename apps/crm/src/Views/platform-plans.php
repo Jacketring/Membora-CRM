@@ -81,6 +81,7 @@ $statusOptions = [
           <?= e(money_amount($monthlyPrice)) ?><small>/mes</small>
         <?php endif; ?>
       </strong>
+      <small>Precios sin IVA.</small>
       <?php if ($hasDiscount): ?>
         <span class="plan-discount-badge"><?= e($plan['discount_label'] ?: 'Oferta activa') ?></span>
       <?php endif; ?>

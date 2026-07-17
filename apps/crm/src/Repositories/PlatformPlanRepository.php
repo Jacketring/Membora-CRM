@@ -78,7 +78,11 @@ final class PlatformPlanRepository
             $options[$plan['code']] = $plan['name'];
         }
 
-        return $options ?: ['TRIAL' => 'Prueba', 'BASIC' => 'Basico', 'PRO' => 'Pro', 'BUSINESS' => 'Business', 'ENTERPRISE' => 'Enterprise'];
+        if ($options) {
+            return $options;
+        }
+
+        return array_column(self::defaultPlans(), 'name', 'code');
     }
 
     public static function priceMap(): array
@@ -88,13 +92,7 @@ final class PlatformPlanRepository
             $prices[$plan['code']] = number_format(self::effectiveMonthlyPrice($plan), 2, '.', '');
         }
 
-        return $prices ?: [
-            'TRIAL' => '0.00',
-            'BASIC' => '49.00',
-            'PRO' => '89.00',
-            'BUSINESS' => '149.00',
-            'ENTERPRISE' => '299.00',
-        ];
+        return $prices ?: array_column(self::defaultPlans(), 'monthly_price', 'code');
     }
 
     public static function create(array $data): void
@@ -138,22 +136,17 @@ final class PlatformPlanRepository
              VALUES (:id, :code, :name, :monthly_price, :setup_price, :max_users, :max_members, "ACTIVE", :features, NOW(), NOW())'
         );
 
-        foreach ([
-            ['TRIAL', 'Prueba', '0.00', '0.00', 2, 100, 'Plan de prueba configurable sin cobro ni renovacion automatica.'],
-            ['BASIC', 'Basico', '49.00', '0.00', 3, 300, 'Leads, socios, tareas y membresias base.'],
-            ['PRO', 'Pro', '89.00', '99.00', 8, 1000, 'Calendario de clases, usuarios y soporte prioritario.'],
-            ['BUSINESS', 'Business', '149.00', '199.00', 20, 3000, 'Multi-equipo, reporting avanzado y soporte preferente.'],
-            ['ENTERPRISE', 'Enterprise', '299.00', '499.00', null, null, 'Condiciones personalizadas para cadenas o franquicias.'],
-        ] as $plan) {
+        $defaultPlans = self::defaultPlans();
+        foreach ($defaultPlans as $plan) {
             $insert->execute([
                 'id' => cuid(),
-                'code' => $plan[0],
-                'name' => $plan[1],
-                'monthly_price' => $plan[2],
-                'setup_price' => $plan[3],
-                'max_users' => $plan[4],
-                'max_members' => $plan[5],
-                'features' => $plan[6],
+                'code' => $plan['code'],
+                'name' => $plan['name'],
+                'monthly_price' => $plan['monthly_price'],
+                'setup_price' => $plan['setup_price'],
+                'max_users' => $plan['max_users'],
+                'max_members' => $plan['max_members'],
+                'features' => $plan['features'],
             ]);
         }
 
@@ -167,6 +160,56 @@ final class PlatformPlanRepository
                  updated_at = NOW()
              WHERE code = "TRIAL"'
         );
+
+        $synchronize = $pdo->prepare(
+            'UPDATE saas_plans
+             SET name = :name,
+                 monthly_price = :monthly_price,
+                 discount_price = NULL,
+                 discount_label = NULL,
+                 max_users = :max_users,
+                 max_members = :max_members,
+                 status = "ACTIVE",
+                 features = :features,
+                 updated_at = NOW()
+             WHERE code = :code
+               AND (name = :legacy_name OR monthly_price = :legacy_price OR features = :legacy_features)'
+        );
+        $legacyPlans = [
+            'BASIC' => ['name' => 'Basico', 'monthly_price' => '39.00', 'features' => 'Leads, socios, tareas y membresias base.'],
+            'PRO' => ['name' => 'Profesional', 'monthly_price' => '69.00', 'features' => 'Calendario de clases, usuarios y soporte prioritario.'],
+            'BUSINESS' => ['name' => '', 'monthly_price' => '-1.00', 'features' => 'Multi-equipo, reporting avanzado y soporte preferente.'],
+            'ENTERPRISE' => ['name' => 'Premium', 'monthly_price' => '-1.00', 'features' => 'Condiciones personalizadas para cadenas o franquicias.'],
+        ];
+        foreach ($defaultPlans as $plan) {
+            if ($plan['code'] === 'TRIAL') {
+                continue;
+            }
+
+            $legacy = $legacyPlans[$plan['code']];
+            $synchronize->execute([
+                'code' => $plan['code'],
+                'name' => $plan['name'],
+                'monthly_price' => $plan['monthly_price'],
+                'max_users' => $plan['max_users'],
+                'max_members' => $plan['max_members'],
+                'features' => $plan['features'],
+                'legacy_name' => $legacy['name'],
+                'legacy_price' => $legacy['monthly_price'],
+                'legacy_features' => $legacy['features'],
+            ]);
+        }
+    }
+
+    private static function defaultPlans(): array
+    {
+        return [
+            ['code' => 'TRIAL', 'name' => 'Prueba', 'monthly_price' => '0.00', 'setup_price' => '0.00', 'max_users' => 2, 'max_members' => 100, 'features' => 'Plan de prueba configurable sin cobro ni renovacion automatica.'],
+            ['code' => 'BASIC', 'name' => 'Basic', 'monthly_price' => '49.00', 'setup_price' => '0.00', 'max_users' => 3, 'max_members' => 300, 'features' => "CRM de leads y socios.\nMembresias, pagos y tareas.\nSoporte por email."],
+            ['code' => 'PRO', 'name' => 'Pro', 'monthly_price' => '89.00', 'setup_price' => '99.00', 'max_users' => 8, 'max_members' => 1000, 'features' => "Todo lo incluido en Basic.\nClases, reservas y check-ins.\nSoporte prioritario."],
+            ['code' => 'BUSINESS', 'name' => 'Business', 'monthly_price' => '149.00', 'setup_price' => '199.00', 'max_users' => 20, 'max_members' => 3000, 'features' => "Todo lo incluido en Pro.\nGestion de equipos y reporting avanzado.\nSoporte preferente."],
+            ['code' => 'ENTERPRISE', 'name' => 'Enterprise', 'monthly_price' => '299.00', 'setup_price' => '499.00', 'max_users' => null, 'max_members' => null, 'features' => "Todo lo incluido en Business.\nCapacidad para cadenas o franquicias.\nSoporte dedicado."],
+        ];
     }
 
     private static function planParams(array $data): array
@@ -200,8 +243,9 @@ final class PlatformPlanRepository
     public static function publicPlans(): array
     {
         $plans = [];
+        $publicCodes = ['BASIC', 'PRO', 'BUSINESS', 'ENTERPRISE'];
         foreach (self::all('', 'ACTIVE') as $plan) {
-            if (strtoupper((string) $plan['code']) === 'TRIAL') {
+            if (!in_array(strtoupper((string) $plan['code']), $publicCodes, true)) {
                 continue;
             }
 

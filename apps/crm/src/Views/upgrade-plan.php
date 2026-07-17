@@ -76,7 +76,7 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
               <del><?= e(money_amount($plan['original_monthly_price'])) ?></del>
             <?php endif; ?>
             <div><strong><?= e(money_amount($plan['monthly_price'])) ?></strong><span>/mes</span></div>
-            <small>Facturación mensual · anual <?= e(money_amount($annualAmount)) ?></small>
+            <small>Facturación mensual · anual <?= e(money_amount($annualAmount)) ?> · Precios sin IVA.</small>
           </div>
 
           <?php if (!empty($plan['discount_label'])): ?>

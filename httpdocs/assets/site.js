@@ -4,10 +4,11 @@ const MEMBORA_PUBLIC_PLANS_URL = window.MEMBORA_PUBLIC_PLANS_URL || 'api/plans.p
 const MEMBORA_REMOTE_PUBLIC_PLANS_URL = '/app/api/plans';
 const MEMBORA_TRIAL_URL = window.MEMBORA_TRIAL_URL || 'api/trial.php';
 
-const DEFAULT_PLAN_FEATURES = [
-  ['Leads, socios y membresías', 'Pagos y facturación', '2 usuarios del equipo', 'Alertas y tareas básicas', 'Soporte por email'],
-  ['Todo lo incluido en Básico', 'Clases, reservas y check-ins', '8 usuarios del equipo', 'Alertas y tareas completas', 'Soporte prioritario'],
-  ['Todo lo incluido en Profesional', 'Usuarios ilimitados', 'Personalización avanzada', 'Soporte dedicado', 'Implantación acompañada'],
+const FALLBACK_PLANS = [
+  { code: 'BASIC', name: 'Basic', monthly_price: '49.00', max_users: 3, max_members: 300, features: ['CRM de leads y socios.', 'Membresias, pagos y tareas.', 'Soporte por email.'] },
+  { code: 'PRO', name: 'Pro', monthly_price: '89.00', max_users: 8, max_members: 1000, features: ['Todo lo incluido en Basic.', 'Clases, reservas y check-ins.', 'Soporte prioritario.'] },
+  { code: 'BUSINESS', name: 'Business', monthly_price: '149.00', max_users: 20, max_members: 3000, features: ['Todo lo incluido en Pro.', 'Gestion de equipos y reporting avanzado.', 'Soporte preferente.'] },
+  { code: 'ENTERPRISE', name: 'Enterprise', monthly_price: '299.00', max_users: null, max_members: null, features: ['Todo lo incluido en Business.', 'Capacidad para cadenas o franquicias.', 'Soporte dedicado.'] },
 ];
 
 function startDemoLogin(type = 'client') {
@@ -52,9 +53,9 @@ function formatPlanPrice(value) {
   })} EUR/mes`;
 }
 
-function renderPlanCard(plan, index) {
+function renderPlanCard(plan) {
   const article = document.createElement('article');
-  if (index === 1) {
+  if (String(plan.code).toUpperCase() === 'PRO') {
     article.className = 'highlight-plan';
   }
 
@@ -62,9 +63,8 @@ function renderPlanCard(plan, index) {
   title.textContent = plan.name || 'Plan Membora';
 
   const description = document.createElement('p');
-  const remoteFeatures = Array.isArray(plan.features) ? plan.features.filter(Boolean) : [];
-  const features = remoteFeatures.length > 1 ? remoteFeatures.slice(1) : (DEFAULT_PLAN_FEATURES[index] || []);
-  description.textContent = remoteFeatures[0] || 'Plan comercial de Membora.';
+  const features = Array.isArray(plan.features) ? plan.features.filter(Boolean) : [];
+  description.textContent = 'Plan mensual de Membora CRM.';
 
   const price = document.createElement('strong');
   if (plan.original_monthly_price) {
@@ -75,7 +75,11 @@ function renderPlanCard(plan, index) {
   }
   price.append(formatPlanPrice(plan.monthly_price));
 
-  article.append(title, description, price);
+  const taxNote = document.createElement('small');
+  taxNote.className = 'web-plan-tax-note';
+  taxNote.textContent = 'Precios sin IVA.';
+
+  article.append(title, description, price, taxNote);
 
   if (plan.discount_label) {
     const badge = document.createElement('span');
@@ -84,20 +88,23 @@ function renderPlanCard(plan, index) {
     article.appendChild(badge);
   }
 
-  if (features.length > 0) {
-    const list = document.createElement('ul');
-    features.forEach((feature) => {
+  const list = document.createElement('ul');
+  const limits = [
+    plan.max_users === null ? 'Usuarios sin límite' : `Hasta ${plan.max_users} usuarios`,
+    plan.max_members === null ? 'Socios sin límite' : `Hasta ${plan.max_members} socios`,
+  ];
+  [...limits, ...features].forEach((feature) => {
       const item = document.createElement('li');
       item.textContent = feature;
       list.appendChild(item);
-    });
-    article.appendChild(list);
-  }
+  });
+  article.appendChild(list);
 
   const action = document.createElement('a');
   action.className = 'plan-action';
-  action.href = index === 2 ? '#contacto' : '#prueba-gratis';
-  action.textContent = index === 0 ? 'Empezar' : (index === 1 ? 'Probar gratis 14 días' : 'Contactar');
+  const isEnterprise = String(plan.code).toUpperCase() === 'ENTERPRISE';
+  action.href = isEnterprise ? '#contacto' : '#prueba-gratis';
+  action.textContent = isEnterprise ? 'Contratar' : 'Probar gratis 14 días';
   article.appendChild(action);
 
   return article;
@@ -133,8 +140,10 @@ async function loadPublicPlans() {
     }
 
     pricingGrid.replaceChildren(...plans.map(renderPlanCard));
+    updateStructuredPlanData(plans);
   } catch (error) {
-    // La web mantiene los planes estaticos si el CRM no responde.
+    pricingGrid.replaceChildren(...FALLBACK_PLANS.map(renderPlanCard));
+    updateStructuredPlanData(FALLBACK_PLANS);
   }
 }
 
@@ -388,6 +397,32 @@ function showTrialMessage(message, type) {
   trialAlert.textContent = message;
   trialAlert.className = `form-alert ${type}`;
   trialAlert.hidden = false;
+}
+
+function updateStructuredPlanData(plans) {
+  const script = document.querySelector('#membora-structured-data');
+  if (!script) {
+    return;
+  }
+
+  try {
+    const data = JSON.parse(script.textContent);
+    const software = data['@graph']?.find((item) => item['@id'] === 'https://membora.es/#software');
+    if (!software) {
+      return;
+    }
+
+    software.offers = plans.map((plan) => ({
+      '@type': 'Offer',
+      name: plan.name,
+      price: String(plan.monthly_price),
+      priceCurrency: 'EUR',
+      description: 'Precio mensual sin IVA.',
+    }));
+    script.textContent = JSON.stringify(data);
+  } catch (error) {
+    // Los planes visibles siguen disponibles aunque el marcado estructurado no pueda actualizarse.
+  }
 }
 
 trialForm?.addEventListener('submit', async (event) => {

@@ -103,7 +103,7 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 ### Planes
 
-`GET /api/plans` responde con `success`, moneda `EUR` y una lista de planes activos. La web publica consume este endpoint mediante `httpdocs/api/plans.php`.
+`GET /api/plans` responde con `success`, moneda `EUR` y los cuatro planes comerciales activos (`Basic`, `Pro`, `Business` y `Enterprise`). Cada elemento incluye `monthly_price`, `max_users`, `max_members` y `features`. La web publica consume este endpoint mediante `httpdocs/api/plans.php` y solo usa su catalogo de fallback si fallan el proxy y `/app/api/plans`.
 
 ### Prueba self-service
 

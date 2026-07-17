@@ -1484,11 +1484,15 @@ button, input, textarea { font: inherit; }
 }
 
 .pricing-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .pricing-grid strong {
   color: var(--primary);
   font-size: 24px;
+}
+.web-plan-tax-note {
+  color: var(--muted);
+  font-size: 12px;
 }
 .pricing-grid ul {
   color: var(--muted);
