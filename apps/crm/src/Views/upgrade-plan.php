@@ -2,6 +2,7 @@
 $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
 $currentPlanCode = $isTrial ? 'TRIAL' : strtoupper((string) ($empresa['plan'] ?? ''));
 $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
+$hasStripeSubscription = trim((string) ($empresa['stripe_subscription_id'] ?? '')) !== '';
 ?>
 <div class="upgrade-plan-page">
   <section class="upgrade-plan-hero">
@@ -58,8 +59,8 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
           $isCurrent = !$isTrial && $planCode === $currentPlanCode;
           $isUpgrade = PlatformPlanRepository::canUpgrade($currentPlanCode, $planCode);
           $isFeatured = $planCode === 'PRO';
-          $monthlyAvailable = $isUpgrade && ($simulatedCheckout || ($isTrial && $stripeReady && !empty($plan['stripe_monthly_available'])));
-          $annualAvailable = $isUpgrade && ($simulatedCheckout || ($isTrial && $stripeReady && !empty($plan['stripe_annual_available'])));
+          $monthlyAvailable = $isUpgrade && ($simulatedCheckout || (!$hasStripeSubscription && $stripeReady && !empty($plan['stripe_monthly_available'])));
+          $annualAvailable = $isUpgrade && ($simulatedCheckout || (!$hasStripeSubscription && $stripeReady && !empty($plan['stripe_annual_available'])));
           $checkoutAction = $simulatedCheckout ? 'open_tenant_simulated_checkout' : 'create_tenant_stripe_checkout';
           $features = array_slice($plan['features'] ?? [], 0, 4);
           $annualAmount = (float) $plan['monthly_price'] * 12;
@@ -122,8 +123,10 @@ $remainingDays = max(0, (int) ($accessState['remaining_days'] ?? 0));
             <?php endif; ?>
           </div>
 
-          <?php if (!$simulatedCheckout && !$monthlyAvailable && !$annualAvailable): ?>
-            <small class="upgrade-plan-unavailable">Pendiente de configuración en Stripe</small>
+          <?php if (!$simulatedCheckout && $isUpgrade && !$monthlyAvailable && !$annualAvailable): ?>
+            <small class="upgrade-plan-unavailable"><?= $hasStripeSubscription
+              ? 'Cambio de suscripción pendiente de gestión'
+              : 'Pendiente de configurar el Price ID en Stripe' ?></small>
           <?php endif; ?>
         </article>
       <?php endforeach; ?>

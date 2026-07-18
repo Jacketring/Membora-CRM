@@ -615,14 +615,17 @@ final class Actions
             flash('No se encontro la empresa vinculada a tu cuenta.', 'error');
             redirect('dashboard');
         }
-        $isTrial = strtoupper((string) ($empresa['plan'] ?? '')) === 'TRIAL' || (string) ($empresa['status'] ?? '') === 'TRIAL';
-        if (!$isTrial) {
-            flash('La mejora directa esta disponible para empresas en prueba.', 'error');
-            redirect('dashboard');
-        }
-
         $planCode = strtoupper(post_value('plan_code', ''));
         $renewalPeriod = strtoupper(post_value('renewal_period', 'MONTHLY'));
+        if (!PlatformPlanRepository::canUpgrade((string) ($empresa['plan'] ?? ''), $planCode)) {
+            flash('Selecciona un plan superior al que tienes actualmente.', 'error');
+            redirect('upgrade-plan');
+        }
+        if (trim((string) ($empresa['stripe_subscription_id'] ?? '')) !== '') {
+            flash('La suscripcion ya esta vinculada a Stripe. Contacta con Membora para cambiar el plan sin crear una suscripcion duplicada.', 'error');
+            redirect('upgrade-plan');
+        }
+
         try {
             $url = StripeBillingService::createCheckoutSession((string) $empresa['id'], $planCode, $renewalPeriod, true);
         } catch (Throwable $exception) {

@@ -191,12 +191,16 @@ Prueba:
 2. Pegar `sk_test_...`, `pk_test_...` y `whsec_...`.
 3. Crear Price mensual/anual en Stripe.
 4. Pegar Price IDs en el plan local.
-5. Entrar como administrador de una empresa `TRIAL` y abrir `Mejorar el plan`.
+5. Entrar como administrador de una empresa `TRIAL` o de una empresa activada previamente sin suscripcion Stripe, y abrir `Mejorar el plan`.
 6. Elegir el plan y pulsar `Pagar mensualmente` o `Pagar anualmente`.
 7. Completar pago con `4242 4242 4242 4242`.
 8. Revisar las tablas de facturas/cobros y el registro tecnico `stripe_events`; la pantalla de Facturas no muestra un bloque de diagnostico Stripe.
 9. Confirmar que el evento `invoice.paid` queda procesado en `stripe_events`.
 10. Confirmar que la empresa queda `PAID`, con `access_until` actualizado.
+
+Una empresa activada previamente mediante el checkout simulado puede contratar un plan superior con
+Stripe Checkout si todavia no tiene `stripe_subscription_id`. El sistema rechaza crear una segunda
+suscripcion cuando ya existe una suscripcion Stripe vinculada.
 
 Prueba de fallo:
 

@@ -64,21 +64,21 @@ final class SimulatedCheckoutTest extends TestCase
         self::assertFalse(PlatformPlanRepository::canUpgrade('PRO', 'BASIC'));
         self::assertFalse(PlatformPlanRepository::canUpgrade('ENTERPRISE', 'ENTERPRISE'));
 
-        $empresa = ['name' => 'Gimnasio Demo', 'plan' => 'BASIC', 'status' => 'ACTIVE'];
+        $empresa = ['name' => 'Gimnasio Demo', 'plan' => 'BASIC', 'status' => 'ACTIVE', 'stripe_subscription_id' => null];
         $accessState = ['remaining_days' => 0];
-        $simulatedCheckout = true;
-        $stripeReady = false;
+        $simulatedCheckout = false;
+        $stripeReady = true;
         $canPurchase = true;
         $plans = [
             [
                 'code' => 'BASIC', 'name' => 'Basic', 'monthly_price' => '49.00', 'original_monthly_price' => null,
                 'discount_label' => null, 'features' => [], 'max_users' => 3, 'max_members' => 300,
-                'stripe_monthly_available' => false, 'stripe_annual_available' => false,
+                'stripe_monthly_available' => true, 'stripe_annual_available' => false,
             ],
             [
                 'code' => 'PRO', 'name' => 'Pro', 'monthly_price' => '89.00', 'original_monthly_price' => null,
                 'discount_label' => null, 'features' => [], 'max_users' => 8, 'max_members' => 1000,
-                'stripe_monthly_available' => false, 'stripe_annual_available' => false,
+                'stripe_monthly_available' => true, 'stripe_annual_available' => false,
             ],
         ];
 
@@ -88,7 +88,9 @@ final class SimulatedCheckoutTest extends TestCase
 
         self::assertStringContainsString('PLAN ACTUAL', $plansHtml);
         self::assertStringContainsString('Tu plan actual es BASIC', $plansHtml);
-        self::assertStringContainsString('Mejorar con pago mensual', $plansHtml);
+        self::assertStringContainsString('Elegir pago mensual', $plansHtml);
+        self::assertStringContainsString('create_tenant_stripe_checkout', $plansHtml);
+        self::assertStringNotContainsString('Pendiente de configurar el Price ID en Stripe', $plansHtml);
     }
 
     public function testRejectsARealOrUnknownCardNumber(): void

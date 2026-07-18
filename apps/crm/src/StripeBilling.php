@@ -930,6 +930,12 @@ final class StripeBillingService
         if (!$plan || strtoupper((string) $plan['code']) === 'TRIAL' || (string) ($plan['status'] ?? '') !== 'ACTIVE') {
             throw new RuntimeException('Selecciona un plan de pago antes de crear el checkout.');
         }
+        if ($tenantCheckout && !PlatformPlanRepository::canUpgrade((string) ($empresa['plan'] ?? ''), $planCode)) {
+            throw new RuntimeException('Selecciona un plan superior al que tienes actualmente.');
+        }
+        if ($tenantCheckout && trim((string) ($empresa['stripe_subscription_id'] ?? '')) !== '') {
+            throw new RuntimeException('La empresa ya tiene una suscripcion Stripe vinculada. No se creara otra suscripcion duplicada.');
+        }
 
         $period = strtoupper(trim((string) ($requestedPeriod ?: ($empresa['renewal_period'] ?? 'MONTHLY'))));
         if (!in_array($period, ['MONTHLY', 'ANNUAL'], true)) {
