@@ -128,10 +128,11 @@ La vista, la accion que abre el checkout y el servicio que lo completa validan e
 3. Todos los roles pueden consultar los planes pagados, pero solo `GYM_ADMIN` puede iniciar el cobro.
 4. El administrador elige plan y periodicidad; Membora obtiene la empresa desde el `tenant_id` de la sesion y guarda la eleccion como pendiente.
 5. Stripe crea/reutiliza `stripe_customer_id` y abre Checkout alojado para recoger la forma de pago.
-6. La redireccion de exito no activa el acceso.
+6. La redireccion de exito verifica la sesion directamente en Stripe y puede completar la activacion.
 7. `invoice.paid` aplica el plan pendiente, marca la empresa al dia, actualiza `access_until` y crea pago y factura local.
-8. `invoice.payment_failed` registra el intento vencido/error y no amplia acceso.
-9. `customer.subscription.updated/deleted` sincroniza estado, cancelacion al final del periodo y `current_period_end`.
+8. La URL de retorno consulta tambien la sesion pagada en Stripe y aplica la misma sincronizacion idempotente, como respaldo si el webhook se retrasa.
+9. `invoice.payment_failed` registra el intento vencido/error y no amplia acceso.
+10. `customer.subscription.updated/deleted` sincroniza estado, cancelacion al final del periodo y `current_period_end`.
 
 ### Estado de la interfaz
 

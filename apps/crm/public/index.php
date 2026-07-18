@@ -156,7 +156,26 @@ if ($isStripeWebhookRequest) {
 }
 
 if ($requestPath === '/stripe/checkout/success' || ($_GET['route'] ?? '') === 'stripe-checkout-success') {
-    flash('Checkout completado. El acceso se activara cuando Stripe confirme el pago por webhook.');
+    $source = (string) ($_GET['source'] ?? '');
+    $sessionId = trim((string) ($_GET['session_id'] ?? ''));
+    if ($source === 'tenant' && $sessionId !== '' && Auth::user()) {
+        $empresa = EmpresaRepository::findByTenant((string) (Auth::user()['tenant_id'] ?? ''));
+        try {
+            $confirmed = $empresa
+                && StripeBillingService::reconcileCheckoutSession($sessionId, (string) $empresa['id']);
+            flash($confirmed
+                ? 'Pago confirmado. Tu nuevo plan ya esta activo.'
+                : 'Stripe ha recibido el pago. La activacion terminara cuando llegue la confirmacion final.');
+        } catch (Throwable $exception) {
+            if ($empresa) {
+                StripeBillingRepository::recordEmpresaError((string) $empresa['id'], $exception->getMessage());
+            }
+            log_server_error($exception, 'stripe_checkout_reconcile');
+            flash('Stripe ha recibido el pago. Estamos terminando de sincronizar tu plan.', 'error');
+        }
+    } else {
+        flash('Checkout completado. El acceso se activara cuando Stripe confirme el pago por webhook.');
+    }
     redirect(($_GET['source'] ?? '') === 'tenant' ? 'dashboard' : 'platform-contacts');
 }
 

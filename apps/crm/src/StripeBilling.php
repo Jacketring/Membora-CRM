@@ -437,7 +437,7 @@ final class StripeBillingRepository
                 'monthly_price' => $paidMonthlyPrice,
                 'renewal_period' => $paidRenewalPeriod,
                 'stripe_customer_id' => self::objectId($invoice['customer'] ?? null) ?: null,
-                'stripe_subscription_id' => self::objectId($invoice['subscription'] ?? null) ?: null,
+                'stripe_subscription_id' => self::invoiceSubscriptionId($invoice) ?: null,
                 'stripe_subscription_status' => null,
                 'next_payment_at' => $periodEndDate,
                 'access_until' => $periodEndDate,
@@ -499,7 +499,10 @@ final class StripeBillingRepository
             }
         }
 
-        $subscriptionId = self::objectId($object['subscription'] ?? ($object['id'] ?? null));
+        $subscriptionId = self::invoiceSubscriptionId($object);
+        if ($subscriptionId === '') {
+            $subscriptionId = self::objectId($object['subscription'] ?? ($object['id'] ?? null));
+        }
         if ($subscriptionId !== '') {
             $stmt = Database::connection()->prepare('SELECT * FROM empresas WHERE stripe_subscription_id = :stripe_subscription_id LIMIT 1');
             $stmt->execute(['stripe_subscription_id' => $subscriptionId]);
@@ -520,6 +523,22 @@ final class StripeBillingRepository
         }
 
         return null;
+    }
+
+    public static function invoiceSubscriptionId(array $invoice): string
+    {
+        $legacyId = self::objectId($invoice['subscription'] ?? null);
+        if ($legacyId !== '') {
+            return $legacyId;
+        }
+
+        $parent = $invoice['parent'] ?? [];
+        if (!is_array($parent) || (string) ($parent['type'] ?? '') !== 'subscription_details') {
+            return '';
+        }
+
+        $details = $parent['subscription_details'] ?? [];
+        return is_array($details) ? self::objectId($details['subscription'] ?? null) : '';
     }
 
     private static function upsertPlatformPayment(array $invoice, array $empresa, string $status, string $amount, ?string $paidAt, string $concept, string $paymentIntentId, ?string $dueAt = null): void
@@ -1057,6 +1076,51 @@ final class StripeBillingService
         StripeBillingRepository::syncSubscription($subscription->toArray());
     }
 
+    public static function reconcileCheckoutSession(string $sessionId, string $expectedEmpresaId): bool
+    {
+        StripeBillingConfig::assertReady();
+        if (!preg_match('/^cs_test_[A-Za-z0-9]+$/', $sessionId)) {
+            throw new RuntimeException('La referencia de Checkout no es valida.');
+        }
+
+        $client = new \Stripe\StripeClient(StripeBillingConfig::secretKey());
+        $session = $client->checkout->sessions->retrieve($sessionId, [
+            'expand' => ['subscription.latest_invoice'],
+        ]);
+        $sessionData = $session->toArray();
+        $empresaId = (string) ($sessionData['metadata']['empresa_id'] ?? $sessionData['client_reference_id'] ?? '');
+        if ($empresaId === '' || !hash_equals($expectedEmpresaId, $empresaId)) {
+            throw new RuntimeException('El pago no pertenece a esta empresa.');
+        }
+        if ((string) ($sessionData['status'] ?? '') !== 'complete'
+            || (string) ($sessionData['payment_status'] ?? '') === 'unpaid') {
+            return false;
+        }
+
+        StripeBillingRepository::syncCheckoutSession($sessionData);
+        $subscriptionData = $sessionData['subscription'] ?? [];
+        if (!is_array($subscriptionData)) {
+            $subscriptionData = [];
+        }
+        if ($subscriptionData !== []) {
+            StripeBillingRepository::syncSubscription($subscriptionData);
+        }
+
+        $invoiceData = $subscriptionData['latest_invoice'] ?? $sessionData['invoice'] ?? [];
+        if (is_string($invoiceData) && $invoiceData !== '') {
+            $invoiceData = $client->invoices->retrieve($invoiceData)->toArray();
+        }
+        if (!is_array($invoiceData) || (string) ($invoiceData['status'] ?? '') !== 'paid') {
+            return false;
+        }
+
+        $metadata = $sessionData['metadata'] ?? [];
+        $invoiceData['_membora_subscription_metadata'] = is_array($metadata) ? $metadata : [];
+        StripeBillingRepository::syncInvoicePaid($invoiceData);
+
+        return true;
+    }
+
     public static function handleWebhook(string $payload, string $signature): array
     {
         StripeBillingConfig::assertReady();
@@ -1108,10 +1172,12 @@ final class StripeBillingService
 
     private static function withSubscriptionMetadata(array $invoice): array
     {
-        $subscription = $invoice['subscription'] ?? null;
-        $subscriptionId = is_string($subscription)
-            ? $subscription
-            : (is_array($subscription) ? (string) ($subscription['id'] ?? '') : '');
+        $parentDetails = $invoice['parent']['subscription_details'] ?? [];
+        if (is_array($parentDetails) && is_array($parentDetails['metadata'] ?? null)) {
+            $invoice['_membora_subscription_metadata'] = $parentDetails['metadata'];
+        }
+
+        $subscriptionId = StripeBillingRepository::invoiceSubscriptionId($invoice);
         if ($subscriptionId === '') {
             return $invoice;
         }

@@ -23,6 +23,22 @@ final class SimulatedCheckoutTest extends TestCase
         }
     }
 
+    public function testReadsSubscriptionFromCurrentAndLegacyStripeInvoices(): void
+    {
+        self::assertSame('sub_legacy', StripeBillingRepository::invoiceSubscriptionId([
+            'subscription' => 'sub_legacy',
+        ]));
+        self::assertSame('sub_basil', StripeBillingRepository::invoiceSubscriptionId([
+            'parent' => [
+                'type' => 'subscription_details',
+                'subscription_details' => ['subscription' => 'sub_basil'],
+            ],
+        ]));
+        self::assertSame('', StripeBillingRepository::invoiceSubscriptionId([
+            'parent' => ['type' => 'quote_details'],
+        ]));
+    }
+
     public function testAcceptsOnlyTheDocumentedFakeCard(): void
     {
         $futureYear = (int) date('y') + 2;
