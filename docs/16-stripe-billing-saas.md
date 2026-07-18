@@ -46,7 +46,7 @@ En `apps/crm/.env`:
 
 ```env
 PAYMENTS_MODE="stripe_test"
-CHECKOUT_PROVIDER="simulated"
+CHECKOUT_PROVIDER="stripe"
 STRIPE_PUBLISHABLE_KEY="pk_test_PEGAR_AQUI"
 STRIPE_SECRET_KEY="sk_test_PEGAR_AQUI"
 STRIPE_WEBHOOK_SECRET="whsec_PEGAR_AQUI"
@@ -56,7 +56,7 @@ Antes de generar facturas de demostracion, completar tambien las variables `INVO
 
 Donde pegar cada valor:
 
-- `CHECKOUT_PROVIDER=simulated`: usa el checkout interno con tarjeta ficticia, sin contactar con Stripe ni bancos. Es el valor entregado para la demostracion.
+- `CHECKOUT_PROVIDER=simulated`: usa el checkout interno con tarjeta ficticia, sin contactar con Stripe ni bancos. Solo debe habilitarse expresamente para demostraciones aisladas.
 - `CHECKOUT_PROVIDER=stripe`: recupera Stripe Checkout y exige todas las claves y el webhook configurados.
 
 - `STRIPE_PUBLISHABLE_KEY`: Stripe Dashboard > Developers > API keys > Publishable key.

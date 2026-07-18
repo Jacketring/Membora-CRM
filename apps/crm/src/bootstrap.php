@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+// Load the application environment before any service reads configuration.
+// Previously this happened only when the first database connection was opened,
+// so payment configuration could fall back to the simulated checkout.
+require __DIR__ . '/../config/config.php';
+
 require __DIR__ . '/Support.php';
 
 $composerAutoload = __DIR__ . '/../vendor/autoload.php';

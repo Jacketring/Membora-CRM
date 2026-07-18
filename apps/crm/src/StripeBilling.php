@@ -29,9 +29,9 @@ final class StripeBillingConfig
 
     public static function checkoutProvider(): string
     {
-        $provider = strtolower(trim((string) (getenv('CHECKOUT_PROVIDER') ?: 'simulated')));
+        $provider = strtolower(trim((string) (getenv('CHECKOUT_PROVIDER') ?: 'stripe')));
 
-        return in_array($provider, ['simulated', 'stripe'], true) ? $provider : 'simulated';
+        return in_array($provider, ['simulated', 'stripe'], true) ? $provider : 'stripe';
     }
 
     public static function simulatedCheckoutEnabled(): bool

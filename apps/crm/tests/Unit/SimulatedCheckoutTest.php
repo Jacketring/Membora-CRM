@@ -6,6 +6,23 @@ use PHPUnit\Framework\TestCase;
 
 final class SimulatedCheckoutTest extends TestCase
 {
+    public function testStripeIsTheSafeDefaultCheckoutProvider(): void
+    {
+        $previous = getenv('CHECKOUT_PROVIDER');
+        putenv('CHECKOUT_PROVIDER');
+
+        try {
+            self::assertSame('stripe', StripeBillingConfig::checkoutProvider());
+            self::assertFalse(StripeBillingConfig::simulatedCheckoutEnabled());
+        } finally {
+            if ($previous === false) {
+                putenv('CHECKOUT_PROVIDER');
+            } else {
+                putenv('CHECKOUT_PROVIDER=' . $previous);
+            }
+        }
+    }
+
     public function testAcceptsOnlyTheDocumentedFakeCard(): void
     {
         $futureYear = (int) date('y') + 2;
