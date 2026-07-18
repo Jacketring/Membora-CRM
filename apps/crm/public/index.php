@@ -156,8 +156,21 @@ if ($isStripeWebhookRequest) {
 }
 
 if ($requestPath === '/stripe/checkout/success') {
-    flash('Checkout completado. El acceso se activara cuando Stripe confirme el pago por webhook.');
-    redirect(($_GET['source'] ?? '') === 'tenant' ? 'dashboard' : 'platform-contacts');
+    $isTenantCheckout = ($_GET['source'] ?? '') === 'tenant';
+    $successRoute = $isTenantCheckout ? 'dashboard' : 'platform-contacts';
+    try {
+        $activated = StripeBillingService::activateFromCheckoutSession((string) ($_GET['session_id'] ?? ''));
+        if ($activated) {
+            flash('Pago confirmado. Tu plan ya esta activo.');
+        } else {
+            flash('Checkout completado. El acceso se activara en cuanto Stripe confirme el pago.');
+        }
+    } catch (Throwable $exception) {
+        // Si la activacion inmediata falla, el webhook sigue siendo la red de seguridad.
+        log_server_error($exception, 'stripe_checkout_success');
+        flash('Checkout completado. El acceso se activara en cuanto Stripe confirme el pago.');
+    }
+    redirect($successRoute);
 }
 
 if ($requestPath === '/stripe/checkout/cancel') {

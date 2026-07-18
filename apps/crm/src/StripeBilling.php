@@ -914,9 +914,6 @@ final class StripeBillingService
     public static function createCheckoutSession(string $empresaId, ?string $requestedPlanCode = null, ?string $requestedPeriod = null, bool $tenantCheckout = false): string
     {
         StripeBillingConfig::assertReady();
-        if ($tenantCheckout && StripeBillingConfig::webhookSecret() === '') {
-            throw new RuntimeException('Falta configurar el webhook firmado de Stripe antes de aceptar pagos.');
-        }
         StripeBillingRepository::ensureSchema();
         \Stripe\Stripe::setApiKey(StripeBillingConfig::secretKey());
 
@@ -996,6 +993,50 @@ final class StripeBillingService
         StripeBillingRepository::markCheckoutSession($empresaId, (string) $session->id, (string) $plan['code'], $period);
 
         return (string) $session->url;
+    }
+
+    /**
+     * Activa la suscripcion en cuanto el usuario vuelve del pago, sin depender del webhook.
+     * El webhook sigue siendo la fuente de verdad para eventos posteriores (renovaciones, impagos,
+     * cancelaciones), pero la activacion inmediata no debe quedar bloqueada si el webhook no llega.
+     * Devuelve true si el pago esta confirmado y la empresa ha quedado activada.
+     */
+    public static function activateFromCheckoutSession(string $sessionId): bool
+    {
+        if (trim($sessionId) === '') {
+            return false;
+        }
+
+        StripeBillingConfig::assertReady();
+        StripeBillingRepository::ensureSchema();
+        \Stripe\Stripe::setApiKey(StripeBillingConfig::secretKey());
+
+        $session = \Stripe\Checkout\Session::retrieve([
+            'id' => $sessionId,
+            'expand' => ['subscription', 'subscription.latest_invoice', 'customer'],
+        ]);
+        $sessionArray = $session->toArray();
+
+        // Vincula cliente y suscripcion de Stripe con la empresa (aunque el pago aun no este confirmado).
+        StripeBillingRepository::syncCheckoutSession($sessionArray);
+
+        $paid = ($sessionArray['payment_status'] ?? '') === 'paid'
+            || ($sessionArray['status'] ?? '') === 'complete';
+        if (!$paid) {
+            return false;
+        }
+
+        $subscription = $sessionArray['subscription'] ?? null;
+        if (is_array($subscription)) {
+            StripeBillingRepository::syncSubscription($subscription);
+
+            $invoice = $subscription['latest_invoice'] ?? null;
+            if (is_array($invoice) && ($invoice['status'] ?? '') === 'paid') {
+                StripeBillingRepository::syncInvoicePaid($invoice);
+            }
+        }
+
+        return true;
     }
 
     private static function resolveConfiguredPriceId(string $configuredId, string $period): string
