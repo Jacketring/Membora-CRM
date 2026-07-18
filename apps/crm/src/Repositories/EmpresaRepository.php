@@ -843,6 +843,8 @@ final class EmpresaRepository
             'billing_integrations',
             'webhook_logs',
             'webhook_settings',
+            // Nombre heredado usado por el esquema inicial de producción.
+            'check_ins',
             'checkins',
             'reservations',
             'payments',
