@@ -1,6 +1,6 @@
 # Backend PHP, rutas y acciones - Membora CRM
 
-Fecha de actualizacion: 17/07/2026.
+Fecha de actualizacion: 18/07/2026.
 
 ## 1. Arquitectura activa
 
@@ -16,7 +16,7 @@ La navegacion usa el parametro `route`; las escrituras internas usan `POST` con 
 | `POST` | `/api/trial` | Solicita una prueba de 14 dias con verificacion de email. Alias: `?action=trial_registration`. |
 | `POST` | `/webhook/lead` | Recibe captacion web por origen permitido o integraciones de tenant mediante token. Alias: `?action=webhook_lead`. |
 | `POST` | `/stripe/webhook` | Recibe eventos Stripe y valida obligatoriamente `Stripe-Signature`. Alias: `?action=stripe_webhook`. |
-| `GET` | `/stripe/checkout/success` | Retorno informativo de checkout; el webhook confirma el acceso y el cobro. |
+| `GET` | `/stripe/checkout/success` o `?route=stripe-checkout-success` | Retorno autenticado; recupera la sesion en Stripe y puede reconciliar acceso y cobro pagados como respaldo del webhook. |
 | `GET` | `/stripe/checkout/cancel` | Retorno de checkout cancelado sin activar acceso ni registrar cobro. |
 
 La web publica dispone de proxies en `httpdocs/api/plans.php`, `trial.php` y `lead.php`. Estos proxies conservan el mismo origen publico, aplican tiempos limite y trasladan una respuesta JSON generica al navegador.
@@ -115,9 +115,9 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 ### Stripe
 
-`POST /stripe/webhook` funciona cuando `PAYMENTS_MODE=stripe_test`, verifica la firma, registra `stripe_events` para idempotencia y sincroniza suscripciones, cobros y facturas. El checkout no activa el acceso por la URL de retorno: espera la confirmacion firmada del webhook.
+`POST /stripe/webhook` funciona cuando `PAYMENTS_MODE=stripe_test`, verifica la firma, registra `stripe_events` para idempotencia y sincroniza suscripciones, cobros y facturas. Es la via principal de confirmacion. La URL de retorno no confia en datos del navegador: recupera la Checkout Session con la clave secreta, comprueba la empresa autenticada y puede ejecutar la misma sincronizacion idempotente si Stripe confirma que la factura esta pagada.
 
-`POST action=create_tenant_stripe_checkout` acepta `plan_code` y `renewal_period`, pero obtiene la empresa exclusivamente desde el `tenant_id` de la sesion. Solo se ofrece desde una empresa `TRIAL`, admite planes activos de pago y Price IDs configurados. Guarda la eleccion como pendiente, envia al administrador del gimnasio a Stripe Checkout y requiere `STRIPE_WEBHOOK_SECRET`. `invoice.paid` activa el plan, actualiza el acceso y crea pago y factura; Membora no recibe ni almacena los datos de tarjeta.
+`POST action=create_tenant_stripe_checkout` acepta `plan_code` y `renewal_period`, pero obtiene la empresa exclusivamente desde el `tenant_id` de la sesion. Se ofrece desde `TRIAL` o desde un plan activo inferior que todavia no tenga una suscripcion Stripe vinculada; admite planes activos de pago y Price IDs configurados, rechaza descensos y evita crear una segunda suscripcion. Guarda la eleccion como pendiente, envia al administrador del gimnasio a Stripe Checkout y requiere `STRIPE_WEBHOOK_SECRET`. `invoice.paid` o la reconciliacion autenticada de la sesion pagada activan el plan, actualizan el acceso y crean pago y factura de forma idempotente; Membora no recibe ni almacena los datos de tarjeta.
 
 `POST action=open_tenant_simulated_checkout` prepara la pantalla interna y `POST action=complete_tenant_simulated_checkout` valida exclusivamente la tarjeta ficticia documentada. La empresa siempre se obtiene de la sesion; el servidor recalcula plan, importe y periodo, exige que el destino sea superior al plan actual y crea pago, justificante y acceso dentro de una transaccion. La jerarquia es `TRIAL < BASIC < PRO < BUSINESS < ENTERPRISE`; los campos `card_*` se descartan y se censuran en auditoria.
 

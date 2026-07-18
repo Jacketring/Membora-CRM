@@ -16,7 +16,7 @@ vendor/bin/phpstan analyse
 vendor/bin/captainhook install
 ```
 
-La ejecución local del 17 de julio de 2026 completa **60 tests y 291 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
+La ejecución local del 18 de julio de 2026 completa **65 tests y 306 aserciones** sin errores. La cobertura se genera en `apps/crm/coverage/`; el CI exige un mínimo del 80 % a la capa aislable de permisos, CSRF, helpers y webhook. La última medición de cobertura guardada, realizada el 11 de julio de 2026, alcanza **93,50 % de líneas (604/646)**. Es una medición histórica de la capa configurada, no de todo el producto. En Plesk se sube `vendor/` o se ejecuta `composer install --no-dev --optimize-autoloader`.
 
 Playwright está en `e2e/` y es solo para desarrollo/CI; Node.js no forma parte del despliegue. Debe apuntar exclusivamente a una app y BD local o de staging preparadas para pruebas, nunca a producción:
 
@@ -312,7 +312,7 @@ Las correcciones de seguridad y los requisitos de despliegue se detallan en
 - Seccion `Usuarios` para gestionar cuentas de plataforma separadas de los usuarios de gimnasio.
 - Seccion `Planes` para mantener el catalogo canonico Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR, con limites y prestaciones sincronizados con API, web publica y checkout.
 - Stripe Billing en modo de prueba con checkout, webhooks firmados, idempotencia, renovaciones y cancelacion al final del periodo.
-- `Mejorar el plan` marca el plan actual y solo permite ascensos. En el proveedor simulado, Basic puede subir a Pro, Business o Enterprise; Pro a Business o Enterprise; y Business a Enterprise. Los controles tecnicos y diagnosticos Stripe siguen ocultos en las pantallas administrativas.
+- `Mejorar el plan` marca el plan actual y solo permite ascensos. En el proveedor simulado, Basic puede subir a Pro, Business o Enterprise; Pro a Business o Enterprise; y Business a Enterprise. Stripe Checkout permite la misma progresión desde cuentas sin una suscripción Stripe vinculada y evita crear suscripciones duplicadas. El webhook y el retorno verificado sincronizan el plan de forma idempotente. Los controles técnicos y diagnósticos Stripe siguen ocultos en las pantallas administrativas.
 - Ruta interna `platform-web`, oculta del menu y exclusiva de superadministradores, para diagnosticar el formulario publico y los envios cuando sea necesario.
 - Seccion `Logs` para filtrar actividad por empresa, accion, fecha y texto.
 - Acceso de soporte al CRM de una empresa conectada.

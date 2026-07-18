@@ -1,6 +1,6 @@
 # Stripe Billing SaaS - Membora CRM
 
-Fecha de actualizacion: 17/07/2026.
+Fecha de actualizacion: 18/07/2026.
 
 ## 1. Alcance
 

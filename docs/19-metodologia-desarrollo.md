@@ -1,6 +1,6 @@
 # Metodología de desarrollo y validación
 
-Fecha de actualización: 17/07/2026.
+Fecha de actualización: 18/07/2026.
 
 ## 1. Enfoque
 
@@ -84,7 +84,7 @@ Un cambio se considera terminado cuando, de forma proporcional a su alcance:
 
 ## 5. Estado verificable de calidad
 
-La ejecución local repetida el 17/07/2026 completó **60 tests y 291 aserciones** sin errores. PHPStan también finalizó sin errores.
+La ejecución local repetida el 18/07/2026 completó **65 tests y 306 aserciones** sin errores. PHPStan también finalizó sin errores.
 
 La última medición de cobertura guardada corresponde al 11/07/2026: **93,50 % de líneas (604/646)** en la capa lógica configurada. Esta cifra es una evidencia histórica y no debe confundirse con una medición de todo el producto ni con el número actual de pruebas. El pipeline exige al menos un 80 % de cobertura de sentencias sobre la capa incluida en su filtro.
 

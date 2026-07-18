@@ -8,7 +8,7 @@ La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/inde
 
 El CRM se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
 
-Estado verificado el 17/07/2026: **60 tests y 291 aserciones** de PHPUnit, además de PHPStan sin errores.
+Estado verificado el 18/07/2026: **65 tests y 306 aserciones** de PHPUnit, además de PHPStan sin errores.
 
 ## Requisitos
 
@@ -161,7 +161,7 @@ Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones N
 
 La facturacion SaaS usa `PAYMENTS_MODE=stripe_test`. `CHECKOUT_PROVIDER=simulated` mantiene todo el pago dentro de la demostracion y `CHECKOUT_PROVIDER=stripe` exige claves `sk_test_` y webhook. La activacion Live queda fuera del estado cerrado actual; consulta `../../docs/16-stripe-billing-saas.md`.
 
-El estado tecnico de Stripe, sus identificadores y la URL del webhook no se muestran en Facturas CRM ni en el formulario administrativo de suscripcion. El administrador de una empresa `TRIAL` dispone de dos proveedores configurables. `CHECKOUT_PROVIDER=simulated` abre un checkout interno con tarjeta ficticia, no contacta con bancos y crea un pago/factura claramente simulados para la demostracion. `CHECKOUT_PROVIDER=stripe` entra en Stripe Checkout; el plan queda pendiente y solo se activa cuando `/stripe/webhook` recibe `invoice.paid`.
+El estado tecnico de Stripe, sus identificadores y la URL del webhook no se muestran en Facturas CRM ni en el formulario administrativo de suscripcion. El administrador de una empresa `TRIAL`, o de un plan activo sin suscripcion Stripe vinculada, dispone del proveedor configurado. `CHECKOUT_PROVIDER=simulated` abre un checkout interno con tarjeta ficticia, no contacta con bancos y crea un pago/factura claramente simulados para la demostracion. `CHECKOUT_PROVIDER=stripe` entra en Stripe Checkout; el plan se activa cuando `/stripe/webhook` recibe `invoice.paid` o cuando el retorno autenticado recupera y verifica directamente la sesion pagada. Ambas rutas son idempotentes y se bloquean suscripciones duplicadas.
 
 ## Web comercial
 

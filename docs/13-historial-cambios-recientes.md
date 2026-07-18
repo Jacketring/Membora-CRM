@@ -1,6 +1,6 @@
 # Historial de cambios recientes - Membora CRM
 
-Fecha de actualizacion: 17/07/2026.
+Fecha de actualizacion: 18/07/2026.
 
 ## 1. Objetivo
 
@@ -103,11 +103,11 @@ El estado actual incluye checkout, webhooks firmados, idempotencia, suscripcione
 
 Para la entrega se retiraron de la interfaz el bloque diagnostico de Stripe, el boton de Checkout y la cancelacion directa de Stripe. El webhook y las acciones de backend siguen implementados para pruebas tecnicas; el modal visible concentra ahora la gestion local de renovacion con mas espacio y una jerarquia mas clara.
 
-Posteriormente se incorporo un checkout visible con un alcance distinto: las empresas `TRIAL` ven los dias restantes y pueden abrir `Mejorar el plan`. El administrador del gimnasio elige un plan pagado y completa los datos bancarios en Stripe. La eleccion queda pendiente y solo `invoice.paid` cambia el plan y crea el pago y la factura administrativa. Los diagnosticos y controles Stripe del superadministrador continúan ocultos.
+Posteriormente se incorporo un checkout visible: las empresas `TRIAL` ven los dias restantes y pueden abrir `Mejorar el plan`. El administrador del gimnasio elige un plan pagado y completa los datos bancarios en Stripe. La eleccion queda pendiente hasta que `invoice.paid` o la reconciliacion autenticada de la sesion pagada cambian el plan y crean el pago y la factura administrativa de forma idempotente. Los diagnosticos y controles Stripe del superadministrador continúan ocultos.
 
 Para la demostracion final se incorporo un proveedor `simulated` separado del flujo Stripe. Presenta un checkout propio con una unica tarjeta ficticia admitida, no contacta con bancos, censura todos los campos `card_*` y crea pago/factura con marcas explicitas de simulacion. Stripe se conserva seleccionable mediante `CHECKOUT_PROVIDER=stripe`.
 
-El recorrido se amplio despues a clientes activos: Basic, Pro y Business ven el aviso de mejora; la pantalla marca `PLAN ACTUAL` y solo habilita rangos superiores. La misma regla se valida al abrir y completar el checkout simulado, por lo que un POST manipulado no permite repetir plan ni hacer downgrade. Enterprise no recibe el aviso. Stripe Checkout continua limitado al alta desde `TRIAL` para evitar una segunda suscripcion en lugar de una actualizacion controlada.
+El recorrido se amplio despues a clientes activos: Basic, Pro y Business ven el aviso de mejora; la pantalla marca `PLAN ACTUAL` y solo habilita rangos superiores. La misma regla se valida en ambos proveedores, por lo que un POST manipulado no permite repetir plan ni hacer downgrade. Enterprise no recibe el aviso. Stripe Checkout permite ascender a cuentas que no tengan una suscripcion Stripe vinculada y bloquea una segunda suscripcion cuando ya existe una.
 
 ## 6. Alta self-service y limpieza de pruebas
 
@@ -116,7 +116,7 @@ La activacion por correo se completo como un flujo de dos mensajes:
 - El primer enlace confirma la propiedad del correo y requiere una accion `POST` antes de crear datos.
 - La activacion crea `Cliente CRM`, empresa `TRIAL`, tenant y usuario `GYM_ADMIN` vinculados.
 - El segundo enlace revela una contrasena inicial aleatoria cifrada, durante una hora y una sola vez.
-- Si falla una parte del aprovisionamiento o del segundo correo, se revierte el alta parcial y la solicitud vuelve a un estado reintentable.
+- Si falla una parte del aprovisionamiento o del segundo correo, se conservan las referencias ya creadas y la solicitud continúa desde una fase reintentable sin duplicar ni borrar la cuenta.
 - El rate limit especifico de la prueba esta desactivado por defecto durante la depuracion y puede reactivarse con `TRIAL_RATE_LIMIT_ENABLED=true`.
 
 Tambien se incorporo la eliminacion controlada de empresas de prueba, la eliminacion directa de leads y clientes comerciales y la reparacion automatica de contactos que falten para empresas ya existentes. La herramienta `platform-web` se conserva oculta como apoyo interno para diagnosticar correos.

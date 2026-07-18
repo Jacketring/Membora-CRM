@@ -1,6 +1,6 @@
 # Arquitectura y flujos
 
-Fecha de actualización: 17/07/2026.
+Fecha de actualización: 18/07/2026.
 
 ## Flujo metodológico
 
@@ -117,13 +117,16 @@ sequenceDiagram
     S->>CRM: Webhook firmado
     CRM->>DB: Registra stripe_event idempotente
     CRM->>DB: Sincroniza suscripción, factura, cobro y acceso
+    S-->>CRM: Retorno con Checkout Session
+    CRM->>S: Verifica sesion, empresa y factura pagada
+    CRM->>DB: Reconciliacion idempotente de respaldo
 ```
 
-La URL de éxito no confirma el pago. Solo el webhook firmado modifica el estado financiero y de acceso. El código rechaza claves que no sean `sk_test_`; Stripe Live permanece pendiente.
+El webhook firmado es la via principal. Como respaldo, la URL de exito recupera la sesion directamente desde Stripe, valida que pertenezca a la empresa autenticada y solo sincroniza una factura confirmada como pagada. Ambas rutas reutilizan operaciones idempotentes. El código rechaza claves que no sean `sk_test_`; Stripe Live permanece pendiente.
 
 La interfaz visible de empresas y facturas no muestra actualmente el bloque de diagnostico, el boton de Checkout ni la cancelacion directa en Stripe. El backend y el webhook de prueba se conservan como integracion tecnica, mientras la gestion diaria visible usa el estado local de renovacion.
 
-Las cuentas `TRIAL` disponen de un banner con los dias restantes; Basic, Pro y Business conservan una llamada de mejora. `upgrade-plan` marca la tarjeta contratada y usa la jerarquia `TRIAL < BASIC < PRO < BUSINESS < ENTERPRISE` para habilitar solo ascensos. `CHECKOUT_PROVIDER=simulated` vuelve a validar la jerarquia, admite unicamente datos ficticios y crea transaccionalmente pago, justificante y acceso sin llamadas externas. `CHECKOUT_PROVIDER=stripe` permanece limitado a la conversion desde `TRIAL`, conserva la seleccion pendiente y solo `invoice.paid` aplica el plan dentro de la transaccion que crea el pago y la factura de plataforma.
+Las cuentas `TRIAL` disponen de un banner con los dias restantes; Basic, Pro y Business conservan una llamada de mejora. `upgrade-plan` marca la tarjeta contratada y usa la jerarquia `TRIAL < BASIC < PRO < BUSINESS < ENTERPRISE` para habilitar solo ascensos. `CHECKOUT_PROVIDER=simulated` vuelve a validar la jerarquia, admite unicamente datos ficticios y crea transaccionalmente pago, justificante y acceso sin llamadas externas. `CHECKOUT_PROVIDER=stripe` permite altas y ascensos mientras no exista una suscripcion Stripe vinculada, conserva la seleccion pendiente y aplica el plan cuando el webhook o la reconciliacion autenticada confirman la factura pagada.
 
 ## Modo soporte multi-tenant
 

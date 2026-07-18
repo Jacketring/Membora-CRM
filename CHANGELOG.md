@@ -10,7 +10,12 @@ Todos los cambios notables se documentan aquí siguiendo [Keep a Changelog](http
 - El alta de prueba verificada crea y vincula automaticamente `Cliente CRM`, empresa `TRIAL`, tenant y administrador durante 14 dias; los emails ya registrados reciben un aviso de acceso en lugar de una respuesta silenciosa.
 - Unificado el catalogo SaaS en Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR mensuales sin IVA para base de datos, panel, API, landing, `schema.org` y fallback.
 - La landing obtiene planes desde la API, muestra limites y prestaciones y solo usa el fallback cuando fallan el proxy y el endpoint directo.
-- `Mejorar el plan` identifica el plan actual y permite unicamente ascensos en el checkout simulado; Basic, Pro y Business reciben el aviso de mejora y Enterprise queda excluido.
+- `Mejorar el plan` identifica el plan actual y permite unicamente ascensos con el proveedor configurado; Basic, Pro y Business reciben el aviso de mejora y Enterprise queda excluido.
+- Stripe Checkout es el proveedor predeterminado en `stripe_test`, admite altas y ascensos desde cuentas sin suscripcion Stripe previa y bloquea suscripciones duplicadas.
+- El retorno de Stripe usa el dominio real autorizado, vuelve al dashboard y reconcilia de forma idempotente la sesion pagada como respaldo del webhook.
+- La sincronizacion de facturas admite tanto el formato Stripe anterior como `invoice.parent.subscription_details` de las versiones actuales de la API.
+- El alta de prueba y el correo de credenciales funcionan como fases persistentes y reintentables; los enlaces usan el reloj de MariaDB para evitar desfases del servidor.
+- La eliminacion de empresas, clientes, leads y socios limpia o desvincula sus dependencias sin recrear contactos eliminados.
 - Retirados del repositorio los materiales antiguos de presentacion para evitar referencias a una version desactualizada.
 
 ### Added

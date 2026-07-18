@@ -292,7 +292,7 @@ Como superadministrador, quiero iniciar un checkout Stripe de prueba para valida
 Criterios de aceptacion:
 
 - Solo se aceptan claves `sk_test_` y precios Stripe configurados.
-- El retorno del navegador no activa por si solo la suscripcion.
+- El retorno del navegador no activa por confiar en sus parametros: el servidor debe recuperar la sesion y verificar el pago directamente en Stripe, o recibir el webhook firmado.
 - Los webhooks firmados se procesan una sola vez y sincronizan cobro, factura y acceso.
 
 ### HU-30 Entrar en modo soporte

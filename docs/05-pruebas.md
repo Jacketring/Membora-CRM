@@ -1,12 +1,12 @@
 # Plan de pruebas - Membora CRM
 
-Fecha de actualización: 17/07/2026.
+Fecha de actualización: 18/07/2026.
 
 Este plan corresponde a la fase de verificación de la metodología incremental descrita en `docs/19-metodologia-desarrollo.md`.
 
 ## Automatización
 
-La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, catálogo y jerarquía de planes, webhook, checkout simulado, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 17 de julio de 2026 completa **60 tests y 291 aserciones** sin errores.
+La suite PHPUnit cubre permisos por rol, CSRF, normalización de entradas, reglas de membresía, auditoría segura, catálogo y jerarquía de planes, webhook, checkout simulado, métricas del dashboard, estados históricos de reservas, provisionamiento de pruebas e inicialización de Sentry. La ejecución local del 18 de julio de 2026 completa **65 tests y 306 aserciones** sin errores.
 
 El 11 de julio de 2026 se midió una cobertura del **93,50 % de líneas (604/646)** en la capa lógica configurada, por encima del umbral CI del 80 %. Esta cobertura es la última medición guardada y debe tratarse como evidencia histórica de esa capa, no como cobertura actual de todo el producto.
 
@@ -502,18 +502,18 @@ Precondicion: `PAYMENTS_MODE=stripe_test`, claves de prueba y Price IDs validos.
 
 Pasos:
 
-1. Entrar como administrador de una empresa `TRIAL` y comprobar el banner con dias restantes.
+1. Entrar como administrador de una empresa `TRIAL` o de un plan activo sin suscripcion Stripe vinculada y comprobar las opciones superiores disponibles.
 2. Abrir `Mejorar el plan`, confirmar que no aparece el plan gratuito y elegir un plan de pago mensual o anual configurado.
 3. Completar Stripe Checkout con una tarjeta de prueba; no introducir datos bancarios en ningun formulario propio de Membora.
-4. Confirmar que el retorno por si solo no activa el acceso.
-5. Enviar o esperar el webhook firmado.
+4. Confirmar que el retorno consulta en Stripe la sesion pagada y activa el plan cuando la factura ya esta pagada.
+5. Enviar o esperar el webhook firmado y comprobar que produce el mismo resultado idempotente.
 6. Repetir el mismo evento.
 7. Solicitar la cancelacion de Stripe al final del periodo y recibir su actualizacion por webhook.
 
 Resultado esperado:
 
 - El webhook sincroniza empresa, suscripcion, factura y cobro.
-- El plan y la periodicidad elegidos permanecen pendientes hasta `invoice.paid` y despues sustituyen el estado `TRIAL`.
+- El plan y la periodicidad elegidos permanecen pendientes hasta que la factura pagada se confirma por webhook o reconciliacion directa; despues sustituyen `TRIAL` o el plan inferior.
 - El pago aparece en `Admin CRM > Facturacion > Pagos` y la factura en `Admin CRM > Facturacion > Facturas`.
 - El mismo `stripe_event_id` no se procesa dos veces.
 - La cancelacion conserva el acceso hasta el final del periodo y queda sincronizada por webhook.

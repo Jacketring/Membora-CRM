@@ -77,7 +77,7 @@ Recorrido recomendado:
 15. Login como administrador de plataforma.
 16. Panel `Admin CRM`: contactos, empresas, renovaciones, facturas, planes, auditoria y acceso de soporte. No abrir la herramienta oculta de correo salvo que sea necesario diagnosticar SMTP.
 17. Web publica: formulario, opiniones y enlaces legales.
-18. Mostrar el plan actual y `Mejorar el plan`: desde `TRIAL` se elige un plan y desde Basic, Pro o Business solo se permiten ascensos simulados; explicar que Stripe Live todavia no esta activo.
+18. Mostrar el plan actual y `Mejorar el plan`: desde `TRIAL` se elige un plan y desde Basic, Pro o Business solo se permiten ascensos; Stripe Checkout funciona en Test para cuentas sin suscripcion Stripe vinculada y Stripe Live todavia no esta activo.
 
 ## 5. Slides
 

@@ -1,6 +1,6 @@
 # Estado actual de la version PHP - Membora CRM
 
-Fecha de actualizacion: 17/07/2026.
+Fecha de actualizacion: 18/07/2026.
 
 ## 1. Resumen
 
@@ -28,9 +28,9 @@ No se usa Node.js en produccion.
 
 El desarrollo sigue el proceso incremental documentado en `docs/19-metodologia-desarrollo.md`: alcance, requisitos, historias, especificación, pruebas, implementación, integración continua y validación del despliegue.
 
-Estado verificado el 17/07/2026:
+Estado verificado el 18/07/2026:
 
-- PHPUnit: **60 tests y 291 aserciones**, sin errores.
+- PHPUnit: **65 tests y 306 aserciones**, sin errores (18/07/2026).
 - PHPStan: sin errores.
 - GitHub Actions: sintaxis PHP, PHPUnit, umbral de cobertura y PHPStan; E2E condicionado a un staging configurado.
 
@@ -211,8 +211,8 @@ Estado verificado el 17/07/2026:
 - Banner de modo soporte y retorno al panel de administracion.
 - Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
 - Stripe Billing funcional en modo `stripe_test`: checkout alojado, webhook firmado, idempotencia, suscripciones, cancelacion al final del periodo y sincronizacion de cobros y facturas.
-- Los controles tecnicos de checkout/cancelacion Stripe y el bloque de diagnostico se mantienen fuera de empresas y facturas. Stripe Checkout visible conserva el alta desde `TRIAL`; los ascensos de clientes pagados se realizan solo con el proveedor simulado para no crear suscripciones Stripe duplicadas.
-- En modo simulado se crean inmediatamente un pago y justificante diferenciados y se activa el plan, tanto desde `TRIAL` como al subir de Basic, Pro o Business; en modo Stripe el plan no se activa hasta `invoice.paid`.
+- Los controles tecnicos de checkout/cancelacion Stripe y el bloque de diagnostico se mantienen fuera de empresas y facturas. Stripe Checkout visible permite el alta desde `TRIAL` y los ascensos de cuentas activas que no tengan una suscripcion Stripe vinculada; si ya existe una, bloquea otra suscripcion duplicada.
+- En modo simulado se crean inmediatamente un pago y justificante diferenciados y se activa el plan, tanto desde `TRIAL` como al subir de Basic, Pro o Business; en modo Stripe el plan se activa tras confirmar la factura pagada por webhook firmado o reconciliacion autenticada de la sesion.
 
 ## 5. Pendiente para operacion real
 

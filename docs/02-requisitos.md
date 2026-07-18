@@ -224,7 +224,7 @@ El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el re
 
 - Debe crear checkout alojado y asociarlo a empresa, plan y periodicidad.
 - Debe verificar `Stripe-Signature` y procesar eventos de forma idempotente.
-- El acceso y el cobro solo cambian tras confirmacion por webhook, no por la URL de retorno.
+- El acceso y el cobro solo cambian tras verificar el pago contra Stripe: normalmente mediante webhook firmado y, como respaldo idempotente, consultando la sesion desde la URL de retorno autenticada.
 - Debe permitir cancelar al final del periodo y consultar el estado sincronizado de la suscripcion.
 - Stripe Live queda pendiente de configuracion bancaria, fiscal y comercial.
 - Una empresa `TRIAL` debe ver los dias restantes y poder elegir un plan de pago desde su propio CRM.
@@ -232,7 +232,7 @@ El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el re
 - El backend debe rechazar la seleccion del mismo plan, los descensos y codigos fuera del catalogo, aunque se manipule el formulario.
 - Solo el administrador del gimnasio puede iniciar Checkout; los demas roles pueden consultar los planes.
 - En modo simulado solo se admite la tarjeta ficticia documentada; sus campos se descartan y censuran en auditoria, sin contactar con Stripe ni bancos.
-- El pago simulado crea pago y justificante administrativo diferenciados y activa el acceso en una unica transaccion. Con el proveedor Stripe, el plan permanece pendiente hasta `invoice.paid`.
+- El pago simulado crea pago y justificante administrativo diferenciados y activa el acceso en una unica transaccion. Con el proveedor Stripe, el plan permanece pendiente hasta que `invoice.paid` o la reconciliacion autenticada de una sesion pagada confirman la factura.
 
 ### RF-21 Autenticacion recuperable
 
