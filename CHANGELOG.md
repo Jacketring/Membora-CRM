@@ -5,6 +5,7 @@ Todos los cambios notables se documentan aquí siguiendo [Keep a Changelog](http
 ## [Unreleased]
 
 ### Changed
+- Ocultados temporalmente los accesos y el bloque publico de la demo de 20 minutos; la prueba gratuita de 14 dias permanece disponible.
 - La activacion de prueba reinicia una sesion anonima despues de cerrar la cuenta anterior, evitando que la caducidad de la cookie invalide el formulario CSRF antes de crear el contacto, la empresa y el correo de credenciales.
 - El formulario comercial solicita contacto con Membora y el aviso de activacion explica la llegada del correo de contraseña y los pasos para iniciar sesion.
 - La empresa tecnica de la demo deja de sincronizarse como contacto comercial, se retira cualquier contacto demo previo y el dominio antiguo del login redirige a `membora.es/app`.
