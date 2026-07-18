@@ -6,14 +6,14 @@ $baseAmount = (float) $payment['amount'];
 $taxRate = 0.21;
 $taxAmount = round($baseAmount * $taxRate, 2);
 $totalAmount = round($baseAmount + $taxAmount, 2);
-$planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
+$planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'SAAS';
 ?>
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Factura <?= e($invoiceNumber) ?> - Membora CRM</title>
+  <title>Factura <?= e($invoiceNumber) ?> - Membora</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <style>
     :root {
@@ -192,7 +192,7 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
   <article class="invoice">
     <header class="invoice-header">
       <div class="brand">
-        <h1>Membora CRM</h1>
+        <h1>Membora</h1>
         <p>SaaS para gimnasios, estudios deportivos y centros fitness.</p>
         <p>contacto@josehurtado.dev</p>
       </div>
@@ -207,8 +207,8 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
     <section class="summary-grid">
       <div class="party">
         <span>Emisor</span>
-        <h2>Membora CRM</h2>
-        <p>Proyecto SaaS Membora CRM</p>
+        <h2>Membora</h2>
+        <p>Proyecto SaaS Membora</p>
         <p>Madrid, España</p>
         <p>NIF/CIF: pendiente de alta comercial</p>
       </div>
@@ -233,7 +233,7 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
         <tr>
           <td><strong><?= e($payment['concept']) ?></strong></td>
           <td>
-            Servicio SaaS Membora CRM.
+            Servicio SaaS Membora.
             <?php if (!empty($payment['notes'])): ?>
               <br><?= e($payment['notes']) ?>
             <?php endif; ?>
@@ -262,11 +262,11 @@ $planLabel = $payment['plan'] ? strtoupper((string) $payment['plan']) : 'CRM';
 
     <section class="notes">
       <span>Observaciones</span>
-      <p>Documento generado desde Admin CRM para control interno y entrega al cliente. Los datos fiscales del emisor deben completarse antes de un uso comercial real.</p>
+      <p>Documento generado desde Administración Membora para control interno y entrega al cliente. Los datos fiscales del emisor deben completarse antes de un uso comercial real.</p>
       <p>Forma de pago: transferencia bancaria o método acordado con la empresa cliente.</p>
     </section>
 
-    <p class="footer">Factura generada por Membora CRM. Conserva este documento junto con el justificante de pago correspondiente.</p>
+    <p class="footer">Factura generada por Membora. Conserva este documento junto con el justificante de pago correspondiente.</p>
   </article>
   <script src="assets/app.js"></script>
 </body>

@@ -1,4 +1,4 @@
-# Historial de cambios recientes - Membora CRM
+# Historial de cambios recientes - Membora
 
 Fecha de actualizacion: 18/07/2026.
 
@@ -16,23 +16,23 @@ Se ha ampliado la gestion de empresas para controlar mejor el ciclo de vida come
 
 - Fecha de alta de la suscripcion.
 - Fecha desde la que el cliente empieza a pagar.
-- Fecha de acceso hasta la que puede usar el CRM.
+- Fecha de acceso hasta la que puede usar la plataforma.
 - Periodicidad mensual o anual.
 - Estado de renovacion.
 - Cancelacion al final del periodo contratado.
 - Reactivacion de empresas cuando procede.
 
-El sistema usa esta informacion para distinguir entre prueba, cliente activo, acceso suspendido y cancelacion. Tambien permite bloquear visualmente el CRM del cliente cuando la demo o el periodo contratado han caducado.
+El sistema usa esta informacion para distinguir entre prueba, cliente activo, acceso suspendido y cancelacion. Tambien permite bloquear visualmente la plataforma del cliente cuando la demo o el periodo contratado han caducado.
 
 ### Acceso y bloqueo por suscripcion
 
-Se ha incorporado control de acceso SaaS para empresas conectadas. Si una empresa no tiene acceso vigente, el CRM cliente muestra un bloqueo visual con un modal orientado a elegir plan o continuar el proceso de contratacion.
+Se ha incorporado control de acceso SaaS para empresas conectadas. Si una empresa no tiene acceso vigente, la plataforma del cliente muestra un bloqueo visual con un modal orientado a elegir plan o continuar el proceso de contratacion.
 
 Este bloqueo no sustituye a una pasarela de pago real. Es una base funcional para enlazar posteriormente Stripe u otro proveedor.
 
 ### Planes SaaS
 
-Los planes comerciales se gestionan desde `Admin CRM > Planes` y `saas_plans` actua como fuente de ejecucion para panel, API, landing y checkout. El catalogo se unifico en Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR mensuales sin IVA, con limites y prestaciones visibles.
+Los planes comerciales se gestionan desde `Administración Membora > Planes` y `saas_plans` actua como fuente de ejecucion para panel, API, landing y checkout. El catalogo se unifico en Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR mensuales sin IVA, con limites y prestaciones visibles.
 
 La landing consulta el proxy y `/app/api/plans`; solo si fallan ambos usa un fallback equivalente. Las tarjetas estaticas antiguas, los precios de mockups y el `AggregateOffer` incoherente se retiraron. El marcado `schema.org` se construye con los planes realmente mostrados.
 
@@ -40,7 +40,7 @@ La landing consulta el proxy y `/app/api/plans`; solo si fallan ambos usa un fal
 
 ### Modulo de facturas
 
-Se ha creado la zona de facturacion SaaS para las facturas emitidas por Membora CRM a sus empresas cliente. Esta facturacion pertenece al administrador de plataforma y es distinta de la facturacion interna de cada gimnasio con sus socios.
+Se ha creado la zona de facturacion SaaS para las facturas emitidas por Membora a sus empresas cliente. Esta facturacion pertenece al administrador de plataforma y es distinta de la facturacion interna de cada gimnasio con sus socios.
 
 Funcionalidades incorporadas:
 
@@ -114,7 +114,7 @@ El recorrido se amplio despues a clientes activos: Basic, Pro y Business ven el 
 La activacion por correo se completo como un flujo de dos mensajes:
 
 - El primer enlace confirma la propiedad del correo y requiere una accion `POST` antes de crear datos.
-- La activacion crea `Cliente CRM`, empresa `TRIAL`, tenant y usuario `GYM_ADMIN` vinculados.
+- La activacion crea `Cliente`, empresa `TRIAL`, tenant y usuario `GYM_ADMIN` vinculados.
 - El segundo enlace revela una contrasena inicial aleatoria cifrada, durante una hora y una sola vez.
 - Si falla una parte del aprovisionamiento o del segundo correo, se conservan las referencias ya creadas y la solicitud continúa desde una fase reintentable sin duplicar ni borrar la cuenta.
 - El rate limit especifico de la prueba esta desactivado por defecto durante la depuracion y puede reactivarse con `TRIAL_RATE_LIMIT_ENABLED=true`.
@@ -141,24 +141,24 @@ La estrategia documentada es integrar mas adelante un proveedor especializado o 
 
 Se han aplicado cambios para que la web publica funcione mejor como entrada comercial:
 
-- Carga de planes desde el CRM.
+- Carga de planes desde la plataforma.
 - Proxy de planes publicos a traves del dominio web.
 - Proxy del formulario publico de leads.
 - Reenvio del origen permitido para evitar problemas de CORS.
-- Compatibilidad para que `membora.es` pueda cargar planes del CRM.
+- Compatibilidad para que `membora.es` pueda cargar planes de la plataforma.
 - Actualizacion de assets de marca.
 
-La web publica sigue separada del CRM y vive en `httpdocs`.
+La web publica sigue separada de la plataforma y vive en `httpdocs`.
 
 ## 9. Despliegue en Plesk
 
 Se ha reforzado la estructura del repositorio para el despliegue en Plesk:
 
-- CRM PHP en `apps/crm`.
+- Aplicación PHP en `apps/crm`.
 - Entrada publica en `apps/crm/public`.
 - Web comercial estatica en `httpdocs`.
 - Recuperacion del entrypoint publico legado para compatibilidad.
-- Carga del `.env` legado del CRM cuando aplica.
+- Carga del `.env` legado de la plataforma cuando aplica.
 
 El criterio operativo sigue siendo no usar Node.js, Prisma ni builds frontend en produccion.
 
@@ -210,8 +210,8 @@ Referencias recientes en Git:
 - `c817fcd` - Reenviar origen permitido desde proxy de leads.
 - `c771134` - Proxy del formulario publico de leads por dominio web.
 - `79bc668` - Proxy de planes publicos por dominio web.
-- `4520bdd` - Permitir que `membora.es` cargue planes del CRM.
-- `c035331` - Asegurar sincronizacion de planes publicos desde CRM.
+- `4520bdd` - Permitir que `membora.es` cargue planes de la plataforma.
+- `c035331` - Asegurar sincronizacion de planes publicos desde la aplicación.
 - `d51853c` - Actualizar assets de marca de Membora.
 - `013813c` - Reestructurar repo para despliegue en Plesk.
 

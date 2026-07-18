@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-  <title>Acceso a Membora CRM</title>
+  <title>Acceso a Membora</title>
   <link rel="stylesheet" href="assets/app.css?v=20260716-trial-credentials">
 </head>
 <body>
   <main class="login-screen"><div class="login-overlay"></div>
     <section class="login-panel">
-      <div class="brand-lockup brand-lockup--login"><img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora CRM"><div><p>Portal de gestión fitness</p></div></div>
+      <div class="brand-lockup brand-lockup--login"><img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora"><div><p>Portal de gestión fitness</p></div></div>
 
       <?php if (is_array($credentials ?? null)): ?>
         <article class="login-card">

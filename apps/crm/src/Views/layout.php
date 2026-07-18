@@ -10,7 +10,7 @@ $jsVersion = is_file($jsPath) ? (string) filemtime($jsPath) : '1';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#004bf2">
-  <title><?= e($title) ?> - Membora CRM</title>
+  <title><?= e($title) ?> - Membora</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/app.css?v=<?= e($cssVersion) ?>">
 </head>
@@ -33,9 +33,9 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
   <main class="app-shell">
     <aside class="sidebar">
       <div class="brand-lockup brand-lockup--sidebar">
-        <img class="brand-logo brand-logo--sidebar" src="assets/membora-logo.svg" alt="Membora CRM">
+        <img class="brand-logo brand-logo--sidebar" src="assets/membora-logo.svg" alt="Membora">
         <div>
-          <h1>Membora CRM</h1>
+          <h1>Membora</h1>
           <p><?= e($user['tenant_name'] ?? 'NexoFit Studio') ?></p>
         </div>
       </div>
@@ -139,15 +139,15 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
             </a>
             <a href="index.php?route=novedades" role="menuitem">
               <strong>Novedades</strong>
-              <small>Versiones y cambios del CRM</small>
+              <small>Versiones y cambios de la plataforma</small>
             </a>
             <?php if ($isPlatformAdmin): ?>
               <a href="index.php?route=platform-dashboard" role="menuitem">
-                <strong>Admin CRM</strong>
+                <strong>Administración Membora</strong>
                 <small>Empresas, planes y pagos</small>
               </a>
               <a href="index.php?route=platform-audit" role="menuitem">
-                <strong>Logs CRM</strong>
+                <strong>Logs de plataforma</strong>
                 <small>Actividad de empresas cliente</small>
               </a>
             <?php endif; ?>
@@ -155,7 +155,7 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
               <input type="hidden" name="action" value="logout">
               <button class="danger-menu-action" type="submit" role="menuitem">
                 <strong>Cerrar sesión</strong>
-                <small>Salir de Membora CRM</small>
+                <small>Salir de Membora</small>
               </button>
             </form>
           </div>
@@ -182,11 +182,11 @@ $publicPlans = $subscriptionBlocked ? PlatformPlanRepository::publicPlans() : []
           <div class="support-context-banner" role="status">
             <div>
               <strong>Modo soporte</strong>
-              <span>Estas viendo el CRM de <?= e($user['support_company_name'] ?? $user['tenant_name']) ?>.</span>
+              <span>Estas viendo la plataforma de <?= e($user['support_company_name'] ?? $user['tenant_name']) ?>.</span>
             </div>
             <form method="post">
               <input type="hidden" name="action" value="exit_empresa_crm">
-              <button class="secondary-action" type="submit">Volver a Admin CRM</button>
+              <button class="secondary-action" type="submit">Volver a Administración Membora</button>
             </form>
           </div>
         <?php endif; ?>

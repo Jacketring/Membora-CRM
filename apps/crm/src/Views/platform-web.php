@@ -8,7 +8,7 @@ $webUrl = $webUrl ?? 'https://membora.es';
 <div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Web comercial</h2>
-    <p>Estado de conexion entre la web pública de Membora CRM y los leads comerciales del administrador.</p>
+    <p>Estado de conexion entre la web pública de Membora y los leads comerciales del administrador.</p>
   </div>
   <div class="platform-heading-actions">
     <a class="secondary-action" href="index.php?route=platform-contacts&type=lead">Ver contactos</a>
@@ -21,7 +21,7 @@ $webUrl = $webUrl ?? 'https://membora.es';
     <header>
       <div>
         <h3>Flujo actual</h3>
-        <p>El formulario publico crea solicitudes comerciales en `Admin CRM > Contactos`.</p>
+        <p>El formulario publico crea solicitudes comerciales en `Administración Membora > Contactos`.</p>
       </div>
       <span>Sin token</span>
     </header>
@@ -31,12 +31,12 @@ $webUrl = $webUrl ?? 'https://membora.es';
         <strong><?= e(rtrim((string) $webUrl, '/')) ?></strong>
       </div>
       <div>
-        <span>2. El CRM recibe la solicitud</span>
+        <span>2. La plataforma recibe la solicitud</span>
         <strong><?= e($webhookUrl) ?></strong>
       </div>
       <div>
         <span>3. El administrador la gestiona</span>
-        <strong>Admin CRM > Contactos > Convertir en cliente</strong>
+        <strong>Administración Membora > Contactos > Convertir en cliente</strong>
       </div>
     </div>
   </article>

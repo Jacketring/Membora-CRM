@@ -1,12 +1,12 @@
-# Membora CRM PHP
+# Membora PHP
 
-Aplicacion PHP monolitica para ejecutar Membora CRM en `/app/` dentro del mismo dominio que la web publica, sin Next.js, NestJS ni procesos Node en produccion.
+Aplicacion PHP monolitica para ejecutar Membora en `/app/` dentro del mismo dominio que la web publica, sin Next.js, NestJS ni procesos Node en produccion.
 
-La web comercial vive en `httpdocs/` y expone el CRM mediante `httpdocs/app/index.php`, manteniendo el codigo privado en `apps/crm`.
+La web comercial vive en `httpdocs/` y expone la plataforma mediante `httpdocs/app/index.php`, manteniendo el codigo privado en `apps/crm`.
 
 ## Metodología y validación
 
-El CRM se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
+La plataforma se desarrolla mediante incrementos trazables desde requisitos e historias hasta especificaciones, pruebas, implementación, integración continua y despliegue. La metodología completa está en `../../docs/19-metodologia-desarrollo.md` y el plan de verificación en `../../docs/05-pruebas.md`.
 
 Estado verificado el 18/07/2026: **65 tests y 306 aserciones** de PHPUnit, además de PHPStan sin errores.
 
@@ -27,7 +27,7 @@ Crear `apps/crm/.env` a partir de `.env.example`.
 Configuracion recomendada:
 
 ```env
-APP_NAME="Membora CRM"
+APP_NAME="Membora"
 APP_ENV="production"
 APP_URL="https://membora.es/app"
 WEB_APP_URL="https://membora.es,https://www.membora.es"
@@ -40,7 +40,7 @@ DB_PASSWORD="password"
 MAIL_ENABLED="true"
 MAIL_MAILER="smtp"
 MAIL_FROM_EMAIL="no-reply@josehurtado.dev"
-MAIL_FROM_NAME="Membora CRM"
+MAIL_FROM_NAME="Membora"
 MAIL_REPLY_TO="contacto@josehurtado.dev"
 SMTP_HOST="mail.josehurtado.dev"
 SMTP_PORT="587"
@@ -100,13 +100,13 @@ La app crea y usa tablas de administracion SaaS para controlar clientes, empresa
 - Cliente comercial previo a la contratacion.
 - Empresa cliente.
 - Plan.
-- Estado del CRM.
+- Estado de la plataforma.
 - Estado de pago.
 - Precio mensual.
 - Proximo pago para planes de pago.
 - Dias de prueba configurables cuando el plan de la empresa es `Prueba`.
 - Notas internas.
-- Acceso de soporte al CRM de la empresa si tiene `tenant_id`.
+- Acceso de soporte a la plataforma de la empresa si tiene `tenant_id`.
 - Creacion de tenant y usuario administrador al pasar de cliente a empresa.
 - Pagos SaaS por empresa: concepto, importe, vencimiento, fecha de pago y estado.
 - Facturas SaaS y de clientes: lineas, impuestos, emision, pagos asociados y vista imprimible.
@@ -161,15 +161,15 @@ Esto permite desplegar cambios incrementales en Plesk sin ejecutar migraciones N
 
 La facturacion SaaS usa `PAYMENTS_MODE=stripe_test`. `CHECKOUT_PROVIDER=simulated` mantiene todo el pago dentro de la demostracion y `CHECKOUT_PROVIDER=stripe` exige claves `sk_test_` y webhook. La activacion Live queda fuera del estado cerrado actual; consulta `../../docs/16-stripe-billing-saas.md`.
 
-El estado tecnico de Stripe, sus identificadores y la URL del webhook no se muestran en Facturas CRM ni en el formulario administrativo de suscripcion. El administrador de una empresa `TRIAL`, o de un plan activo sin suscripcion Stripe vinculada, dispone del proveedor configurado. `CHECKOUT_PROVIDER=simulated` abre un checkout interno con tarjeta ficticia, no contacta con bancos y crea un pago/factura claramente simulados para la demostracion. `CHECKOUT_PROVIDER=stripe` entra en Stripe Checkout; el plan se activa cuando `/stripe/webhook` recibe `invoice.paid` o cuando el retorno autenticado recupera y verifica directamente la sesion pagada. Ambas rutas son idempotentes y se bloquean suscripciones duplicadas.
+El estado tecnico de Stripe, sus identificadores y la URL del webhook no se muestran en Facturas de plataforma ni en el formulario administrativo de suscripcion. El administrador de una empresa `TRIAL`, o de un plan activo sin suscripcion Stripe vinculada, dispone del proveedor configurado. `CHECKOUT_PROVIDER=simulated` abre un checkout interno con tarjeta ficticia, no contacta con bancos y crea un pago/factura claramente simulados para la demostracion. `CHECKOUT_PROVIDER=stripe` entra en Stripe Checkout; el plan se activa cuando `/stripe/webhook` recibe `invoice.paid` o cuando el retorno autenticado recupera y verifica directamente la sesion pagada. Ambas rutas son idempotentes y se bloquean suscripciones duplicadas.
 
 ## Web comercial
 
-La captacion web se revisa desde el panel de administradores de Membora CRM, no desde cada gimnasio cliente.
+La captacion web se revisa desde el panel de administradores de Membora, no desde cada gimnasio cliente.
 
-Los enlaces de demo de la web publica envian un `POST` al login demo del CRM. La demo cliente publica no depende del nombre exacto de `APP_ENV`, mientras que la demo de administrador solo se habilita con `APP_ENV=demo`. Cada acceso crea un usuario temporal con credenciales aleatorias, dura 20 minutos, muestra un contador y elimina ese usuario al cerrar sesion, caducar o cerrar la pestana. Al terminar devuelve al usuario a `WEB_APP_URL`.
+Los enlaces de demo de la web publica envian un `POST` al login demo de la plataforma. La demo cliente publica no depende del nombre exacto de `APP_ENV`, mientras que la demo de administrador solo se habilita con `APP_ENV=demo`. Cada acceso crea un usuario temporal con credenciales aleatorias, dura 20 minutos, muestra un contador y elimina ese usuario al cerrar sesion, caducar o cerrar la pestana. Al terminar devuelve al usuario a `WEB_APP_URL`.
 
-El formulario `Empieza gratis` envia a `/app/api/trial`. El servidor verifica origen y honeypot y envia un enlace de activacion de una hora. El rate limit especifico de esta prueba esta desactivado por defecto mientras se depura el alta; se reactiva con `TRIAL_RATE_LIMIT_ENABLED=true`. Tras confirmar el email crea o actualiza un contacto `Cliente CRM` con el nombre de la empresa y el correo real, vincula ese contacto a la empresa, crea el tenant `TRIAL` de 14 dias y crea automaticamente su usuario administrador. Antes de completar el alta comprueba de nuevo que el usuario esta activo y comparte el `tenant_id` de la empresa. La contrasena inicial se genera aleatoriamente y se entrega mediante un segundo correo que contiene un enlace temporal, no la contrasena: la credencial permanece cifrada con una clave derivada de `APP_KEY` (o `DB_PASSWORD` como compatibilidad), requiere una confirmacion explicita para revelarse y queda consumida inmediatamente para que no pueda verse de nuevo.
+El formulario `Empieza gratis` envia a `/app/api/trial`. El servidor verifica origen y honeypot y envia un enlace de activacion de una hora. El rate limit especifico de esta prueba esta desactivado por defecto mientras se depura el alta; se reactiva con `TRIAL_RATE_LIMIT_ENABLED=true`. Tras confirmar el email crea o actualiza un contacto `Cliente` con el nombre de la empresa y el correo real, vincula ese contacto a la empresa, crea el tenant `TRIAL` de 14 dias y crea automaticamente su usuario administrador. Antes de completar el alta comprueba de nuevo que el usuario esta activo y comparte el `tenant_id` de la empresa. La contrasena inicial se genera aleatoriamente y se entrega mediante un segundo correo que contiene un enlace temporal, no la contrasena: la credencial permanece cifrada con una clave derivada de `APP_KEY` (o `DB_PASSWORD` como compatibilidad), requiere una confirmacion explicita para revelarse y queda consumida inmediatamente para que no pueda verse de nuevo.
 
 El formulario de `httpdocs` envia al webhook:
 
@@ -178,11 +178,11 @@ El formulario de `httpdocs` envia al webhook:
 ```
 
 El webhook acepta `POST` con JSON, `application/x-www-form-urlencoded` o `multipart/form-data`.
-No es necesario copiar tokens en la web. El CRM valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Admin CRM > Contactos`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.
+No es necesario copiar tokens en la web. La plataforma valida el origen configurado en `WEB_APP_URL`, aplica honeypot y rate limit, y crea la solicitud en `Administración Membora > Contactos`. Desde esa seccion el administrador puede mantenerla como lead, actualizar su estado o convertirla en cliente.
 
-La vista `Contactos` comprueba ademas la integridad entre empresas y clientes. Si encuentra una empresa con email cuyo `client_id` esta vacio o apunta a un registro inexistente, crea o recupera automaticamente el `Cliente CRM`, lo marca como cliente y repara el vinculo. Esto permite recuperar altas antiguas incompletas sin editar la base de datos.
+La vista `Contactos` comprueba ademas la integridad entre empresas y clientes. Si encuentra una empresa con email cuyo `client_id` esta vacio o apunta a un registro inexistente, crea o recupera automaticamente el `Cliente`, lo marca como cliente y repara el vinculo. Esto permite recuperar altas antiguas incompletas sin editar la base de datos.
 
-Cuando la solicitud incluye un email valido, el CRM intenta enviar una confirmacion HTML al contacto. Para produccion se recomienda SMTP con `MAIL_MAILER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD`. Si el envio falla, el lead se crea igualmente y el fallo queda registrado para diagnostico.
+Cuando la solicitud incluye un email valido, la plataforma intenta enviar una confirmacion HTML al contacto. Para produccion se recomienda SMTP con `MAIL_MAILER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_ENCRYPTION`, `SMTP_USERNAME` y `SMTP_PASSWORD`. Si el envio falla, el lead se crea igualmente y el fallo queda registrado para diagnostico.
 
 La ruta `index.php?route=platform-web` y su vista `platform-web.php` se crearon como herramienta interna durante la depuracion del flujo de correo. No forman parte de la interfaz funcional y se mantienen ocultas del menu. Un superadministrador puede abrir la ruta directamente cuando necesite usar `Prueba de correo`, revisar la configuracion detectada o consultar `Ultimos envios tecnicos`; nunca se muestran secretos SMTP completos.
 

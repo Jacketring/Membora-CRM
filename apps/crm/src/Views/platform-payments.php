@@ -14,7 +14,7 @@ $statusOptions = [
 
 <div class="page-heading leads-heading platform-heading">
   <div>
-    <h2>Pagos CRM</h2>
+    <h2>Pagos de plataforma</h2>
     <p>Controla cobros de empresas cliente, pagos vencidos y facturación mensual del SaaS.</p>
   </div>
   <button class="primary-action" type="button" data-open-modal="payment-create-modal">Nuevo pago</button>

@@ -4,7 +4,7 @@ Fecha de actualización: 18/07/2026.
 
 ## 1. Enfoque
 
-Membora CRM se ha desarrollado mediante una metodología **incremental, orientada a requisitos y apoyada por pruebas automatizadas**. El proyecto no aplica Scrum formal —no existe un equipo con todos sus roles ni ceremonias— y tampoco se presenta como TDD estricto. Se utiliza un ciclo adaptado a un proyecto individual de TFM:
+Membora se ha desarrollado mediante una metodología **incremental, orientada a requisitos y apoyada por pruebas automatizadas**. El proyecto no aplica Scrum formal —no existe un equipo con todos sus roles ni ceremonias— y tampoco se presenta como TDD estricto. Se utiliza un ciclo adaptado a un proyecto individual de TFM:
 
 ```text
 Alcance → requisitos → historias de usuario → especificación y criterios de aceptación

@@ -15,7 +15,7 @@ $statusOptions = [
 $typeOptions = [
     '' => 'Todos',
     'lead' => 'Lead web',
-    'client' => 'Cliente CRM',
+    'client' => 'Cliente',
 ];
 $leadStatusOptions = [
     'NEW' => 'Nuevo',
@@ -44,7 +44,7 @@ $paymentOptions = [
 <div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Contactos</h2>
-    <p>Gestiona en una sola tabla los leads web y los clientes comerciales antes de crear su empresa CRM.</p>
+    <p>Gestiona en una sola tabla los leads web y los clientes comerciales antes de crear su empresa cliente.</p>
   </div>
   <button class="primary-action" type="button" data-open-modal="client-create-modal">Nuevo contacto</button>
 </div>
@@ -189,7 +189,7 @@ $paymentOptions = [
   <header>
     <div>
       <h2>Nuevo contacto</h2>
-      <p>Registra un contacto comercial antes de crear su empresa CRM.</p>
+      <p>Registra un contacto comercial antes de crear su empresa cliente.</p>
     </div>
     <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
   </header>
@@ -214,7 +214,7 @@ $paymentOptions = [
           <span>Tipo</span>
           <select name="contact_type">
             <option value="lead" selected>Lead</option>
-            <option value="client">Cliente CRM</option>
+            <option value="client">Cliente</option>
           </select>
         </label>
         <label class="field">

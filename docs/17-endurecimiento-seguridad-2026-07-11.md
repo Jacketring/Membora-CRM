@@ -1,10 +1,10 @@
 # Endurecimiento de seguridad — 11 de julio de 2026
 
-Este documento resume las correcciones aplicadas al CRM PHP para reforzar el aislamiento multi-tenant, la autenticacion, las credenciales y los endpoints publicos.
+Este documento resume las correcciones aplicadas a la plataforma PHP para reforzar el aislamiento multi-tenant, la autenticacion, las credenciales y los endpoints publicos.
 
 ## 1. Control de roles y aislamiento multi-tenant
 
-- Los roles `SUPER_ADMIN` y `SUPERADMIN` ya no aparecen entre los roles asignables desde el CRM de un gimnasio.
+- Los roles `SUPER_ADMIN` y `SUPERADMIN` ya no aparecen entre los roles asignables desde la plataforma de un gimnasio.
 - Las altas y ediciones de usuarios validan el rol en el servidor mediante `assignableRoleExists()`.
 - Un POST manipulado con un rol de plataforma se rechaza incluso si el identificador existe en la tabla `roles`.
 - Los usuarios no-plataforma sin `tenant_id` ya no reciben automaticamente el gimnasio mas antiguo. El acceso falla de forma segura.

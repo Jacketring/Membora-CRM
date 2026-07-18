@@ -1,4 +1,4 @@
-# Plan de pruebas - Membora CRM
+# Plan de pruebas - Membora
 
 Fecha de actualización: 18/07/2026.
 
@@ -27,7 +27,7 @@ Playwright valida login correcto e incorrecto, bloqueo de rutas de plataforma pa
 
 ## 1. Objetivo
 
-Este documento define las pruebas manuales recomendadas para validar la version PHP de Membora CRM antes de la entrega del TFM.
+Este documento define las pruebas manuales recomendadas para validar la version PHP de Membora antes de la entrega del TFM.
 
 El objetivo es comprobar que:
 
@@ -77,7 +77,7 @@ Pasos:
 
 1. Entrar en Plesk.
 2. Revisar configuracion de hosting.
-3. Confirmar que la raiz del documento apunta a `httpdocs` y que el CRM abre en `/app/`.
+3. Confirmar que la raiz del documento apunta a `httpdocs` y que la plataforma abre en `/app/`.
 
 Resultado esperado:
 
@@ -115,7 +115,7 @@ Pasos:
 
 1. Abrir `https://membora.es/`.
 2. Pulsar un enlace de demo.
-3. Confirmar que se inicia sesion automaticamente en el CRM con datos de prueba.
+3. Confirmar que se inicia sesion automaticamente en la plataforma con datos de prueba.
 4. Verificar que aparece un contador de 20 minutos en la parte superior.
 5. Pulsar `Salir de la demo` junto al contador y comprobar que vuelve a Membora.
 6. Forzar o esperar el fin de la sesion temporal.
@@ -124,7 +124,7 @@ Pasos:
 Resultado esperado:
 
 - La demo no abre una version estatica separada.
-- El CRM muestra una sesion funcional con datos demo.
+- La plataforma muestra una sesion funcional con datos demo.
 - Cada acceso utiliza un usuario temporal diferente.
 - El boton de salida cierra la sesion, elimina el usuario temporal y vuelve a la web publica.
 - El usuario temporal se elimina al cerrar sesion, cerrar la pestana o superar los 20 minutos.
@@ -146,9 +146,9 @@ Pasos:
 Resultado esperado:
 
 - El formulario no revela si un correo ya estaba registrado.
-- Sin verificar el correo no se crea ninguna empresa ni usuario del CRM.
+- Sin verificar el correo no se crea ninguna empresa ni usuario de la plataforma.
 - El enlace solo se puede usar una vez y caduca al cabo de una hora.
-- Tras verificarlo aparece un contacto `Cliente CRM`, una empresa vinculada, un tenant aislado, 14 dias de prueba y un usuario `GYM_ADMIN` activo con el mismo `tenant_id`.
+- Tras verificarlo aparece un contacto `Cliente`, una empresa vinculada, un tenant aislado, 14 dias de prueba y un usuario `GYM_ADMIN` activo con el mismo `tenant_id`.
 - La contrasena no se incluye en el correo: se genera aleatoriamente, permanece cifrada y solo puede revelarse una vez durante una hora.
 - Un fallo de provisionamiento o SMTP conserva las referencias ya creadas y el mismo enlace permite continuar sin registros duplicados.
 
@@ -164,7 +164,7 @@ Pasos:
 Resultado esperado:
 
 - Se muestra el dashboard del gimnasio.
-- La barra lateral muestra modulos de gimnasio, no `Admin CRM`.
+- La barra lateral muestra modulos de gimnasio, no `Administración Membora`.
 
 ### PF-02 Leads
 
@@ -386,17 +386,17 @@ Pasos:
 
 Resultado esperado:
 
-- Se abre `Admin CRM`.
+- Se abre `Administración Membora`.
 - La barra lateral no muestra modulos de gimnasio.
 
 ### PA-02 Contactos
 
 Pasos:
 
-1. Abrir `Admin CRM > Contactos`.
+1. Abrir `Administración Membora > Contactos`.
 2. Comprobar que aparecen solicitudes web y clientes comerciales en una misma tabla.
 3. Filtrar por tipo `Lead web`.
-4. Filtrar por tipo `Cliente CRM`.
+4. Filtrar por tipo `Cliente`.
 5. Convertir un lead web en cliente.
 6. Crear un contacto manual.
 7. Editar el estado de un contacto.
@@ -414,7 +414,7 @@ Pasos:
 
 1. Crear empresa.
 2. Editar plan.
-3. Cambiar estado CRM.
+3. Cambiar estado de acceso.
 4. Cambiar estado de pago.
 5. Revisar MRR.
 
@@ -427,9 +427,9 @@ Resultado esperado:
 
 Pasos:
 
-1. En `Admin CRM`, pulsar `Entrar` en una empresa con tenant conectado.
-2. Revisar el CRM del gimnasio.
-3. Pulsar `Volver a Admin CRM`.
+1. En `Administración Membora`, pulsar `Entrar` en una empresa con tenant conectado.
+2. Revisar la plataforma del gimnasio.
+3. Pulsar `Volver a Administración Membora`.
 
 Resultado esperado:
 
@@ -441,7 +441,7 @@ Resultado esperado:
 
 Pasos:
 
-1. Abrir `Admin CRM > Usuarios`.
+1. Abrir `Administración Membora > Usuarios`.
 2. Crear y editar un usuario de plataforma.
 3. Comprobar desde un administrador de gimnasio que la ruta y las acciones se bloquean.
 4. Eliminar el usuario de prueba.
@@ -485,7 +485,7 @@ Resultado esperado:
 
 Pasos:
 
-1. Revisar Basic, Pro, Business y Enterprise en `Admin CRM > Planes`.
+1. Revisar Basic, Pro, Business y Enterprise en `Administración Membora > Planes`.
 2. Consultar `/app/api/plans` y el proxy `/api/plans.php`.
 3. Bloquear temporalmente ambas rutas en un entorno local y comprobar el fallback de la landing.
 
@@ -514,7 +514,7 @@ Resultado esperado:
 
 - El webhook sincroniza empresa, suscripcion, factura y cobro.
 - El plan y la periodicidad elegidos permanecen pendientes hasta que la factura pagada se confirma por webhook o reconciliacion directa; despues sustituyen `TRIAL` o el plan inferior.
-- El pago aparece en `Admin CRM > Facturacion > Pagos` y la factura en `Admin CRM > Facturacion > Facturas`.
+- El pago aparece en `Administración Membora > Facturacion > Pagos` y la factura en `Administración Membora > Facturacion > Facturas`.
 - El mismo `stripe_event_id` no se procesa dos veces.
 - La cancelacion conserva el acceso hasta el final del periodo y queda sincronizada por webhook.
 - Ninguna prueba usa claves Live ni dinero real.

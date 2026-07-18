@@ -9,7 +9,7 @@ $taskCompletionRate = $dashboardMetrics['taskCompletionRate'];
 <section class="dashboard-hero">
   <div>
     <span class="eyebrow">Panel operativo</span>
-    <h2><?= e($user['tenant_name'] ?? 'Membora CRM') ?></h2>
+    <h2><?= e($user['tenant_name'] ?? 'Membora') ?></h2>
     <p>Vista rápida de ventas, tareas y riesgos para decidir que atender primero.</p>
   </div>
   <div class="dashboard-hero-actions">

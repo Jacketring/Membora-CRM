@@ -483,7 +483,7 @@ final class Actions
             redirect('platform-companies');
         }
 
-        flash('Empresa y datos de su CRM eliminados correctamente. El contacto comercial se ha conservado.');
+        flash('Empresa y datos de su plataforma eliminados correctamente. El contacto comercial se ha conservado.');
         redirect('platform-companies');
     }
 
@@ -1123,7 +1123,7 @@ final class Actions
         }
 
         Auth::enterTenantContext($empresa);
-        flash('Estas viendo el CRM de ' . $empresa['name'] . '.');
+        flash('Estas viendo la plataforma de ' . $empresa['name'] . '.');
         redirect('dashboard');
     }
 

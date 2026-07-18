@@ -369,7 +369,7 @@ final class TrialRegistrationRepository
 
         $tenantId = trim((string) ($empresa['tenant_id'] ?? ''));
         if (!$empresa || $tenantId === '' || !hash_equals($clientId, (string) ($empresa['client_id'] ?? ''))) {
-            throw new RuntimeException('No se pudo preparar la empresa y su espacio CRM.');
+            throw new RuntimeException('No se pudo preparar la empresa y su espacio en Membora.');
         }
 
         $userId = trim((string) ($registration['user_id'] ?? ''));

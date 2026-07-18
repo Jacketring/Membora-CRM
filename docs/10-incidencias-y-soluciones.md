@@ -1,4 +1,4 @@
-# Incidencias tecnicas y soluciones aplicadas - Membora CRM
+# Incidencias tecnicas y soluciones aplicadas - Membora
 
 Fecha de actualizacion: 17/07/2026.
 
@@ -45,7 +45,7 @@ Solucion aplicada:
 
 Resultado:
 
-El despliegue queda reducido a configurar el document root en `httpdocs`, subir `.env` y abrir `/app/` para acceder al CRM.
+El despliegue queda reducido a configurar el document root en `httpdocs`, subir `.env` y abrir `/app/` para acceder a la plataforma.
 
 Prevencion:
 
@@ -117,7 +117,7 @@ Los formularios de creacion/edicion podian fallar si faltaban columnas, tablas a
 
 Causa raiz:
 
-El CRM fue creciendo por modulos y algunas relaciones no existian en la base original.
+La plataforma fue creciendo por modulos y algunas relaciones no existian en la base original.
 
 Solucion aplicada:
 
@@ -141,11 +141,11 @@ Los formularios principales crean y editan datos con errores controlados en luga
 
 Problema:
 
-La web comercial vive en otro subdominio y envia leads al CRM. Esto puede fallar si el origen no coincide exactamente.
+La web comercial vive en otro subdominio y envia leads a la plataforma. Esto puede fallar si el origen no coincide exactamente.
 
 Causa raiz:
 
-El navegador envia `Origin` y el CRM debe validar `WEB_APP_URL` para aceptar solicitudes entre subdominios.
+El navegador envia `Origin` y la plataforma debe validar `WEB_APP_URL` para aceptar solicitudes entre subdominios.
 
 Solucion aplicada:
 
@@ -158,7 +158,7 @@ Solucion aplicada:
 
 Resultado:
 
-El formulario publico queda conectado al CRM sin exponer credenciales de base de datos en la web.
+El formulario publico queda conectado a la plataforma sin exponer credenciales de base de datos en la web.
 
 Prevencion:
 
@@ -334,7 +334,7 @@ Solucion aplicada:
 
 Resultado:
 
-El CRM cubre asistencia a clase y entrada general de socios.
+La plataforma cubre asistencia a clase y entrada general de socios.
 
 ### I-13 Alertas de riesgo inexistentes o dispersas
 
@@ -410,7 +410,7 @@ El backend bloquea accesos no permitidos aunque se intente enviar una URL o form
 
 Problema:
 
-El superadmin necesitaba entrar al CRM de una empresa conectada sin perder la posibilidad de volver al panel SaaS.
+El superadmin necesitaba entrar a la plataforma de una empresa conectada sin perder la posibilidad de volver al panel SaaS.
 
 Causa raiz:
 
@@ -425,7 +425,7 @@ Solucion aplicada:
 
 Resultado:
 
-El soporte puede revisar datos del cliente y volver a `Admin CRM` de forma controlada.
+El soporte puede revisar datos del cliente y volver a `Administración Membora` de forma controlada.
 
 ### I-17 Creacion de empresa desde cliente comercial
 
@@ -441,7 +441,7 @@ Solucion aplicada:
 
 - Separacion de acciones `create_empresa` y `update_empresa`.
 - Validacion de identificadores.
-- Creacion de tenant y usuario administrador al crear CRM.
+- Creacion de tenant y usuario administrador al crear el espacio de la empresa.
 - Checklist de regresion para clientes/empresas.
 
 Resultado:
@@ -478,7 +478,7 @@ El webhook funciona, pero en Plesk podria interesar reducir dependencias entre s
 
 Causa raiz:
 
-La web y el CRM estan separados y el webhook depende de HTTP, CORS y disponibilidad del CRM.
+La web y la plataforma estan separados y el webhook depende de HTTP, CORS y disponibilidad de la plataforma.
 
 Solucion aplicada:
 

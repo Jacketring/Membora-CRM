@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Recibir formularios de la web pública, validarlos y crear o actualizar un lead del CRM de forma segura.
+Recibir formularios de la web pública, validarlos y crear o actualizar un lead de la plataforma de forma segura.
 
 ## Entradas y salidas
 

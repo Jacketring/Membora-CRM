@@ -27,7 +27,7 @@ $clientType = $clientValues['status'] === 'LEAD' ? 'lead' : 'client';
   <label class="field">
     <span>Tipo</span>
     <select name="contact_type">
-      <option value="client" <?= $clientType === 'client' ? 'selected' : '' ?>>Cliente CRM</option>
+      <option value="client" <?= $clientType === 'client' ? 'selected' : '' ?>>Cliente</option>
       <option value="lead" <?= $clientType === 'lead' ? 'selected' : '' ?>>Lead</option>
     </select>
   </label>

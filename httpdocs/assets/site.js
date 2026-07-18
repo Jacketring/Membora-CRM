@@ -5,7 +5,7 @@ const MEMBORA_REMOTE_PUBLIC_PLANS_URL = '/app/api/plans';
 const MEMBORA_TRIAL_URL = window.MEMBORA_TRIAL_URL || 'api/trial.php';
 
 const FALLBACK_PLANS = [
-  { code: 'BASIC', name: 'Basic', monthly_price: '49.00', max_users: 3, max_members: 300, features: ['CRM de leads y socios.', 'Membresias, pagos y tareas.', 'Soporte por email.'] },
+  { code: 'BASIC', name: 'Basic', monthly_price: '49.00', max_users: 3, max_members: 300, features: ['Gestión de leads y socios.', 'Membresias, pagos y tareas.', 'Soporte por email.'] },
   { code: 'PRO', name: 'Pro', monthly_price: '89.00', max_users: 8, max_members: 1000, features: ['Todo lo incluido en Basic.', 'Clases, reservas y check-ins.', 'Soporte prioritario.'] },
   { code: 'BUSINESS', name: 'Business', monthly_price: '149.00', max_users: 20, max_members: 3000, features: ['Todo lo incluido en Pro.', 'Gestion de equipos y reporting avanzado.', 'Soporte preferente.'] },
   { code: 'ENTERPRISE', name: 'Enterprise', monthly_price: '299.00', max_users: null, max_members: null, features: ['Todo lo incluido en Business.', 'Capacidad para cadenas o franquicias.', 'Soporte dedicado.'] },
@@ -64,7 +64,7 @@ function renderPlanCard(plan) {
 
   const description = document.createElement('p');
   const features = Array.isArray(plan.features) ? plan.features.filter(Boolean) : [];
-  description.textContent = 'Plan mensual de Membora CRM.';
+  description.textContent = 'Plan mensual de Membora.';
 
   const price = document.createElement('strong');
   if (plan.original_monthly_price) {
@@ -162,7 +162,7 @@ const clientFeatures = {
   },
   leads: {
     tag: 'Formulario comercial',
-    title: 'CRM de leads',
+    title: 'Gestión de leads',
     description: 'Pantalla para registrar interesados, hacer seguimiento comercial y convertir pruebas en socios.',
     items: [
       'Alta de lead con nombre, contacto, origen, interés y notas.',

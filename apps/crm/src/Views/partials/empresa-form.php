@@ -101,7 +101,7 @@ foreach (($clients ?? []) as $clientOption) {
     </select>
   </label>
   <label class="field">
-    <span>Estado CRM</span>
+    <span>Estado de acceso</span>
     <select name="status">
       <?php foreach (array_filter($statusOptions, static fn ($label, $value): bool => $value !== '', ARRAY_FILTER_USE_BOTH) as $value => $label): ?>
         <option value="<?= e($value) ?>" <?= $empresaValues['status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
@@ -141,12 +141,12 @@ foreach (($clients ?? []) as $clientOption) {
 
   <?php if (!$isEditingEmpresa): ?>
     <div class="form-full platform-form-divider">
-      <strong>Acceso al CRM de la empresa</strong>
+      <strong>Acceso a la plataforma de la empresa</strong>
       <span>Marca esta opcion para crear el tenant y el usuario administrador de este gimnasio.</span>
     </div>
     <label class="settings-check form-full">
       <input name="create_tenant" type="checkbox" value="1" checked>
-      <span>Crear CRM y usuario administrador para esta empresa</span>
+      <span>Crear espacio y usuario administrador para esta empresa</span>
     </label>
     <label class="field">
       <span>Nombre administrador</span>

@@ -447,8 +447,8 @@ final class EmpresaRepository
 
         $period = (string) ($empresa['renewal_period'] ?? 'MONTHLY');
         $nextPaymentAt = $due->modify($period === 'ANNUAL' ? '+1 year' : '+1 month')->format('Y-m-d');
-        $concept = 'Renovacion suscripcion CRM - ' . $due->format('m/Y');
-        $notes = 'Renovacion creada desde Admin CRM para ' . $empresa['name'] . '.';
+        $concept = 'Renovacion suscripcion Membora - ' . $due->format('m/Y');
+        $notes = 'Renovacion creada desde Administración Membora para ' . $empresa['name'] . '.';
 
         $pdo = Database::connection();
         $pdo->beginTransaction();
@@ -566,7 +566,7 @@ final class EmpresaRepository
                 'blocked' => true,
                 'kind' => 'subscription_suspended',
                 'title' => 'Tu suscripcion esta suspendida',
-                'message' => 'Contacta con Membora o elige un plan para recuperar el acceso al CRM.',
+                'message' => 'Contacta con Membora o elige un plan para recuperar el acceso a la plataforma.',
             ];
         }
 
@@ -605,7 +605,7 @@ final class EmpresaRepository
                     'blocked' => true,
                     'kind' => 'access_expired',
                     'title' => 'Tu acceso ha finalizado',
-                    'message' => 'La suscripcion estuvo activa hasta el ' . format_date_short($accessUntil) . '. Elige un plan para reactivar el CRM.',
+                    'message' => 'La suscripcion estuvo activa hasta el ' . format_date_short($accessUntil) . '. Elige un plan para reactivar la plataforma.',
                     'expires_at' => $accessUntil,
                 ];
             }

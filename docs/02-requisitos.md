@@ -1,4 +1,4 @@
-# Requisitos - Membora CRM
+# Requisitos - Membora
 
 > Nota de estado: este documento combina requisitos del MVP y requisitos previstos. El estado implementado actual esta resumido en `docs/07-estado-actual-php.md`; la arquitectura PHP activa esta documentada en `docs/06-api-backend.md`.
 
@@ -6,7 +6,7 @@ Dentro de la metodología del proyecto, estos requisitos conectan el alcance con
 
 ## 1. Objetivo
 
-Membora CRM debe ser una aplicacion web SaaS responsive para gimnasios y centros fitness pequenos o medianos. El sistema debe centralizar la gestion comercial y operativa basica del centro: leads, socios, membresias, pagos manuales, clases, reservas, check-ins, tareas, alertas y dashboard.
+Membora debe ser una aplicacion web SaaS responsive para gimnasios y centros fitness pequenos o medianos. El sistema debe centralizar la gestion comercial y operativa basica del centro: leads, socios, membresias, pagos manuales, clases, reservas, check-ins, tareas, alertas y dashboard.
 
 ## 2. Requisitos funcionales
 
@@ -204,7 +204,7 @@ Una persona debe poder solicitar una prueba gratuita de 14 dias desde la web pub
 
 - El email se verifica mediante un enlace de un solo uso y una hora de validez.
 - No se crea tenant, empresa ni usuario antes de verificar el email.
-- Tras la activacion se crea o actualiza un contacto `Cliente CRM`, se vincula una empresa `TRIAL`, un tenant aislado y su administrador.
+- Tras la activacion se crea o actualiza un contacto `Cliente`, se vincula una empresa `TRIAL`, un tenant aislado y su administrador.
 - El sistema genera una contrasena inicial aleatoria y envia un segundo correo con un enlace temporal para revelarla una sola vez; la contrasena no viaja en el correo.
 - La credencial temporal permanece cifrada, caduca en una hora y se consume antes de mostrarse para impedir una segunda visualizacion.
 - El limite especifico por IP y email se puede activar con `TRIAL_RATE_LIMIT_ENABLED=true`; durante la depuracion final permanece desactivado por defecto, sin desactivar origen permitido ni honeypot.
@@ -227,7 +227,7 @@ El sistema debe integrar Stripe Billing en modo `stripe_test` para validar el re
 - El acceso y el cobro solo cambian tras verificar el pago contra Stripe: normalmente mediante webhook firmado y, como respaldo idempotente, consultando la sesion desde la URL de retorno autenticada.
 - Debe permitir cancelar al final del periodo y consultar el estado sincronizado de la suscripcion.
 - Stripe Live queda pendiente de configuracion bancaria, fiscal y comercial.
-- Una empresa `TRIAL` debe ver los dias restantes y poder elegir un plan de pago desde su propio CRM.
+- Una empresa `TRIAL` debe ver los dias restantes y poder elegir un plan de pago desde su propio espacio de Membora.
 - Las empresas `BASIC`, `PRO` y `BUSINESS` deben ver una llamada de mejora; la pantalla debe marcar su plan actual y habilitar unicamente planes de rango superior.
 - El backend debe rechazar la seleccion del mismo plan, los descensos y codigos fuera del catalogo, aunque se manipule el formulario.
 - Solo el administrador del gimnasio puede iniciar Checkout; los demas roles pueden consultar los planes.
@@ -249,7 +249,7 @@ Cada gimnasio debe poder configurar una integracion externa generica, exportar p
 
 ### RF-23 Novedades, perfil y configuracion
 
-Los usuarios autenticados deben poder actualizar su perfil, imagen y preferencias visuales, y consultar la version actual y el historial de novedades del CRM.
+Los usuarios autenticados deben poder actualizar su perfil, imagen y preferencias visuales, y consultar la version actual y el historial de novedades de la plataforma.
 
 ### RF-24 Planes publicos
 

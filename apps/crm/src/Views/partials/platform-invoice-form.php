@@ -18,7 +18,7 @@ $invoiceValues = $isEditingInvoice ? $invoice : [
     'period_start_at' => '',
     'period_end_at' => '',
     'due_at' => date('Y-m-d', strtotime('+15 days')),
-    'issuer_name' => getenv('INVOICE_ISSUER_NAME') ?: getenv('APP_NAME') ?: 'Membora CRM',
+    'issuer_name' => getenv('INVOICE_ISSUER_NAME') ?: getenv('APP_NAME') ?: 'Membora',
     'issuer_tax_id' => getenv('INVOICE_ISSUER_TAX_ID') ?: '',
     'issuer_address' => getenv('INVOICE_ISSUER_ADDRESS') ?: '',
     'issuer_postal_code' => getenv('INVOICE_ISSUER_POSTAL_CODE') ?: '',
@@ -54,7 +54,7 @@ $invoiceValues = $isEditingInvoice ? $invoice : [
 ];
 if (!$invoiceItems) {
     $invoiceItems = [[
-        'description' => $invoiceValues['concept'] ?: 'Suscripción Membora CRM',
+        'description' => $invoiceValues['concept'] ?: 'Suscripción Membora',
         'quantity' => '1.000',
         'unit' => 'ud',
         'unit_price' => $invoiceValues['taxable_base'] ?: '0.00',

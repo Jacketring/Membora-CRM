@@ -19,7 +19,7 @@ flowchart LR
 
 Este ciclo incremental se detalla en `docs/19-metodologia-desarrollo.md`.
 
-## Arquitectura del CRM
+## Arquitectura de la plataforma
 
 ```mermaid
 flowchart LR
@@ -44,7 +44,7 @@ flowchart LR
     Proxies --> PublicEntry
 ```
 
-`httpdocs` es el único document root. El puente permite servir el CRM y sus recursos autorizados sin publicar directamente el código, la configuración ni los repositorios.
+`httpdocs` es el único document root. El puente permite servir la plataforma y sus recursos autorizados sin publicar directamente el código, la configuración ni los repositorios.
 
 ## Captación web
 
@@ -52,7 +52,7 @@ flowchart LR
 sequenceDiagram
     participant W as Web pública
     participant API as API webhook
-    participant CRM as CRM
+    participant CRM as Membora
     participant DB as MariaDB
     participant M as Email
     W->>API: Formulario con origen público o token de tenant
@@ -71,13 +71,13 @@ sequenceDiagram
     participant API as /api/trial
     participant DB as MariaDB
     participant M as Email
-    participant CRM as CRM
+    participant CRM as Membora
     U->>API: Datos y consentimiento
     API->>API: Origen, honeypot y rate limit configurable
     API->>DB: Guarda solicitud y hash del token
     API->>M: Enlace de activación de una hora
     U->>CRM: activate-trial?token=... y confirmación POST
-    CRM->>DB: Crea Cliente CRM, empresa TRIAL, tenant y administrador
+    CRM->>DB: Crea Cliente, empresa TRIAL, tenant y administrador
     CRM->>M: Segundo enlace para revelar la credencial
     U->>CRM: trial-credentials?token=... y confirmación POST
     CRM->>DB: Consume la credencial cifrada
@@ -93,7 +93,7 @@ La recuperación ordinaria reutiliza `auth_tokens`: responde de forma neutra, en
 ```mermaid
 sequenceDiagram
     participant W as Web pública
-    participant CRM as CRM
+    participant CRM as Membora
     participant DB as MariaDB
     W->>CRM: POST demo_login
     CRM->>DB: Crea usuario temporal y datos demo
@@ -107,7 +107,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant A as Admin CRM
+    participant A as Administración Membora
     participant CRM as StripeBillingService
     participant S as Stripe Test
     participant DB as MariaDB
@@ -134,7 +134,7 @@ Las cuentas `TRIAL` disponen de un banner con los dias restantes; Basic, Pro y B
 flowchart LR
     Admin[Superadmin] --> Company[Empresa seleccionada]
     Company --> Context[Contexto de soporte con tenant_id]
-    Context --> Gym[CRM del gimnasio + banner]
+    Context --> Gym[Espacio del gimnasio + banner]
     Gym --> Return[Salir de soporte]
     Return --> Admin
 ```

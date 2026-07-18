@@ -1,4 +1,4 @@
-# Alcance del MVP - Membora CRM
+# Alcance del MVP - Membora
 
 Fecha de actualizacion: 17/07/2026.
 
@@ -6,7 +6,7 @@ Este alcance constituye la primera fase de la metodología incremental descrita 
 
 ## 1. Objetivo
 
-Membora CRM es una aplicacion web SaaS responsive para gimnasios, estudios deportivos y centros fitness pequenos o medianos. El MVP centraliza la gestion comercial y operativa basica: leads, socios, membresias, clases, reservas, tareas, usuarios internos y administracion SaaS de empresas cliente.
+Membora es una aplicacion web SaaS responsive para gimnasios, estudios deportivos y centros fitness pequenos o medianos. El MVP centraliza la gestion comercial y operativa basica: leads, socios, membresias, clases, reservas, tareas, usuarios internos y administracion SaaS de empresas cliente.
 
 La version final del proyecto se ha simplificado a una aplicacion PHP monolitica para facilitar el despliegue en Plesk, evitar procesos Node.js en produccion y reducir complejidad operativa.
 
@@ -15,7 +15,7 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 - Propietario o administrador del gimnasio.
 - Recepcion y equipo comercial.
 - Entrenadores.
-- Administrador de plataforma Membora CRM.
+- Administrador de plataforma Membora.
 - Evaluador academico del TFM.
 
 ## 3. Alcance funcional implementado
@@ -47,30 +47,30 @@ La version final del proyecto se ha simplificado a una aplicacion PHP monolitica
 
 ### Administracion SaaS
 
-- Panel `Admin CRM`.
+- Panel `Administración Membora`.
 - Resumen con MRR, ARR, ARPA, pagos y prioridades.
 - Contactos unificados con leads web y clientes comerciales.
 - Conversion de lead web a cliente comercial.
 - Alta y edicion de contactos desde la misma tabla, incluyendo cambio de tipo para devolver un cliente a lead.
 - Empresas cliente.
-- Creacion de tenant y usuario administrador al crear una empresa CRM.
-- Estados de CRM y pago.
+- Creacion de tenant y usuario administrador al crear una empresa cliente.
+- Estados de acceso y pago.
 - Plan de prueba configurable por dias, sin proximo pago visible solo cuando el plan seleccionado es `Prueba`.
 - Gestion central de suscripcion SaaS por empresa cliente: fecha de alta, fecha desde la que paga, fecha de acceso hasta, plan, periodicidad mensual/anual, estado de renovacion, cancelacion al final del periodo y reactivacion.
-- Bloqueo visual del CRM cliente cuando la demo o el acceso contratado han caducado, con modal para elegir plan y continuar el proceso de contratacion.
+- Bloqueo visual de la plataforma del cliente cuando la demo o el acceso contratado han caducado, con modal para elegir plan y continuar el proceso de contratacion.
 - Catalogo SaaS canonico con Basic 49 EUR, Pro 89 EUR, Business 149 EUR y Enterprise 299 EUR mensuales sin IVA; incluye limites de usuarios/socios, prestaciones y sincronizacion con panel, API, landing y checkout.
 - Pagos SaaS por empresa.
 - Facturas SaaS emitidas por Membora a empresas cliente, con borradores, emision, serie/numero correlativo por empresa, datos historicos de emisor/cliente, lineas, descuentos, IVA desglosado, pagos parciales, estado de cobro y vista imprimible/PDF.
 - Base funcional para checkout y cobros SaaS: la demo pide pocos datos y la contratacion debe completar datos fiscales, plan y forma de pago antes de activar el acceso.
 - Diagnostico interno de webhook, correo y ultimos envios en una ruta directa exclusiva de superadministracion, oculta del menu por tratarse de una herramienta de depuracion.
-- Acceso de soporte al CRM de una empresa conectada.
+- Acceso de soporte a la plataforma de una empresa conectada.
 
 ### Web comercial
 
 - Web estatica desplegable en `httpdocs`.
-- Acceso a demo funcional del CRM desde la web publica, con sesion temporal de 20 minutos.
-- Seccion de planes cargada desde el catalogo activo de `Admin CRM > Planes`.
-- Formulario publico conectado al webhook del CRM.
+- Acceso a demo funcional de la plataforma desde la web publica, con sesion temporal de 20 minutos.
+- Seccion de planes cargada desde el catalogo activo de `Administración Membora > Planes`.
+- Formulario publico conectado al webhook de la plataforma.
 - Email HTML de confirmacion cuando SMTP esta configurado.
 
 ## 4. Fuera del alcance actual
@@ -107,11 +107,11 @@ No se usa en produccion:
 
 ## 6. Arquitectura de despliegue
 
-CRM:
+Aplicación:
 
 ```text
 https://membora.es/app/
-Document root unico: httpdocs (CRM publicado en /app/)
+Document root unico: httpdocs (aplicación publicada en /app/)
 ```
 
 Web comercial:
@@ -121,7 +121,7 @@ https://membora.es/
 Document root: httpdocs
 ```
 
-El CRM recibe solicitudes comerciales en:
+La plataforma recibe solicitudes comerciales en:
 
 ```text
 POST /webhook/lead
@@ -161,7 +161,7 @@ Tablas SaaS principales:
 - `saas_plans`
 - `webhook_logs`
 
-La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba comercial. Si el plan de una empresa es `TRIAL`, el CRM oculta la fecha de proximo pago, no marca renovacion y muestra la duracion de prueba configurada. Tambien centraliza la suscripcion SaaS con `subscription_started_at`, `paid_since`, `access_until`, `renewal_period`, `renewal_status` y `cancelled_at`, de forma que una empresa puede cancelar la renovacion y conservar acceso hasta la fecha contratada.
+La tabla `empresas` incluye `trial_days` para controlar la duracion de la prueba comercial. Si el plan de una empresa es `TRIAL`, la plataforma oculta la fecha de proximo pago, no marca renovacion y muestra la duracion de prueba configurada. Tambien centraliza la suscripcion SaaS con `subscription_started_at`, `paid_since`, `access_until`, `renewal_period`, `renewal_status` y `cancelled_at`, de forma que una empresa puede cancelar la renovacion y conservar acceso hasta la fecha contratada.
 
 ## 8. Stripe, cobros y checkout
 
@@ -188,7 +188,7 @@ El flujo objetivo de contratacion sera:
 5. Membora activa o renueva la empresa, actualiza `next_payment_at` y `access_until`, y registra el pago.
 6. El usuario recibe una confirmacion clara: "Enhorabuena, ya tienes acceso y puedes usar la aplicacion".
 
-Las renovaciones Stripe se sincronizan mediante webhooks y nunca se marcan como cobradas por la URL de retorno. Los pagos manuales de socios pueden generarse de forma recurrente dentro del CRM, pero no constituyen un cargo bancario automatico.
+Las renovaciones Stripe se sincronizan mediante webhooks y nunca se marcan como cobradas por la URL de retorno. Los pagos manuales de socios pueden generarse de forma recurrente dentro de la plataforma, pero no constituyen un cargo bancario automatico.
 
 ## 9. Facturacion de Membora y Verifactu
 
@@ -241,7 +241,7 @@ Hasta entonces, el MVP puede guardar facturas internas y estados de cobro, pero 
 13. Revisar usuarios internos, perfil y configuracion.
 14. Entrar como administrador de plataforma.
 15. Revisar contactos, empresas, pagos, planes y web comercial.
-16. Entrar en modo soporte sobre una empresa y volver a Admin CRM.
+16. Entrar en modo soporte sobre una empresa y volver a Administración Membora.
 
 ## 11. Criterios de aceptacion del MVP
 
@@ -249,5 +249,5 @@ Hasta entonces, el MVP puede guardar facturas internas y estados de cobro, pero 
 - El login funciona con credenciales demo.
 - Los datos de gimnasio se filtran por `tenant_id`.
 - Los formularios principales crean y editan datos sin errores 500.
-- La web publica registra leads en `Admin CRM > Contactos`.
+- La web publica registra leads en `Administración Membora > Contactos`.
 - La documentacion explica instalacion, despliegue, credenciales, modelo de datos, pruebas y estado actual.

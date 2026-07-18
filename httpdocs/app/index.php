@@ -5,7 +5,7 @@ declare(strict_types=1);
 $crmPublicRoot = realpath(__DIR__ . '/../../apps/crm/public');
 if ($crmPublicRoot === false) {
     http_response_code(503);
-    exit('El CRM no esta disponible.');
+    exit('La plataforma no esta disponible.');
 }
 
 $requestPath = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/app/'), PHP_URL_PATH) ?: '/app/';

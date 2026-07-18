@@ -500,7 +500,7 @@ final class PlatformInvoiceRepository
             'customer_country' => $customer['country'],
             'customer_email' => $customer['email'],
             'customer_phone' => $customer['phone'],
-            'concept' => trim((string) ($data['concept'] ?? ($items[0]['description'] ?? 'Factura Membora CRM'))),
+            'concept' => trim((string) ($data['concept'] ?? ($items[0]['description'] ?? 'Factura Membora'))),
             'subtotal_amount' => self::centsToDecimal($totals['subtotal_cents']),
             'discount_amount' => self::centsToDecimal($totals['discount_cents']),
             'taxable_base' => self::centsToDecimal($totals['base_cents']),
@@ -601,7 +601,7 @@ final class PlatformInvoiceRepository
     private static function issuerSnapshot(array $data): array
     {
         return [
-            'name' => trim((string) ($data['issuer_name'] ?? getenv('INVOICE_ISSUER_NAME') ?: getenv('APP_NAME') ?: 'Membora CRM')),
+            'name' => trim((string) ($data['issuer_name'] ?? getenv('INVOICE_ISSUER_NAME') ?: getenv('APP_NAME') ?: 'Membora')),
             'tax_id' => trim((string) ($data['issuer_tax_id'] ?? getenv('INVOICE_ISSUER_TAX_ID') ?: '')),
             'address' => trim((string) ($data['issuer_address'] ?? getenv('INVOICE_ISSUER_ADDRESS') ?: '')),
             'postal_code' => trim((string) ($data['issuer_postal_code'] ?? getenv('INVOICE_ISSUER_POSTAL_CODE') ?: '')),
@@ -635,7 +635,7 @@ final class PlatformInvoiceRepository
         $rows = $data['items'] ?? [];
         if (!is_array($rows) || $rows === []) {
             $rows = [[
-                'description' => $data['concept'] ?? 'Servicio Membora CRM',
+                'description' => $data['concept'] ?? 'Servicio Membora',
                 'quantity' => '1',
                 'unit' => 'ud',
                 'unit_price' => $data['taxable_base'] ?? '0',

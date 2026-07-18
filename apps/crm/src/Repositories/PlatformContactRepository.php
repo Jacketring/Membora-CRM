@@ -78,7 +78,7 @@ final class PlatformContactRepository
                     'status_label' => platform_client_status_label($client['status']),
                     'status_class' => strtolower((string) $client['status']),
                     'notes' => $client['notes'],
-                    'source_label' => 'Cliente CRM',
+                    'source_label' => 'Cliente',
                     'created_at' => $client['created_at'],
                     'updated_at' => $client['updated_at'],
                     'empresa' => $empresa,

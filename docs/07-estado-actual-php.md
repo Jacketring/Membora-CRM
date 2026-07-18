@@ -1,10 +1,10 @@
-# Estado actual de la version PHP - Membora CRM
+# Estado actual de la version PHP - Membora
 
 Fecha de actualizacion: 18/07/2026.
 
 ## 1. Resumen
 
-Membora CRM se encuentra actualmente como una aplicacion PHP monolitica desplegable en Plesk. La decision tecnica principal ha sido abandonar el despliegue productivo con Node.js para reducir problemas de build, consumo de recursos y mantenimiento en hosting compartido.
+Membora se encuentra actualmente como una aplicacion PHP monolitica desplegable en Plesk. La decision tecnica principal ha sido abandonar el despliegue productivo con Node.js para reducir problemas de build, consumo de recursos y mantenimiento en hosting compartido.
 
 La aplicacion funciona bajo un unico dominio y el prefijo `/app/`:
 
@@ -172,9 +172,9 @@ Estado verificado el 18/07/2026:
 - Roles en espanol.
 - Separacion respecto a socios/clientes.
 
-### Administracion SaaS de Membora CRM
+### Administracion SaaS de Membora
 
-- Panel `Admin CRM` separado en resumen, contactos, empresas, usuarios de plataforma, pagos, facturas, planes y auditoria. La herramienta de web/correo permanece accesible solo por URL directa para diagnostico y esta oculta del menu.
+- Panel `Administración Membora` separado en resumen, contactos, empresas, usuarios de plataforma, pagos, facturas, planes y auditoria. La herramienta de web/correo permanece accesible solo por URL directa para diagnostico y esta oculta del menu.
 - Resumen ejecutivo con MRR, ARR, ARPA, pagos pendientes, cobrado en el mes y prioridades.
 - Tabla unificada de `Contactos` en la interfaz de administracion, combinando `platform_leads` y `platform_clients`.
 - Gestion de solicitudes web con estados nuevo, contactado, cualificado, convertido o perdido.
@@ -184,13 +184,13 @@ Estado verificado el 18/07/2026:
 - Tabla `empresas`.
 - Alta y edicion de empresas cliente desde clientes comerciales.
 - Eliminacion controlada de empresas de prueba y de sus datos operativos asociados, conservando el contacto comercial y la auditoria.
-- Creacion de tenant y usuario administrador al crear una empresa con CRM.
-- Estado del CRM: activo, prueba, suspendido o cancelado.
+- Creacion de tenant y usuario administrador al crear una empresa con plataforma.
+- Estado de la plataforma: activo, prueba, suspendido o cancelado.
 - Estado de pago: al dia, pendiente, vencido o prueba.
 - Precio mensual y proximo pago para planes de pago.
 - Plan de prueba configurable por dias. Solo cuando el plan seleccionado es `Prueba`, se oculta el proximo pago, se muestra la duracion de prueba y no se ofrece renovacion.
 - Banner superior para cuentas `TRIAL` con dias restantes y para clientes Basic, Pro o Business con una llamada a `Mejorar el plan`; Enterprise queda excluido del upselling.
-- Catalogo exclusivo de planes de pago dentro del CRM del gimnasio. La tarjeta contratada se marca como `PLAN ACTUAL`; solo los niveles superiores quedan disponibles y el backend rechaza repeticiones o descensos.
+- Catalogo exclusivo de planes de pago dentro de la plataforma del gimnasio. La tarjeta contratada se marca como `PLAN ACTUAL`; solo los niveles superiores quedan disponibles y el backend rechaza repeticiones o descensos.
 - MRR estimado.
 - Tabla `empresa_payments` para cobros SaaS por empresa.
 - Registro y edicion de pagos con concepto, importe, vencimiento, fecha de pago, estado y notas.
@@ -201,13 +201,13 @@ Estado verificado el 18/07/2026:
 - Endpoint publico de cuatro planes consumido por la web comercial; la landing usa fallback equivalente solo si fallan el proxy y la ruta directa y actualiza `schema.org` desde el catalogo mostrado.
 - Web comercial externa en `httpdocs`.
 - Web comercial con enlaces a aviso legal, privacidad y cookies.
-- El alta self-service verificada crea automaticamente un contacto `Cliente CRM`, su empresa `TRIAL` de 14 dias, el tenant y un usuario `GYM_ADMIN` activo y vinculado al mismo `tenant_id`.
+- El alta self-service verificada crea automaticamente un contacto `Cliente`, su empresa `TRIAL` de 14 dias, el tenant y un usuario `GYM_ADMIN` activo y vinculado al mismo `tenant_id`.
 - La contrasena inicial se entrega en un segundo correo mediante un enlace cifrado, temporal y de una sola visualizacion; no se incluye en el mensaje.
-- Al abrir Contactos se reparan registros comerciales ausentes a partir de empresas existentes, lo que evita empresas sin su `Cliente CRM` visible.
-- Enlaces de demo desde la web publica hacia una sesion funcional del CRM durante 20 minutos.
-- Webhook publico sin token manual para registrar solicitudes en `Admin CRM > Contactos`.
+- Al abrir Contactos se reparan registros comerciales ausentes a partir de empresas existentes, lo que evita empresas sin su `Cliente` visible.
+- Enlaces de demo desde la web publica hacia una sesion funcional de la plataforma durante 20 minutos.
+- Webhook publico sin token manual para registrar solicitudes en `Administración Membora > Contactos`.
 - Email HTML automatico de confirmacion para el visitante cuando envia el formulario web.
-- Acceso de soporte al CRM de una empresa conectada.
+- Acceso de soporte a la plataforma de una empresa conectada.
 - Banner de modo soporte y retorno al panel de administracion.
 - Logs de plataforma para filtrar actividad de empresas por accion, fecha y texto.
 - Stripe Billing funcional en modo `stripe_test`: checkout alojado, webhook firmado, idempotencia, suscripciones, cancelacion al final del periodo y sincronizacion de cobros y facturas.
@@ -290,9 +290,9 @@ Tambien puede anadir columnas auxiliares para imagenes, configuracion visual, fa
 ## 8. Flujo de despliegue recomendado
 
 1. Pull desde GitHub en Plesk.
-2. Confirmar que el document root apunta a `httpdocs` y que `/app/` carga el CRM.
+2. Confirmar que el document root apunta a `httpdocs` y que `/app/` carga la plataforma.
 3. Confirmar que `apps/crm/.env` tiene las credenciales reales.
-4. Abrir la URL del CRM.
+4. Abrir la URL de la plataforma.
 5. Iniciar sesion con un usuario demo o con el admin de plataforma.
 
 No se debe ejecutar `npm install`, `npm run build` ni comandos Prisma para la version PHP.

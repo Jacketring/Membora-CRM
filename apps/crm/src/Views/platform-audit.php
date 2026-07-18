@@ -1,6 +1,6 @@
 <div class="page-heading">
   <div>
-    <h2>Logs CRM</h2>
+    <h2>Logs de plataforma</h2>
     <p>Supervisa acciones realizadas en las empresas cliente: socios, tareas, pagos, reservas, usuarios y cambios operativos.</p>
   </div>
 </div>
@@ -24,7 +24,7 @@
   </article>
 </section>
 
-<form class="lead-toolbar member-toolbar" method="get" aria-label="Filtros de logs CRM" data-auto-filter-form data-live-search-form data-live-search-target="platform-audit-table">
+<form class="lead-toolbar member-toolbar" method="get" aria-label="Filtros de logs de plataforma" data-auto-filter-form data-live-search-form data-live-search-target="platform-audit-table">
   <input type="hidden" name="route" value="platform-audit">
   <label class="lead-search">
     <span>Buscar</span>
@@ -97,7 +97,7 @@
           <tr class="lead-data-row" data-live-search-row>
             <td><?= e(format_date($log['created_at'])) ?></td>
             <td>
-              <strong><?= e($log['tenant_name'] ?: 'Admin CRM') ?></strong>
+              <strong><?= e($log['tenant_name'] ?: 'Administración Membora') ?></strong>
             </td>
             <td>
               <strong><?= e($log['user_name'] ?: 'Sistema') ?></strong>

@@ -452,7 +452,7 @@ switch ($route) {
             'status' => '',
             'payment_status' => '',
         ];
-        render_layout('Admin CRM', 'platform-dashboard', [
+        render_layout('Administración Membora', 'platform-dashboard', [
             'filters' => $filters,
             'metrics' => EmpresaRepository::metrics(),
             'paymentMetrics' => PlatformPaymentRepository::metrics(),
@@ -477,7 +477,7 @@ switch ($route) {
             'status' => trim((string) ($_GET['status'] ?? '')),
             'type' => trim((string) ($_GET['type'] ?? '')),
         ];
-        render_layout('Contactos CRM', 'platform-contacts', [
+        render_layout('Contactos', 'platform-contacts', [
             'filters' => $filters,
             'metrics' => PlatformContactRepository::metrics(),
             'planOptions' => PlatformPlanRepository::options(),
@@ -536,7 +536,7 @@ switch ($route) {
             'q' => trim((string) ($_GET['q'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
         ];
-        render_layout('Pagos CRM', 'platform-payments', [
+        render_layout('Pagos de plataforma', 'platform-payments', [
             'filters' => $filters,
             'metrics' => PlatformPaymentRepository::metrics(),
             'empresas' => EmpresaRepository::all(),
@@ -569,7 +569,7 @@ switch ($route) {
             'q' => trim((string) ($_GET['q'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
         ];
-        render_layout('Facturas CRM', 'platform-invoices', [
+        render_layout('Facturas de plataforma', 'platform-invoices', [
             'filters' => $filters,
             'metrics' => PlatformInvoiceRepository::metrics(),
             'empresas' => EmpresaRepository::all(),
@@ -605,7 +605,7 @@ switch ($route) {
             'q' => trim((string) ($_GET['q'] ?? '')),
             'status' => trim((string) ($_GET['status'] ?? '')),
         ];
-        render_layout('Planes CRM', 'platform-plans', [
+        render_layout('Planes de plataforma', 'platform-plans', [
             'filters' => $filters,
             'metrics' => PlatformPlanRepository::metrics(),
             'plans' => PlatformPlanRepository::all($filters['q'], $filters['status']),
@@ -642,7 +642,7 @@ switch ($route) {
             flash('La auditoria no se esta guardando: ' . $_SESSION['audit_log_error'], 'error');
             unset($_SESSION['audit_log_error']);
         }
-        render_layout('Logs CRM', 'platform-audit', [
+        render_layout('Logs de plataforma', 'platform-audit', [
             'filters' => $filters,
             'metrics' => AuditLogRepository::platformMetrics($filters['tenant_id']),
             'tenantOptions' => AuditLogRepository::tenantOptions(),

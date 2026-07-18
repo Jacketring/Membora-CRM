@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este documento resume las medidas de seguridad aplicadas en Membora CRM y deja documentadas las dos estrategias posibles para recibir solicitudes desde la web publica:
+Este documento resume las medidas de seguridad aplicadas en Membora y deja documentadas las dos estrategias posibles para recibir solicitudes desde la web publica:
 
 - Captacion mediante webhook HTTP.
 - Captacion mediante insercion directa en base de datos desde la web PHP.
@@ -17,7 +17,7 @@ La seguridad se trata como criterio transversal en cada incremento, no como una 
 
 ### 1. Aislamiento por empresa
 
-Los datos del CRM de gimnasios se separan mediante:
+Los datos del gestión del gimnasios se separan mediante:
 
 ```text
 tenant_id
@@ -36,7 +36,7 @@ Esto aplica a:
 - Usuarios internos.
 - Pagos, check-ins, alertas y auditoria.
 
-La administracion SaaS de Membora CRM usa tablas de plataforma como:
+La administracion SaaS de Membora usa tablas de plataforma como:
 
 - `platform_leads`.
 - `platform_clients`.
@@ -97,13 +97,13 @@ Objetivo:
 
 ### 6. Validacion de origen y CSRF en formularios internos
 
-Las acciones POST internas del CRM validan el origen usando:
+Las acciones POST internas de la plataforma validan el origen usando:
 
 - `Origin`.
 - `Referer`.
 - `APP_URL`.
 
-Si una solicitud POST viene desde un origen externo al CRM, se bloquea.
+Si una solicitud POST viene desde un origen externo a la plataforma, se bloquea.
 
 Ademas, los formularios incluyen un token CSRF de 256 bits asociado a la sesion. `demo_login` es la unica excepcion al CSRF interno porque se inicia desde la web publica y aplica su politica de origen especifica.
 
@@ -192,10 +192,10 @@ La ruta de diagnostico solo admite superadministradores y esta oculta del menu. 
 
 Ventajas:
 
-- Web y CRM pueden estar separados.
+- La web y la aplicación pueden estar separadas.
 - Permite integraciones futuras externas.
 - No expone credenciales de base de datos en la web publica.
-- Centraliza validacion en el CRM.
+- Centraliza validacion en la plataforma.
 
 Puntos a vigilar:
 
@@ -285,8 +285,8 @@ Motivo:
 - [ ] Probar envio de correo real.
 - [ ] Probar subida de imagen valida.
 - [ ] Probar rechazo de imagen no permitida.
-- [ ] Probar que un usuario de gimnasio no entra en Admin CRM.
-- [ ] Probar que Admin CRM puede entrar/salir de modo soporte.
+- [ ] Probar que un usuario de gimnasio no entra en Administración Membora.
+- [ ] Probar que Administración Membora puede entrar/salir de modo soporte.
 - [ ] Revisar que los datos de una empresa no aparecen en otra.
 
 ## Notas para el TFM

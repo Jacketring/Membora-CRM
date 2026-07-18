@@ -2,7 +2,7 @@
 
 ## Cambios aplicados
 
-- Posicionamiento principal cambiado de `ERP para gimnasios` a `software para gimnasios` y `CRM para gimnasios`.
+- Posicionamiento principal cambiado de `ERP para gimnasios` a `software para gimnasios` y `software para gimnasios`.
 - Title, meta description, canonical, Open Graph y Twitter Card en las cinco paginas publicas.
 - JSON-LD `Organization`, `SoftwareApplication` y `FAQPage` en la home.
 - `robots.txt` y `sitemap.xml` publicos; `/app/` queda fuera del rastreo.
@@ -17,7 +17,7 @@
 
 ## Alta self-service
 
-La prueba de 14 dias exige confirmacion de email. El enlace caduca en una hora y solo puede usarse una vez. Tras confirmar, se crean el `Cliente CRM`, la empresa, el tenant `TRIAL` y su administrador. Un segundo enlace permite revelar durante una hora la contrasena inicial cifrada y la consume en la primera visualizacion. Hay validacion de origen y honeypot; el rate limit especifico por IP y email queda configurable y desactivado por defecto durante la depuracion final.
+La prueba de 14 dias exige confirmacion de email. El enlace caduca en una hora y solo puede usarse una vez. Tras confirmar, se crean el `Cliente`, la empresa, el tenant `TRIAL` y su administrador. Un segundo enlace permite revelar durante una hora la contrasena inicial cifrada y la consume en la primera visualizacion. Hay validacion de origen y honeypot; el rate limit especifico por IP y email queda configurable y desactivado por defecto durante la depuracion final.
 
 ## Validacion automatica
 

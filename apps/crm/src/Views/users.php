@@ -1,7 +1,7 @@
 <div class="page-heading">
   <div>
     <h2>Usuarios</h2>
-    <p>Gestiona el personal interno que puede acceder al CRM. Los socios/clientes no aparecen en esta sección.</p>
+    <p>Gestiona el personal interno que puede acceder a la plataforma. Los socios/clientes no aparecen en esta sección.</p>
   </div>
   <button class="primary-action primary-action--compact" data-open-modal="user-modal" type="button">Nuevo usuario</button>
 </div>
@@ -91,7 +91,7 @@ foreach ($roles as $role) {
 
   <div class="leads-table-wrap">
     <table class="leads-table users-table" id="users-table">
-      <caption class="sr-only">Listado de usuarios internos del CRM</caption>
+      <caption class="sr-only">Listado de usuarios internos de la plataforma</caption>
       <thead>
         <tr>
           <th scope="col">Nombre</th>
@@ -216,7 +216,7 @@ foreach ($roles as $role) {
     <header>
       <div>
         <h2 id="user-modal-title">Nuevo usuario</h2>
-        <p>Alta de personal interno con acceso al CRM.</p>
+        <p>Alta de personal interno con acceso a la plataforma.</p>
       </div>
       <button data-close-modal type="button">Cerrar</button>
     </header>

@@ -36,7 +36,7 @@ $paymentStatusOptions = [
   </label>
   <label class="field">
     <span>Concepto</span>
-    <input name="concept" required value="<?= e($paymentValues['concept']) ?>" placeholder="Mensualidad CRM junio">
+    <input name="concept" required value="<?= e($paymentValues['concept']) ?>" placeholder="Mensualidad Membora junio">
   </label>
   <label class="field">
     <span>Importe</span>

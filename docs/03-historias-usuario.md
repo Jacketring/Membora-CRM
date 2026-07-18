@@ -1,4 +1,4 @@
-# Historias de usuario - Membora CRM
+# Historias de usuario - Membora
 
 > Nota de estado: estas historias recogen el alcance funcional del producto. La version PHP actual cubre el flujo principal e incluye permisos por rol, auditoria, pagos, check-ins, alertas e integracion generica de facturacion.
 
@@ -8,7 +8,7 @@ Las historias y sus criterios de aceptación forman parte de la metodología inc
 
 ### HU-01 Login
 
-Como usuario interno, quiero iniciar sesion con email y contrasena para acceder al CRM.
+Como usuario interno, quiero iniciar sesion con email y contrasena para acceder a la plataforma.
 
 Criterios de aceptacion:
 
@@ -214,14 +214,14 @@ Criterios de aceptacion:
 
 ### HU-22 Solicitar una prueba gratuita
 
-Como propietario de un gimnasio, quiero verificar mi email y crear una prueba de 14 dias para evaluar el CRM con un espacio aislado.
+Como propietario de un gimnasio, quiero verificar mi email y crear una prueba de 14 dias para evaluar la plataforma con un espacio aislado.
 
 Criterios de aceptacion:
 
 - La solicitud valida consentimiento, origen y honeypot; el limite especifico de frecuencia es configurable y esta desactivado por defecto durante la depuracion final.
 - Antes de verificar el email no se crea ninguna empresa ni cuenta operativa.
 - El enlace de activacion caduca y solo se usa una vez.
-- El contacto aparece como `Cliente CRM` con empresa vinculada y el nuevo usuario entra en un tenant propio con plan `TRIAL` durante 14 dias.
+- El contacto aparece como `Cliente` con empresa vinculada y el nuevo usuario entra en un tenant propio con plan `TRIAL` durante 14 dias.
 - Un segundo correo entrega un enlace temporal para revelar la contrasena inicial una sola vez, sin incluirla en el cuerpo del mensaje.
 
 ### HU-23 Recuperar la contrasena
@@ -245,7 +245,7 @@ Criterios de aceptacion:
 
 ### HU-25 Personalizar mi cuenta
 
-Como usuario interno, quiero editar mi perfil, imagen, color y tema, y consultar las novedades del CRM.
+Como usuario interno, quiero editar mi perfil, imagen, color y tema, y consultar las novedades de la plataforma.
 
 Criterios de aceptacion:
 
@@ -297,7 +297,7 @@ Criterios de aceptacion:
 
 ### HU-30 Entrar en modo soporte
 
-Como superadministrador, quiero entrar temporalmente en el CRM de una empresa para resolver incidencias y volver de forma visible al panel SaaS.
+Como superadministrador, quiero entrar temporalmente en la plataforma de una empresa para resolver incidencias y volver de forma visible al panel SaaS.
 
 Criterios de aceptacion:
 
@@ -319,12 +319,12 @@ Criterios de aceptacion:
 
 ### HU-31 Consultar planes publicos
 
-Como visitante, quiero ver planes y precios actualizados desde el catalogo del CRM.
+Como visitante, quiero ver planes y precios actualizados desde el catalogo de la plataforma.
 
 Criterios de aceptacion:
 
 - El endpoint solo devuelve planes activos y datos comerciales publicos.
-- Una indisponibilidad del CRM produce un error generico y no filtra detalles internos.
+- Una indisponibilidad de la plataforma produce un error generico y no filtra detalles internos.
 
 ### HU-32 Configurar facturacion externa
 

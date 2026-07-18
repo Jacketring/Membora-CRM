@@ -22,7 +22,7 @@ $invoiceDocumentRoute = $clientInvoiceMode ? 'client-invoice' : 'platform-invoic
 
 <div class="page-heading leads-heading platform-heading">
   <div>
-    <h2><?= $clientInvoiceMode ? 'Facturación' : 'Facturas CRM' ?></h2>
+    <h2><?= $clientInvoiceMode ? 'Facturación' : 'Facturas de plataforma' ?></h2>
     <p><?= $clientInvoiceMode ? 'Facturas del gimnasio a sus clientes, con serie, impuestos y estado de cobro.' : 'Facturas emitidas por Membora a gimnasios cliente, con serie, número, IVA y estado de cobro.' ?></p>
   </div>
   <button class="primary-action" type="button" data-open-modal="invoice-create-modal">Nueva factura</button>

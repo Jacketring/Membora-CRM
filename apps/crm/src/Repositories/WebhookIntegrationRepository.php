@@ -221,7 +221,7 @@ final class WebhookIntegrationRepository
 
             return [
                 'success' => true,
-                'message' => $normalized['was_duplicate'] ? 'Lead recibido correctamente. Ya existia en el CRM.' : 'Lead recibido correctamente',
+                'message' => $normalized['was_duplicate'] ? 'Lead recibido correctamente. Ya existia en la plataforma.' : 'Lead recibido correctamente',
                 'lead_id' => $leadId,
             ];
         } catch (Throwable $exception) {

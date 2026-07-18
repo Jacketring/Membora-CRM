@@ -618,7 +618,7 @@ final class StripeBillingRepository
             'period_start_at' => $periodStart,
             'period_end_at' => $periodEnd,
             'due_at' => self::timestampDate($invoice['due_date'] ?? null) ?: $periodEnd,
-            'issuer_name' => getenv('INVOICE_ISSUER_NAME') ?: getenv('APP_NAME') ?: 'Membora CRM',
+            'issuer_name' => getenv('INVOICE_ISSUER_NAME') ?: getenv('APP_NAME') ?: 'Membora',
             'issuer_tax_id' => getenv('INVOICE_ISSUER_TAX_ID') ?: '',
             'issuer_address' => getenv('INVOICE_ISSUER_ADDRESS') ?: '',
             'issuer_postal_code' => getenv('INVOICE_ISSUER_POSTAL_CODE') ?: '',
@@ -789,7 +789,7 @@ final class StripeBillingRepository
             }
         }
 
-        return 'Suscripcion Membora CRM';
+        return 'Suscripcion Membora';
     }
 
     private static function invoicePeriodStartDate(array $invoice): ?string

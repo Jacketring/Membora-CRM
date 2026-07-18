@@ -22,7 +22,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
 <div class="page-heading leads-heading platform-heading">
   <div>
     <h2>Empresas cliente</h2>
-    <p>Gestiona clientes del CRM, estado comercial, pagos, plan contratado y acceso de soporte.</p>
+    <p>Gestiona clientes de la plataforma, estado comercial, pagos, plan contratado y acceso de soporte.</p>
   </div>
   <button class="primary-action" type="button" data-open-modal="empresa-create-modal">Nueva empresa</button>
 </div>
@@ -31,7 +31,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
   <article class="dashboard-metric dashboard-metric--primary">
     <span>Activas</span>
     <strong><?= (int) $metrics['active'] ?></strong>
-    <small>CRM operativo</small>
+    <small>Acceso operativo</small>
   </article>
   <article class="dashboard-metric dashboard-metric--green">
     <span>En prueba</span>
@@ -57,7 +57,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
     <input name="q" value="<?= e($filters['q']) ?>" placeholder="Empresa, contacto, plan o notas" data-auto-submit-input>
   </label>
   <label class="field platform-filter-field">
-    <span>Estado CRM</span>
+    <span>Estado de acceso</span>
     <select name="status" data-auto-submit-input>
       <?php foreach ($statusOptions as $value => $label): ?>
         <option value="<?= e($value) ?>" <?= $filters['status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
@@ -89,7 +89,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
           <th>Empresa</th>
           <th>Contacto</th>
           <th>Plan</th>
-          <th>Estado CRM</th>
+          <th>Estado de acceso</th>
           <th>Pago</th>
           <th>Precio mensual</th>
           <th>Suscripción</th>
@@ -139,7 +139,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
                   <form method="post">
                     <input type="hidden" name="action" value="enter_empresa_crm">
                     <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">
-                    <button class="support-enter-action" type="submit" aria-label="Entrar al CRM de <?= e($empresa['name']) ?>">
+                    <button class="support-enter-action" type="submit" aria-label="Entrar a la plataforma de <?= e($empresa['name']) ?>">
                       <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg>
                       <span>Entrar</span>
                     </button>
@@ -179,7 +179,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
                     </button>
                   </form>
                 <?php endif; ?>
-                <form method="post" data-confirm-message="Se eliminarán la empresa, sus usuarios y todos los datos de su CRM. El contacto comercial se conservará. Esta acción no se puede deshacer." data-confirm-action-label="Eliminar empresa">
+                <form method="post" data-confirm-message="Se eliminarán la empresa, sus usuarios y todos los datos de su plataforma. El contacto comercial se conservará. Esta acción no se puede deshacer." data-confirm-action-label="Eliminar empresa">
                   <input type="hidden" name="action" value="delete_empresa">
                   <input type="hidden" name="id" value="<?= e($empresa['id']) ?>">
                   <button class="support-delete-action" type="submit" aria-label="Eliminar empresa <?= e($empresa['name']) ?>">
@@ -204,7 +204,7 @@ $planOptions = $planOptions ?? PlatformPlanRepository::options();
   <header>
     <div>
       <h2>Nueva empresa</h2>
-      <p>Alta manual de cliente CRM para seguimiento comercial y pagos.</p>
+      <p>Alta manual de cliente para seguimiento comercial y pagos.</p>
     </div>
     <button class="modal-close-action" type="button" data-close-modal aria-label="Cerrar">Cerrar</button>
   </header>

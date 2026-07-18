@@ -12,8 +12,8 @@ $statusOptions = [
 
 <div class="page-heading leads-heading platform-heading">
   <div>
-    <h2>Planes CRM</h2>
-    <p>Define los paquetes comerciales de Membora CRM: precios, limites, setup y prestaciones.</p>
+    <h2>Planes de plataforma</h2>
+    <p>Define los paquetes comerciales de Membora: precios, limites, setup y prestaciones.</p>
   </div>
   <button class="primary-action" type="button" data-open-modal="plan-create-modal">Nuevo plan</button>
 </div>

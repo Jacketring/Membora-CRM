@@ -1,4 +1,4 @@
-# Backend PHP, rutas y acciones - Membora CRM
+# Backend PHP, rutas y acciones - Membora
 
 Fecha de actualizacion: 18/07/2026.
 
@@ -107,7 +107,7 @@ Todas las acciones pasan por seguridad de origen, CSRF salvo la excepcion contro
 
 ### Prueba self-service
 
-`POST /api/trial` acepta nombre, empresa, email, consentimiento y honeypot. Valida el origen contra `WEB_APP_URL` y envia un enlace de activacion valido durante una hora. El limite adicional por IP y email esta desactivado por defecto durante la depuracion y se habilita con `TRIAL_RATE_LIMIT_ENABLED=true`. Solo tras una confirmacion `POST` crea o actualiza el contacto como `Cliente CRM`, vincula una empresa `TRIAL`, crea tenant y administrador y comprueba que ambos comparten `tenant_id`. La solicitud guarda `client_id`, `empresa_id`, `tenant_id` y `user_id` después de cada fase: si el proceso se interrumpe, continúa desde esas referencias sin duplicar ni eliminar la cuenta. El envío de credenciales es una fase posterior; un fallo SMTP conserva la cuenta en `EMAIL_FAILED` y permite reintentar con el mismo enlace de activación. La contraseña inicial aleatoria se cifra y se entrega mediante un segundo enlace: requiere confirmación, caduca en una hora y se consume al revelarse. Si el correo ya estaba ocupado, se busca un identificador de cuenta disponible sin duplicar el correo de entrega comercial.
+`POST /api/trial` acepta nombre, empresa, email, consentimiento y honeypot. Valida el origen contra `WEB_APP_URL` y envia un enlace de activacion valido durante una hora. El limite adicional por IP y email esta desactivado por defecto durante la depuracion y se habilita con `TRIAL_RATE_LIMIT_ENABLED=true`. Solo tras una confirmacion `POST` crea o actualiza el contacto como `Cliente`, vincula una empresa `TRIAL`, crea tenant y administrador y comprueba que ambos comparten `tenant_id`. La solicitud guarda `client_id`, `empresa_id`, `tenant_id` y `user_id` después de cada fase: si el proceso se interrumpe, continúa desde esas referencias sin duplicar ni eliminar la cuenta. El envío de credenciales es una fase posterior; un fallo SMTP conserva la cuenta en `EMAIL_FAILED` y permite reintentar con el mismo enlace de activación. La contraseña inicial aleatoria se cifra y se entrega mediante un segundo enlace: requiere confirmación, caduca en una hora y se consume al revelarse. Si el correo ya estaba ocupado, se busca un identificador de cuenta disponible sin duplicar el correo de entrega comercial.
 
 ### Captacion web
 

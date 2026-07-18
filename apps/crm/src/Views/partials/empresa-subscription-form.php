@@ -5,7 +5,7 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
 
 <?php if (!$subscriptionEmpresa): ?>
   <div class="empty-state form-full">
-    Este cliente todavía no tiene una empresa CRM vinculada.
+    Este cliente todavía no tiene una empresa cliente vinculada.
   </div>
   <div class="form-actions form-full">
     <button class="secondary-action" type="button" data-close-modal>Cerrar</button>
@@ -47,7 +47,7 @@ $subscriptionEmpresa = $subscriptionEmpresa ?? ($empresa ?? null);
       <input name="monthly_price" inputmode="decimal" value="<?= e((string) $empresaValues['monthly_price']) ?>" placeholder="49.00" data-plan-price-input>
     </label>
     <label class="field">
-      <span>Estado CRM</span>
+      <span>Estado de acceso</span>
       <select name="status">
         <?php foreach (array_filter($statusOptions, static fn ($label, $value): bool => $value !== '', ARRAY_FILTER_USE_BOTH) as $value => $label): ?>
           <option value="<?= e($value) ?>" <?= $empresaValues['status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>

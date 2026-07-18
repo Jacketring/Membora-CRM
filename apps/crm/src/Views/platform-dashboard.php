@@ -58,7 +58,7 @@ $paidRate = count($allEmpresas) > 0 ? (int) round((($paymentCounts['PAID'] ?? 0)
 
 <div class="page-heading leads-heading platform-heading">
   <div>
-    <h2>Administración Membora CRM</h2>
+    <h2>Administración Membora</h2>
     <p>Panel ejecutivo para controlar cartera, cobros y empresas que necesitan seguimiento.</p>
   </div>
   <div class="platform-heading-actions">

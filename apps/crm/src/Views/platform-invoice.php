@@ -1,7 +1,7 @@
 <?php
 $issuedAt = $invoice['issued_at'] ?: date('Y-m-d');
 $dueAt = $invoice['due_at'] ?: $issuedAt;
-$planLabel = $invoice['plan'] ? strtoupper((string) $invoice['plan']) : 'CRM';
+$planLabel = $invoice['plan'] ? strtoupper((string) $invoice['plan']) : 'SAAS';
 $items = $invoice['items'] ?? [];
 $payments = $invoice['payments'] ?? [];
 $invoiceCode = $invoice['invoice_code'] ?: ($invoice['invoice_series'] . '/BORRADOR');
@@ -13,7 +13,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Factura <?= e($invoiceCode) ?> - Membora CRM</title>
+  <title>Factura <?= e($invoiceCode) ?> - Membora</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <style>
     :root {
@@ -187,7 +187,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
   <article class="invoice">
     <header class="invoice-header">
       <div class="brand">
-        <h1>Membora CRM</h1>
+        <h1>Membora</h1>
         <p>SaaS para gimnasios, estudios deportivos y centros fitness.</p>
         <p>contacto@josehurtado.dev</p>
       </div>
@@ -203,7 +203,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
     <section class="summary-grid">
       <div class="party">
         <span>Emisor</span>
-        <h2><?= e($invoice['issuer_name'] ?: 'Membora CRM') ?></h2>
+        <h2><?= e($invoice['issuer_name'] ?: 'Membora') ?></h2>
         <p><?= e($invoice['issuer_tax_id'] ?: 'NIF/CIF pendiente') ?></p>
         <p><?= e($invoice['issuer_address'] ?: 'Direccion fiscal pendiente') ?></p>
         <p><?= e(trim(($invoice['issuer_postal_code'] ?? '') . ' ' . ($invoice['issuer_city'] ?? '') . ' ' . ($invoice['issuer_province'] ?? ''))) ?></p>
@@ -294,7 +294,7 @@ $taxBreakdown = is_array($taxBreakdown) ? $taxBreakdown : [];
       <?php endif; ?>
     </section>
 
-    <p class="footer">Factura generada por Membora CRM. Conserva este documento junto con el justificante de pago correspondiente.</p>
+    <p class="footer">Factura generada por Membora. Conserva este documento junto con el justificante de pago correspondiente.</p>
   </article>
   <script src="assets/app.js"></script>
 </body>

@@ -24,7 +24,7 @@ final class Mailer
         }
 
         $company = trim((string) ($payload['empresa'] ?? $payload['company'] ?? $payload['company_name'] ?? ''));
-        $subject = 'Hemos recibido tu solicitud en Membora CRM';
+        $subject = 'Hemos recibido tu solicitud en Membora';
         $html = self::webLeadTemplate($name, $company, $leadId);
 
         return self::sendHtml($email, $subject, $html);
@@ -62,7 +62,7 @@ final class Mailer
         }
 
         $html = self::debugTemplate();
-        return self::sendHtml($email, 'Prueba de correo - Membora CRM', $html);
+        return self::sendHtml($email, 'Prueba de correo - Membora', $html);
     }
 
     public static function sendPasswordReset(string $email, string $name, string $resetUrl): bool
@@ -80,7 +80,7 @@ final class Mailer
         }
 
         $html = self::passwordResetTemplate($name, $resetUrl);
-        return self::sendHtml($email, 'Restablece tu contraseña - Membora CRM', $html);
+        return self::sendHtml($email, 'Restablece tu contraseña - Membora', $html);
     }
 
     public static function sendTrialActivation(string $email, string $name, string $company, string $activationUrl, ?string $accountEmail = null): bool
@@ -116,7 +116,7 @@ final class Mailer
         }
         return self::sendHtml(
             $email,
-            'Tu acceso a Membora CRM ya está preparado',
+            'Tu acceso a Membora ya está preparado',
             self::trialCredentialsTemplate($name, $company, $accountEmail, $credentialUrl)
         );
     }
@@ -137,7 +137,7 @@ final class Mailer
         }
 
         $html = self::existingTrialAccountTemplate($name, $loginUrl, $forgotPasswordUrl);
-        return self::sendHtml($email, 'Ya tienes acceso a Membora CRM', $html);
+        return self::sendHtml($email, 'Ya tienes acceso a Membora', $html);
     }
 
     private static function sendHtml(string $to, string $subject, string $html): bool
@@ -169,14 +169,14 @@ final class Mailer
     private static function sendNativeMail(string $to, string $subject, string $html): bool
     {
         $fromEmail = self::fromEmail();
-        $fromName = self::headerText((string) (getenv('MAIL_FROM_NAME') ?: 'Membora CRM'));
+        $fromName = self::headerText((string) (getenv('MAIL_FROM_NAME') ?: 'Membora'));
         $replyTo = trim((string) (getenv('MAIL_REPLY_TO') ?: $fromEmail));
         $headers = [
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
             'From: ' . $fromName . ' <' . $fromEmail . '>',
             'Reply-To: ' . $replyTo,
-            'X-Mailer: Membora CRM',
+            'X-Mailer: Membora',
         ];
 
         $sent = @mail($to, self::encodedSubject($subject), $html, implode("\r\n", $headers), '-f' . $fromEmail);
@@ -252,7 +252,7 @@ final class Mailer
     private static function smtpMessage(string $to, string $subject, string $html): string
     {
         $fromEmail = self::fromEmail();
-        $fromName = self::headerText((string) (getenv('MAIL_FROM_NAME') ?: 'Membora CRM'));
+        $fromName = self::headerText((string) (getenv('MAIL_FROM_NAME') ?: 'Membora'));
         $replyTo = trim((string) (getenv('MAIL_REPLY_TO') ?: $fromEmail));
         $messageIdHost = parse_url(app_base_url(), PHP_URL_HOST) ?: 'membora.local';
         $headers = [
@@ -265,7 +265,7 @@ final class Mailer
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
             'Content-Transfer-Encoding: 8bit',
-            'X-Mailer: Membora CRM',
+            'X-Mailer: Membora',
         ];
 
         $body = str_replace(["\r\n", "\r"], "\n", $html);
@@ -329,7 +329,7 @@ final class Mailer
             <tr>
               <td style="background:#004bf2;padding:28px 32px;color:#ffffff;">
                 {$emailLogo}
-                <span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span>
+                <span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora</span>
               </td>
             </tr>
             <tr>
@@ -337,7 +337,7 @@ final class Mailer
                 <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Solicitud recibida</p>
                 <h1 style="margin:0 0 16px;font-size:30px;line-height:1.18;color:#071327;">Gracias, {$safeName}</h1>
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#334155;">
-                  Hemos recibido correctamente tu solicitud para <strong>{$safeCompany}</strong>. Una persona del equipo de Membora CRM revisara la informacion y contactara contigo en un plazo aproximado de <strong>24 a 48 horas</strong>.
+                  Hemos recibido correctamente tu solicitud para <strong>{$safeCompany}</strong>. Una persona del equipo de Membora revisara la informacion y contactara contigo en un plazo aproximado de <strong>24 a 48 horas</strong>.
                 </p>
                 <div style="margin:26px 0;padding:20px;border-radius:16px;background:#eef4ff;border:1px solid #cfe0ff;">
                   <p style="margin:0 0 8px;font-size:14px;color:#004bf2;font-weight:800;">Que ocurre ahora</p>
@@ -351,11 +351,11 @@ final class Mailer
             </tr>
             <tr>
               <td style="padding:0 32px 34px;">
-                <a href="{$webUrl}" style="display:inline-block;background:#004bf2;color:#ffffff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Volver a Membora CRM</a>
+                <a href="{$webUrl}" style="display:inline-block;background:#004bf2;color:#ffffff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Volver a Membora</a>
               </td>
             </tr>
             <tr>
-              <td style="padding:22px 32px;background:#f8fafc;color:#64748b;font-size:13px;line-height:1.5;">Este correo confirma que el formulario se ha enviado correctamente. Si no has solicitado informacion sobre Membora CRM, puedes ignorarlo.</td>
+              <td style="padding:22px 32px;background:#f8fafc;color:#64748b;font-size:13px;line-height:1.5;">Este correo confirma que el formulario se ha enviado correctamente. Si no has solicitado informacion sobre Membora, puedes ignorarlo.</td>
             </tr>
           </table>
         </td>
@@ -381,14 +381,14 @@ HTML;
             <tr>
               <td style="background:#004bf2;padding:24px 28px;color:#ffffff;">
                 {$emailLogo}
-                <span style="font-size:22px;font-weight:900;vertical-align:middle;">Membora CRM</span>
+                <span style="font-size:22px;font-weight:900;vertical-align:middle;">Membora</span>
               </td>
             </tr>
             <tr>
               <td style="padding:30px 28px;">
                 <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Prueba tecnica</p>
-                <h1 style="margin:0 0 14px;font-size:26px;color:#071327;">El correo de Membora CRM funciona</h1>
-                <p style="margin:0;color:#334155;font-size:16px;line-height:1.6;">Si estas viendo este mensaje, el SMTP configurado en Plesk esta enviando correctamente correos desde el CRM.</p>
+                <h1 style="margin:0 0 14px;font-size:26px;color:#071327;">El correo de Membora funciona</h1>
+                <p style="margin:0;color:#334155;font-size:16px;line-height:1.6;">Si estas viendo este mensaje, el SMTP configurado en Plesk esta enviando correctamente correos desde la plataforma.</p>
               </td>
             </tr>
           </table>
@@ -420,12 +420,12 @@ HTML;
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:32px 14px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;box-shadow:0 20px 50px rgba(15,23,42,.10);">
-          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span></td></tr>
+          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora</span></td></tr>
           <tr><td style="padding:34px 32px 18px;">
             <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Prueba gratuita de 14 días</p>
             <h1 style="margin:0 0 16px;font-size:30px;line-height:1.18;color:#071327;">Hola, {$safeName}</h1>
             <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#334155;">Confirma tu email para crear el cliente, la empresa y el usuario administrador de <strong>{$safeCompany}</strong>. Después recibirás otro correo con un enlace para ver tu contraseña una sola vez.</p>
-            <p style="margin:0 0 18px;padding:14px 16px;border-radius:12px;background:#eef4ff;color:#1f3657;font-size:14px;line-height:1.5;">Tu email de acceso al CRM será <strong>{$safeAccountEmail}</strong>.</p>
+            <p style="margin:0 0 18px;padding:14px 16px;border-radius:12px;background:#eef4ff;color:#1f3657;font-size:14px;line-height:1.5;">Tu email de acceso a la plataforma será <strong>{$safeAccountEmail}</strong>.</p>
             <p style="margin:26px 0;"><a href="{$safeUrl}" style="display:inline-block;background:#004bf2;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;">Activar prueba gratuita</a></p>
             <p style="margin:0;color:#64748b;font-size:14px;line-height:1.6;">El enlace caduca en una hora y solo puede utilizarse una vez. Si no has solicitado esta prueba, ignora este correo.</p>
           </td></tr>
@@ -448,12 +448,12 @@ HTML;
         return <<<HTML
 <!doctype html>
 <html lang="es">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ya tienes acceso a Membora CRM</title></head>
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ya tienes acceso a Membora</title></head>
   <body style="margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0b172a;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:32px 14px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;">
-          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span></td></tr>
+          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora</span></td></tr>
           <tr><td style="padding:34px 32px;">
             <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Cuenta existente</p>
             <h1 style="margin:0 0 16px;font-size:28px;color:#071327;">Hola, {$safeName}</h1>
@@ -480,12 +480,12 @@ HTML;
         return <<<HTML
 <!doctype html>
 <html lang="es">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Tu acceso a Membora CRM</title></head>
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Tu acceso a Membora</title></head>
   <body style="margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0b172a;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:32px 14px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;">
-          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span></td></tr>
+          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora</span></td></tr>
           <tr><td style="padding:34px 32px;">
             <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Cuenta preparada</p>
             <h1 style="margin:0 0 16px;font-size:28px;color:#071327;">Hola, {$safeName}</h1>
@@ -516,7 +516,7 @@ HTML;
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:32px 14px;">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#fff;border-radius:22px;overflow:hidden;border:1px solid #dce6f5;">
-          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora CRM</span></td></tr>
+          <tr><td style="background:#004bf2;padding:28px 32px;color:#fff;">{$emailLogo}<span style="font-size:23px;font-weight:900;vertical-align:middle;">Membora</span></td></tr>
           <tr><td style="padding:34px 32px;">
             <p style="margin:0 0 10px;color:#004bf2;font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:.08em;">Recuperación de acceso</p>
             <h1 style="margin:0 0 16px;font-size:28px;color:#071327;">{$safeName}, crea una nueva contraseña</h1>
@@ -550,7 +550,7 @@ HTML;
         $radius = $size >= 48 ? 14 : 12;
         $margin = $size >= 48 ? 12 : 10;
 
-        return '<span aria-label="Membora CRM" style="display:inline-block;width:' . $innerSize . 'px;height:' . $innerSize . 'px;line-height:' . $innerSize . 'px;border-radius:' . $radius . 'px;background:#ffffff;color:#004bf2;text-align:center;font-size:' . $fontSize . 'px;font-weight:900;vertical-align:middle;margin-right:' . $margin . 'px;">M</span>';
+        return '<span aria-label="Membora" style="display:inline-block;width:' . $innerSize . 'px;height:' . $innerSize . 'px;line-height:' . $innerSize . 'px;border-radius:' . $radius . 'px;background:#ffffff;color:#004bf2;text-align:center;font-size:' . $fontSize . 'px;font-weight:900;vertical-align:middle;margin-right:' . $margin . 'px;">M</span>';
     }
 
     private static function encodedSubject(string $subject): string

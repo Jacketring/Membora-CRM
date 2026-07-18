@@ -221,7 +221,7 @@ final class PlatformPlanRepository
     {
         return [
             ['code' => 'TRIAL', 'name' => 'Prueba', 'monthly_price' => '0.00', 'setup_price' => '0.00', 'max_users' => 2, 'max_members' => 100, 'features' => 'Plan de prueba configurable sin cobro ni renovacion automatica.'],
-            ['code' => 'BASIC', 'name' => 'Basic', 'monthly_price' => '49.00', 'setup_price' => '0.00', 'max_users' => 3, 'max_members' => 300, 'features' => "CRM de leads y socios.\nMembresias, pagos y tareas.\nSoporte por email."],
+            ['code' => 'BASIC', 'name' => 'Basic', 'monthly_price' => '49.00', 'setup_price' => '0.00', 'max_users' => 3, 'max_members' => 300, 'features' => "Gestión de leads y socios.\nMembresias, pagos y tareas.\nSoporte por email."],
             ['code' => 'PRO', 'name' => 'Pro', 'monthly_price' => '89.00', 'setup_price' => '99.00', 'max_users' => 8, 'max_members' => 1000, 'features' => "Todo lo incluido en Basic.\nClases, reservas y check-ins.\nSoporte prioritario."],
             ['code' => 'BUSINESS', 'name' => 'Business', 'monthly_price' => '149.00', 'setup_price' => '199.00', 'max_users' => 20, 'max_members' => 3000, 'features' => "Todo lo incluido en Pro.\nGestion de equipos y reporting avanzado.\nSoporte preferente."],
             ['code' => 'ENTERPRISE', 'name' => 'Enterprise', 'monthly_price' => '299.00', 'setup_price' => '499.00', 'max_users' => null, 'max_members' => null, 'features' => "Todo lo incluido en Business.\nCapacidad para cadenas o franquicias.\nSoporte dedicado."],

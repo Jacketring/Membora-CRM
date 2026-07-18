@@ -55,7 +55,7 @@ if ($status < 200 || $status >= 300 || !is_array($payload) || empty($payload['su
     http_response_code(502);
     echo json_encode([
         'success' => false,
-        'message' => 'No se pudieron cargar los planes publicos del CRM.',
+        'message' => 'No se pudieron cargar los planes publicos de la plataforma.',
         'status' => $status,
         'error' => $error ?: null,
     ], JSON_UNESCAPED_UNICODE);

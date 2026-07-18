@@ -9,7 +9,7 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#004bf2">
-  <title>Membora CRM - Login</title>
+  <title>Membora - Login</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/app.css?v=20260716-login-actions">
 </head>
@@ -18,7 +18,7 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
     <div class="login-overlay"></div>
     <section class="login-panel">
       <div class="brand-lockup brand-lockup--login">
-        <img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora CRM">
+        <img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora">
         <div>
           <p>Portal de gestión fitness</p>
         </div>
@@ -26,7 +26,7 @@ $demoEnabled = DemoAccessPolicy::isEnabled((string) getenv('APP_ENV'));
       <form class="login-card" method="post" action="index.php?route=login">
         <input type="hidden" name="action" value="login">
         <header>
-          <h2>Accede a tu CRM</h2>
+          <h2>Accede a tu plataforma</h2>
           <p>Introduce tus credenciales para gestionar tu centro.</p>
         </header>
         <?php if ($flash): ?>

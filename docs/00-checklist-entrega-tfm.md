@@ -1,4 +1,4 @@
-# Checklist de entrega del TFM - Membora CRM
+# Checklist de entrega del TFM - Membora
 
 Fecha oficial de entrega indicada en la guia: **20/07/2026**.
 
@@ -48,7 +48,7 @@ https://membora.es/app/
 Estado:
 
 - [x] Despliegue PHP en Plesk definido.
-- [x] Document root unico: `httpdocs`; CRM disponible en `/app/`.
+- [x] Document root unico: `httpdocs`; aplicación disponible en `/app/`.
 - [x] Base de datos MariaDB.
 - [x] Produccion sin Node.js.
 - [x] Produccion sin build frontend.
@@ -75,7 +75,7 @@ Recorrido recomendado:
 13. Usuarios internos y permisos por rol.
 14. Perfil y configuracion visual.
 15. Login como administrador de plataforma.
-16. Panel `Admin CRM`: contactos, empresas, renovaciones, facturas, planes, auditoria y acceso de soporte. No abrir la herramienta oculta de correo salvo que sea necesario diagnosticar SMTP.
+16. Panel `Administración Membora`: contactos, empresas, renovaciones, facturas, planes, auditoria y acceso de soporte. No abrir la herramienta oculta de correo salvo que sea necesario diagnosticar SMTP.
 17. Web publica: formulario, opiniones y enlaces legales.
 18. Mostrar el plan actual y `Mejorar el plan`: desde `TRIAL` se elige un plan y desde Basic, Pro o Business solo se permiten ascensos; Stripe Checkout funciona en Test para cuentas sin suscripcion Stripe vinculada y Stripe Live todavia no esta activo.
 
@@ -120,7 +120,7 @@ Guion recomendado:
 4. Login con usuario demo.
 5. Recorrido funcional por los modulos implementados.
 6. Explicacion del modelo multiempresa con `tenant_id`.
-7. Panel `Admin CRM` para empresas cliente.
+7. Panel `Administración Membora` para empresas cliente.
 8. Pruebas y despliegue.
 9. Conclusiones y mejoras futuras.
 

@@ -1,4 +1,4 @@
-# Modelo de datos actual - Membora CRM
+# Modelo de datos actual - Membora
 
 ## Diagrama entidad-relación
 
@@ -33,7 +33,7 @@ Fecha de actualizacion: 16/07/2026.
 
 Este documento describe el modelo de datos usado por la version PHP actual. Sustituye al planteamiento inicial basado en Prisma/NestJS para reflejar la implementacion desplegable en Plesk.
 
-La aplicacion usa una base de datos MariaDB compartida. Los datos operativos de cada gimnasio se aislan mediante `tenant_id`. La administracion SaaS de Membora CRM usa tablas globales de plataforma para leads web, clientes comerciales, empresas, planes y cobros.
+La aplicacion usa una base de datos MariaDB compartida. Los datos operativos de cada gimnasio se aislan mediante `tenant_id`. La administracion SaaS de Membora usa tablas globales de plataforma para leads web, clientes comerciales, empresas, planes y cobros.
 
 ## 2. Principios de datos
 
@@ -83,10 +83,10 @@ Columnas auxiliares que PHP puede anadir:
 
 ## 4. Tablas de administracion SaaS
 
-Estas tablas son globales de Membora CRM y no representan datos internos de un gimnasio concreto:
+Estas tablas son globales de Membora y no representan datos internos de un gimnasio concreto:
 
 - `platform_leads`: solicitudes recibidas desde la web publica.
-- `platform_clients`: contactos comerciales antes de crear CRM.
+- `platform_clients`: contactos comerciales antes de crear su espacio en Membora.
 - `empresas`: empresas cliente del SaaS, plan contratado, estado, pago y dias de prueba comercial.
 - `empresa_payments`: cobros SaaS por empresa.
 - `saas_plans`: catalogo comercial de planes SaaS.
@@ -128,7 +128,7 @@ Tablas transversales de autenticacion, demo y provisionamiento:
 - `AuditLog` 0..N -> `User` y opcionalmente a una entidad funcional mediante `entity_type` y `entity_id`.
 - `PlatformLead` 0..1 -> 1 `PlatformClient` al convertir una solicitud web.
 - `PlatformClient` 0..N -> N `Empresa` como origen comercial.
-- `Empresa` 0..1 -> 1 `Tenant` cuando el CRM esta creado.
+- `Empresa` 0..1 -> 1 `Tenant` cuando la plataforma esta creado.
 - `Empresa` 1 -> N `EmpresaPayment`.
 - `Empresa` 1 -> N `PlatformInvoice`.
 - `PlatformInvoice` 1 -> N `PlatformInvoiceItem` y `PlatformInvoicePayment`.

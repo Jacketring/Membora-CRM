@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Revisar el estado funcional de Membora CRM despues de los ultimos cambios en:
+Revisar el estado funcional de Membora despues de los ultimos cambios en:
 
-- App PHP del CRM.
+- App PHP de la plataforma.
 - Panel de administracion SaaS.
 - Web comercial publica.
 - Formulario web conectado a leads comerciales.
@@ -17,9 +17,9 @@ Esta auditoria combina comprobaciones automaticas locales y una checklist manual
 ```text
 Workspace local: C:\Users\Jose.Versens\Documents\membora-crm
 PHP CLI local: 8.2.12
-App CRM local: http://127.0.0.1:8092
+Aplicación local: http://127.0.0.1:8092
 Web publica local: http://127.0.0.1:8091
-Produccion CRM: https://membora.es/app/
+Aplicación en producción: https://membora.es/app/
 Produccion web: https://membora.es/
 ```
 
@@ -40,7 +40,7 @@ Resultado:
 OK
 ```
 
-Se ejecuto `php -l` sobre todos los archivos PHP de la app CRM (por aquel entonces en `php-app/`, hoy en `apps/crm/`).
+Se ejecuto `php -l` sobre todos los archivos PHP de la aplicación (por aquel entonces en `php-app/`, hoy en `apps/crm/`).
 
 Resultado:
 
@@ -64,7 +64,7 @@ Assets verificados:
 
 - `httpdocs/assets/site.css`: HTTP 200.
 - `httpdocs/assets/site.js`: HTTP 200.
-- Demo publica: redireccion/control de entrada hacia demo funcional del CRM.
+- Demo publica: redireccion/control de entrada hacia demo funcional de la plataforma.
 - `apps/crm/public/assets/app.css`: HTTP 200.
 - `apps/crm/public/assets/app.js`: HTTP 200.
 - `apps/crm/public/assets/favicon.svg`: HTTP 200.
@@ -122,7 +122,7 @@ Detalle:
 https://membora.es/app/webhook/lead
 ```
 
-Esto es correcto para produccion, pero dificulta probar el formulario contra un CRM local o staging sin editar el archivo.
+Esto es correcto para produccion, pero dificulta probar el formulario contra una plataforma local o staging sin editar el archivo.
 
 Recomendacion:
 
@@ -171,7 +171,7 @@ En seguimiento
 
 Detalle:
 
-El CRM ya detecta SMTP y el correo de confirmacion llega al usuario. Se corrigio:
+La plataforma ya detecta SMTP y el correo de confirmacion llega al usuario. Se corrigio:
 
 - Logo roto en el email.
 - Referencia interna `php_...` visible en el correo.
@@ -180,7 +180,7 @@ Prueba pendiente:
 
 - Enviar formulario real desde la web.
 - Confirmar que llega el email al contacto.
-- Confirmar que aparece el lead en `Admin CRM > Contactos`.
+- Confirmar que aparece el lead en `Administración Membora > Contactos`.
 - Confirmar si Plesk registra el envio en seguimiento de correo.
 
 ### H-04 Revisar modo oscuro despues de cambios visuales
@@ -201,7 +201,7 @@ Detalle:
 
 Se corrigio un problema de celdas vacias de tabla en modo oscuro/claro, pero conviene hacer un barrido visual de:
 
-- Admin CRM.
+- Administración Membora.
 - Web comercial.
 - Clases/reservas.
 - Modales y confirmaciones.
@@ -223,7 +223,7 @@ Pendiente de prueba manual
 
 Detalle:
 
-El CRM sube imagenes de:
+La plataforma sube imagenes de:
 
 - Perfil de usuario.
 - Foto de socio.
@@ -298,8 +298,8 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 - Crear empresa desde cliente.
 - Crear tenant y usuario jefe.
 - Editar empresa existente.
-- Entrar en CRM de esa empresa desde soporte.
-- Volver a Admin CRM.
+- Entrar en el espacio de esa empresa desde soporte.
+- Volver a Administración Membora.
 
 ## Checklist manual recomendada en Plesk
 
@@ -307,7 +307,7 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 
 - [ ] `membora.es/app/` abre login.
 - [ ] `membora.es/` abre web publica.
-- [ ] El unico document root apunta a `httpdocs` y `/app/` abre el CRM.
+- [ ] El unico document root apunta a `httpdocs` y `/app/` abre la plataforma.
 - [ ] Document root web apunta a `httpdocs`.
 - [ ] `apps/crm/.env` tiene DB real.
 - [ ] `apps/crm/.env` tiene SMTP real.
@@ -319,7 +319,7 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 - [ ] Credenciales erroneas muestran error comprensible.
 - [ ] Cerrar sesion funciona.
 
-### Admin CRM
+### Administración Membora
 
 - [ ] Dashboard carga metricas.
 - [ ] Contactos lista solicitudes web y clientes comerciales.
@@ -331,8 +331,8 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 - [ ] Registrar pago SaaS.
 - [ ] Crear/editar plan.
 - [ ] Enviar correo de prueba.
-- [ ] Entrar al CRM de una empresa en modo soporte.
-- [ ] Volver a Admin CRM.
+- [ ] Entrar a la plataforma de una empresa en modo soporte.
+- [ ] Volver a Administración Membora.
 
 ### Web publica
 
@@ -340,11 +340,11 @@ Se corrigio anteriormente que crear empresa editaba la primera. Debe revalidarse
 - [ ] Demo publica abre una sesion funcional con contador de 20 minutos.
 - [ ] Formulario envia solicitud.
 - [ ] Mensaje de exito aparece.
-- [ ] Lead aparece en `Admin CRM > Contactos`.
+- [ ] Lead aparece en `Administración Membora > Contactos`.
 - [ ] Email de confirmacion llega al contacto.
 - [ ] Honeypot no es visible.
 
-### CRM gimnasio
+### Gestión del gimnasio
 
 - [ ] Dashboard carga sin textos negros en modo oscuro.
 - [ ] Buscador global muestra resultados.
@@ -375,7 +375,7 @@ Necesita prueba manual con base de datos real en Plesk para cerrar reservas, emp
 Prioridad recomendada antes de darlo por cerrado:
 
 1. Probar formulario web real completo.
-2. Probar Admin CRM completo.
+2. Probar Administración Membora completo.
 3. Probar reservas con aforo.
 4. Probar uploads.
 5. Barrido visual en modo oscuro y responsive.

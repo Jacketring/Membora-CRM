@@ -118,7 +118,7 @@ function app_base_url(): string
         $configuredPath = (string) (parse_url($configured, PHP_URL_PATH) ?: '');
         $appPath = '/' . trim((string) (getenv('MEMBORA_APP_PATH') ?: '/app'), '/');
 
-        // Production exposes the CRM below /app. Keep return URLs inside the
+        // Production exposes Membora below /app. Keep return URLs inside the
         // application even when APP_URL was configured with only the origin.
         if (($configuredPath === '' || $configuredPath === '/') && $appPath !== '/') {
             return $configured . $appPath;
@@ -791,9 +791,9 @@ function audit_action_label(?string $action): string
         'delete_platform_lead' => 'Eliminación de lead web',
         'send_platform_test_email' => 'Prueba de email',
         'reset_platform_trial_attempts' => 'Reinicio de alta de prueba',
-        'create_platform_client' => 'Creación de cliente CRM',
-        'update_platform_client' => 'Actualizacion de cliente CRM',
-        'delete_platform_client' => 'Eliminación de cliente CRM',
+        'create_platform_client' => 'Creación de cliente',
+        'update_platform_client' => 'Actualizacion de cliente',
+        'delete_platform_client' => 'Eliminación de cliente',
         'create_empresa' => 'Creación de empresa',
         'update_empresa' => 'Actualizacion de empresa',
         'delete_empresa' => 'Eliminación de empresa',
@@ -806,14 +806,14 @@ function audit_action_label(?string $action): string
         'open_tenant_simulated_checkout' => 'Inicio de checkout simulado',
         'complete_tenant_simulated_checkout' => 'Pago simulado de plan',
         'cancel_empresa_stripe_subscription' => 'Cancelacion de Stripe al final del periodo',
-        'create_platform_payment' => 'Creación de pago CRM',
-        'update_platform_payment' => 'Actualizacion de pago CRM',
-        'create_platform_invoice' => 'Creación de factura CRM',
-        'update_platform_invoice' => 'Actualizacion de factura CRM',
-        'issue_platform_invoice' => 'Emision de factura CRM',
-        'add_platform_invoice_payment' => 'Pago parcial de factura CRM',
-        'create_platform_plan' => 'Creación de plan CRM',
-        'update_platform_plan' => 'Actualizacion de plan CRM',
+        'create_platform_payment' => 'Creación de pago de plataforma',
+        'update_platform_payment' => 'Actualizacion de pago de plataforma',
+        'create_platform_invoice' => 'Creación de factura de plataforma',
+        'update_platform_invoice' => 'Actualizacion de factura de plataforma',
+        'issue_platform_invoice' => 'Emision de factura de plataforma',
+        'add_platform_invoice_payment' => 'Pago parcial de factura de plataforma',
+        'create_platform_plan' => 'Creación de plan de plataforma',
+        'update_platform_plan' => 'Actualizacion de plan de plataforma',
         'create_platform_user' => 'Creación de usuario administrador',
         'update_platform_user' => 'Actualización de usuario administrador',
         'delete_platform_user' => 'Eliminación de usuario administrador',
@@ -852,11 +852,11 @@ function audit_entity_label(?string $entity): string
         'empresa' => 'Empresa',
         'empresa_crm' => 'Empresa',
         'empresa_subscription' => 'Empresa',
-        'platform_client' => 'Cliente CRM',
+        'platform_client' => 'Cliente',
         'platform_lead' => 'Lead web',
-        'platform_payment' => 'Pago CRM',
-        'platform_invoice' => 'Factura CRM',
-        'platform_plan' => 'Plan CRM',
+        'platform_payment' => 'Pago de plataforma',
+        'platform_invoice' => 'Factura de plataforma',
+        'platform_plan' => 'Plan de plataforma',
         'audit' => 'Auditoría',
         'view_audit' => 'Auditoría',
         'lead_note' => 'Nota',
@@ -882,15 +882,15 @@ function audit_area_label(?string $route): string
         'tasks' => 'Tareas',
         'alerts' => 'Alertas',
         'audit' => 'Auditoría',
-        'platform-audit' => 'Logs CRM',
+        'platform-audit' => 'Logs de plataforma',
         'platform-companies' => 'Empresas',
-        'platform-contacts' => 'Contactos CRM',
-        'platform-clients' => 'Contactos CRM',
-        'platform-leads' => 'Contactos CRM',
-        'platform-payments' => 'Pagos CRM',
-        'platform-invoices' => 'Facturas CRM',
-        'platform-invoice' => 'Factura CRM',
-        'platform-plans' => 'Planes CRM',
+        'platform-contacts' => 'Contactos',
+        'platform-clients' => 'Contactos',
+        'platform-leads' => 'Contactos',
+        'platform-payments' => 'Pagos de plataforma',
+        'platform-invoices' => 'Facturas de plataforma',
+        'platform-invoice' => 'Factura de plataforma',
+        'platform-plans' => 'Planes de plataforma',
         'platform-users' => 'Usuarios Admin',
         'platform-web' => 'Web comercial',
         'upgrade-plan' => 'Mejorar plan',
@@ -899,9 +899,9 @@ function audit_area_label(?string $route): string
         'profile' => 'Perfil',
         'settings' => 'Configuración',
         'novedades' => 'Novedades',
-    ], 'CRM');
+    ], 'Membora');
 
-    return $label === '' || str_contains($label, '_') || str_contains($label, '-') ? 'CRM' : $label;
+    return $label === '' || str_contains($label, '_') || str_contains($label, '-') ? 'Membora' : $label;
 }
 
 function audit_metadata_summary(?string $metadata): string

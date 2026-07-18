@@ -18,6 +18,6 @@ Vive fuera de cualquier `public/`, por lo que **nunca es accesible directamente 
 
 Alinea el repositorio con las buenas practicas del master:
 
-- El unico document root apunta a `httpdocs`; el CRM se expone de forma controlada en `/app/` sin publicar `src`, `.env` ni el almacenamiento compartido.
+- El unico document root apunta a `httpdocs`; la plataforma se expone de forma controlada en `/app/` sin publicar `src`, `.env` ni el almacenamiento compartido.
 - Los secretos (`.env`) y el almacenamiento quedan fuera del webroot.
 - Lo comun a todo el proyecto se centraliza en la raiz por coherencia.

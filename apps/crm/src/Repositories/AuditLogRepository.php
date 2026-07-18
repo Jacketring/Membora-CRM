@@ -256,7 +256,7 @@ final class AuditLogRepository
     public static function tenantOptions(): array
     {
         self::ensureTable();
-        $options = ['' => 'Todas las empresas', '__platform' => 'Admin CRM'];
+        $options = ['' => 'Todas las empresas', '__platform' => 'Administración Membora'];
 
         try {
             EmpresaRepository::ensureTables();

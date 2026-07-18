@@ -1,10 +1,10 @@
-# Stripe Billing SaaS - Membora CRM
+# Stripe Billing SaaS - Membora
 
 Fecha de actualizacion: 18/07/2026.
 
 ## 1. Alcance
 
-Esta integracion cubre los cobros que realizan los gimnasios por usar Membora CRM. No afecta a los pagos internos de socios del gimnasio.
+Esta integracion cubre los cobros que realizan los gimnasios por usar Membora. No afecta a los pagos internos de socios del gimnasio.
 
 El modo inicial soportado es:
 
@@ -16,7 +16,7 @@ No se deben usar claves de produccion durante desarrollo.
 
 ## 2. Diagnostico inicial
 
-Antes de integrar Stripe, Membora CRM ya tenia:
+Antes de integrar Stripe, Membora ya tenia:
 
 - Empresas SaaS en `empresas`.
 - Clientes comerciales en `platform_clients`.
@@ -69,7 +69,7 @@ Donde pegar cada valor:
 
 ## 4. Price IDs
 
-Cada plan local de `Admin CRM > Planes` tiene dos campos:
+Cada plan local de `Administración Membora > Planes` tiene dos campos:
 
 - `Stripe Price o producto mensual`
 - `Stripe Price o producto anual`
@@ -170,9 +170,9 @@ composer install --no-dev --prefer-dist
 ```
 
 4. Editar `apps/crm/.env` y pegar claves test.
-5. Confirmar que `APP_URL` apunta al dominio real del CRM.
+5. Confirmar que `APP_URL` apunta al dominio real de la plataforma.
 6. Configurar webhook en Stripe con `{APP_URL}/stripe/webhook`.
-7. Configurar los Price IDs en `Admin CRM > Planes`.
+7. Configurar los Price IDs en `Administración Membora > Planes`.
 
 Si Plesk no permite Composer, generar `apps/crm/vendor` en local con Composer y subir esa carpeta por SFTP, sin guardar claves en el repositorio.
 

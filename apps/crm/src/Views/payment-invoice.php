@@ -194,7 +194,7 @@ $planName = $payment['plan_name'] ?: 'Membresía';
       <div class="brand">
         <h1><?= e($tenantName) ?></h1>
         <p>Centro deportivo y gestión de membresías.</p>
-        <p>Factura emitida desde Membora CRM.</p>
+        <p>Factura emitida desde Membora.</p>
       </div>
       <div class="invoice-meta">
         <strong>Factura</strong>
@@ -264,11 +264,11 @@ $planName = $payment['plan_name'] ?: 'Membresía';
 
     <section class="notes">
       <p>Forma de pago: <?= e(payment_method_label($payment['payment_method'])) ?>.</p>
-      <p>Este documento sirve como justificante del pago registrado en el CRM del centro.</p>
+      <p>Este documento sirve como justificante del pago registrado en la plataforma del centro.</p>
     </section>
 
     <p class="footer">
-      Factura generada automaticamente por Membora CRM. Revisa los datos fiscales antes de usarla como documento definitivo de facturación.
+      Factura generada automaticamente por Membora. Revisa los datos fiscales antes de usarla como documento definitivo de facturación.
     </p>
   </article>
   <script src="assets/app.js"></script>

@@ -3,12 +3,12 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#004bf2"><title>Membora CRM - Recuperar contraseña</title>
+  <meta name="theme-color" content="#004bf2"><title>Membora - Recuperar contraseña</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg"><link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
   <main class="login-screen"><div class="login-overlay"></div><section class="login-panel">
-    <div class="brand-lockup brand-lockup--login"><img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora CRM"><div><p>Portal de gestión fitness</p></div></div>
+    <div class="brand-lockup brand-lockup--login"><img class="brand-logo brand-logo--login" src="assets/membora-logo.svg" alt="Membora"><div><p>Portal de gestión fitness</p></div></div>
     <form class="login-card" method="post">
       <input type="hidden" name="action" value="request_password_reset">
       <header><h2>Recupera tu contraseña</h2><p>Indica el email de tu cuenta y te enviaremos un enlace temporal.</p></header>

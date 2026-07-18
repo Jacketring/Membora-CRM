@@ -287,7 +287,7 @@ final class PlatformClientRepository
                 'contact_name' => $client['contact_name'] ?: $client['company_name'],
                 'email' => $client['email'],
                 'phone' => $client['phone'],
-                'message' => $client['notes'] ?: 'Cliente devuelto a lead desde el panel CRM.',
+                'message' => $client['notes'] ?: 'Cliente devuelto a lead desde el panel de la plataforma.',
                 'id' => $leadId,
             ]);
             return;
@@ -303,7 +303,7 @@ final class PlatformClientRepository
             'contact_name' => $client['contact_name'] ?: $client['company_name'],
             'email' => $client['email'],
             'phone' => $client['phone'],
-            'message' => $client['notes'] ?: 'Cliente devuelto a lead desde el panel CRM.',
+            'message' => $client['notes'] ?: 'Cliente devuelto a lead desde el panel de la plataforma.',
             'client_id' => $clientId,
         ]);
     }

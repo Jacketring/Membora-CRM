@@ -216,7 +216,7 @@ final class Auth
     public static function enterTenantContext(array $empresa): void
     {
         if (empty($empresa['tenant_id'])) {
-            flash('Esta empresa no tiene un CRM conectado todavia.', 'error');
+            flash('Esta empresa no tiene una plataforma conectada todavia.', 'error');
             redirect('platform-dashboard');
         }
 
@@ -230,7 +230,7 @@ final class Auth
         $tenant = $stmt->fetch();
 
         if (!$tenant) {
-            flash('No se encontro el CRM conectado a esta empresa.', 'error');
+            flash('No se encontro la plataforma conectada a esta empresa.', 'error');
             redirect('platform-dashboard');
         }
 
@@ -330,7 +330,7 @@ final class Auth
     {
         $isPlatformAdmin = in_array(strtoupper((string) $user['role_key']), ['SUPER_ADMIN', 'SUPERADMIN'], true);
         if ($isPlatformAdmin) {
-            $user['tenant_name'] = 'Membora CRM';
+            $user['tenant_name'] = 'Membora';
             $user['tenant_primary_color'] = '#004bf2';
         } elseif (empty($user['tenant_id'])) {
             return false;
