@@ -168,7 +168,7 @@ final class TrialRegistrationRepository
         $credentialToken = '';
 
         try {
-            if ($previousStatus === 'EMAIL_FAILED') {
+            if ($previousStatus === 'EMAIL_FAILED' || self::hasPreparedTrialAccount($registration)) {
                 self::retryCredentialEmail($registration);
                 return;
             }
@@ -424,9 +424,25 @@ final class TrialRegistrationRepository
             'email' => (string) $registration['email'],
         ]);
         $userId = trim((string) $stmt->fetchColumn());
-        $credentialToken = $userId !== '' ? TrialCredentialRepository::rotateTokenForUser($userId) : null;
+        if ($userId === '') {
+            throw new RuntimeException('No se encontró el usuario preparado para reenviar el acceso.');
+        }
+
+        $credentialToken = TrialCredentialRepository::rotateTokenForUser($userId);
         if (!$credentialToken) {
-            throw new RuntimeException('No se encontró la credencial temporal para reenviar el acceso.');
+            $initialPassword = self::generateInitialPassword();
+            $userId = EmpresaRepository::ensureTenantAdminUser(
+                $tenantId,
+                (string) $registration['name'],
+                (string) $registration['email'],
+                $initialPassword
+            );
+            $credentialToken = TrialCredentialRepository::issue(
+                $userId,
+                (string) $registration['email'],
+                (string) $registration['company_name'],
+                $initialPassword
+            );
         }
 
         $credentialUrl = self::publicAppUrl() . '/index.php?route=trial-credentials&token=' . urlencode($credentialToken);
@@ -453,6 +469,27 @@ final class TrialRegistrationRepository
         Database::connection()->prepare(
             'UPDATE trial_registrations SET status = "ACTIVATED", activated_at = NOW() WHERE id = :id'
         )->execute(['id' => $registration['id']]);
+    }
+
+    private static function hasPreparedTrialAccount(array $registration): bool
+    {
+        $deliveryEmail = (string) ($registration['delivery_email'] ?: $registration['email']);
+        $client = PlatformClientRepository::findByEmail($deliveryEmail);
+        $empresa = $client ? EmpresaRepository::findByClient((string) $client['id']) : null;
+        $tenantId = trim((string) ($empresa['tenant_id'] ?? ''));
+        if (!$client || !$empresa || $tenantId === '') {
+            return false;
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT COUNT(*) FROM users WHERE tenant_id = :tenant_id AND email = :email'
+        );
+        $stmt->execute([
+            'tenant_id' => $tenantId,
+            'email' => (string) $registration['email'],
+        ]);
+
+        return (int) $stmt->fetchColumn() === 1;
     }
 
     private static function logEmailDiagnostic(string $status, string $message, string $email): void
