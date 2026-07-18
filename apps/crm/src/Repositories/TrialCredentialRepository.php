@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 final class TrialCredentialRepository
 {
-    private const TTL_SECONDS = 3600;
-
     public static function issue(string $userId, string $accountEmail, string $companyName, string $password): string
     {
         self::ensureTable();
@@ -14,7 +12,7 @@ final class TrialCredentialRepository
         $stmt = Database::connection()->prepare(
             'INSERT INTO trial_credential_deliveries
              (id, user_id, account_email, company_name, token_hash, password_encrypted, expires_at, viewed_at, created_at)
-             VALUES (:id, :user_id, :account_email, :company_name, :token_hash, :password_encrypted, :expires_at, NULL, NOW())'
+             VALUES (:id, :user_id, :account_email, :company_name, :token_hash, :password_encrypted, DATE_ADD(NOW(), INTERVAL 1 HOUR), NULL, NOW())'
         );
         $stmt->execute([
             'id' => cuid(),
@@ -23,7 +21,6 @@ final class TrialCredentialRepository
             'company_name' => trim($companyName),
             'token_hash' => hash('sha256', $token),
             'password_encrypted' => self::encrypt($password),
-            'expires_at' => date('Y-m-d H:i:s', time() + self::TTL_SECONDS),
         ]);
         return $token;
     }
@@ -64,13 +61,12 @@ final class TrialCredentialRepository
             $token = bin2hex(random_bytes(32));
             $update = $pdo->prepare(
                 'UPDATE trial_credential_deliveries
-                 SET token_hash = :token_hash, expires_at = :expires_at
+                 SET token_hash = :token_hash, expires_at = DATE_ADD(NOW(), INTERVAL 1 HOUR)
                  WHERE id = :id AND viewed_at IS NULL'
             );
             $update->execute([
                 'id' => $deliveryId,
                 'token_hash' => hash('sha256', $token),
-                'expires_at' => date('Y-m-d H:i:s', time() + self::TTL_SECONDS),
             ]);
             if ($update->rowCount() !== 1) {
                 $pdo->rollBack();
