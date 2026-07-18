@@ -41,6 +41,52 @@ final class TrialCredentialRepository
         return (int) $stmt->fetchColumn() === 1;
     }
 
+    public static function rotateTokenForUser(string $userId): ?string
+    {
+        self::ensureTable();
+        $pdo = Database::connection();
+        $pdo->beginTransaction();
+
+        try {
+            $stmt = $pdo->prepare(
+                'SELECT id FROM trial_credential_deliveries
+                 WHERE user_id = :user_id AND viewed_at IS NULL
+                 ORDER BY created_at DESC
+                 LIMIT 1 FOR UPDATE'
+            );
+            $stmt->execute(['user_id' => $userId]);
+            $deliveryId = trim((string) $stmt->fetchColumn());
+            if ($deliveryId === '') {
+                $pdo->rollBack();
+                return null;
+            }
+
+            $token = bin2hex(random_bytes(32));
+            $update = $pdo->prepare(
+                'UPDATE trial_credential_deliveries
+                 SET token_hash = :token_hash, expires_at = :expires_at
+                 WHERE id = :id AND viewed_at IS NULL'
+            );
+            $update->execute([
+                'id' => $deliveryId,
+                'token_hash' => hash('sha256', $token),
+                'expires_at' => date('Y-m-d H:i:s', time() + self::TTL_SECONDS),
+            ]);
+            if ($update->rowCount() !== 1) {
+                $pdo->rollBack();
+                return null;
+            }
+
+            $pdo->commit();
+            return $token;
+        } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $exception;
+        }
+    }
+
     public static function consume(string $token): ?array
     {
         self::ensureTable();

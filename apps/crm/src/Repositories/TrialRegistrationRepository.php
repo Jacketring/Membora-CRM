@@ -5,6 +5,7 @@ declare(strict_types=1);
 final class TrialRegistrationRepository
 {
     private const TRIAL_DAYS = 14;
+    public const CREDENTIAL_EMAIL_FAILED = 'La cuenta está preparada, pero no se pudo enviar el correo de acceso.';
 
     public static function validationErrors(array $payload): array
     {
@@ -136,7 +137,7 @@ final class TrialRegistrationRepository
 
         $stmt = Database::connection()->prepare(
             'SELECT * FROM trial_registrations
-             WHERE token_hash = :token_hash AND status = "PENDING" AND expires_at > NOW()
+             WHERE token_hash = :token_hash AND status IN ("PENDING", "EMAIL_FAILED") AND expires_at > NOW()
              LIMIT 1'
         );
         $stmt->execute(['token_hash' => hash('sha256', $token)]);
@@ -145,11 +146,15 @@ final class TrialRegistrationRepository
             throw new RuntimeException('El enlace de activación ha caducado o ya se ha utilizado.');
         }
 
+        $previousStatus = (string) $registration['status'];
         $claim = Database::connection()->prepare(
             'UPDATE trial_registrations SET status = "ACTIVATING"
-             WHERE id = :id AND status = "PENDING"'
+             WHERE id = :id AND status = :previous_status'
         );
-        $claim->execute(['id' => $registration['id']]);
+        $claim->execute([
+            'id' => $registration['id'],
+            'previous_status' => $previousStatus,
+        ]);
         if ($claim->rowCount() !== 1) {
             throw new RuntimeException('Esta prueba ya se está activando.');
         }
@@ -163,6 +168,11 @@ final class TrialRegistrationRepository
         $credentialToken = '';
 
         try {
+            if ($previousStatus === 'EMAIL_FAILED') {
+                self::retryCredentialEmail($registration);
+                return;
+            }
+
             $clientId = PlatformClientRepository::upsertTrialCustomer(
                 (string) $registration['company_name'],
                 (string) $registration['company_name'],
@@ -213,7 +223,7 @@ final class TrialRegistrationRepository
                     'Correo de credenciales de prueba: ' . Mailer::lastError(),
                     $deliveryEmail
                 );
-                throw new RuntimeException('No se pudo enviar el correo con las credenciales: ' . Mailer::lastError());
+                throw new RuntimeException(self::CREDENTIAL_EMAIL_FAILED);
             }
             self::logEmailDiagnostic(
                 'trial_email',
@@ -226,6 +236,23 @@ final class TrialRegistrationRepository
             )->execute(['id' => $registration['id']]);
 
         } catch (Throwable $exception) {
+            if ($exception->getMessage() === self::CREDENTIAL_EMAIL_FAILED) {
+                Database::connection()->prepare(
+                    'UPDATE trial_registrations
+                     SET status = "EMAIL_FAILED", expires_at = DATE_ADD(NOW(), INTERVAL 1 HOUR)
+                     WHERE id = :id'
+                )->execute(['id' => $registration['id']]);
+                throw $exception;
+            }
+            if ($previousStatus === 'EMAIL_FAILED') {
+                Database::connection()->prepare(
+                    'UPDATE trial_registrations
+                     SET status = "EMAIL_FAILED", expires_at = DATE_ADD(NOW(), INTERVAL 1 HOUR)
+                     WHERE id = :id'
+                )->execute(['id' => $registration['id']]);
+                throw $exception;
+            }
+
             if ($credentialToken !== '') {
                 try {
                     TrialCredentialRepository::revoke($credentialToken);
@@ -270,7 +297,7 @@ final class TrialRegistrationRepository
         $token = self::normalizeActivationToken($token);
         $stmt = Database::connection()->prepare(
             'SELECT COUNT(*) FROM trial_registrations
-             WHERE token_hash = :token_hash AND status = "PENDING" AND expires_at > NOW()'
+             WHERE token_hash = :token_hash AND status IN ("PENDING", "EMAIL_FAILED") AND expires_at > NOW()'
         );
         $stmt->execute(['token_hash' => hash('sha256', $token)]);
         if ((int) $stmt->fetchColumn() !== 1) {
@@ -289,7 +316,7 @@ final class TrialRegistrationRepository
         $stmt = Database::connection()->prepare(
             'DELETE FROM trial_registrations
              WHERE (email = :account_email OR delivery_email = :delivery_email)
-               AND status IN ("PENDING", "FAILED", "ACTIVATING")'
+               AND status IN ("PENDING", "FAILED", "EMAIL_FAILED", "ACTIVATING")'
         );
         $stmt->execute([
             'account_email' => $email,
@@ -377,6 +404,55 @@ final class TrialRegistrationRepository
         $appPath = '/' . trim((string) (getenv('MEMBORA_APP_PATH') ?: '/app'), '/');
 
         return $webOrigin . $appPath;
+    }
+
+    private static function retryCredentialEmail(array $registration): void
+    {
+        $deliveryEmail = (string) ($registration['delivery_email'] ?: $registration['email']);
+        $client = PlatformClientRepository::findByEmail($deliveryEmail);
+        $empresa = $client ? EmpresaRepository::findByClient((string) $client['id']) : null;
+        $tenantId = trim((string) ($empresa['tenant_id'] ?? ''));
+        if (!$client || !$empresa || $tenantId === '') {
+            throw new RuntimeException('No se encontró la cuenta preparada para reenviar el acceso.');
+        }
+
+        $stmt = Database::connection()->prepare(
+            'SELECT id FROM users WHERE tenant_id = :tenant_id AND email = :email LIMIT 1'
+        );
+        $stmt->execute([
+            'tenant_id' => $tenantId,
+            'email' => (string) $registration['email'],
+        ]);
+        $userId = trim((string) $stmt->fetchColumn());
+        $credentialToken = $userId !== '' ? TrialCredentialRepository::rotateTokenForUser($userId) : null;
+        if (!$credentialToken) {
+            throw new RuntimeException('No se encontró la credencial temporal para reenviar el acceso.');
+        }
+
+        $credentialUrl = self::publicAppUrl() . '/index.php?route=trial-credentials&token=' . urlencode($credentialToken);
+        if (!Mailer::sendTrialCredentials(
+            $deliveryEmail,
+            (string) $registration['name'],
+            (string) $registration['company_name'],
+            (string) $registration['email'],
+            $credentialUrl
+        )) {
+            self::logEmailDiagnostic(
+                'email_error',
+                'Reenvío de credenciales de prueba: ' . Mailer::lastError(),
+                $deliveryEmail
+            );
+            throw new RuntimeException(self::CREDENTIAL_EMAIL_FAILED);
+        }
+
+        self::logEmailDiagnostic(
+            'trial_email',
+            'Reenvío del enlace de credenciales aceptado por el transporte de envío.',
+            $deliveryEmail
+        );
+        Database::connection()->prepare(
+            'UPDATE trial_registrations SET status = "ACTIVATED", activated_at = NOW() WHERE id = :id'
+        )->execute(['id' => $registration['id']]);
     }
 
     private static function logEmailDiagnostic(string $status, string $message, string $email): void

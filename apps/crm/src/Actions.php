@@ -237,6 +237,11 @@ final class Actions
             redirect('login');
         } catch (Throwable $exception) {
             log_server_error($exception, 'trial_activation');
+            if ($exception->getMessage() === TrialRegistrationRepository::CREDENTIAL_EMAIL_FAILED) {
+                flash('La cuenta está creada, pero el correo de acceso no pudo enviarse. Vuelve a pulsar el botón para reintentarlo.', 'error');
+                header('Location: index.php?route=activate-trial&token=' . urlencode($token));
+                exit;
+            }
             $safeMessages = [
                 'El enlace de activación no es válido.',
                 'El enlace de activación ha caducado o ya se ha utilizado.',
