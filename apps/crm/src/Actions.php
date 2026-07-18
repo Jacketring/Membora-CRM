@@ -460,9 +460,17 @@ final class Actions
             EmpresaRepository::delete($id);
         } catch (Throwable $exception) {
             log_server_error($exception, 'delete_empresa');
-            $message = str_contains($exception->getMessage(), 'superadministrador')
-                ? 'No puedes eliminar la única empresa vinculada al superadministrador. Crea otra empresa y vuelve a intentarlo.'
-                : 'No se pudo eliminar la empresa porque todavía tiene datos relacionados. Revisa el registro del servidor con la referencia delete_empresa.';
+            $error = $exception->getMessage();
+            if (str_contains($error, 'superadministrador')) {
+                $message = 'No puedes eliminar la única empresa vinculada al superadministrador. Crea otra empresa y vuelve a intentarlo.';
+            } elseif (preg_match('/foreign key constraint fails \(`[^`]+`\.`([^`]+)`.*CONSTRAINT `([^`]+)`/i', $error, $matches)) {
+                $table = preg_replace('/[^a-zA-Z0-9_]/', '', $matches[1]) ?: 'desconocida';
+                $constraint = preg_replace('/[^a-zA-Z0-9_]/', '', $matches[2]) ?: 'desconocida';
+                $message = 'No se pudo eliminar la empresa: la tabla relacionada ' . $table
+                    . ' lo impide (restricción ' . $constraint . ').';
+            } else {
+                $message = 'No se pudo eliminar la empresa. Consulta el registro del servidor con la referencia delete_empresa.';
+            }
             flash($message, 'error');
             redirect('platform-companies');
         }
