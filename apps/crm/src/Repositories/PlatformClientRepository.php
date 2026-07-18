@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 final class PlatformClientRepository
 {
+    private const DEMO_CLIENT_EMAIL = 'demo.cliente@membora.crm';
+
     public static function ensureTable(): void
     {
         Database::connection()->exec(
@@ -39,8 +41,8 @@ final class PlatformClientRepository
     public static function all(string $query = '', string $status = '', bool $includeLeadStatus = false): array
     {
         self::ensureTable();
-        $params = [];
-        $where = ['1 = 1'];
+        $params = ['demo_email' => self::DEMO_CLIENT_EMAIL];
+        $where = ['LOWER(COALESCE(email, "")) <> :demo_email'];
 
         if ($query !== '') {
             $where[] = '(company_name LIKE :query OR contact_name LIKE :query OR email LIKE :query OR phone LIKE :query OR notes LIKE :query)';
@@ -336,17 +338,21 @@ final class PlatformClientRepository
     public static function syncMissingFromEmpresas(): int
     {
         self::ensureTable();
+        PlatformLeadRepository::ensureTable();
         EmpresaRepository::ensureTables();
 
         $pdo = Database::connection();
-        $stmt = $pdo->query(
+        self::removeStoredDemoContact($pdo);
+        $stmt = $pdo->prepare(
             'SELECT empresas.id, empresas.name, empresas.contact_email
              FROM empresas
              LEFT JOIN platform_clients ON platform_clients.id = empresas.client_id
              WHERE platform_clients.id IS NULL
                AND empresas.contact_email IS NOT NULL
-               AND empresas.contact_email <> ""'
+               AND empresas.contact_email <> ""
+               AND LOWER(empresas.contact_email) <> :demo_email'
         );
+        $stmt->execute(['demo_email' => self::DEMO_CLIENT_EMAIL]);
         $repaired = 0;
 
         foreach ($stmt->fetchAll() as $empresa) {
@@ -383,7 +389,27 @@ final class PlatformClientRepository
 
     private static function count(PDO $pdo, string $where): int
     {
-        $stmt = $pdo->query("SELECT COUNT(*) FROM platform_clients WHERE {$where}");
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM platform_clients
+             WHERE ({$where}) AND LOWER(COALESCE(email, \"\")) <> :demo_email"
+        );
+        $stmt->execute(['demo_email' => self::DEMO_CLIENT_EMAIL]);
         return (int) $stmt->fetchColumn();
+    }
+
+    private static function removeStoredDemoContact(PDO $pdo): void
+    {
+        $ids = $pdo->prepare('SELECT id FROM platform_clients WHERE LOWER(email) = :demo_email');
+        $ids->execute(['demo_email' => self::DEMO_CLIENT_EMAIL]);
+        $clientIds = $ids->fetchAll(PDO::FETCH_COLUMN);
+
+        foreach ($clientIds as $clientId) {
+            $pdo->prepare('UPDATE empresas SET client_id = NULL WHERE client_id = :client_id')
+                ->execute(['client_id' => $clientId]);
+            $pdo->prepare('DELETE FROM platform_leads WHERE client_id = :client_id')
+                ->execute(['client_id' => $clientId]);
+            $pdo->prepare('DELETE FROM platform_clients WHERE id = :client_id')
+                ->execute(['client_id' => $clientId]);
+        }
     }
 }

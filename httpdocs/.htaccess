@@ -3,6 +3,13 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^app\.crm\.josehurtado\.dev$ [NC]
+  RewriteCond %{REQUEST_URI} ^/app(?:/|$) [NC]
+  RewriteRule ^ https://membora.es%{REQUEST_URI} [R=301,L,NE]
+
+  RewriteCond %{HTTP_HOST} ^app\.crm\.josehurtado\.dev$ [NC]
+  RewriteRule ^ https://membora.es/app%{REQUEST_URI} [R=301,L,NE]
+
   RewriteCond %{HTTP_HOST} ^www\.membora\.es$ [NC]
   RewriteRule ^ https://membora.es%{REQUEST_URI} [R=301,L,NE]
 

@@ -737,7 +737,6 @@ const demoExpiresIn = Number.parseInt(document.body.dataset.demoExpiresIn || '0'
 if (demoCountdown && demoExpiresIn > 0) {
   const cleanupForm = document.querySelector('[data-demo-cleanup-form]');
   const keepaliveForm = document.querySelector('[data-demo-keepalive-form]');
-  let demoNavigationExpected = false;
   let keepaliveTimer = null;
 
   const keepDemoSessionAlive = () => {
@@ -750,16 +749,23 @@ if (demoCountdown && demoExpiresIn > 0) {
     }).catch(() => {});
   };
 
-  document.addEventListener('submit', () => { demoNavigationExpected = true; }, true);
-  document.addEventListener('click', (event) => {
-    if (event.target.closest('a[href]')) demoNavigationExpected = true;
-  }, true);
-
-  window.addEventListener('pagehide', () => {
-    if (!demoNavigationExpected && cleanupForm && navigator.sendBeacon) {
+  const scheduleDemoCleanup = () => {
+    if (cleanupForm && navigator.sendBeacon) {
       navigator.sendBeacon('index.php', new FormData(cleanupForm));
     }
+  };
+
+  window.addEventListener('pagehide', () => {
+    scheduleDemoCleanup();
     if (keepaliveTimer) window.clearInterval(keepaliveTimer);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      scheduleDemoCleanup();
+    } else {
+      keepDemoSessionAlive();
+    }
   });
 
   keepDemoSessionAlive();
@@ -776,7 +782,6 @@ if (demoCountdown && demoExpiresIn > 0) {
     remainingSeconds -= 1;
     if (remainingSeconds <= 0) {
       window.clearInterval(demoTimer);
-      demoNavigationExpected = true;
       window.location.href = 'index.php?route=demo-expired';
       return;
     }
