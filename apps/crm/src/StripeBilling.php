@@ -990,8 +990,8 @@ final class StripeBillingService
                 'price' => $priceId,
                 'quantity' => 1,
             ]],
-            'success_url' => app_base_url() . '/stripe/checkout/success?source=' . ($tenantCheckout ? 'tenant' : 'platform') . '&session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => app_base_url() . '/stripe/checkout/cancel?source=' . ($tenantCheckout ? 'tenant' : 'platform') . '&empresa_id=' . rawurlencode((string) $empresa['id']),
+            'success_url' => app_base_url() . '/index.php?route=stripe-checkout-success&source=' . ($tenantCheckout ? 'tenant' : 'platform') . '&session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => app_base_url() . '/index.php?route=stripe-checkout-cancel&source=' . ($tenantCheckout ? 'tenant' : 'platform') . '&empresa_id=' . rawurlencode((string) $empresa['id']),
             'allow_promotion_codes' => true,
             'metadata' => $metadata,
             'subscription_data' => [

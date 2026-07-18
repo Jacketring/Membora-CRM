@@ -114,7 +114,17 @@ function app_base_url(): string
 {
     $configured = getenv('APP_URL');
     if ($configured) {
-        return rtrim($configured, '/');
+        $configured = rtrim($configured, '/');
+        $configuredPath = (string) (parse_url($configured, PHP_URL_PATH) ?: '');
+        $appPath = '/' . trim((string) (getenv('MEMBORA_APP_PATH') ?: '/app'), '/');
+
+        // Production exposes the CRM below /app. Keep return URLs inside the
+        // application even when APP_URL was configured with only the origin.
+        if (($configuredPath === '' || $configuredPath === '/') && $appPath !== '/') {
+            return $configured . $appPath;
+        }
+
+        return $configured;
     }
 
     $host = $_SERVER['HTTP_HOST'] ?? 'membora.es';

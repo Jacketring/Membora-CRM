@@ -197,6 +197,22 @@ final class ComprehensiveSupportTest extends TestCase
         }
     }
 
+    public function testAppBaseUrlAddsProductionAppPathWhenOnlyOriginIsConfigured(): void
+    {
+        $previousAppUrl = getenv('APP_URL');
+        $previousAppPath = getenv('MEMBORA_APP_PATH');
+
+        try {
+            putenv('APP_URL=https://membora.es');
+            putenv('MEMBORA_APP_PATH=/app');
+
+            self::assertSame('https://membora.es/app', app_base_url());
+        } finally {
+            $previousAppUrl === false ? putenv('APP_URL') : putenv('APP_URL=' . $previousAppUrl);
+            $previousAppPath === false ? putenv('MEMBORA_APP_PATH') : putenv('MEMBORA_APP_PATH=' . $previousAppPath);
+        }
+    }
+
     public function testProductionClientDemoAcceptsEveryConfiguredPublicOrigin(): void
     {
         $previousEnvironment = getenv('APP_ENV');

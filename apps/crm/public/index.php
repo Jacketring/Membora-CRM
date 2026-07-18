@@ -155,12 +155,12 @@ if ($isStripeWebhookRequest) {
     exit;
 }
 
-if ($requestPath === '/stripe/checkout/success') {
+if ($requestPath === '/stripe/checkout/success' || ($_GET['route'] ?? '') === 'stripe-checkout-success') {
     flash('Checkout completado. El acceso se activara cuando Stripe confirme el pago por webhook.');
     redirect(($_GET['source'] ?? '') === 'tenant' ? 'dashboard' : 'platform-contacts');
 }
 
-if ($requestPath === '/stripe/checkout/cancel') {
+if ($requestPath === '/stripe/checkout/cancel' || ($_GET['route'] ?? '') === 'stripe-checkout-cancel') {
     flash('Checkout cancelado. No se ha activado ningun acceso ni se ha registrado ningun cobro.', 'error');
     redirect(($_GET['source'] ?? '') === 'tenant' ? 'upgrade-plan' : 'platform-contacts');
 }

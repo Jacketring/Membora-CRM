@@ -47,6 +47,7 @@ En `apps/crm/.env`:
 ```env
 PAYMENTS_MODE="stripe_test"
 CHECKOUT_PROVIDER="stripe"
+APP_URL="https://membora.es/app"
 STRIPE_PUBLISHABLE_KEY="pk_test_PEGAR_AQUI"
 STRIPE_SECRET_KEY="sk_test_PEGAR_AQUI"
 STRIPE_WEBHOOK_SECRET="whsec_PEGAR_AQUI"
