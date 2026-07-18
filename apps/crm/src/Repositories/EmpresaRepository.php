@@ -853,6 +853,7 @@ final class EmpresaRepository
             'tasks',
             'class_sessions',
             'class_types',
+            'communication_logs',
             'members',
             'lead_notes',
             'leads',
